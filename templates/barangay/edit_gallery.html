@@ -7,7 +7,7 @@
     <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg">
         <h1 class="text-2xl font-bold text-gray-800 mb-6">Edit Gallery Item</h1>
 
-        <form action="{{ url_for('barangay_edit_gallery', id=gallery_item.id) }}" method="POST"
+        <form action="{{ url_for('barangay.barangay_edit_gallery', id=gallery_item.id) }}" method="POST"
             enctype="multipart/form-data">
             <div class="space-y-6">
                 <div>
@@ -39,7 +39,7 @@
                 </div>
 
                 <div class="flex justify-end gap-4">
-                    <a href="{{ url_for('barangay_dashboard') }}"
+                    <a href="{{ url_for('barangay.barangay_dashboard') }}"
                         class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</a>
                     <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Update
                         Item</button>

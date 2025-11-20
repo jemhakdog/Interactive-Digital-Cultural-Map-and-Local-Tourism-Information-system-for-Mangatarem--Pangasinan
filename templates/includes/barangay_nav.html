@@ -1,10 +1,11 @@
-<a href="{{ url_for('barangay_dashboard') }}"
-    class="text-green-700 font-bold hover:text-green-900 transition">Dashboard</a>
-<a href="{{ url_for('barangay_profile_manage') }}" class="hover:text-green-600 transition">Profile</a>
-<a href="{{ url_for('barangay_attractions') }}" class="hover:text-green-600 transition">Attractions</a>
-<a href="{{ url_for('barangay_events') }}" class="hover:text-green-600 transition">Events</a>
-<a href="{{ url_for('barangay_gallery') }}" class="hover:text-green-600 transition">Gallery</a>
+<a href="{{ url_for('barangay.barangay_dashboard') }}"
+    class="dashboard-link hover:text-green-600 transition font-semibold">Dashboard</a>
+<a href="{{ url_for('barangay.barangay_profile_manage') }}" class="hover:text-green-600 transition">Profile</a>
+<a href="{{ url_for('barangay.barangay_attractions') }}" class="hover:text-green-600 transition">Attractions</a>
+<a href="{{ url_for('barangay.barangay_events') }}" class="hover:text-green-600 transition">Events</a>
+<a href="{{ url_for('barangay.barangay_gallery') }}" class="hover:text-green-600 transition">Gallery</a>
+<div class="flex items-center gap-2">
 
-<a href="{{ url_for('index') }}" class="hover:text-green-600 transition">View Site</a>
-<a href="{{ url_for('logout') }}"
-    class="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition text-sm">Logout</a>
+    <a href="{{ url_for('auth.logout') }}"
+        class="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700 transition text-sm">Logout</a>
+</div>

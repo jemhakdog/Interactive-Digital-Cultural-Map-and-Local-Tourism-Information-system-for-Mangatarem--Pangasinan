@@ -13,7 +13,7 @@
         </h1>
         <p class="text-xl md:text-2xl mb-10 max-w-2xl mx-auto">Explore the rich culture, stunning landscapes, and
             hidden gems of Mangatarem, Pangasinan.</p>
-        <a href="{{ url_for('map_view') }}"
+        <a href="{{ url_for('public.map_view') }}"
             class="bg-white text-green-800 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-green-100 transition transform hover:scale-105 inline-block">
             Explore the Map
         </a>
@@ -46,7 +46,7 @@
                     </div>
                     <h3 class="text-xl font-bold mb-2 text-gray-800">{{ attraction.name }}</h3>
                     <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ attraction.description }}</p>
-                    <a href="{{ url_for('attraction_detail', id=attraction.id) }}"
+                    <a href="{{ url_for('public.attraction_detail', id=attraction.id) }}"
                         class="text-green-700 font-semibold hover:text-green-900 inline-flex items-center">
                         View Details
                         <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,7 +60,8 @@
         </div>
 
         <div class="text-center mt-12">
-            <a href="{{ url_for('map_view') }}" class="text-green-700 font-semibold hover:underline">See all attractions
+            <a href="{{ url_for('public.map_view') }}" class="text-green-700 font-semibold hover:underline">See all
+                attractions
                 &rarr;</a>
         </div>
     </div>
@@ -71,7 +72,7 @@
     <div class="container mx-auto px-6 text-center">
         <h2 class="text-3xl font-bold mb-6">Ready to start your adventure?</h2>
         <p class="text-gray-600 mb-8">Plan your trip and navigate with ease using our digital tools.</p>
-        <a href="{{ url_for('map_view') }}"
+        <a href="{{ url_for('public.map_view') }}"
             class="bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-green-800 transition">
             Open Map
         </a>

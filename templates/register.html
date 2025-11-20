@@ -7,7 +7,7 @@
     <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg">
         <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Barangay Registration</h1>
 
-        <form action="{{ url_for('register') }}" method="POST">
+        <form action="{{ url_for('auth.register') }}" method="POST">
             <div class="space-y-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Username</label>
@@ -120,7 +120,7 @@
                     class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition">Register</button>
 
                 <p class="text-center text-sm text-gray-600">
-                    Already have an account? <a href="{{ url_for('login') }}"
+                    Already have an account? <a href="{{ url_for('auth.login') }}"
                         class="text-green-600 hover:underline">Login</a>
                 </p>
             </div>

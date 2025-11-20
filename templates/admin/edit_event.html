@@ -51,7 +51,7 @@ Edit Event - {% if current_user.role == 'admin' %}Admin{% else %}Barangay{% endi
                 </div>
 
                 <div class="flex justify-end gap-4">
-                    <a href="{{ url_for('admin_dashboard') }}"
+                    <a href="{{ url_for('admin.admin_dashboard') }}"
                         class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</a>
                     <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Update
                         Event</button>

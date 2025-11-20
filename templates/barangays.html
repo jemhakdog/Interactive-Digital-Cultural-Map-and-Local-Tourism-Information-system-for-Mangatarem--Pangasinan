@@ -12,7 +12,7 @@
     {% if barangays %}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {% for barangay in barangays %}
-        <a href="{{ url_for('barangay_profile', name=barangay) }}"
+        <a href="{{ url_for('public.barangay_profile', name=barangay) }}"
             class="block bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden group border border-gray-100">
             <div class="h-40 bg-green-100 flex items-center justify-center group-hover:bg-green-200 transition">
                 <span class="text-4xl">🏘️</span>
