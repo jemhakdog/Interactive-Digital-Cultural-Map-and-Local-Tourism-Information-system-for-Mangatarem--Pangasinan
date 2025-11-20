@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative bg-green-800 text-white py-32 overflow-hidden">
+    <div
+        class="absolute inset-0 opacity-20 bg-[url('https://placehold.co/1920x1080?text=Mangatarem+Landscape')] bg-cover bg-center">
+    </div>
+    <div class="container mx-auto px-6 relative z-10 text-center">
+        <h1 class="text-5xl md:text-6xl font-bold mb-6 leading-tight">Discover the Beauty of <br /> <span
+                class="text-green-300">Mangatarem</span></h1>
+        <p class="text-xl md:text-2xl mb-10 max-w-2xl mx-auto text-gray-200">Explore hidden gems, historical landmarks,
+            and breathtaking nature trails through our interactive digital map.</p>
+        <a href="{{ url_for('map_view') }}"
+            class="bg-white text-green-800 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-green-100 transition transform hover:scale-105 inline-block">
+            Explore the Map
+        </a>
+    </div>
+</section>
+
+<!-- Featured Attractions -->
+<section class="py-20 bg-white">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Featured Destinations</h2>
+            <p class="text-gray-600 max-w-xl mx-auto">From serene hot springs to historic churches, experience the best
+                that Mangatarem has to offer.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+            {% for attraction in featured %}
+            <div
+                class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300 border border-gray-100">
+                <div class="h-48 overflow-hidden">
+                    <img src="{{ attraction.image_url }}" alt="{{ attraction.name }}"
+                        class="w-full h-full object-cover transform hover:scale-110 transition duration-500">
+                </div>
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-2">
+                        <span
+                            class="text-xs font-semibold uppercase tracking-wider text-green-600 bg-green-100 px-2 py-1 rounded">{{
+                            attraction.category }}</span>
+                        <span class="text-yellow-500 text-sm flex items-center">★ {{ attraction.rating }}</span>
+                    </div>
+                    <h3 class="text-xl font-bold mb-2 text-gray-800">{{ attraction.name }}</h3>
+                    <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ attraction.description }}</p>
+                    <a href="{{ url_for('attraction_detail', id=attraction.id) }}"
+                        class="text-green-700 font-semibold hover:text-green-900 inline-flex items-center">
+                        View Details
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                            </path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-12">
+            <a href="{{ url_for('map_view') }}" class="text-green-700 font-semibold hover:underline">See all attractions
+                &rarr;</a>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="bg-gray-100 py-20">
+    <div class="container mx-auto px-6 text-center">
+        <h2 class="text-3xl font-bold mb-6">Ready to start your adventure?</h2>
+        <p class="text-gray-600 mb-8">Plan your trip and navigate with ease using our digital tools.</p>
+        <a href="{{ url_for('map_view') }}"
+            class="bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-green-800 transition">
+            Open Map
+        </a>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ barangay_name }} - Mangatarem Tourism{% endblock %}
+
+{% block content %}
+<!-- Hero Header -->
+<div class="bg-green-800 py-16 text-white">
+    <div class="container mx-auto px-6">
+        <div class="flex flex-col md:flex-row items-center justify-between">
+            <div>
+                <h1 class="text-4xl md:text-5xl font-bold mb-2">{{ barangay_name }}</h1>
+                <p class="text-xl text-green-100">Barangay Profile & Cultural Assets</p>
+            </div>
+            <div class="mt-6 md:mt-0">
+                <span class="bg-white/20 backdrop-blur px-4 py-2 rounded-lg text-sm font-semibold">
+                    Mangatarem, Pangasinan
+                </span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container mx-auto px-6 py-12">
+    <!-- Tabs -->
+    <div class="flex border-b border-gray-200 mb-8 overflow-x-auto" x-data="{ activeTab: 'attractions' }">
+        <button @click="activeTab = 'attractions'"
+            :class="{ 'border-green-600 text-green-600': activeTab === 'attractions', 'border-transparent text-gray-500 hover:text-gray-700': activeTab !== 'attractions' }"
+            class="py-4 px-6 border-b-2 font-medium text-sm focus:outline-none whitespace-nowrap">
+            Attractions ({{ attractions|length }})
+        </button>
+        <button @click="activeTab = 'events'"
+            :class="{ 'border-green-600 text-green-600': activeTab === 'events', 'border-transparent text-gray-500 hover:text-gray-700': activeTab !== 'events' }"
+            class="py-4 px-6 border-b-2 font-medium text-sm focus:outline-none whitespace-nowrap">
+            Events ({{ events|length }})
+        </button>
+        <button @click="activeTab = 'gallery'"
+            :class="{ 'border-green-600 text-green-600': activeTab === 'gallery', 'border-transparent text-gray-500 hover:text-gray-700': activeTab !== 'gallery' }"
+            class="py-4 px-6 border-b-2 font-medium text-sm focus:outline-none whitespace-nowrap">
+            Gallery ({{ gallery_items|length }})
+        </button>
+    </div>
+
+    <!-- Content Sections (using Alpine.js logic for simplicity, or just simple blocks if Alpine isn't available. 
+         Since I don't see Alpine explicitly, I'll use standard sections with IDs and maybe some simple JS or just stack them for now if no JS framework is guaranteed. 
+         Actually, I'll just stack them for now to be safe and robust, or use a simple script.) -->
+
+    <!-- Using a simple script for tabs since I can't guarantee Alpine is installed -->
+    <div id="tab-contents">
+        <!-- Attractions Section -->
+        <div id="attractions-section" class="tab-content block">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <span class="mr-2">🏰</span> Attractions
+            </h2>
+            {% if attractions %}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+                {% for attraction in attractions %}
+                <div
+                    class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition border border-gray-100">
+                    <div class="h-48 overflow-hidden">
+                        <img src="{{ attraction.image_url or 'https://placehold.co/600x400?text=No+Image' }}"
+                            alt="{{ attraction.name }}" class="w-full h-full object-cover">
+                    </div>
+                    <div class="p-6">
+                        <span
+                            class="text-xs font-semibold uppercase tracking-wider text-green-600 bg-green-100 px-2 py-1 rounded">
+                            {{ attraction.category }}
+                        </span>
+                        <h3 class="text-xl font-bold mt-2 mb-2 text-gray-800">{{ attraction.name }}</h3>
+                        <p class="text-gray-600 text-sm line-clamp-2">{{ attraction.description }}</p>
+                        <a href="{{ url_for('attraction_detail', id=attraction.id) }}"
+                            class="mt-4 inline-block text-green-700 font-semibold hover:underline">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-gray-500 italic mb-12">No attractions listed for this barangay yet.</p>
+            {% endif %}
+        </div>
+
+        <!-- Events Section -->
+        <div id="events-section" class="tab-content mt-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <span class="mr-2">📅</span> Upcoming Events
+            </h2>
+            {% if events %}
+            <div class="space-y-6 mb-12">
+                {% for event in events %}
+                <div class="bg-white rounded-xl shadow-md p-6 flex flex-col md:flex-row gap-6 border border-gray-100">
+                    <div class="w-full md:w-48 h-32 flex-shrink-0">
+                        <img src="{{ event.image_url or 'https://placehold.co/600x400?text=Event' }}"
+                            alt="{{ event.title }}" class="w-full h-full object-cover rounded-lg">
+                    </div>
+                    <div class="flex-1">
+                        <div class="flex items-center text-sm text-green-600 font-semibold mb-2">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                            {{ event.date.strftime('%B %d, %Y') }}
+                        </div>
+                        <h3 class="text-xl font-bold text-gray-800 mb-2">{{ event.title }}</h3>
+                        <p class="text-gray-600 mb-3">{{ event.description }}</p>
+                        <div class="flex items-center text-sm text-gray-500">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            {{ event.location }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-gray-500 italic mb-12">No upcoming events listed.</p>
+            {% endif %}
+        </div>
+
+        <!-- Gallery Section -->
+        <div id="gallery-section" class="tab-content mt-12">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <span class="mr-2">🖼️</span> Gallery
+            </h2>
+            {% if gallery_items %}
+            <div class="columns-1 md:columns-3 gap-6 space-y-6">
+                {% for item in gallery_items %}
+                <div class="break-inside-avoid bg-white rounded-xl shadow-md overflow-hidden border border-gray-100">
+                    {% if item.type == 'video' %}
+                    <video src="{{ item.url }}" controls class="w-full"></video>
+                    {% else %}
+                    <img src="{{ item.url }}" alt="{{ item.caption }}" class="w-full">
+                    {% endif %}
+                    {% if item.caption %}
+                    <div class="p-4">
+                        <p class="text-gray-600 text-sm">{{ item.caption }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <p class="text-gray-500 italic">No gallery items available.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

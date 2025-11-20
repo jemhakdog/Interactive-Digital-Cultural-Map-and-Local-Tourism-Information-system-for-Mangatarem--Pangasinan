@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Barangay Dashboard - Mangatarem Tourism{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-12">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Barangay Dashboard</h1>
+        <div class="flex gap-4">
+            <a href="{{ url_for('logout') }}"
+                class="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700 transition">Logout</a>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+        <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-green-500">
+            <h3 class="text-gray-500 text-sm font-semibold uppercase">Total Attractions</h3>
+            <p class="text-3xl font-bold text-gray-800 mt-2">{{ stats.attractions }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-blue-500">
+            <h3 class="text-gray-500 text-sm font-semibold uppercase">Upcoming Events</h3>
+            <p class="text-3xl font-bold text-gray-800 mt-2">{{ stats.events }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-xl shadow-md border-l-4 border-purple-500">
+            <h3 class="text-gray-500 text-sm font-semibold uppercase">Gallery Items</h3>
+            <p class="text-3xl font-bold text-gray-800 mt-2">{{ stats.gallery }}</p>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <a href="{{ url_for('barangay_attractions') }}"
+            class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-between group">
+            <div>
+                <h3 class="font-bold text-gray-800 group-hover:text-green-600 transition">Manage Attractions</h3>
+                <p class="text-sm text-gray-500 mt-1">View, add, or edit attractions</p>
+            </div>
+            <span class="text-2xl">🏰</span>
+        </a>
+        <a href="{{ url_for('barangay_events') }}"
+            class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-between group">
+            <div>
+                <h3 class="font-bold text-gray-800 group-hover:text-green-600 transition">Manage Events</h3>
+                <p class="text-sm text-gray-500 mt-1">View, add, or edit events</p>
+            </div>
+            <span class="text-2xl">📅</span>
+        </a>
+        <a href="{{ url_for('barangay_gallery') }}"
+            class="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition flex items-center justify-between group">
+            <div>
+                <h3 class="font-bold text-gray-800 group-hover:text-green-600 transition">Manage Gallery</h3>
+                <p class="text-sm text-gray-500 mt-1">View, add, or edit gallery items</p>
+            </div>
+            <span class="text-2xl">🖼️</span>
+        </a>
+    </div>
+</div>
+{% endblock %}

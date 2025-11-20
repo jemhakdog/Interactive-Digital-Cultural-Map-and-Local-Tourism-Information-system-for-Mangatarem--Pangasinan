@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+
+{% block title %}Explore Map - Mangatarem Tourism{% endblock %}
+
+{% block content %}
+<div class="flex flex-col md:flex-row h-[calc(100vh-64px)] relative">
+    <!-- Sidebar List (Desktop) / Bottom Sheet (Mobile) -->
+    <div id="attractions-sidebar"
+        class="w-full md:w-1/3 lg:w-1/4 bg-white shadow-xl z-10 overflow-y-auto h-1/3 md:h-full order-2 md:order-1 flex flex-col transition-transform duration-300 ease-in-out">
+        <div class="p-4 border-b sticky top-0 bg-white z-10">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-xl font-bold text-gray-800">Attractions</h2>
+                <button id="toggle-sidebar" class="hidden md:block p-2 hover:bg-gray-100 rounded-lg transition"
+                    title="Toggle sidebar">
+                    <svg id="toggle-icon-close" class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
+                        </path>
+                    </svg>
+                    <svg id="toggle-icon-open" class="w-5 h-5 text-gray-600 hidden" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="relative mb-3">
+                <input type="text" id="search-input" placeholder="Search places..."
+                    class="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500">
+                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+
+            <!-- Filters -->
+            <div class="flex flex-col gap-2">
+                <div class="flex gap-2 overflow-x-auto pb-1 no-scrollbar">
+                    <button
+                        class="filter-btn px-3 py-1 text-sm bg-green-100 text-green-700 rounded-full whitespace-nowrap hover:bg-green-200 transition"
+                        data-category="all">All</button>
+                    <button
+                        class="filter-btn px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-full whitespace-nowrap hover:bg-gray-200 transition"
+                        data-category="Nature">Nature</button>
+                    <button
+                        class="filter-btn px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-full whitespace-nowrap hover:bg-gray-200 transition"
+                        data-category="Historical">Historical</button>
+                    <button
+                        class="filter-btn px-3 py-1 text-sm bg-gray-100 text-gray-600 rounded-full whitespace-nowrap hover:bg-gray-200 transition"
+                        data-category="Religious">Religious</button>
+                </div>
+
+                <select id="barangay-filter"
+                    class="w-full px-3 py-2 text-sm bg-gray-50 text-gray-700 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer hover:bg-gray-100 transition">
+                    <option value="all">All Barangays</option>
+                    {% for barangay in barangays %}
+                    <option value="{{ barangay }}">{{ barangay }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div id="attractions-list" class="p-4 space-y-4 flex-grow overflow-y-auto">
+            <!-- List items will be injected here by JS -->
+            <div class="text-center text-gray-500 py-4">Loading...</div>
+        </div>
+    </div>
+
+    <!-- Map Container -->
+    <div id="map"
+        class="w-full md:w-2/3 lg:w-3/4 h-2/3 md:h-full bg-gray-200 order-1 md:order-2 z-0 transition-all duration-300 ease-in-out">
+    </div>
+
+    <!-- Floating toggle button (visible when sidebar is collapsed) -->
+    <button id="open-sidebar-btn"
+        class="hidden md:hidden fixed left-4 bottom-8 z-20 bg-white shadow-lg p-3 rounded-full hover:bg-gray-50 transition"
+        title="Show attractions">
+        <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+        </svg>
+    </button>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+{% endblock %}

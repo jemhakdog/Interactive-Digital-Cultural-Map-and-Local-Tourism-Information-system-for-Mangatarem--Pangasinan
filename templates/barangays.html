@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Barangay Directory - Mangatarem Tourism{% endblock %}
+
+{% block content %}
+<div class="bg-green-800 py-20 text-white text-center">
+    <h1 class="text-4xl md:text-5xl font-bold mb-4">Barangay Directory</h1>
+    <p class="text-xl text-green-100">Explore the unique culture and heritage of our communities</p>
+</div>
+
+<div class="container mx-auto px-6 py-12">
+    {% if barangays %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for barangay in barangays %}
+        <a href="{{ url_for('barangay_profile', name=barangay) }}"
+            class="block bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden group border border-gray-100">
+            <div class="h-40 bg-green-100 flex items-center justify-center group-hover:bg-green-200 transition">
+                <span class="text-4xl">🏘️</span>
+            </div>
+            <div class="p-6 text-center">
+                <h3 class="text-2xl font-bold text-gray-800 group-hover:text-green-700 transition">{{ barangay }}</h3>
+                <p class="text-gray-500 mt-2">Click to view profile</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-12">
+        <div class="text-6xl mb-4">🏙️</div>
+        <h3 class="text-2xl font-bold text-gray-800 mb-2">No Barangays Found</h3>
+        <p class="text-gray-600">There are currently no active barangay profiles.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

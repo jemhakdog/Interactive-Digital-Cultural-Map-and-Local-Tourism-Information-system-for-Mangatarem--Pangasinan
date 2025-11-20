@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Gallery Item - Barangay{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-12">
+    <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6">Upload Gallery Item</h1>
+
+        <form action="{{ url_for('barangay_add_gallery') }}" method="POST" enctype="multipart/form-data">
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Media Type</label>
+                    <select name="type" id="type"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2">
+                        <option value="photo">Photo</option>
+                        <option value="video">Video</option>
+                    </select>
+                    <p class="text-xs text-gray-500 mt-1">File type will be auto-detected if you upload a file</p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Upload Media File</label>
+                    <input type="file" name="media_file" accept="image/*,video/*"
+                        class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
+
+                    <label class="block text-sm font-medium text-gray-700 mt-4">Or Media URL</label>
+                    <input type="url" name="url"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2"
+                        placeholder="https://...">
+                    <p class="text-xs text-gray-500 mt-1">Upload a file or provide a URL (file upload takes priority)
+                    </p>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Caption (Optional)</label>
+                    <textarea name="caption" rows="3"
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2"
+                        placeholder="Describe this photo or video..."></textarea>
+                </div>
+
+                <div class="flex justify-end gap-4">
+                    <a href="{{ url_for('barangay_dashboard') }}"
+                        class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</a>
+                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Upload
+                        Item</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

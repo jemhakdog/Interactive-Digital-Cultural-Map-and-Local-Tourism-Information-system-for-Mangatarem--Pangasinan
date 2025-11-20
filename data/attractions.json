@@ -1,0 +1,46 @@
+[
+  {
+    "id": 1,
+    "name": "Manleluag Spring Protected Landscape",
+    "category": "Nature",
+    "barangay": "Malabobo",
+    "description": "A protected area containing natural hot springs and a diverse forest ecosystem. Perfect for nature lovers and relaxation.",
+    "lat": 15.6667,
+    "lng": 120.2833,
+    "image": "https://placehold.co/600x400?text=Manleluag+Spring",
+    "rating": 4.8
+  },
+  {
+    "id": 2,
+    "name": "Daang Kalikasan",
+    "category": "Nature",
+    "barangay": "Malabobo",
+    "description": "A scenic road offering breathtaking views of the mountains and rolling hills. A popular spot for road trips and photography.",
+    "lat": 15.7000,
+    "lng": 120.2500,
+    "image": "https://placehold.co/600x400?text=Daang+Kalikasan",
+    "rating": 4.7
+  },
+  {
+    "id": 3,
+    "name": "St. Raymund de Penafort Church",
+    "category": "Historical",
+    "barangay": "Poblacion",
+    "description": "A historic church with Spanish colonial architecture. A significant cultural and religious landmark in Mangatarem.",
+    "lat": 15.7889,
+    "lng": 120.2986,
+    "image": "https://placehold.co/600x400?text=St.+Raymund+Church",
+    "rating": 4.6
+  },
+  {
+    "id": 4,
+    "name": "Timmanguyob Falls",
+    "category": "Nature",
+    "barangay": "Cabaluyan",
+    "description": "A hidden gem featuring a stunning waterfall and refreshing pools. Requires a bit of a trek but worth the effort.",
+    "lat": 15.6500,
+    "lng": 120.2200,
+    "image": "https://placehold.co/600x400?text=Timmanguyob+Falls",
+    "rating": 4.5
+  }
+]

@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Profile - {{ current_user.barangay }}{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-12">
+    <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg">
+        <h1 class="text-3xl font-bold text-gray-800 mb-2">Manage Barangay Profile</h1>
+        <p class="text-gray-600 mb-8">Update the cultural and historical information for Barangay {{
+            current_user.barangay }}.</p>
+
+        <form method="POST" class="space-y-8">
+            <!-- History -->
+            <div>
+                <label class="block text-lg font-semibold text-gray-800 mb-2">History & Description</label>
+                <p class="text-sm text-gray-500 mb-2">Provide a brief history and general description of the barangay.
+                </p>
+                <textarea name="history" rows="6"
+                    class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-4"
+                    placeholder="Enter history here...">{{ info.history if info else '' }}</textarea>
+            </div>
+
+            <!-- Cultural Assets -->
+            <div>
+                <label class="block text-lg font-semibold text-gray-800 mb-2">Cultural Assets</label>
+                <p class="text-sm text-gray-500 mb-2">List significant cultural properties, artifacts, or sites.</p>
+                <textarea name="cultural_assets" rows="4"
+                    class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-4"
+                    placeholder="Enter cultural assets...">{{ info.cultural_assets if info else '' }}</textarea>
+            </div>
+
+            <!-- Traditions -->
+            <div>
+                <label class="block text-lg font-semibold text-gray-800 mb-2">Traditions</label>
+                <p class="text-sm text-gray-500 mb-2">Describe local traditions, festivals, or customary observances.
+                </p>
+                <textarea name="traditions" rows="4"
+                    class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-4"
+                    placeholder="Enter traditions...">{{ info.traditions if info else '' }}</textarea>
+            </div>
+
+            <!-- Local Practices -->
+            <div>
+                <label class="block text-lg font-semibold text-gray-800 mb-2">Local Practices</label>
+                <p class="text-sm text-gray-500 mb-2">Detail unique local practices, livelihoods, or daily customs.</p>
+                <textarea name="local_practices" rows="4"
+                    class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-4"
+                    placeholder="Enter local practices...">{{ info.local_practices if info else '' }}</textarea>
+            </div>
+
+            <!-- Unique Features -->
+            <div>
+                <label class="block text-lg font-semibold text-gray-800 mb-2">Unique Community Features</label>
+                <p class="text-sm text-gray-500 mb-2">Any other unique characteristics or points of interest.</p>
+                <textarea name="unique_features" rows="4"
+                    class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-4"
+                    placeholder="Enter unique features...">{{ info.unique_features if info else '' }}</textarea>
+            </div>
+
+            <div class="flex justify-end gap-4 pt-4 border-t">
+                <a href="{{ url_for('barangay_dashboard') }}"
+                    class="px-6 py-3 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition">
+                    Cancel
+                </a>
+                <button type="submit"
+                    class="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium shadow-md transition transform hover:-translate-y-0.5">
+                    Save Profile
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,130 @@
+{% extends 'base.html' %}
+
+{% block title %}Register - Mangatarem Tourism{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-6 py-12">
+    <div class="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg">
+        <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Barangay Registration</h1>
+
+        <form action="{{ url_for('register') }}" method="POST">
+            <div class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Username</label>
+                    <input type="text" name="username" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Email</label>
+                    <input type="email" name="email" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Password</label>
+                    <input type="password" name="password" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Select Barangay</label>
+                    <select name="barangay" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2">
+                        <option value="" disabled selected>Select your Barangay</option>
+                        <option value="Andangin">Andangin</option>
+                        <option value="Arellano Street (Poblacion)">Arellano Street (Poblacion)</option>
+                        <option value="Bantay">Bantay</option>
+                        <option value="Bantocaling">Bantocaling</option>
+                        <option value="Baracbac">Baracbac</option>
+                        <option value="Peania Pedania (Bedania)">Peania Pedania (Bedania)</option>
+                        <option value="Bogtong Bolo">Bogtong Bolo</option>
+                        <option value="Bogtong Bunao">Bogtong Bunao</option>
+                        <option value="Bogtong Centro">Bogtong Centro</option>
+                        <option value="Bogtong Niog">Bogtong Niog</option>
+                        <option value="Bogtong Silag">Bogtong Silag</option>
+                        <option value="Buaya">Buaya</option>
+                        <option value="Buenlag">Buenlag</option>
+                        <option value="Bueno">Bueno</option>
+                        <option value="Bunagan">Bunagan</option>
+                        <option value="Bunlalacao">Bunlalacao</option>
+                        <option value="Burgos Street (Poblacion)">Burgos Street (Poblacion)</option>
+                        <option value="Cabaluyan 1st">Cabaluyan 1st</option>
+                        <option value="Cabaluyan 2nd">Cabaluyan 2nd</option>
+                        <option value="Cabarabuan">Cabarabuan</option>
+                        <option value="Cabaruan">Cabaruan</option>
+                        <option value="Cabayaoasan">Cabayaoasan</option>
+                        <option value="Cabayugan">Cabayugan</option>
+                        <option value="Cacaoiten">Cacaoiten</option>
+                        <option value="Calomboyan Norte">Calomboyan Norte</option>
+                        <option value="Calomboyan Sur">Calomboyan Sur</option>
+                        <option value="Calvo (Poblacion)">Calvo (Poblacion)</option>
+                        <option value="Casilagan">Casilagan</option>
+                        <option value="Catarataraan">Catarataraan</option>
+                        <option value="Caturay Norte">Caturay Norte</option>
+                        <option value="Caturay Sur">Caturay Sur</option>
+                        <option value="Caviernesan">Caviernesan</option>
+                        <option value="Dorongan Ketaket">Dorongan Ketaket</option>
+                        <option value="Dorongan Linmansangan">Dorongan Linmansangan</option>
+                        <option value="Dorongan Punta">Dorongan Punta</option>
+                        <option value="Dorongan Sawat">Dorongan Sawat</option>
+                        <option value="Dorongan Valerio">Dorongan Valerio</option>
+                        <option value="General Luna (Poblacion)">General Luna (Poblacion)</option>
+                        <option value="Historia">Historia</option>
+                        <option value="Lawak Langka">Lawak Langka</option>
+                        <option value="Linmansangan">Linmansangan</option>
+                        <option value="Lopez (Poblacion)">Lopez (Poblacion)</option>
+                        <option value="Mabini (Poblacion)">Mabini (Poblacion)</option>
+                        <option value="Macarang">Macarang</option>
+                        <option value="Malabobo">Malabobo</option>
+                        <option value="Malibong">Malibong</option>
+                        <option value="Malunec">Malunec</option>
+                        <option value="Maravilla (Poblacion)">Maravilla (Poblacion)</option>
+                        <option value="Maravilla-Arellano Ext. (Pob)">Maravilla-Arellano Ext. (Pob)</option>
+                        <option value="Muelang">Muelang</option>
+                        <option value="Naguilayan East">Naguilayan East</option>
+                        <option value="Naguilayan West">Naguilayan West</option>
+                        <option value="Nancasalan Cabison-Bulaney-Niog">Nancasalan Cabison-Bulaney-Niog</option>
+                        <option value="Olegario-Caoile (Poblacion)">Olegario-Caoile (Poblacion)</option>
+                        <option value="Olo Cacamposan">Olo Cacamposan</option>
+                        <option value="Olo Cafabrosan">Olo Cafabrosan</option>
+                        <option value="Olo Cagarlitan">Olo Cagarlitan</option>
+                        <option value="Osmeña (Poblacion)">Osmeña (Poblacion)</option>
+                        <option value="Pacalat">Pacalat</option>
+                        <option value="Pampano">Pampano</option>
+                        <option value="Parian">Parian</option>
+                        <option value="Paul">Paul</option>
+                        <option value="Pogon-Aniat">Pogon-Aniat</option>
+                        <option value="Pogon-Lomboy (Poblacion)">Pogon-Lomboy (Poblacion)</option>
+                        <option value="Ponglo-Baleg">Ponglo-Baleg</option>
+                        <option value="Ponglo-Muelag">Ponglo-Muelag</option>
+                        <option value="Quetegan">Quetegan</option>
+                        <option value="Quezon (Poblacion)">Quezon (Poblacion)</option>
+                        <option value="Salavante">Salavante</option>
+                        <option value="Sapang">Sapang</option>
+                        <option value="Sonson Ongkit">Sonson Ongkit</option>
+                        <option value="Suaco">Suaco</option>
+                        <option value="Tagac">Tagac</option>
+                        <option value="Takipan">Takipan</option>
+                        <option value="Talogtog">Talogtog</option>
+                        <option value="Tococ Barikir">Tococ Barikir</option>
+                        <option value="Torre 1st">Torre 1st</option>
+                        <option value="Torre 2nd">Torre 2nd</option>
+                        <option value="Torres Bugallon (Poblacion)">Torres Bugallon (Poblacion)</option>
+                        <option value="Umangan">Umangan</option>
+                        <option value="Zamora (Poblacion)">Zamora (Poblacion)</option>
+                    </select>
+                </div>
+
+                <button type="submit"
+                    class="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition">Register</button>
+
+                <p class="text-center text-sm text-gray-600">
+                    Already have an account? <a href="{{ url_for('login') }}"
+                        class="text-green-600 hover:underline">Login</a>
+                </p>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
