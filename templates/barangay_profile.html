@@ -22,7 +22,12 @@
 
 <div class="container mx-auto px-6 py-12">
     <!-- Tabs -->
-    <div class="flex border-b border-gray-200 mb-8 overflow-x-auto" x-data="{ activeTab: 'attractions' }">
+    <div class="flex border-b border-gray-200 mb-8 overflow-x-auto" x-data="{ activeTab: 'cultural' }">
+        <button @click="activeTab = 'cultural'"
+            :class="{ 'border-green-600 text-green-600': activeTab === 'cultural', 'border-transparent text-gray-500 hover:text-gray-700': activeTab !== 'cultural' }"
+            class="py-4 px-6 border-b-2 font-medium text-sm focus:outline-none whitespace-nowrap">
+            Cultural Profile
+        </button>
         <button @click="activeTab = 'attractions'"
             :class="{ 'border-green-600 text-green-600': activeTab === 'attractions', 'border-transparent text-gray-500 hover:text-gray-700': activeTab !== 'attractions' }"
             class="py-4 px-6 border-b-2 font-medium text-sm focus:outline-none whitespace-nowrap">
@@ -40,14 +45,72 @@
         </button>
     </div>
 
-    <!-- Content Sections (using Alpine.js logic for simplicity, or just simple blocks if Alpine isn't available. 
-         Since I don't see Alpine explicitly, I'll use standard sections with IDs and maybe some simple JS or just stack them for now if no JS framework is guaranteed. 
-         Actually, I'll just stack them for now to be safe and robust, or use a simple script.) -->
+    <div id="tab-contents" x-data="{ activeTab: 'cultural' }">
+        <!-- Cultural Profile Section -->
+        <div id="cultural-section" class="tab-content block" x-show="activeTab === 'cultural'">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                <span class="mr-2">🏛️</span> Cultural Profile
+            </h2>
 
-    <!-- Using a simple script for tabs since I can't guarantee Alpine is installed -->
-    <div id="tab-contents">
+            {% if barangay_info %}
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                {% if barangay_info.history %}
+                <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100 md:col-span-2">
+                    <h3 class="text-xl font-bold text-green-800 mb-3">History</h3>
+                    <p class="text-gray-700 whitespace-pre-line">{{ barangay_info.history }}</p>
+                </div>
+                {% endif %}
+
+                {% if barangay_info.cultural_assets %}
+                <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                    <h3 class="text-xl font-bold text-green-800 mb-3">Cultural Assets</h3>
+                    <p class="text-gray-700 whitespace-pre-line">{{ barangay_info.cultural_assets }}</p>
+                </div>
+                {% endif %}
+
+                {% if barangay_info.traditions %}
+                <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                    <h3 class="text-xl font-bold text-green-800 mb-3">Traditions</h3>
+                    <p class="text-gray-700 whitespace-pre-line">{{ barangay_info.traditions }}</p>
+                </div>
+                {% endif %}
+
+                {% if barangay_info.local_practices %}
+                <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                    <h3 class="text-xl font-bold text-green-800 mb-3">Local Practices</h3>
+                    <p class="text-gray-700 whitespace-pre-line">{{ barangay_info.local_practices }}</p>
+                </div>
+                {% endif %}
+
+                {% if barangay_info.unique_features %}
+                <div class="bg-white rounded-xl shadow-md p-6 border border-gray-100">
+                    <h3 class="text-xl font-bold text-green-800 mb-3">Unique Features</h3>
+                    <p class="text-gray-700 whitespace-pre-line">{{ barangay_info.unique_features }}</p>
+                </div>
+                {% endif %}
+            </div>
+            {% else %}
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-8">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-yellow-700">
+                            Cultural information for this barangay has not been added yet.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
         <!-- Attractions Section -->
-        <div id="attractions-section" class="tab-content block">
+        <div id="attractions-section" class="tab-content block" x-show="activeTab === 'attractions'">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                 <span class="mr-2">🏰</span> Attractions
             </h2>
@@ -81,7 +144,7 @@
         </div>
 
         <!-- Events Section -->
-        <div id="events-section" class="tab-content mt-12">
+        <div id="events-section" class="tab-content mt-12" x-show="activeTab === 'events'">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                 <span class="mr-2">📅</span> Upcoming Events
             </h2>
@@ -124,7 +187,7 @@
         </div>
 
         <!-- Gallery Section -->
-        <div id="gallery-section" class="tab-content mt-12">
+        <div id="gallery-section" class="tab-content mt-12" x-show="activeTab === 'gallery'">
             <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
                 <span class="mr-2">🖼️</span> Gallery
             </h2>
@@ -151,4 +214,10 @@
         </div>
     </div>
 </div>
+
+<!-- Simple Script for Tabs if Alpine is not loaded globally (though x-data suggests it is) -->
+<!-- We'll assume Alpine is loaded in base.html. If not, we might need to add it or use vanilla JS. -->
+<!-- Since the original code had x-data, we assume Alpine is present. But just in case, we need to make sure the parent div has the x-data scope. -->
+<!-- I added x-data="{ activeTab: 'cultural' }" to the container div above. -->
+
 {% endblock %}
