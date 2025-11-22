@@ -1,141 +1,213 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Sidebar Toggle Functionality
-    const sidebar = document.getElementById('attractions-sidebar');
-    const toggleBtn = document.getElementById('toggle-sidebar');
-    const openBtn = document.getElementById('open-sidebar-btn');
-    const toggleIconClose = document.getElementById('toggle-icon-close');
-    const toggleIconOpen = document.getElementById('toggle-icon-open');
-    const mapContainer = document.getElementById('map');
+    // ========================================
+    // 1. INITIALIZE MAP WITH CARTODB VOYAGER TILES
+    // ========================================
+    const map = L.map('map').setView([15.7889, 120.2986], 13); // Mangatarem coordinates
 
-    let sidebarCollapsed = false;
-
-    function toggleSidebar() {
-        sidebarCollapsed = !sidebarCollapsed;
-
-        if (sidebarCollapsed) {
-            // Collapse sidebar to the left
-            sidebar.classList.add('md:-translate-x-full', 'md:w-0', 'md:min-w-0');
-            sidebar.classList.remove('md:w-1/3', 'lg:w-1/4');
-            mapContainer.classList.remove('md:w-2/3', 'lg:w-3/4');
-            mapContainer.classList.add('md:w-full');
-            openBtn.classList.remove('md:hidden');
-            openBtn.classList.add('md:block');
-
-            // Swap icons
-            toggleIconClose.classList.add('hidden');
-            toggleIconOpen.classList.remove('hidden');
-        } else {
-            // Expand sidebar
-            sidebar.classList.remove('md:-translate-x-full', 'md:w-0', 'md:min-w-0');
-            sidebar.classList.add('md:w-1/3', 'lg:w-1/4');
-            mapContainer.classList.add('md:w-2/3', 'lg:w-3/4');
-            mapContainer.classList.remove('md:w-full');
-            openBtn.classList.add('md:hidden');
-            openBtn.classList.remove('md:block');
-
-            // Swap icons
-            toggleIconClose.classList.remove('hidden');
-            toggleIconOpen.classList.add('hidden');
-        }
-
-        // Invalidate map size after animation completes
-        setTimeout(() => {
-            map.invalidateSize();
-        }, 300);
-    }
-
-    toggleBtn.addEventListener('click', toggleSidebar);
-    openBtn.addEventListener('click', toggleSidebar);
-
-    // Initialize Map centered on Mangatarem
-    const map = L.map('map').setView([15.7889, 120.2986], 13);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    // Use CartoDB Voyager for cleaner, modern aesthetic
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+        subdomains: 'abcd',
+        maxZoom: 20
     }).addTo(map);
 
-    let markers = [];
-    let attractionsData = [];
+    // ========================================
+    // 2. DEFINE CUSTOM ICONS (Color-Coded by Category)
+    // ========================================
+    const iconConfig = {
+        Nature: { color: '#10b981', emoji: '🌿' },      // Green
+        Historical: { color: '#f59e0b', emoji: '🏛️' },  // Amber
+        Religious: { color: '#8b5cf6', emoji: '⛪' },   // Purple
+        Food: { color: '#ef4444', emoji: '🍴' },        // Red
+        default: { color: '#6b7280', emoji: '📍' }      // Gray
+    };
 
-    // Fetch attractions
+    function getCustomIcon(category) {
+        const config = iconConfig[category] || iconConfig.default;
+        const svgIcon = `
+            <svg width="32" height="40" viewBox="0 0 32 40" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 0C7.163 0 0 7.163 0 16c0 12 16 24 16 24s16-12 16-24c0-8.837-7.163-16-16-16z" 
+                      fill="${config.color}" stroke="#fff" stroke-width="2"/>
+                <text x="16" y="20" text-anchor="middle" font-size="14" fill="#fff">${config.emoji}</text>
+            </svg>
+        `;
+
+        return L.divIcon({
+            html: svgIcon,
+            className: 'custom-marker-icon',
+            iconSize: [32, 40],
+            iconAnchor: [16, 40],
+            popupAnchor: [0, -40]
+        });
+    }
+
+    // ========================================
+    // 3. DATA & MARKER MANAGEMENT
+    // ========================================
+    let attractionsData = [];
+    let markersLayer = L.markerClusterGroup({
+        maxClusterRadius: 50,
+        spiderfyOnMaxZoom: true,
+        showCoverageOnHover: false,
+        zoomToBoundsOnClick: true,
+        iconCreateFunction: function (cluster) {
+            const count = cluster.getChildCount();
+            return L.divIcon({
+                html: `<div class="cluster-icon"><span>${count}</span></div>`,
+                className: 'custom-cluster',
+                iconSize: [40, 40]
+            });
+        }
+    });
+    map.addLayer(markersLayer);
+
+    // Store marker references for flyTo functionality
+    const markerMap = {};
+
+    // ========================================
+    // 4. TAB SYSTEM
+    // ========================================
+    const tabPlaces = document.getElementById('tab-places');
+    const tabRoutes = document.getElementById('tab-routes');
+    const placesContent = document.getElementById('places-content');
+    const routesContent = document.getElementById('routes-content');
+
+    function switchTab(tab) {
+        if (tab === 'places') {
+            tabPlaces.classList.add('text-green-700', 'border-green-700', 'bg-green-50', 'font-semibold');
+            tabPlaces.classList.remove('text-gray-500', 'font-medium');
+            tabRoutes.classList.remove('text-green-700', 'border-green-700', 'bg-green-50', 'font-semibold');
+            tabRoutes.classList.add('text-gray-500', 'font-medium');
+
+            placesContent.classList.remove('hidden');
+            routesContent.classList.add('hidden');
+        } else {
+            tabRoutes.classList.add('text-green-700', 'border-green-700', 'bg-green-50', 'font-semibold');
+            tabRoutes.classList.remove('text-gray-500', 'font-medium');
+            tabPlaces.classList.remove('text-green-700', 'border-green-700', 'bg-green-50', 'font-semibold');
+            tabPlaces.classList.add('text-gray-500', 'font-medium');
+
+            routesContent.classList.remove('hidden');
+            placesContent.classList.add('hidden');
+        }
+    }
+
+    tabPlaces.addEventListener('click', () => switchTab('places'));
+    tabRoutes.addEventListener('click', () => switchTab('routes'));
+
+    // ========================================
+    // 5. FETCH & RENDER ATTRACTIONS
+    // ========================================
     fetch('/api/attractions')
         .then(response => response.json())
         .then(data => {
             attractionsData = data;
-            renderList(data);
+            renderAttractions(data);
             addMarkers(data);
         })
         .catch(error => console.error('Error fetching attractions:', error));
 
-    const listContainer = document.getElementById('attractions-list');
-    const searchInput = document.getElementById('search-input');
-    const filterBtns = document.querySelectorAll('.filter-btn');
-
     function addMarkers(attractions) {
         // Clear existing markers
-        markers.forEach(marker => map.removeLayer(marker));
-        markers = [];
+        markersLayer.clearLayers();
 
         attractions.forEach(attraction => {
-            const marker = L.marker([attraction.lat, attraction.lng])
-                .addTo(map)
-                .bindTooltip(`
-                    <div class="flex gap-3 p-2 min-w-[250px] max-w-[300px] bg-white shadow-xl rounded-lg border border-gray-100">
-                        <img src="${attraction.image}" class="w-20 h-20 object-cover rounded-md flex-shrink-0" alt="${attraction.name}">
-                        <div class="flex flex-col justify-center overflow-hidden">
-                            <h3 class="font-bold text-gray-800 text-sm leading-tight mb-1 truncate">${attraction.name}</h3>
-                            <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded-full w-fit mb-1">${attraction.category}</span>
-                            <p class="text-xs text-gray-500 line-clamp-2 leading-tight">${attraction.description}</p>
-                        </div>
-                    </div>
-                `, {
-                    direction: 'top',
-                    offset: [0, -30],
-                    className: 'custom-tooltip'
-                });
+            const icon = getCustomIcon(attraction.category);
+            const marker = L.marker([attraction.lat, attraction.lng], { icon: icon });
 
-            // Click to view details page
-            marker.on('click', () => {
-                window.location.href = `/attraction/${attraction.id}`;
+            // Custom HTML popup with image
+            const popupContent = `
+                <div class="w-56 overflow-hidden">
+                    <img src="${attraction.image}" class="w-full h-28 object-cover mb-2 rounded" alt="${attraction.name}">
+                    <h3 class="font-bold text-green-800 text-sm mb-1">${attraction.name}</h3>
+                    <span class="inline-block bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full mb-2">${attraction.category}</span>
+                    <p class="text-xs text-gray-600 mb-2 line-clamp-2">${attraction.description}</p>
+                    <a href="/attraction/${attraction.id}" class="block text-xs text-center bg-green-600 text-white py-1.5 rounded hover:bg-green-700 transition">View Details</a>
+                </div>
+            `;
+
+            marker.bindPopup(popupContent, {
+                maxWidth: 250,
+                className: 'custom-popup'
             });
 
-            markers.push(marker);
+            // Add to cluster layer
+            markersLayer.addLayer(marker);
+
+            // Store reference for flyTo
+            markerMap[attraction.id] = marker;
         });
     }
 
-    function renderList(attractions) {
-        listContainer.innerHTML = '';
+    function renderAttractions(attractions) {
+        const listContainer = document.getElementById('places-content');
+
         if (attractions.length === 0) {
-            listContainer.innerHTML = '<div class="text-center text-gray-500">No attractions found.</div>';
+            listContainer.innerHTML = '<div class="text-center text-gray-500 py-4">No attractions found.</div>';
             return;
         }
 
+        listContainer.innerHTML = '';
+
         attractions.forEach(attraction => {
-            const item = document.createElement('div');
-            item.className = 'bg-gray-50 p-3 rounded-lg hover:bg-green-50 cursor-pointer transition border border-gray-200';
-            item.innerHTML = `
-                <div class="flex gap-3">
-                    <img src="${attraction.image}" class="w-20 h-20 object-cover rounded" alt="${attraction.name}">
+            const categoryConfig = iconConfig[attraction.category] || iconConfig.default;
+            const categoryLabel = attraction.category.toUpperCase();
+
+            // Generate star rating display (mock for now, replace with real ratings if available)
+            const rating = attraction.rating || 4;
+            const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+            const reviewCount = attraction.review_count || Math.floor(Math.random() * 50);
+
+            const card = document.createElement('div');
+            card.className = 'group bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer overflow-hidden flex flex-row h-32';
+            card.innerHTML = `
+                <div class="w-1/3 h-full bg-gray-200 relative">
+                    <img src="${attraction.image}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="${attraction.name}">
+                    <div class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold" style="color: ${categoryConfig.color}">${categoryLabel}</div>
+                </div>
+                <div class="w-2/3 p-3 flex flex-col justify-between">
                     <div>
-                        <h4 class="font-bold text-gray-800">${attraction.name}</h4>
-                        <span class="text-xs bg-green-100 text-green-800 px-2 py-0.5 rounded-full">${attraction.category}</span>
-                        <p class="text-xs text-gray-500 mt-1 line-clamp-2">${attraction.description}</p>
+                        <h3 class="font-bold text-gray-800 text-sm leading-tight mb-1 group-hover:text-green-700 transition line-clamp-1">${attraction.name}</h3>
+                        <p class="text-xs text-gray-500 line-clamp-2">${attraction.description}</p>
+                    </div>
+                    <div class="flex justify-between items-end mt-2">
+                        <div class="text-xs text-amber-500 font-bold">${stars} <span class="text-gray-400 font-normal">(${reviewCount})</span></div>
+                        <button class="text-[10px] bg-green-50 text-green-700 px-2 py-1 rounded hover:bg-green-100 transition">View on Map ➔</button>
                     </div>
                 </div>
             `;
-            item.addEventListener('click', () => {
-                // Fly to marker
-                map.flyTo([attraction.lat, attraction.lng], 15);
-                // Find and open popup
-                // Note: This is a simple implementation. For better performance with many markers, use a map/dictionary.
-                // Here we just re-create the popup or find the marker index if we tracked it better.
-                // Let's just re-center for now.
-            });
-            listContainer.appendChild(item);
+
+            // FlyTo functionality
+            card.addEventListener('click', () => flyToLocation(attraction.id, attraction.lat, attraction.lng));
+            listContainer.appendChild(card);
         });
     }
 
+    // ========================================
+    // 6. FLYTO ANIMATION
+    // ========================================
+    function flyToLocation(id, lat, lng) {
+        map.flyTo([lat, lng], 16, {
+            animate: true,
+            duration: 1.5
+        });
+
+        // Open popup after animation
+        setTimeout(() => {
+            const marker = markerMap[id];
+            if (marker) {
+                marker.openPopup();
+            }
+        }, 1600);
+    }
+
+    // ========================================
+    // 7. FILTERING & SEARCH
+    // ========================================
+    const searchInput = document.getElementById('search-input');
+    const filterBtns = document.querySelectorAll('.filter-btn');
     const barangayFilter = document.getElementById('barangay-filter');
+
     let currentCategory = 'all';
     let currentBarangay = 'all';
 
@@ -150,34 +222,86 @@ document.addEventListener('DOMContentLoaded', function () {
             return matchesSearch && matchesCategory && matchesBarangay;
         });
 
-        renderList(filtered);
+        renderAttractions(filtered);
         addMarkers(filtered);
     }
 
-    // Search functionality
     searchInput.addEventListener('input', filterAttractions);
 
-    // Category Filter functionality
+    // Category filter buttons
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
             // Update active state
             filterBtns.forEach(b => {
-                b.classList.remove('bg-green-100', 'text-green-700');
-                b.classList.add('bg-gray-100', 'text-gray-600');
+                b.classList.remove('bg-green-600', 'text-white');
+                b.classList.add('bg-white', 'border', 'border-gray-200', 'text-gray-600');
             });
-            btn.classList.remove('bg-gray-100', 'text-gray-600');
-            btn.classList.add('bg-green-100', 'text-green-700');
+            btn.classList.remove('bg-white', 'border', 'border-gray-200', 'text-gray-600');
+            btn.classList.add('bg-green-600', 'text-white');
 
             currentCategory = btn.dataset.category;
             filterAttractions();
         });
     });
 
-    // Barangay Filter functionality
+    // Barangay filter
     if (barangayFilter) {
         barangayFilter.addEventListener('change', (e) => {
             currentBarangay = e.target.value;
             filterAttractions();
         });
     }
+
+    // ========================================
+    // 8. GEOLOCATION "NEAR ME" FEATURE
+    // ========================================
+    const locateBtn = document.getElementById('locate-me');
+    let userLocationMarker = null;
+
+    locateBtn.addEventListener('click', () => {
+        locateBtn.classList.add('animate-pulse');
+
+        map.locate({ setView: true, maxZoom: 15 });
+    });
+
+    map.on('locationfound', (e) => {
+        locateBtn.classList.remove('animate-pulse');
+
+        // Remove previous user marker
+        if (userLocationMarker) {
+            map.removeLayer(userLocationMarker);
+        }
+
+        // Add blue circle for user location
+        userLocationMarker = L.circle(e.latlng, {
+            radius: e.accuracy / 2,
+            color: '#3b82f6',
+            fillColor: '#3b82f6',
+            fillOpacity: 0.2,
+            weight: 2
+        }).addTo(map);
+
+        // Add user marker
+        const userIcon = L.divIcon({
+            html: '<div class="user-location-marker"></div>',
+            className: 'user-marker',
+            iconSize: [16, 16]
+        });
+
+        L.marker(e.latlng, { icon: userIcon }).addTo(map)
+            .bindPopup("You are here!")
+            .openPopup();
+    });
+
+    map.on('locationerror', () => {
+        locateBtn.classList.remove('animate-pulse');
+        alert('Unable to get your location. Please check your browser settings.');
+    });
+
+    // ========================================
+    // 9. FLOATING ROUTES TOGGLE
+    // ========================================
+    const routesToggle = document.getElementById('routes-toggle');
+    routesToggle.addEventListener('click', () => switchTab('routes'));
+
 });
