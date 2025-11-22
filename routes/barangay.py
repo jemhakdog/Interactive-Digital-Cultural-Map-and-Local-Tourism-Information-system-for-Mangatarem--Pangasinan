@@ -10,6 +10,15 @@ barangay_bp = Blueprint('barangay', __name__, url_prefix='/barangay')
 @barangay_bp.route('/dashboard')
 @login_required
 def barangay_dashboard():
+    """
+    Display the barangay contributor dashboard.
+    
+    Shows statistics of attractions, events, and gallery items
+    created by the current contributor user.
+    
+    Returns:
+        Rendered barangay dashboard template with contributor's content statistics.
+    """
     if current_user.role != 'contributor':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -25,6 +34,14 @@ def barangay_dashboard():
 @barangay_bp.route('/attractions')
 @login_required
 def barangay_attractions():
+    """
+    Display all attractions created by the current contributor.
+    
+    Shows a list of the contributor's attractions with their approval status.
+    
+    Returns:
+        Rendered attractions management template.
+    """
     if current_user.role != 'contributor':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -35,6 +52,14 @@ def barangay_attractions():
 @barangay_bp.route('/events')
 @login_required
 def barangay_events():
+    """
+    Display all events created by the current contributor.
+    
+    Shows a list of the contributor's events with their approval status.
+    
+    Returns:
+        Rendered events management template.
+    """
     if current_user.role != 'contributor':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -45,6 +70,14 @@ def barangay_events():
 @barangay_bp.route('/gallery')
 @login_required
 def barangay_gallery():
+    """
+    Display all gallery items created by the current contributor.
+    
+    Shows a list of the contributor's gallery items with their approval status.
+    
+    Returns:
+        Rendered gallery management template.
+    """
     if current_user.role != 'contributor':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -55,6 +88,16 @@ def barangay_gallery():
 @barangay_bp.route('/attractions/add', methods=['GET', 'POST'])
 @login_required
 def barangay_add_attraction():
+    """
+    Add a new attraction for the barangay.
+    
+    Contributors can create new attractions with details, location, and images.
+    All new attractions are submitted with 'pending' status for admin approval.
+    
+    Returns:
+        GET: Rendered add attraction form.
+        POST: Redirect to dashboard after successful submission.
+    """
     from flask import current_app
     
     if current_user.role != 'contributor':
@@ -93,6 +136,19 @@ def barangay_add_attraction():
 @barangay_bp.route('/attractions/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def barangay_edit_attraction(id):
+    """
+    Edit an existing attraction owned by the current contributor.
+    
+    Contributors can only edit their own attractions. After editing,
+    the attraction status is reset to 'pending' for admin re-approval.
+    
+    Args:
+        id: The ID of the attraction to edit.
+    
+    Returns:
+        GET: Rendered edit attraction form.
+        POST: Redirect to dashboard after successful update.
+    """
     from flask import current_app
     
     attraction = Attraction.query.get_or_404(id)
@@ -133,6 +189,17 @@ def barangay_edit_attraction(id):
 @barangay_bp.route('/attractions/delete/<int:id>')
 @login_required
 def barangay_delete_attraction(id):
+    """
+    Delete an attraction owned by the current contributor.
+    
+    Contributors can only delete their own attractions.
+    
+    Args:
+        id: The ID of the attraction to delete.
+    
+    Returns:
+        Redirect to dashboard with confirmation message.
+    """
     attraction = Attraction.query.get_or_404(id)
     
     # Only allow deleting own attractions
@@ -148,6 +215,16 @@ def barangay_delete_attraction(id):
 @barangay_bp.route('/events/add', methods=['GET', 'POST'])
 @login_required
 def barangay_add_event():
+    """
+    Add a new event for the barangay.
+    
+    Contributors can create new events with details, dates, and images.
+    All new events are submitted with 'pending' status for admin approval.
+    
+    Returns:
+        GET: Rendered add event form.
+        POST: Redirect to dashboard after successful submission.
+    """
     from flask import current_app
     
     if current_user.role != 'contributor':
@@ -185,6 +262,19 @@ def barangay_add_event():
 @barangay_bp.route('/events/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def barangay_edit_event(id):
+    """
+    Edit an existing event owned by the current contributor.
+    
+    Contributors can only edit their own events. After editing,
+    the event status is reset to 'pending' for admin re-approval.
+    
+    Args:
+        id: The ID of the event to edit.
+    
+    Returns:
+        GET: Rendered edit event form.
+        POST: Redirect to dashboard after successful update.
+    """
     from flask import current_app
     
     event = Event.query.get_or_404(id)
@@ -226,6 +316,17 @@ def barangay_edit_event(id):
 @barangay_bp.route('/events/delete/<int:id>')
 @login_required
 def barangay_delete_event(id):
+    """
+    Delete an event owned by the current contributor.
+    
+    Contributors can only delete their own events.
+    
+    Args:
+        id: The ID of the event to delete.
+    
+    Returns:
+        Redirect to dashboard with confirmation message.
+    """
     event = Event.query.get_or_404(id)
     
     # Only allow deleting own events
@@ -241,6 +342,16 @@ def barangay_delete_event(id):
 @barangay_bp.route('/profile', methods=['GET', 'POST'])
 @login_required
 def barangay_profile_manage():
+    """
+    Manage the barangay's cultural and tourism profile information.
+    
+    Contributors can update their barangay's history, cultural assets,
+    traditions, local practices, and unique features.
+    
+    Returns:
+        GET: Rendered profile management form.
+        POST: Redirect to profile page after successful update.
+    """
     if current_user.role != 'contributor':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -267,6 +378,16 @@ def barangay_profile_manage():
 @barangay_bp.route('/gallery/add', methods=['GET', 'POST'])
 @login_required
 def barangay_add_gallery():
+    """
+    Add a new gallery item (photo or video) for the barangay.
+    
+    Contributors can upload media files or provide URLs. Media type is
+    automatically detected. All items are submitted with 'pending' status.
+    
+    Returns:
+        GET: Rendered add gallery form.
+        POST: Redirect to dashboard after successful submission.
+    """
     from flask import current_app
     
     if current_user.role != 'contributor':
@@ -313,6 +434,19 @@ def barangay_add_gallery():
 @barangay_bp.route('/gallery/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def barangay_edit_gallery(id):
+    """
+    Edit an existing gallery item owned by the current contributor.
+    
+    Contributors can only edit their own gallery items. After editing,
+    the item status is reset to 'pending' for admin re-approval.
+    
+    Args:
+        id: The ID of the gallery item to edit.
+    
+    Returns:
+        GET: Rendered edit gallery form.
+        POST: Redirect to dashboard after successful update.
+    """
     from flask import current_app
     
     gallery_item = GalleryItem.query.get_or_404(id)
@@ -358,6 +492,17 @@ def barangay_edit_gallery(id):
 @barangay_bp.route('/gallery/delete/<int:id>')
 @login_required
 def barangay_delete_gallery(id):
+    """
+    Delete a gallery item owned by the current contributor.
+    
+    Contributors can only delete their own gallery items.
+    
+    Args:
+        id: The ID of the gallery item to delete.
+    
+    Returns:
+        Redirect to dashboard with confirmation message.
+    """
     gallery_item = GalleryItem.query.get_or_404(id)
     
     # Only allow deleting own gallery items
@@ -371,5 +516,14 @@ def barangay_delete_gallery(id):
     return redirect(url_for('barangay.barangay_dashboard'))
 
 def allowed_file(filename):
+    """
+    Check if a file has an allowed extension.
+    
+    Args:
+        filename: The name of the file to check.
+    
+    Returns:
+        bool: True if the file extension is allowed, False otherwise.
+    """
     from flask import current_app
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']

@@ -5,12 +5,29 @@ public_bp = Blueprint('public', __name__)
 
 @public_bp.route('/')
 def index():
+    """
+    Render the home page with featured attractions.
+    
+    Displays the top 3 approved attractions as featured content.
+    
+    Returns:
+        Rendered index template with featured attractions.
+    """
     # Get featured attractions (limit 3)
     featured = Attraction.query.filter_by(status='approved').limit(3).all()
     return render_template('index.html', featured=featured)
 
 @public_bp.route('/map')
 def map_view():
+    """
+    Display the interactive map with all approved attractions.
+    
+    Provides a filterable map view showing all tourism spots and
+    cultural attractions across Mangatarem's barangays.
+    
+    Returns:
+        Rendered map template with list of barangays for filtering.
+    """
     # Pass all approved attractions to the map
     attractions = Attraction.query.filter_by(status='approved').all()
     
@@ -26,39 +43,142 @@ def map_view():
 
 @public_bp.route('/attraction/<int:id>')
 def attraction_detail(id):
+    """
+    Display detailed information about a specific attraction.
+    
+    Args:
+        id: The ID of the attraction to display.
+    
+    Returns:
+        Rendered detail template with attraction information.
+    """
     attraction = Attraction.query.get_or_404(id)
     return render_template('detail.html', attraction=attraction)
 
 @public_bp.route('/events')
 def events():
+    """
+    Display all approved events in chronological order.
+    
+    Shows upcoming and ongoing cultural events and festivals
+    across all barangays.
+    
+    Returns:
+        Rendered events template with list of events.
+    """
     events = Event.query.filter_by(status='approved').order_by(Event.date.asc()).all()
     return render_template('events.html', events=events)
 
 @public_bp.route('/gallery')
 def gallery():
+    """
+    Display the photo and video gallery.
+    
+    Shows all approved gallery items (photos and videos) from
+    barangay contributors, sorted by upload date (newest first).
+    
+    Returns:
+        Rendered gallery template with approved media items.
+    """
     items = GalleryItem.query.filter_by(status='approved').order_by(GalleryItem.uploaded_at.desc()).all()
-    return render_template('gallery.html', gallery_items=items)
+    
+    # Get list of unique barangays from approved gallery items for the filter
+    # We need to join with User table to get the barangay
+    barangays = db.session.query(User.barangay).join(GalleryItem).filter(
+        GalleryItem.status == 'approved',
+        User.barangay != None
+    ).distinct().order_by(User.barangay).all()
+    
+    barangay_list = [b[0] for b in barangays]
+    
+    return render_template('gallery.html', gallery_items=items, barangays=barangay_list)
 
 @public_bp.route('/routes')
 def routes():
+    """
+    Display suggested tourism routes.
+    
+    Returns:
+        Rendered routes template.
+    """
     return render_template('routes.html')
 
 @public_bp.route('/barangays')
 def barangays():
+    """
+    Display directory of all barangays with active contributors.
+    
+    Shows a list of barangays that have approved contributors,
+    with representative images from their attractions.
+    
+    Returns:
+        Rendered barangays directory template with barangay list.
+    """
     # Get list of barangays that have active contributors
     # We use a set to ensure uniqueness
-    barangays = db.session.query(User.barangay).filter(
+    barangay_names = db.session.query(User.barangay).filter(
         User.role == 'contributor', 
         User.is_approved == True,
         User.barangay != None
     ).distinct().all()
     
-    # Convert list of tuples to list of strings
-    barangay_list = [b[0] for b in barangays]
+    barangay_list = []
+    for b in barangay_names:
+        name = b[0]
+        # Get all approved attractions for this barangay to calculate metadata
+        attractions = Attraction.query.filter(
+            Attraction.barangay == name,
+            Attraction.status == 'approved'
+        ).all()
+        
+        # Find a representative image (first attraction with an image)
+        image_url = None
+        for attraction in attractions:
+            if attraction.image_url:
+                image_url = attraction.image_url
+                break
+        
+        # Calculate center coordinates (centroid)
+        lat = 15.9949 # Default
+        lng = 120.4869 # Default
+        if attractions:
+            lat = sum(a.lat for a in attractions) / len(attractions)
+            lng = sum(a.lng for a in attractions) / len(attractions)
+            
+        # Collect unique categories as tags
+        tags = list(set(a.category for a in attractions))
+        
+        # Count attractions
+        attraction_count = len(attractions)
+        
+        barangay_list.append({
+            'name': name,
+            'image_url': image_url,
+            'lat': lat,
+            'lng': lng,
+            'tags': tags,
+            'attraction_count': attraction_count
+        })
+    
+    # Sort by name
+    barangay_list.sort(key=lambda x: x['name'])
+    
     return render_template('barangays.html', barangays=barangay_list)
 
 @public_bp.route('/barangay/<name>')
 def barangay_profile(name):
+    """
+    Display a barangay's cultural and tourism profile page.
+    
+    Shows all approved attractions, events, gallery items, and
+    cultural information for a specific barangay.
+    
+    Args:
+        name: The name of the barangay.
+    
+    Returns:
+        Rendered barangay profile template with all content for the barangay.
+    """
     # Get all approved content for this barangay
     attractions = Attraction.query.filter_by(barangay=name, status='approved').all()
     events = Event.query.filter_by(barangay=name, status='approved').order_by(Event.date.asc()).all()

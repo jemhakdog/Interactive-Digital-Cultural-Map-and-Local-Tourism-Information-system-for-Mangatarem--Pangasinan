@@ -10,6 +10,15 @@ admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
 @admin_bp.route('/dashboard')
 @login_required
 def admin_dashboard():
+    """
+    Display the admin dashboard with statistics and pending approvals.
+    
+    Shows counts of attractions, events, and gallery items, along with
+    pending user registrations and gallery items awaiting approval.
+    
+    Returns:
+        Rendered admin dashboard template with stats and pending items.
+    """
     # Admin only
     if current_user.role != 'admin':
         flash('Access denied.')
@@ -29,6 +38,15 @@ def admin_dashboard():
 @admin_bp.route('/users/approve/<int:id>')
 @login_required
 def approve_user(id):
+    """
+    Approve a pending contributor user registration.
+    
+    Args:
+        id: The ID of the user to approve.
+    
+    Returns:
+        Redirect to admin dashboard with success message.
+    """
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -42,6 +60,15 @@ def approve_user(id):
 @admin_bp.route('/users/reject/<int:id>')
 @login_required
 def reject_user(id):
+    """
+    Reject and delete a pending contributor user registration.
+    
+    Args:
+        id: The ID of the user to reject.
+    
+    Returns:
+        Redirect to admin dashboard with confirmation message.
+    """
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -55,6 +82,14 @@ def reject_user(id):
 @admin_bp.route('/attractions')
 @login_required
 def admin_attractions():
+    """
+    Display the attractions management page for admins.
+    
+    Shows all attractions with pending items highlighted for review.
+    
+    Returns:
+        Rendered attractions management template with pending and all attractions.
+    """
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -67,6 +102,14 @@ def admin_attractions():
 @admin_bp.route('/events')
 @login_required
 def admin_events():
+    """
+    Display the events management page for admins.
+    
+    Shows all events with pending items highlighted for review.
+    
+    Returns:
+        Rendered events management template with pending and all events.
+    """
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -79,6 +122,15 @@ def admin_events():
 @admin_bp.route('/attractions/approve/<int:id>')
 @login_required
 def approve_attraction(id):
+    """
+    Approve a pending attraction submission.
+    
+    Args:
+        id: The ID of the attraction to approve.
+    
+    Returns:
+        Redirect to attractions management page with success message.
+    """
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -92,6 +144,17 @@ def approve_attraction(id):
 @admin_bp.route('/attractions/delete/<int:id>')
 @login_required
 def delete_attraction(id):
+    """
+    Delete an attraction from the system.
+    
+    Admins can delete any attraction, contributors can only delete their own.
+    
+    Args:
+        id: The ID of the attraction to delete.
+    
+    Returns:
+        Redirect to attractions management page with confirmation message.
+    """
     attraction = Attraction.query.get_or_404(id)
     
     # Check permission
@@ -107,6 +170,19 @@ def delete_attraction(id):
 @admin_bp.route('/attractions/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_attraction(id):
+    """
+    Edit an existing attraction.
+    
+    Admins can edit any attraction, contributors can only edit their own.
+    When a contributor edits an attraction, its status resets to pending.
+    
+    Args:
+        id: The ID of the attraction to edit.
+    
+    Returns:
+        GET: Rendered edit attraction form.
+        POST: Redirect to attractions page after successful update.
+    """
     from flask import current_app
     
     attraction = Attraction.query.get_or_404(id)
@@ -148,6 +224,15 @@ def edit_attraction(id):
 @admin_bp.route('/events/approve/<int:id>')
 @login_required
 def approve_event(id):
+    """
+    Approve a pending event submission.
+    
+    Args:
+        id: The ID of the event to approve.
+    
+    Returns:
+        Redirect to events management page with success message.
+    """
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -161,6 +246,15 @@ def approve_event(id):
 @admin_bp.route('/events/reject/<int:id>')
 @login_required
 def reject_event(id):
+    """
+    Reject and delete a pending event submission.
+    
+    Args:
+        id: The ID of the event to reject.
+    
+    Returns:
+        Redirect to events management page with confirmation message.
+    """
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -174,6 +268,15 @@ def reject_event(id):
 @admin_bp.route('/gallery/approve/<int:id>')
 @login_required
 def approve_gallery(id):
+    """
+    Approve a pending gallery item submission.
+    
+    Args:
+        id: The ID of the gallery item to approve.
+    
+    Returns:
+        Redirect to admin dashboard with success message.
+    """
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -187,6 +290,15 @@ def approve_gallery(id):
 @admin_bp.route('/gallery/reject/<int:id>')
 @login_required
 def reject_gallery(id):
+    """
+    Reject and delete a pending gallery item submission.
+    
+    Args:
+        id: The ID of the gallery item to reject.
+    
+    Returns:
+        Redirect to admin dashboard with confirmation message.
+    """
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -198,5 +310,14 @@ def reject_gallery(id):
     return redirect(url_for('admin.admin_dashboard'))
 
 def allowed_file(filename):
+    """
+    Check if a file has an allowed extension.
+    
+    Args:
+        filename: The name of the file to check.
+    
+    Returns:
+        bool: True if the file extension is allowed, False otherwise.
+    """
     from flask import current_app
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in current_app.config['ALLOWED_EXTENSIONS']

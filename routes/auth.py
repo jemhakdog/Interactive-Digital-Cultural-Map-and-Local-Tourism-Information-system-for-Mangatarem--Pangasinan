@@ -6,6 +6,18 @@ auth_bp = Blueprint('auth', __name__)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
+    """
+    Handle user login.
+    
+    GET: Display login form.
+    POST: Authenticate user credentials and create session.
+    
+    Contributor users must be approved by admin before they can log in.
+    
+    Returns:
+        GET: Rendered login template.
+        POST: Redirect to home page on success, or login page with error.
+    """
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -23,6 +35,16 @@ def login():
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
+    """
+    Handle new user registration for barangay contributors.
+    
+    Creates a new contributor account that requires admin approval.
+    Validates that username and email are unique.
+    
+    Returns:
+        GET: Rendered registration template.
+        POST: Redirect to login page with confirmation message.
+    """
     if request.method == 'POST':
         username = request.form.get('username')
         email = request.form.get('email')
@@ -50,5 +72,11 @@ def register():
 @auth_bp.route('/logout')
 @login_required
 def logout():
+    """
+    Log out the current user and end their session.
+    
+    Returns:
+        Redirect to home page.
+    """
     logout_user()
     return redirect(url_for('public.index'))

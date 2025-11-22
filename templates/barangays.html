@@ -3,33 +3,578 @@
 {% block title %}Barangay Directory - Mangatarem Tourism{% endblock %}
 
 {% block content %}
-<div class="bg-green-800 py-20 text-white text-center">
-    <h1 class="text-4xl md:text-5xl font-bold mb-4">Barangay Directory</h1>
-    <p class="text-xl text-green-100">Explore the unique culture and heritage of our communities</p>
+<!-- Hero Section -->
+<div class="relative h-[60vh] min-h-[500px] flex items-center justify-center overflow-hidden">
+    <!-- Parallax Background -->
+    <div class="absolute inset-0 z-0">
+        <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80"
+            alt="Mangatarem Landscape"
+            class="w-full h-full object-cover object-center transform scale-110 motion-safe:animate-subtle-zoom">
+        <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-green-900/90"></div>
+    </div>
+
+    <!-- Hero Content -->
+    <div class="relative z-10 text-center px-4 max-w-5xl mx-auto mt-16">
+        <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 tracking-tight drop-shadow-lg">
+            Explore Our Roots
+        </h1>
+        <p class="text-xl md:text-2xl text-gray-200 mb-10 font-light max-w-3xl mx-auto drop-shadow-md">
+            Discover the unique culture, heritage, and hidden gems of Mangatarem’s 82 Barangays.
+        </p>
+
+        <!-- Search & Filter Bar -->
+        <div
+            class="bg-white/10 backdrop-blur-md p-2 rounded-full border border-white/20 shadow-2xl max-w-3xl mx-auto flex flex-col md:flex-row gap-2">
+            <div class="relative flex-grow group">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <svg class="h-5 w-5 text-gray-300 group-focus-within:text-white transition-colors" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                </div>
+                <input type="text" id="barangaySearch" placeholder="Find a Barangay..."
+                    class="w-full bg-transparent border-none text-white placeholder-gray-300 focus:ring-0 pl-12 py-3 rounded-full transition-all outline-none">
+            </div>
+
+            <div class="h-px md:h-auto md:w-px bg-white/20 mx-2"></div>
+
+            <div class="relative min-w-[200px]">
+                <select id="categoryFilter"
+                    class="w-full bg-transparent border-none text-white focus:ring-0 py-3 pl-4 pr-10 appearance-none cursor-pointer outline-none">
+                    <option value="all" class="text-gray-800">All Categories</option>
+                    <option value="Nature" class="text-gray-800">Nature</option>
+                    <option value="History" class="text-gray-800">History</option>
+                    <option value="Food" class="text-gray-800">Food</option>
+                    <option value="Festivals" class="text-gray-800">Festivals</option>
+                </select>
+                <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none">
+                    <svg class="h-4 w-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <button
+                class="bg-terracotta-500 hover:bg-terracotta-600 text-white px-8 py-3 rounded-full font-medium transition-all shadow-lg hover:shadow-terracotta-500/30 transform hover:-translate-y-0.5">
+                Explore
+            </button>
+        </div>
+    </div>
 </div>
 
-<div class="container mx-auto px-6 py-12">
-    {% if barangays %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {% for barangay in barangays %}
-        <a href="{{ url_for('public.barangay_profile', name=barangay) }}"
-            class="block bg-white rounded-xl shadow-md hover:shadow-xl transition duration-300 overflow-hidden group border border-gray-100">
-            <div class="h-40 bg-green-100 flex items-center justify-center group-hover:bg-green-200 transition">
-                <span class="text-4xl">🏘️</span>
+<!-- Main Content -->
+<div class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Breadcrumbs & Toolbar -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <nav class="text-sm font-medium text-gray-500">
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="{{ url_for('public.index') }}" class="hover:text-green-700 transition-colors">Home</a>
+                        <svg class="fill-current w-3 h-3 mx-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+                            <path
+                                d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z" />
+                        </svg>
+                    </li>
+                    <li>
+                        <span class="text-gray-800">Barangays</span>
+                    </li>
+                </ol>
+            </nav>
+
+            <div class="flex items-center gap-4 bg-white p-1.5 rounded-lg shadow-sm border border-gray-200">
+                <span class="text-sm text-gray-500 px-3 hidden sm:inline">Showing {{ barangays|length }} Results</span>
+                <div class="h-4 w-px bg-gray-200 hidden sm:block"></div>
+                <button id="gridViewBtn" class="p-2 rounded-md bg-green-50 text-green-700 transition-colors"
+                    title="Grid View">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                        </path>
+                    </svg>
+                </button>
+                <button id="mapViewBtn"
+                    class="p-2 rounded-md text-gray-400 hover:text-green-700 hover:bg-gray-50 transition-colors"
+                    title="Map View">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 01-.553-.894L15 4m0 13V4m0 0L9 7">
+                        </path>
+                    </svg>
+                </button>
             </div>
-            <div class="p-6 text-center">
-                <h3 class="text-2xl font-bold text-gray-800 group-hover:text-green-700 transition">{{ barangay }}</h3>
-                <p class="text-gray-500 mt-2">Click to view profile</p>
+        </div>
+
+        <!-- Grid View -->
+        <div id="gridView" class="animate-fade-in">
+            {% if barangays %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {% for barangay in barangays %}
+                <a href="{{ url_for('public.barangay_profile', name=barangay.name) }}"
+                    class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 flex flex-col h-full barangay-card">
+
+                    <!-- Image -->
+                    <div class="relative aspect-[3/4] overflow-hidden bg-gray-100">
+                        {% if barangay.image_url %}
+                        <img src="{{ barangay.image_url }}" alt="{{ barangay.name }}"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        {% else %}
+                        <div class="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
+                            <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                        </div>
+                        {% endif %}
+
+                        <!-- Gradient Overlay -->
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity">
+                        </div>
+
+                        <!-- Content Overlay -->
+                        <div class="absolute bottom-0 left-0 right-0 p-5 text-white">
+                            <div class="flex flex-wrap gap-2 mb-2">
+                                {% for tag in barangay.tags[:2] %}
+                                <span
+                                    class="tag-badge text-[10px] uppercase tracking-wider font-bold bg-white/20 backdrop-blur-sm px-2 py-1 rounded-full border border-white/10">
+                                    {{ tag }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                            <h3
+                                class="text-xl font-bold mb-1 leading-tight group-hover:text-terracotta-300 transition-colors">
+                                {{ barangay.name }}</h3>
+                            <div class="flex items-center text-xs text-gray-300 gap-3">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                        </path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    {{ barangay.attraction_count }} Attractions
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Hover Action -->
+                        <div
+                            class="absolute bottom-5 right-5 opacity-0 transform translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                            <div class="bg-white text-green-900 p-2 rounded-full shadow-lg">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Suggested Routes Breakout (Example placement after 4th item) -->
+                {% if loop.index == 4 %}
+                <div
+                    class="col-span-full my-8 bg-gradient-to-r from-terracotta-500 to-terracotta-600 rounded-2xl p-8 md:p-12 text-white relative overflow-hidden shadow-2xl">
+                    <div class="absolute inset-0 opacity-10 pattern-dots"></div>
+                    <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div class="text-center md:text-left">
+                            <h3 class="text-3xl font-bold mb-2">Don't know where to start?</h3>
+                            <p class="text-terracotta-100 text-lg">Follow our curated itineraries for the best
+                                experience.</p>
+                        </div>
+                        <div class="flex flex-wrap justify-center gap-4">
+                            <a href="{{ url_for('public.routes') }}"
+                                class="bg-white text-terracotta-600 px-6 py-3 rounded-full font-bold shadow-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+                                <span>View Itineraries</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% endfor %}
             </div>
-        </a>
-        {% endfor %}
+            {% else %}
+            <div class="bg-white rounded-2xl shadow-xl p-12 text-center max-w-2xl mx-auto">
+                <div class="text-7xl mb-6 animate-bounce">🏙️</div>
+                <h3 class="text-3xl font-bold text-gray-800 mb-3">No Barangays Found</h3>
+                <p class="text-gray-600 text-lg">There are currently no active barangay profiles available.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Map View (Hidden by default) -->
+        <div id="mapView"
+            class="hidden animate-fade-in h-[800px] bg-gray-100 rounded-xl overflow-hidden shadow-inner border border-gray-200 relative">
+            <div id="barangayMap" class="w-full h-full z-0"></div>
+        </div>
     </div>
-    {% else %}
-    <div class="text-center py-12">
-        <div class="text-6xl mb-4">🏙️</div>
-        <h3 class="text-2xl font-bold text-gray-800 mb-2">No Barangays Found</h3>
-        <p class="text-gray-600">There are currently no active barangay profiles.</p>
-    </div>
-    {% endif %}
 </div>
+
+<!-- CTA Section -->
+<div class="bg-green-900 text-white py-20 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10">
+        <svg class="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white"></path>
+        </svg>
+    </div>
+    <div class="container mx-auto px-4 text-center relative z-10">
+        <h2 class="text-4xl font-bold mb-6">Have a photo of your Barangay?</h2>
+        <p class="text-xl text-green-100 mb-8 max-w-2xl mx-auto">Help us showcase the beauty of Mangatarem. Contribute
+            your photos and stories to our growing digital archive.</p>
+        <a href="{{ url_for('auth.login') }}"
+            class="inline-block bg-white text-green-900 px-8 py-4 rounded-full font-bold text-lg shadow-xl hover:bg-gray-100 hover:scale-105 transition-all duration-300">
+            Contribute to Gallery
+        </a>
+    </div>
+</div>
+
+<!-- Scripts -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const gridViewBtn = document.getElementById('gridViewBtn');
+        const mapViewBtn = document.getElementById('mapViewBtn');
+        <svg class="h-4 w-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+        </svg>
+                </div >
+            </div >
+
+            <button
+                class="bg-terracotta-500 hover:bg-terracotta-600 text-white px-8 py-3 rounded-full font-medium transition-all shadow-lg hover:shadow-terracotta-500/30 transform hover:-translate-y-0.5">
+                Explore
+            </button>
+        </div >
+    </div >
+</div >
+
+<!-- Main Content -->
+<div class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Breadcrumbs & Toolbar -->
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+            <nav class="text-sm font-medium text-gray-500">
+                <ol class="list-none p-0 inline-flex">
+                    <li class="flex items-center">
+                        <a href="{{ url_for('public.index') }}" class="hover:text-green-700 transition-colors">Home</a>
+                        <svg class="fill-current w-3 h-3 mx-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 512">
+                            <path
+                                d="M285.476 272.971L91.132 467.314c-9.373 9.373-24.569 9.373-33.941 0l-22.667-22.667c-9.357-9.357-9.375-24.522-.04-33.901L188.505 256 34.484 101.255c-9.335-9.379-9.317-24.544.04-33.901l22.667-22.667c9.373-9.373 24.569-9.373 33.941 0L285.475 239.03c9.373 9.372 9.373 24.568.001 33.941z" />
+                        </svg>
+                    </li>
+                    <li>
+                        <span class="text-gray-800">Barangays</span>
+                    </li>
+                </ol>
+            </nav>
+
+            <div class="flex items-center gap-4 bg-white p-1.5 rounded-lg shadow-sm border border-gray-200">
+                <span class="text-sm text-gray-500 px-3 hidden sm:inline">Showing {{ barangays|length }} Results</span>
+                <div class="h-4 w-px bg-gray-200 hidden sm:block"></div>
+                <button id="gridViewBtn" class="p-2 rounded-md bg-green-50 text-green-700 transition-colors"
+                    title="Grid View">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z">
+                        </path>
+                    </svg>
+                </button>
+                <button id="mapViewBtn"
+                    class="p-2 rounded-md text-gray-400 hover:text-green-700 hover:bg-gray-50 transition-colors"
+                    title="Map View">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0121 18.382V7.618a1 1 0 01-.553-.894L15 4m0 13V4m0 0L9 7">
+                        </path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+
+        <!-- Grid View -->
+        <div id="gridView" class="animate-fade-in">
+            {% if barangays %}
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {% for barangay in barangays %}
+                <a href="{{ url_for('public.barangay_profile', name=barangay.name) }}"
+                    class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 flex flex-col h-full barangay-card">
+
+                    <!-- Image -->
+                    <div class="relative aspect-[3/4] overflow-hidden bg-gray-100">
+                        {% if barangay.image_url %}
+                        <img src="{{ barangay.image_url }}" alt="{{ barangay.name }}"
+                            class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                        {% else %}
+                        <div class="w-full h-full flex items-center justify-center bg-gray-100 text-gray-300">
+                            <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                        </div>
+                        {% endif %}
+
+                        <!-- Gradient Overlay -->
+                        <div
+                            class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity">
+                        </div>
+
+                        <!-- Content Overlay -->
+                        <div class="absolute bottom-0 left-0 right-0 p-5 text-white">
+                            <div class="flex flex-wrap gap-2 mb-2">
+                                {% for tag in barangay.tags[:2] %}
+                                <span
+                                    class="tag-badge text-[10px] uppercase tracking-wider font-bold bg-white/20 backdrop-blur-sm px-2 py-1 rounded-full border border-white/10">
+                                    {{ tag }}
+                                </span>
+                                {% endfor %}
+                            </div>
+                            <h3
+                                class="text-xl font-bold mb-1 leading-tight group-hover:text-terracotta-300 transition-colors">
+                                {{ barangay.name }}</h3>
+                            <div class="flex items-center text-xs text-gray-300 gap-3">
+                                <span class="flex items-center gap-1">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                        </path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    {{ barangay.attraction_count }} Attractions
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Hover Action -->
+                        <div
+                            class="absolute bottom-5 right-5 opacity-0 transform translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-300">
+                            <div class="bg-white text-green-900 p-2 rounded-full shadow-lg">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </a>
+
+                <!-- Suggested Routes Breakout (Example placement after 4th item) -->
+                {% if loop.index == 4 %}
+                <div
+                    class="col-span-full my-8 bg-gradient-to-r from-terracotta-500 to-terracotta-600 rounded-2xl p-8 md:p-12 text-white relative overflow-hidden shadow-2xl">
+                    <div class="absolute inset-0 opacity-10 pattern-dots"></div>
+                    <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                        <div class="text-center md:text-left">
+                            <h3 class="text-3xl font-bold mb-2">Don't know where to start?</h3>
+                            <p class="text-terracotta-100 text-lg">Follow our curated itineraries for the best
+                                experience.</p>
+                        </div>
+                        <div class="flex flex-wrap justify-center gap-4">
+                            <a href="{{ url_for('public.routes') }}"
+                                class="bg-white text-terracotta-600 px-6 py-3 rounded-full font-bold shadow-lg hover:bg-gray-50 transition-colors flex items-center gap-2">
+                                <span>View Itineraries</span>
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="bg-white rounded-2xl shadow-xl p-12 text-center max-w-2xl mx-auto">
+                <div class="text-7xl mb-6 animate-bounce">🏙️</div>
+                <h3 class="text-3xl font-bold text-gray-800 mb-3">No Barangays Found</h3>
+                <p class="text-gray-600 text-lg">There are currently no active barangay profiles available.</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Map View (Hidden by default) -->
+        <div id="mapView"
+            class="hidden animate-fade-in h-[800px] bg-gray-100 rounded-xl overflow-hidden shadow-inner border border-gray-200 relative">
+            <div id="barangayMap" class="w-full h-full z-0"></div>
+        </div>
+    </div>
+</div>
+
+<!--CTA Section-- >
+<div class="bg-green-900 text-white py-20 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-10">
+        <svg class="h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 100 C 20 0 50 0 100 100 Z" fill="white"></path>
+        </svg>
+    </div>
+    <div class="container mx-auto px-4 text-center relative z-10">
+        <h2 class="text-4xl font-bold mb-6">Have a photo of your Barangay?</h2>
+        <p class="text-xl text-green-100 mb-8 max-w-2xl mx-auto">Help us showcase the beauty of Mangatarem. Contribute
+            your photos and stories to our growing digital archive.</p>
+        <a href="{{ url_for('auth.login') }}"
+            class="inline-block bg-white text-green-900 px-8 py-4 rounded-full font-bold text-lg shadow-xl hover:bg-gray-100 hover:scale-105 transition-all duration-300">
+            Contribute to Gallery
+        </a>
+    </div>
+</div>
+
+<!--Scripts -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const gridViewBtn = document.getElementById('gridViewBtn');
+        const mapViewBtn = document.getElementById('mapViewBtn');
+        const gridView = document.getElementById('gridView');
+        const mapView = document.getElementById('mapView');
+        const searchInput = document.getElementById('barangaySearch');
+        const categoryFilter = document.getElementById('categoryFilter');
+        const barangayCards = document.querySelectorAll('.barangay-card');
+        let mapInitialized = false;
+        let map;
+
+        // View Toggling
+        function switchView(view) {
+            if (view === 'grid') {
+                gridView.classList.remove('hidden');
+                mapView.classList.add('hidden');
+                gridViewBtn.classList.add('bg-green-50', 'text-green-700');
+                gridViewBtn.classList.remove('text-gray-400', 'hover:bg-gray-50');
+                mapViewBtn.classList.remove('bg-green-50', 'text-green-700');
+                mapViewBtn.classList.add('text-gray-400', 'hover:bg-gray-50');
+            } else {
+                gridView.classList.add('hidden');
+                mapView.classList.remove('hidden');
+                mapViewBtn.classList.add('bg-green-50', 'text-green-700');
+                mapViewBtn.classList.remove('text-gray-400', 'hover:bg-gray-50');
+                gridViewBtn.classList.remove('bg-green-50', 'text-green-700');
+                gridViewBtn.classList.add('text-gray-400', 'hover:bg-gray-50');
+
+                if (!mapInitialized) {
+                    initMap();
+                    mapInitialized = true;
+                } else {
+                    setTimeout(() => map.invalidateSize(), 100);
+                }
+            }
+        }
+
+        if (gridViewBtn) gridViewBtn.addEventListener('click', () => switchView('grid'));
+        if (mapViewBtn) mapViewBtn.addEventListener('click', () => switchView('map'));
+
+        // Map Initialization
+        function initMap() {
+            map = L.map('barangayMap').setView([15.7888, 120.2990], 11); // Mangatarem Coordinates
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            const barangaysData = {{ barangays | tojson }};
+
+            barangaysData.forEach(b => {
+                if (b.lat && b.lng) {
+                    const marker = L.marker([b.lat, b.lng]).addTo(map);
+
+                    const popupContent = `
+                        <div class="text-center min-w-[150px]">
+                            <h3 class="font-bold text-lg mb-2">${b.name}</h3>
+                            ${b.image_url ? `<img src="${b.image_url}" class="w-full h-24 object-cover rounded mb-2">` : ''}
+                            <div class="text-xs text-gray-500 mb-2">${b.attraction_count} Attractions</div>
+                            <a href="/barangay/${b.name}" class="text-green-600 font-medium hover:underline text-sm">View Profile</a>
+                        </div>
+                    `;
+
+                    marker.bindPopup(popupContent);
+                }
+            });
+        }
+
+        // Search and Filter Logic
+        function filterBarangays() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const category = categoryFilter.value.toLowerCase();
+
+            barangayCards.forEach(card => {
+                const name = card.querySelector('h3').textContent.toLowerCase();
+                const tags = Array.from(card.querySelectorAll('.tag-badge')).map(t => t.textContent.toLowerCase());
+
+                const matchesSearch = name.includes(searchTerm);
+                const matchesCategory = category === 'all' || tags.some(t => t.includes(category));
+
+                if (matchesSearch && matchesCategory) {
+                    card.style.display = '';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        if (searchInput) searchInput.addEventListener('input', filterBarangays);
+        if (categoryFilter) categoryFilter.addEventListener('change', filterBarangays);
+    });
+</script>
+
+<style>
+    .animate-subtle-zoom {
+        animation: subtle-zoom 20s infinite alternate;
+    }
+
+    @keyframes subtle-zoom {
+        from {
+            transform: scale(1.1);
+        }
+
+        to {
+            transform: scale(1.2);
+        }
+    }
+
+    .text-terracotta-500 {
+        color: #E07A5F;
+    }
+
+    .bg-terracotta-500 {
+        background-color: #E07A5F;
+    }
+
+    .bg-terracotta-600 {
+        background-color: #D06950;
+    }
+
+    .hover\:bg-terracotta-600:hover {
+        background-color: #D06950;
+    }
+
+    .hover\:text-terracotta-300:hover {
+        color: #F2CCB7;
+    }
+
+    .text-terracotta-100 {
+        color: #F9E5DF;
+    }
+
+    .text-terracotta-600 {
+        color: #D06950;
+    }
+
+    .pattern-dots {
+        background-image: radial-gradient(currentColor 1px, transparent 1px);
+        background-size: 20px 20px;
+    }
+</style>
 {% endblock %}

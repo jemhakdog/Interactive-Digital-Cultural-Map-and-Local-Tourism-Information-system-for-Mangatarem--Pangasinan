@@ -3,44 +3,332 @@
 {% block title %}Events & Festivals - Mangatarem Tourism{% endblock %}
 
 {% block content %}
-<div class="bg-green-800 py-20 text-white text-center">
-    <h1 class="text-4xl md:text-5xl font-bold mb-4">Events & Festivals</h1>
-    <p class="text-xl text-green-100">Celebrate the culture and traditions of Mangatarem</p>
+<style>
+    /* Custom Styles for Event Cards */
+    .event-card {
+        display: flex;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .event-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    .event-date {
+        background-color: #f3f4f6;
+        min-width: 90px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 15px;
+        border-right: 1px solid #eee;
+    }
+
+    .month {
+        font-size: 0.9rem;
+        font-weight: bold;
+        color: #e63946;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .day {
+        font-size: 2rem;
+        font-weight: 800;
+        color: #1f2937;
+        line-height: 1;
+    }
+
+    .event-details {
+        padding: 20px;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .hero-section {
+        background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://mangatarem.gov.ph/wp-content/uploads/2022/06/DJI_0218.jpg');
+        background-size: cover;
+        background-position: center;
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        color: white;
+    }
+
+    .filter-pill {
+        transition: all 0.3s ease;
+        cursor: pointer;
+    }
+
+    .filter-pill.active {
+        background-color: #15803d;
+        /* green-700 */
+        color: white;
+    }
+
+    .filter-pill:not(.active):hover {
+        background-color: #dcfce7;
+        /* green-100 */
+        color: #166534;
+        /* green-800 */
+    }
+</style>
+
+<!-- Hero Section -->
+<div class="hero-section relative">
+    <div class="container mx-auto px-4">
+        <h1 class="text-5xl md:text-6xl font-bold mb-4 animate-fade-in-up">Celebrate with Us</h1>
+        <p class="text-xl md:text-2xl mb-8 max-w-2xl mx-auto">Join the festivities, traditions, and community gatherings
+            of Mangatarem.</p>
+        <div class="flex justify-center gap-4">
+            <button
+                class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-8 rounded-full transition duration-300 shadow-lg transform hover:scale-105">
+                Subscribe to Updates
+            </button>
+        </div>
+    </div>
 </div>
 
 <div class="container mx-auto px-6 py-12">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-        {% for event in events %}
-        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition duration-300">
-            <div class="h-48 overflow-hidden relative">
-                <img src="{{ event.image_url or 'https://placehold.co/600x400?text=Event' }}" alt="{{ event.title }}"
-                    class="w-full h-full object-cover">
-                <div
-                    class="absolute top-4 right-4 bg-white text-green-800 font-bold px-3 py-1 rounded-full text-sm shadow">
-                    {{ event.date.strftime('%b %d') }}
+
+    {% if events %}
+    <!-- Active Events Section -->
+    <div class="mb-12">
+        <div class="flex flex-col md:flex-row justify-between items-center mb-8">
+            <h2 class="text-3xl font-bold text-green-900 mb-4 md:mb-0">Upcoming Events</h2>
+
+            <!-- Filters -->
+            <div class="flex flex-wrap gap-2" id="eventFilters">
+                <button
+                    class="filter-pill active px-4 py-2 rounded-full border border-green-600 text-green-700 font-medium text-sm"
+                    data-filter="all">All</button>
+                <button
+                    class="filter-pill px-4 py-2 rounded-full border border-green-600 text-green-700 font-medium text-sm"
+                    data-filter="religious">Religious</button>
+                <button
+                    class="filter-pill px-4 py-2 rounded-full border border-green-600 text-green-700 font-medium text-sm"
+                    data-filter="civic">Civic</button>
+                <button
+                    class="filter-pill px-4 py-2 rounded-full border border-green-600 text-green-700 font-medium text-sm"
+                    data-filter="entertainment">Entertainment</button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="eventsGrid">
+            {% for event in events %}
+            {% set category = 'civic' %}
+            {% if 'church' in event.location.lower() or 'mass' in event.title.lower() or 'procession' in
+            event.title.lower() %}
+            {% set category = 'religious' %}
+            {% elif 'concert' in event.description.lower() or 'band' in event.description.lower() or 'night' in
+            event.title.lower() %}
+            {% set category = 'entertainment' %}
+            {% endif %}
+
+            <div class="event-card group" data-category="{{ category }}">
+                <!-- Date Badge -->
+                <div class="event-date">
+                    <span class="month">{{ event.date.strftime('%b') }}</span>
+                    <span class="day">{{ event.date.strftime('%d') }}</span>
+                </div>
+
+                <!-- Content -->
+                <div class="event-details">
+                    <div>
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-xl font-bold text-gray-800 group-hover:text-green-700 transition-colors">{{
+                                event.title }}</h3>
+                            <span
+                                class="text-xs font-semibold px-2 py-1 rounded bg-green-100 text-green-800 uppercase tracking-wide">{{
+                                category }}</span>
+                        </div>
+                        <p class="text-gray-600 text-sm mb-3 flex items-center">
+                            <svg class="w-4 h-4 mr-1 text-red-500" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            {{ event.location }}
+                            <span class="mx-2">•</span>
+                            <svg class="w-4 h-4 mr-1 text-green-600" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            {{ event.date.strftime('%I:%M %p') }}
+                        </p>
+                        <p class="text-gray-500 text-sm line-clamp-2 mb-4">{{ event.description }}</p>
+                    </div>
+
+                    <div class="flex justify-between items-center pt-4 border-t border-gray-100">
+                        <button
+                            onclick="addToCalendar('{{ event.title }}', '{{ event.location }}', '{{ event.date.isoformat() }}')"
+                            class="text-sm font-bold text-green-700 hover:text-green-900 flex items-center transition-colors">
+                            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                </path>
+                            </svg>
+                            Add to Calendar
+                        </button>
+                        <button
+                            class="bg-green-600 hover:bg-green-700 text-white text-sm font-bold py-2 px-4 rounded-lg transition-colors shadow-sm">
+                            I'm Going
+                        </button>
+                    </div>
                 </div>
             </div>
-            <div class="p-6">
-                <h3 class="text-2xl font-bold text-gray-800 mb-2">{{ event.title }}</h3>
-                <p class="text-green-600 font-semibold mb-4 flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                        </path>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    </svg>
-                    {{ event.location }}
-                </p>
-                <p class="text-gray-600 mb-4 line-clamp-3">{{ event.description }}</p>
-                <button class="text-green-700 font-bold hover:underline">Read More</button>
+            {% endfor %}
+        </div>
+    </div>
+    {% else %}
+    <!-- Empty State: Annual Highlights -->
+    <div class="text-center py-8 mb-12">
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">Mark Your Calendars!</h2>
+        <p class="text-xl text-gray-600 mb-8">No upcoming events scheduled, but here are our Annual Traditions:</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <!-- Card 1 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition duration-300">
+                <div class="h-48 bg-green-100 relative overflow-hidden">
+                    <img src="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DSC_0054.jpg" alt="Town Fiesta"
+                        class="w-full h-full object-cover">
+                    <div class="absolute top-0 right-0 bg-red-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                        JANUARY</div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Town Fiesta</h3>
+                    <p class="text-gray-600 text-sm">The city's biggest celebration honoring St. Raymond of Penyafort. A
+                        week of street dancing, trade fairs, and religious processions.</p>
+                </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition duration-300">
+                <div class="h-48 bg-yellow-100 relative overflow-hidden">
+                    <img src="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DSC_0098.jpg" alt="Pindang Festival"
+                        class="w-full h-full object-cover">
+                    <div
+                        class="absolute top-0 right-0 bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                        APRIL</div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Pindang Festival</h3>
+                    <p class="text-gray-600 text-sm">Celebrating our local delicacy, 'Pindang' (Carabao Beef Jerky).
+                        Experience culinary contests and the famous boodle fight.</p>
+                </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition duration-300">
+                <div class="h-48 bg-purple-100 relative overflow-hidden">
+                    <img src="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DSC_0123.jpg" alt="Holy Week"
+                        class="w-full h-full object-cover">
+                    <div
+                        class="absolute top-0 right-0 bg-purple-600 text-white text-xs font-bold px-3 py-1 rounded-bl-lg">
+                        MAR/APR</div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Holy Week Procession</h3>
+                    <p class="text-gray-600 text-sm">A solemn tradition of heritage featuring century-old 'carrozas' and
+                        a community-wide passion play.</p>
+                </div>
             </div>
         </div>
-        {% else %}
-        <div class="col-span-full text-center py-12">
-            <p class="text-gray-500 text-xl">No upcoming events at the moment. Check back soon!</p>
-        </div>
-        {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Past Events Link -->
+    <div class="text-center mt-16 pt-8 border-t border-gray-200">
+        <p class="text-gray-600 mb-4">Want to see what you missed?</p>
+        <a href="{{ url_for('public.gallery') }}"
+            class="inline-flex items-center text-green-700 font-bold hover:text-green-900 transition-colors">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                </path>
+            </svg>
+            View Past Event Gallery
+        </a>
     </div>
 </div>
+
+<script>
+    // Filter Functionality
+    document.addEventListener('DOMContentLoaded', function () {
+        const filterButtons = document.querySelectorAll('.filter-pill');
+        const eventCards = document.querySelectorAll('.event-card');
+
+        filterButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Remove active class from all buttons
+                filterButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.classList.remove('bg-green-700', 'text-white'); // Remove active styles
+                    btn.classList.add('text-green-700'); // Add inactive styles
+                });
+
+                // Add active class to clicked button
+                button.classList.add('active');
+
+                const filter = button.getAttribute('data-filter');
+
+                eventCards.forEach(card => {
+                    if (filter === 'all' || card.getAttribute('data-category') === filter) {
+                        card.style.display = 'flex';
+                        // Add animation
+                        card.style.opacity = '0';
+                        setTimeout(() => card.style.opacity = '1', 50);
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    });
+
+    // Add to Calendar Functionality
+    function addToCalendar(title, location, dateStr) {
+        const date = new Date(dateStr);
+        const endDate = new Date(date.getTime() + (2 * 60 * 60 * 1000)); // Assume 2 hours duration
+
+        const formatDate = (d) => d.toISOString().replace(/-|:|\.\d\d\d/g, "");
+
+        const href = encodeURI(
+            'data:text/calendar;charset=utf8,' + [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'BEGIN:VEVENT',
+                'URL:' + document.URL,
+                'DTSTART:' + formatDate(date),
+                'DTEND:' + formatDate(endDate),
+                'SUMMARY:' + title,
+                'DESCRIPTION:Join us for ' + title + ' at ' + location,
+                'LOCATION:' + location,
+                'END:VEVENT',
+                'END:VCALENDAR'
+            ].join('\n')
+        );
+
+        const link = document.createElement('a');
+        link.href = href;
+        link.setAttribute('download', title + '.ics');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+</script>
 {% endblock %}
