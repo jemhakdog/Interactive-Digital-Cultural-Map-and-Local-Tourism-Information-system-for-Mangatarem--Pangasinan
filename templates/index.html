@@ -1,82 +1,253 @@
 {% extends 'base.html' %}
 
+{% block head %}
+<!-- AOS Library for Scroll Animations -->
+<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<!-- Home Page Specific Styles -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+{% endblock %}
+
 {% block content %}
-<!-- Hero Section -->
-<section class="relative bg-gradient-to-br from-green-600 to-green-800 text-white py-32 overflow-hidden">
-    <div class="absolute inset-0 opacity-20">
-        <img src="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DJI_0218.jpg" alt="Mangatarem Landscape"
-            class="w-full h-full object-cover">
-    </div>
-    <div class="container mx-auto px-6 text-center relative z-10">
-        <h1 class="text-5xl md:text-6xl font-extrabold mb-6 drop-shadow-lg">
+<!-- Hero Section - Full Screen with Parallax -->
+<section class="hero-parallax">
+    <div class="hero-background"
+        style="background-image: url('https://mangatarem.gov.ph/wp-content/uploads/2022/06/DJI_0218.jpg');"></div>
+    <div class="hero-gradient-overlay"></div>
+
+    <div class="hero-content">
+        <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold mb-4 drop-shadow-2xl text-white">
             <span id="typing-text"></span><span class="cursor">|</span>
         </h1>
-        <p class="text-xl md:text-2xl mb-10 max-w-2xl mx-auto">Explore the rich culture, stunning landscapes, and
-            hidden gems of Mangatarem, Pangasinan.</p>
-        <a href="{{ url_for('public.map_view') }}"
-            class="bg-white text-green-800 font-bold py-3 px-8 rounded-full shadow-lg hover:bg-green-100 transition transform hover:scale-105 inline-block">
-            Explore the Map
-        </a>
+        <p class="text-xl md:text-2xl mb-8 max-w-3xl text-white drop-shadow-lg">
+            Your guide to the 82 Barangays of Mangatarem, Pangasinan
+        </p>
+        <div class="flex flex-wrap justify-center items-center">
+            <a href="{{ url_for('public.map_view') }}" class="btn-primary">
+                🗺️ Launch Interactive Map
+            </a>
+            <a href="#featured" class="btn-secondary">
+                ▶️ Watch Video
+            </a>
+        </div>
     </div>
 </section>
 
-<!-- Featured Attractions -->
-<section class="py-20 bg-white">
+<!-- Wave Divider -->
+<div class="wave-divider">
+    <svg viewBox="0 0 1200 120" preserveAspectRatio="none">
+        <path
+            d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z"
+            class="shape-fill"></path>
+    </svg>
+</div>
+
+<!-- Featured Destinations Section -->
+<section id="featured" class="py-20 bg-white">
     <div class="container mx-auto px-6">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl font-bold text-gray-800 mb-4">Featured Destinations</h2>
-            <p class="text-gray-600 max-w-xl mx-auto">From serene hot springs to historic churches, experience the best
-                that Mangatarem has to offer.</p>
+        <div class="text-center mb-16" data-aos="fade-up">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Don't Miss These Spots</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto text-lg">
+                From serene hot springs to historic churches, experience the best that Mangatarem has to offer.
+            </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-            {% for attraction in featured %}
-            <div
-                class="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition duration-300 border border-gray-100">
-                <div class="h-48 overflow-hidden">
-                    <img src="{{ attraction.image_url }}" alt="{{ attraction.name }}"
-                        class="w-full h-full object-cover transform hover:scale-110 transition duration-500">
-                </div>
-                <div class="p-6">
-                    <div class="flex justify-between items-center mb-2">
-                        <span
-                            class="text-xs font-semibold uppercase tracking-wider text-green-600 bg-green-100 px-2 py-1 rounded">{{
-                            attraction.category }}</span>
-                        <span class="text-yellow-500 text-sm flex items-center">★ {{ attraction.rating }}</span>
+        {% if featured and featured|length > 0 %}
+        <div class="carousel-container" data-aos="fade-up" data-aos-delay="200">
+            <!-- Carousel Navigation -->
+            <button class="carousel-button prev" aria-label="Previous">
+                <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+            </button>
+
+            <div class="carousel-track">
+                {% for attraction in featured %}
+                <div class="carousel-slide">
+                    <div class="destination-card" style="background-image: url('{{ attraction.image_url }}');">
+                        <div class="card-content">
+                            <span class="card-tag">{{ attraction.category }}</span>
+                            <h3 class="card-title">{{ attraction.name }}</h3>
+                            <p class="card-description">{{ attraction.description }}</p>
+                            <a href="{{ url_for('public.map_view') }}?focus={{ attraction.id }}"
+                                class="card-directions">
+                                📍 Get Directions →
+                            </a>
+                        </div>
                     </div>
-                    <h3 class="text-xl font-bold mb-2 text-gray-800">{{ attraction.name }}</h3>
-                    <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ attraction.description }}</p>
-                    <a href="{{ url_for('public.attraction_detail', id=attraction.id) }}"
-                        class="text-green-700 font-semibold hover:text-green-900 inline-flex items-center">
-                        View Details
-                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
+                </div>
+                {% endfor %}
+            </div>
+
+            <button class="carousel-button next" aria-label="Next">
+                <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </button>
+        </div>
+
+        <div class="text-center mt-12">
+            <a href="{{ url_for('public.map_view') }}" class="text-green-700 font-semibold hover:underline text-lg">
+                Explore all attractions on the map →
+            </a>
+        </div>
+        {% else %}
+        <div class="text-center py-12" data-aos="fade-up">
+            <p class="text-gray-500 text-lg mb-6">Featured destinations coming soon...</p>
+            <a href="{{ url_for('public.map_view') }}" class="btn-primary">
+                Explore the Map
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<!-- Curated Experiences Section -->
+<section class="py-20 bg-gradient-to-br from-gray-50 to-green-50">
+    <div class="container mx-auto px-6">
+        <div class="text-center mb-16" data-aos="fade-up">
+            <h2 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">Curated Experiences</h2>
+            <p class="text-gray-600 max-w-2xl mx-auto text-lg">
+                Discover Mangatarem through carefully crafted journeys
+            </p>
+        </div>
+
+        <!-- Experience 1: Heritage Walk -->
+        <div class="experience-row" data-aos="fade-right">
+            <div class="experience-image">
+                <img src="https://mangatarem.gov.ph/wp-content/uploads/2022/06/423528622_849734160503800_3042916681464663887_n.jpg"
+                    alt="St. Raymond de Penafort Church" />
+            </div>
+            <div class="experience-content">
+                <h3>
+                    <span class="experience-icon">⛪</span>
+                    The Heritage Walk
+                </h3>
+                <p>
+                    Step back in time and explore the Spanish colonial architecture that defines Mangatarem's rich
+                    history.
+                    Visit the iconic St. Raymond de Penafort Parish Church, built in the 1800s, and discover
+                    centuries-old
+                    structures that tell the story of our town's heritage.
+                </p>
+            </div>
+        </div>
+
+        <!-- Experience 2: Eco-Trail -->
+        <div class="experience-row" data-aos="fade-left">
+            <div class="experience-image">
+                <img src="https://mangatarem.gov.ph/wp-content/uploads/2022/06/manleluag-spring.jpg"
+                    alt="Manleluag Spring National Park" />
+            </div>
+            <div class="experience-content">
+                <h3>
+                    <span class="experience-icon">🌿</span>
+                    The Eco-Trail
+                </h3>
+                <p>
+                    Immerse yourself in Mangatarem's natural wonders. Trek through lush forests to hidden waterfalls,
+                    soak in therapeutic hot springs at Manleluag Spring National Park, and experience the breathtaking
+                    views from the Zambales Mountain Range. Perfect for nature enthusiasts and adventure seekers.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Interactive Map Teaser -->
+<section class="map-teaser py-24 text-white">
+    <div class="container mx-auto px-6 text-center relative z-10">
+        <div data-aos="zoom-in">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6">Navigate Like a Local</h2>
+            <p class="text-xl mb-12 max-w-3xl mx-auto opacity-90">
+                Filter by food, lodging, or landmarks. Find the hidden gems near you with our powerful interactive map.
+            </p>
+
+            <div class="map-mockup mb-10">
+                <img src="https://via.placeholder.com/600x400/047857/ffffff?text=Interactive+Map+Preview"
+                    alt="Map Preview" />
+            </div>
+
+            <a href="{{ url_for('public.map_view') }}" class="btn-primary text-lg">
+                🗺️ Explore the Interactive Map
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Events Teaser -->
+<section class="py-20 bg-white">
+    <div class="container mx-auto px-6">
+        <div class="grid md:grid-cols-2 gap-12 items-center">
+            <div data-aos="fade-right">
+                <div class="bg-gradient-to-br from-amber-50 to-orange-50 p-8 rounded-2xl shadow-lg">
+                    <div class="text-6xl mb-4">📅</div>
+                    <h3 class="text-3xl font-bold text-gray-800 mb-4">Upcoming Events</h3>
+                    <p class="text-gray-600 mb-6">
+                        Don't miss out on the vibrant festivals and cultural celebrations that bring our community
+                        together.
+                    </p>
+                    <a href="{{ url_for('public.events') }}"
+                        class="inline-flex items-center text-green-700 font-semibold hover:text-green-900">
+                        View All Events
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                         </svg>
                     </a>
                 </div>
             </div>
-            {% endfor %}
-        </div>
-
-        <div class="text-center mt-12">
-            <a href="{{ url_for('public.map_view') }}" class="text-green-700 font-semibold hover:underline">See all
-                attractions
-                &rarr;</a>
+            <div data-aos="fade-left">
+                <div class="bg-gradient-to-br from-blue-50 to-indigo-50 p-8 rounded-2xl shadow-lg">
+                    <div class="text-6xl mb-4">📸</div>
+                    <h3 class="text-3xl font-bold text-gray-800 mb-4">Community Gallery</h3>
+                    <p class="text-gray-600 mb-6">
+                        Explore stunning photos and videos captured by locals and visitors showcasing the beauty of
+                        Mangatarem.
+                    </p>
+                    <a href="{{ url_for('public.gallery') }}"
+                        class="inline-flex items-center text-green-700 font-semibold hover:text-green-900">
+                        Browse Gallery
+                        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                        </svg>
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 </section>
 
-<!-- Call to Action -->
-<section class="bg-gray-100 py-20">
-    <div class="container mx-auto px-6 text-center">
-        <h2 class="text-3xl font-bold mb-6">Ready to start your adventure?</h2>
-        <p class="text-gray-600 mb-8">Plan your trip and navigate with ease using our digital tools.</p>
-        <a href="{{ url_for('public.map_view') }}"
-            class="bg-green-700 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-green-800 transition">
-            Open Map
-        </a>
+<!-- Newsletter Section -->
+<section class="py-16 bg-gradient-to-br from-green-600 to-green-800 text-white">
+    <div class="container mx-auto px-6 text-center" data-aos="fade-up">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4">Stay Connected</h2>
+        <p class="text-lg mb-8 opacity-90">Subscribe to get updates on new attractions, events, and stories from
+            Mangatarem</p>
+
+        <form class="newsletter-form" onsubmit="return handleNewsletterSubmit(event)">
+            <input type="email" class="newsletter-input" placeholder="Enter your email address" required
+                aria-label="Email address" />
+            <button type="submit" class="newsletter-button">
+                Subscribe
+            </button>
+        </form>
+        <p class="text-sm mt-4 opacity-75">We respect your privacy. Unsubscribe anytime.</p>
     </div>
 </section>
+
+<!-- Scripts -->
+<script src="https://unpkg.com/aos@next/dist/aos.js"></script>
 <script src="{{ url_for('static', filename='js/animations.js') }}"></script>
+<script>
+    // Newsletter form handler
+    function handleNewsletterSubmit(event) {
+        event.preventDefault();
+        const email = event.target.querySelector('input[type="email"]').value;
+        // TODO: Implement actual newsletter subscription logic
+        alert('Thank you for subscribing! (Newsletter feature coming soon)');
+        event.target.reset();
+        return false;
+    }
+</script>
 {% endblock %}
