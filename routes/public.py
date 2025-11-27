@@ -221,3 +221,95 @@ def barangay_profile(name):
                          barangay_info=barangay_info,
                          center_lat=center_lat,
                          center_lng=center_lng)
+
+@public_bp.route('/sitemap.xml')
+def sitemap():
+    """
+    Generate a dynamic sitemap.xml for SEO.
+    
+    Lists all static pages, approved attractions, and active barangays.
+    
+    Returns:
+        XML response containing the sitemap.
+    """
+    from flask import make_response, url_for
+    from datetime import datetime, timedelta
+    
+    host_components = url_for('public.index', _external=True).split('/')
+    host_url = '/'.join(host_components[:3]) # e.g., http://localhost:5000
+    
+    pages = []
+    ten_days_ago = (datetime.now() - timedelta(days=10)).date().isoformat()
+    
+    # Static pages
+    static_urls = [
+        'public.index',
+        'public.map_view',
+        'public.events',
+        'public.gallery',
+        'public.routes',
+        'public.barangays'
+    ]
+    
+    for url in static_urls:
+        pages.append({
+            'loc': url_for(url, _external=True),
+            'lastmod': ten_days_ago,
+            'changefreq': 'weekly',
+            'priority': '0.8' if url == 'public.index' else '0.5'
+        })
+        
+    # Dynamic pages: Attractions
+    attractions = Attraction.query.filter_by(status='approved').all()
+    for attraction in attractions:
+        pages.append({
+            'loc': url_for('public.attraction_detail', id=attraction.id, _external=True),
+            'lastmod': attraction.created_at.date().isoformat() if attraction.created_at else ten_days_ago,
+            'changefreq': 'monthly',
+            'priority': '0.6'
+        })
+        
+    # Dynamic pages: Barangays
+    # Get unique barangays from users/attractions
+    barangay_names = db.session.query(User.barangay).filter(
+        User.role == 'contributor', 
+        User.is_approved == True,
+        User.barangay != None
+    ).distinct().all()
+    
+    for b in barangay_names:
+        pages.append({
+            'loc': url_for('public.barangay_profile', name=b[0], _external=True),
+            'lastmod': ten_days_ago, # Ideally fetch latest update for barangay
+            'changefreq': 'weekly',
+            'priority': '0.7'
+        })
+
+    sitemap_xml = render_template('sitemap.xml', pages=pages)
+    response = make_response(sitemap_xml)
+    response.headers["Content-Type"] = "application/xml"
+    
+    return response
+
+@public_bp.route('/robots.txt')
+def robots():
+    """
+    Generate robots.txt configuration.
+    
+    Returns:
+        Text response with robots.txt content.
+    """
+    from flask import make_response, url_for
+    
+    sitemap_url = url_for('public.sitemap', _external=True)
+    
+    robots_txt = f"""User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /barangay-admin/
+
+Sitemap: {sitemap_url}
+"""
+    response = make_response(robots_txt)
+    response.headers["Content-Type"] = "text/plain"
+    return response
