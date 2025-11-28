@@ -7,9 +7,10 @@
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-gray-800">My Events</h1>
         <div class="flex gap-4">
-            <a href="{{ url_for('barangay_dashboard') }}" class="text-gray-600 hover:text-gray-800 transition">Back to
+            <a href="{{ url_for('barangay.barangay_dashboard') }}"
+                class="text-gray-600 hover:text-gray-800 transition">Back to
                 Dashboard</a>
-            <a href="{{ url_for('barangay_add_event') }}"
+            <a href="{{ url_for('barangay.barangay_add_event') }}"
                 class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition">Add New Event</a>
         </div>
     </div>
@@ -39,9 +40,9 @@
                         </div>
                     </div>
                     <div class="flex gap-3 text-sm">
-                        <a href="{{ url_for('barangay_edit_event', id=event.id) }}"
+                        <a href="{{ url_for('barangay.barangay_edit_event', id=event.id) }}"
                             class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
-                        <button onclick="confirmDelete('{{ url_for('barangay_delete_event', id=event.id) }}')"
+                        <button onclick="confirmDelete('{{ url_for('barangay.barangay_delete_event', id=event.id) }}')"
                             class="text-red-600 hover:text-red-800 font-medium">Delete</button>
                     </div>
                 </li>
