@@ -1,7 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
     // ========================================
-    // 1. INITIALIZE MAP WITH CARTODB VOYAGER TILES
-    // ========================================
     const map = L.map('map').setView([15.7889, 120.2986], 13); // Mangatarem coordinates
 
     // Use CartoDB Voyager for cleaner, modern aesthetic
@@ -107,6 +105,65 @@ document.addEventListener('DOMContentLoaded', function () {
         })
         .catch(error => console.error('Error fetching attractions:', error));
 
+    // ========================================
+    // 10. CARD MANAGEMENT
+    // ========================================
+    const placeCard = document.getElementById('place-card');
+    const cardTitle = document.getElementById('card-title');
+    const cardAddress = document.getElementById('card-address');
+    const cardRating = document.getElementById('card-rating');
+    const cardHours = document.getElementById('card-hours');
+    const cardDistance = document.getElementById('card-distance');
+    const cardDescription = document.getElementById('card-description');
+
+    function updateCard(attraction) {
+        if (!placeCard) return;
+
+        // Populate data
+        cardTitle.textContent = attraction.name;
+        cardAddress.textContent = attraction.barangay ? `${attraction.barangay}, Mangatarem` : 'Mangatarem, Pangasinan';
+        cardDescription.textContent = attraction.description;
+
+        // Mock data for now (since not in DB)
+        cardRating.textContent = (Math.random() * (5.0 - 4.0) + 4.0).toFixed(1);
+
+        // Show card
+        placeCard.classList.remove('hidden');
+        placeCard.classList.remove('translate-y-full');
+    }
+
+    // Close button logic
+    const closeCardBtn = placeCard.querySelector('button');
+    if (closeCardBtn) {
+        closeCardBtn.addEventListener('click', () => {
+            placeCard.classList.add('hidden');
+        });
+    }
+
+    // ========================================
+    // 6. FLYTO ANIMATION
+    // ========================================
+    // ========================================
+    // 6. FLYTO ANIMATION
+    // ========================================
+    function flyToLocation(id, lat, lng) {
+        map.flyTo([lat, lng], 16, {
+            animate: true,
+            duration: 1.5
+        });
+
+        // Find attraction data
+        const attraction = attractionsData.find(a => a.id === id);
+
+        // Show card after animation
+        setTimeout(() => {
+            if (attraction) {
+                updateCard(attraction);
+            }
+        }, 1600);
+    }
+
+    // Update marker click to show card
     function addMarkers(attractions) {
         // Clear existing markers
         markersLayer.clearLayers();
@@ -115,20 +172,15 @@ document.addEventListener('DOMContentLoaded', function () {
             const icon = getCustomIcon(attraction.category);
             const marker = L.marker([attraction.lat, attraction.lng], { icon: icon });
 
-            // Custom HTML popup with image
-            const popupContent = `
-                <div class="w-56 overflow-hidden">
-                    <img src="${attraction.image}" class="w-full h-28 object-cover mb-2 rounded" alt="${attraction.name}">
-                    <h3 class="font-bold text-green-800 text-sm mb-1">${attraction.name}</h3>
-                    <span class="inline-block bg-green-100 text-green-700 text-xs px-2 py-0.5 rounded-full mb-2">${attraction.category}</span>
-                    <p class="text-xs text-gray-600 mb-2 line-clamp-2">${attraction.description}</p>
-                    <a href="/attraction/${attraction.id}" class="block text-xs text-center bg-green-600 text-white py-1.5 rounded hover:bg-green-700 transition">View Details</a>
-                </div>
-            `;
+            // Add click event to show card
+            marker.on('click', () => {
+                updateCard(attraction);
 
-            marker.bindPopup(popupContent, {
-                maxWidth: 250,
-                className: 'custom-popup'
+                // Also center map on click (optional, but good UX)
+                map.flyTo([attraction.lat, attraction.lng], 16, {
+                    animate: true,
+                    duration: 1.0
+                });
             });
 
             // Add to cluster layer
@@ -181,24 +233,6 @@ document.addEventListener('DOMContentLoaded', function () {
             card.addEventListener('click', () => flyToLocation(attraction.id, attraction.lat, attraction.lng));
             listContainer.appendChild(card);
         });
-    }
-
-    // ========================================
-    // 6. FLYTO ANIMATION
-    // ========================================
-    function flyToLocation(id, lat, lng) {
-        map.flyTo([lat, lng], 16, {
-            animate: true,
-            duration: 1.5
-        });
-
-        // Open popup after animation
-        setTimeout(() => {
-            const marker = markerMap[id];
-            if (marker) {
-                marker.openPopup();
-            }
-        }, 1600);
     }
 
     // ========================================

@@ -99,6 +99,61 @@
     <div class="relative flex-1 h-2/3 md:h-full order-1 md:order-2">
         <div id="map" class="w-full h-full z-0"></div>
 
+        <!-- Place Details Card (Floating) -->
+        <div id="place-card"
+            class="hidden absolute bottom-4 left-4 right-4 md:left-4 md:right-auto md:w-96 bg-white rounded-2xl shadow-2xl p-6 z-[400] transition-all duration-300 transform translate-y-0 border border-gray-100">
+            <!-- Close Button -->
+            <button onclick="document.getElementById('place-card').classList.add('hidden')"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+
+            <div class="flex justify-between items-start mb-2">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900 leading-tight" id="card-title">Adidas Outlet</h3>
+                    <p class="text-sm text-gray-500 mt-1" id="card-address">Town Plaza, Mangatarem</p>
+                </div>
+                <div class="flex items-center gap-1 bg-gray-50 border border-gray-100 px-2 py-1 rounded-lg shadow-sm">
+                    <span class="text-orange-400 text-xs">★</span>
+                    <span class="text-xs font-bold text-gray-700" id="card-rating">4.9</span>
+                </div>
+            </div>
+
+            <div class="flex gap-3 mb-4 mt-3">
+                <div
+                    class="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-medium border border-green-100">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span id="card-hours">Open 9am-8pm</span>
+                </div>
+                <div
+                    class="flex items-center gap-2 px-3 py-1.5 bg-gray-50 text-gray-600 rounded-lg text-xs font-medium border border-gray-100">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span id="card-distance">0.5 mi</span>
+                </div>
+            </div>
+
+            <p class="text-sm text-gray-600 leading-relaxed mb-6" id="card-description">
+                Official outlet featuring performance gear. Located right across the Municipal Hall.
+            </p>
+
+            <button
+                class="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3.5 rounded-xl transition shadow-lg flex items-center justify-center gap-2 active:scale-95 transform duration-150">
+                <span>Start Route</span>
+            </button>
+        </div>
+
         <!-- Floating Controls -->
         <div class="absolute top-4 right-4 z-[400] flex flex-col gap-2">
             <!-- Routes Toggle Button -->
