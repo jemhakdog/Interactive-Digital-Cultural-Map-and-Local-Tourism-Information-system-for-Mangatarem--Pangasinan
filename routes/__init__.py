@@ -3,6 +3,7 @@ from .api import api_bp
 from .auth import auth_bp
 from .admin import admin_bp
 from .barangay import barangay_bp
+from .update import update_bp
 
 def register_blueprints(app):
     """Register all application blueprints"""
@@ -11,3 +12,4 @@ def register_blueprints(app):
     app.register_blueprint(auth_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(barangay_bp)
+    app.register_blueprint(update_bp)
