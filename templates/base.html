@@ -4,20 +4,46 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Mangatarem Tourism{% endblock %}</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
-        integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
-        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+    <title>{% block title %}GoMangatarem Information System{% endblock %}</title>
 
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-    </style>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Resource Hints -->
+    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <link rel="dns-prefetch" href="https://unpkg.com">
+    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
+    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
+
+    <!-- SEO Meta Tags -->
+    {% block meta_description %}
+    <meta name="description"
+        content="Interactive Digital Cultural Map and Local Tourism Information system for Mangatarem, Pangasinan">
+    {% endblock %}
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="{{ request.url }}">
+
+    <!-- Open Graph / Facebook -->
+    {% block og_tags %}
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ request.url }}">
+    <meta property="og:title" content="{% block og_title %}{{ self.title() }}{% endblock %}">
+    <meta property="og:description"
+        content="{% block og_description %}Interactive Digital Cultural Map and Local Tourism Information system for Mangatarem, Pangasinan{% endblock %}">
+    <meta property="og:image" content="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DJI_0218.jpg">
+    <meta property="og:site_name" content="GoMangatarem Information System">
+    {% endblock %}
+
+    <!-- Twitter -->
+    {% block twitter_tags %}
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ request.url }}">
+    <meta property="twitter:title" content="{% block twitter_title %}{{ self.title() }}{% endblock %}">
+    <meta property="twitter:description"
+        content="{% block twitter_description %}Interactive Digital Cultural Map and Local Tourism Information system for Mangatarem, Pangasinan{% endblock %}">
+    <meta property="twitter:image" content="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DJI_0218.jpg">
+    {% endblock %}
+
     {% block head %}{% endblock %}
 </head>
 
@@ -32,7 +58,7 @@
                     class="text-2xl font-bold text-white flex items-center gap-2 group">
                     <span
                         class="transform group-hover:rotate-12 transition-transform duration-300 text-green-500">🌿</span>
-                    <span class="tracking-tight">Mangatarem Tourism</span>
+                    <span class="tracking-tight">GoMangatarem</span>
                 </a>
 
                 <div class="hidden md:flex space-x-8 items-center text-sm font-medium text-gray-300">
@@ -105,7 +131,7 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
                 <div class="space-y-6">
                     <a href="#" class="text-3xl font-bold flex items-center gap-2 text-white">
-                        <span>🌿</span> Mangatarem Tourism
+                        <span>🌿</span> GoMangatarem
                     </a>
                     <p class="text-gray-400 text-lg max-w-md leading-relaxed">
                         Discover the cultural identity, community highlights, and hidden gems of our barangays. Your
@@ -194,7 +220,7 @@
 
             <div
                 class="flex flex-col md:flex-row justify-between items-center pt-8 border-t border-gray-800 text-sm text-gray-500">
-                <p>&copy; 2025 Mangatarem Tourism IS. All rights reserved.</p>
+                <p>&copy; 2025 GoMangatarem IS. All rights reserved.</p>
                 <div class="flex space-x-6 mt-4 md:mt-0">
                     <a href="#" class="hover:text-white transition">Privacy Policy</a>
                     <a href="#" class="hover:text-white transition">Terms of Service</a>
@@ -206,7 +232,7 @@
     {% endblock %}
 
     {% block scripts %}{% endblock %}
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
     <script>
         // Handle Flask Flash Messages with SweetAlert2
         {% with messages = get_flashed_messages() %}

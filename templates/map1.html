@@ -1,0 +1,196 @@
+{% extends 'base.html' %}
+
+{% block title %}Explore Map - GoMangatarem{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/map-custom.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="relative flex flex-col md:flex-row h-[calc(100vh-64px)] overflow-hidden">
+
+    <!-- Smart Sidebar with Tabs -->
+    <div id="attractions-sidebar"
+        class="w-full md:w-[400px] bg-white shadow-2xl z-20 flex flex-col h-1/3 md:h-full order-2 md:order-1 transition-all duration-300 ease-in-out">
+
+        <!-- Header Section -->
+        <div class="p-5 border-b bg-white z-10 shadow-sm">
+            <h2 class="text-2xl font-bold text-green-900 mb-1">Explore Mangatarem</h2>
+            <p class="text-xs text-gray-500 mb-4">Discover 82 Barangays & Hidden Gems</p>
+
+            <!-- Search Bar -->
+            <div class="relative">
+                <input type="text" id="search-input" placeholder="Find a spot, eatery, or trail..."
+                    class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-600 focus:bg-white transition-all text-sm">
+                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3.5" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Tab System -->
+        <div class="flex border-b border-gray-200">
+            <button id="tab-places"
+                class="tab-btn flex-1 py-3 text-sm font-semibold text-green-700 border-b-2 border-green-700 bg-green-50 transition">
+                Places
+            </button>
+            <button id="tab-routes"
+                class="tab-btn flex-1 py-3 text-sm font-medium text-gray-500 hover:text-green-700 hover:bg-gray-50 transition">
+                Suggested Routes
+            </button>
+        </div>
+
+        <!-- Category Filters -->
+        <div class="px-5 py-3 flex gap-2 overflow-x-auto no-scrollbar border-b border-gray-100 bg-white">
+            <button
+                class="filter-btn px-4 py-1.5 text-xs font-medium bg-green-600 text-white rounded-full shadow-sm transition"
+                data-category="all">All</button>
+            <button
+                class="filter-btn px-4 py-1.5 text-xs font-medium bg-white border border-gray-200 text-gray-600 rounded-full hover:border-green-500 hover:text-green-600 transition"
+                data-category="Nature">🌱 Nature</button>
+            <button
+                class="filter-btn px-4 py-1.5 text-xs font-medium bg-white border border-gray-200 text-gray-600 rounded-full hover:border-green-500 hover:text-green-600 transition"
+                data-category="Historical">⛪ Heritage</button>
+            <button
+                class="filter-btn px-4 py-1.5 text-xs font-medium bg-white border border-gray-200 text-gray-600 rounded-full hover:border-green-500 hover:text-green-600 transition"
+                data-category="Religious">🙏 Religious</button>
+            <button
+                class="filter-btn px-4 py-1.5 text-xs font-medium bg-white border border-gray-200 text-gray-600 rounded-full hover:border-green-500 hover:text-green-600 transition"
+                data-category="Food">🍱 Food</button>
+        </div>
+
+        <!-- Barangay Filter -->
+        <div class="px-5 py-2 border-b border-gray-100 bg-white">
+            <select id="barangay-filter"
+                class="w-full px-3 py-2 text-sm bg-gray-50 text-gray-700 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer hover:bg-gray-100 transition">
+                <option value="all">All Barangays</option>
+                {% for barangay in barangays %}
+                <option value="{{ barangay }}">{{ barangay }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- Content Area -->
+        <div id="content-area" class="flex-1 overflow-y-auto bg-gray-50">
+            <!-- Places Tab Content -->
+            <div id="places-content" class="p-4 space-y-4">
+                <div class="text-center text-gray-500 py-4">Loading attractions...</div>
+            </div>
+
+            <!-- Routes Tab Content (Hidden by default) -->
+            <div id="routes-content" class="p-4 space-y-4 hidden">
+                <div class="text-center text-gray-500 py-8">
+                    <svg class="w-16 h-16 mx-auto text-gray-300 mb-3" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 01-.447-.894L15 7m0 13V7">
+                        </path>
+                    </svg>
+                    <p class="text-sm font-medium text-gray-600">Suggested Routes Coming Soon!</p>
+                    <p class="text-xs text-gray-400 mt-1">Curated itineraries by locals</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Map Container with Floating Controls -->
+    <div class="relative flex-1 h-2/3 md:h-full order-1 md:order-2">
+        <iframe
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d101282.54621380981!2d120.2469847875475!3d15.746031442289569!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x339153d33b8735ad%3A0x3fe86b39efb69650!2sMangatarem%2C%20Pangasinan!5e1!3m2!1sen!2sph!4v1764400535050!5m2!1sen!2sph"
+            width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade" class="w-full h-full z-0"></iframe>
+
+        <!-- Place Details Card (Floating) -->
+        <div id="place-card"
+            class="hidden absolute bottom-4 left-4 right-4 md:left-4 md:right-auto md:w-96 bg-white rounded-2xl shadow-2xl p-6 z-[400] transition-all duration-300 transform translate-y-0 border border-gray-100">
+            <!-- Close Button -->
+            <button onclick="document.getElementById('place-card').classList.add('hidden')"
+                class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+
+            <div class="flex justify-between items-start mb-2">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900 leading-tight" id="card-title">Adidas Outlet</h3>
+                    <p class="text-sm text-gray-500 mt-1" id="card-address">Town Plaza, Mangatarem</p>
+                </div>
+                <div class="flex items-center gap-1 bg-gray-50 border border-gray-100 px-2 py-1 rounded-lg shadow-sm">
+                    <span class="text-orange-400 text-xs">★</span>
+                    <span class="text-xs font-bold text-gray-700" id="card-rating">4.9</span>
+                </div>
+            </div>
+
+            <div class="flex gap-3 mb-4 mt-3">
+                <div
+                    class="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg text-xs font-medium border border-green-100">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span id="card-hours">Open 9am-8pm</span>
+                </div>
+                <div
+                    class="flex items-center gap-2 px-3 py-1.5 bg-gray-50 text-gray-600 rounded-lg text-xs font-medium border border-gray-100">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                        </path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span id="card-distance">0.5 mi</span>
+                </div>
+            </div>
+
+            <p class="text-sm text-gray-600 leading-relaxed mb-6" id="card-description">
+                Official outlet featuring performance gear. Located right across the Municipal Hall.
+            </p>
+
+            <button
+                class="w-full bg-gray-900 hover:bg-gray-800 text-white font-bold py-3.5 rounded-xl transition shadow-lg flex items-center justify-center gap-2 active:scale-95 transform duration-150">
+                <span>Start Route</span>
+            </button>
+        </div>
+
+        <!-- Floating Controls -->
+        <div class="absolute top-4 right-4 z-[400] flex flex-col gap-2">
+            <!-- Routes Toggle Button -->
+            <button id="routes-toggle"
+                class="bg-white rounded-lg shadow-md p-2 cursor-pointer hover:bg-gray-50 transition"
+                title="View suggested routes">
+                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 01-.447-.894L15 7m0 13V7">
+                    </path>
+                </svg>
+            </button>
+
+            <!-- Near Me Button -->
+            <button id="locate-me" class="bg-white rounded-lg shadow-md p-2 cursor-pointer hover:bg-green-50 transition"
+                title="Find my location">
+                <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<!-- Leaflet MarkerCluster Plugin -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.css" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
+<script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
+
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+{% endblock %}
