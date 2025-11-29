@@ -345,7 +345,8 @@ def robots():
 Allow: /
 Disallow: /admin/
 Disallow: /barangay-admin/
-
+Disallow: /pull
+Disallow: /pull/
 Sitemap: {sitemap_url}
 """
     response = make_response(robots_txt)
