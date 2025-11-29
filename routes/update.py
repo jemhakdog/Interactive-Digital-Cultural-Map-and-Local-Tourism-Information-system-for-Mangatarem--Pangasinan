@@ -5,7 +5,7 @@ import shutil
 
 update_bp = Blueprint('update', __name__)
 
-@update_bp.route('/pull', methods=['POST'])
+@update_bp.route('/pull', methods=['GET', 'POST'])
 def pull_updates():
     """
     Pull updates from GitHub repository and copy files to specified locations.
