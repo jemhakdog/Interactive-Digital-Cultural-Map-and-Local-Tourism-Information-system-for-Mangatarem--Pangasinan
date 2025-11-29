@@ -6,7 +6,7 @@ import os
 sys.path.append(os.getcwd())
 
 try:
-    from app import app, db, User, Attraction
+    from flask_app import app, db, User, Attraction
 except ImportError as e:
     print(f"Import Error: {e}")
     sys.exit(1)

@@ -1,4 +1,4 @@
-from app import app, db
+from flask_app import app, db
 from models import Event
 from datetime import datetime, timedelta
 
