@@ -316,6 +316,16 @@ def sitemap():
 
 @public_bp.route('/google364b8336ce52ae86.html')
 def verify_site():
+    """
+    Serve Google Search Console verification file.
+
+    This route provides the verification file required by Google Search Console
+    to verify ownership of the website. This is necessary for accessing
+    Google Search Console features and improving site visibility in search results.
+
+    Returns:
+        Rendered verification template file.
+    """
     return render_template("google364b8336ce52ae86.html")
 
     
