@@ -260,7 +260,35 @@ def sitemap():
     host_url = '/'.join(host_components[:3]) # e.g., http://localhost:5000
 
     pages = []
-    ten_days_ago = (datetime.now() - timedelta(days=10)).date().isoformat()
+    import subprocess
+    import os
+
+    def get_last_commit_date():
+        """
+        Get the last commit date from git history.
+        
+        Attempts to read from the production source repository path first,
+        then falls back to the current directory (for dev environment).
+        Returns today's date if git command fails.
+        """
+        source_repo = "/home/GoMangatarem/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan"
+        try:
+            cmd = ['git', 'log', '-1', '--format=%cd', '--date=iso']
+            
+            # Check if production path exists
+            if os.path.exists(source_repo):
+                cmd = ['git', '-C', source_repo, 'log', '-1', '--format=%cd', '--date=iso']
+            
+            result = subprocess.run(cmd, capture_output=True, text=True, check=True)
+            # The date comes back like "2023-10-27 10:00:00 +0000", verify/parse if needed
+            # For simplicity, we just want the date part YYYY-MM-DD
+            # Simple ISO date format from git log is usually YYYY-MM-DD HH:MM:SS +/-TZ
+            return result.stdout.strip().split(' ')[0]
+        except Exception as e:
+            # Fallback to today's date if anything fails
+            return datetime.now().date().isoformat()
+
+    last_update = get_last_commit_date()
 
     # Static pages
     static_urls = [
@@ -275,7 +303,7 @@ def sitemap():
     for url in static_urls:
         pages.append({
             'loc': url_for(url, _external=True),
-            'lastmod': ten_days_ago,
+            'lastmod': last_update,
             'changefreq': 'weekly',
             'priority': '0.8' if url == 'public.index' else '0.5'
         })
@@ -285,7 +313,7 @@ def sitemap():
     for attraction in attractions:
         pages.append({
             'loc': url_for('public.attraction_detail', id=attraction.id, _external=True),
-            'lastmod': attraction.created_at.date().isoformat() if attraction.created_at else ten_days_ago,
+            'lastmod': attraction.created_at.date().isoformat() if attraction.created_at else last_update,
             'changefreq': 'monthly',
             'priority': '0.6'
         })
@@ -301,7 +329,7 @@ def sitemap():
     for b in barangay_names:
         pages.append({
             'loc': url_for('public.barangay_profile', name=b[0], _external=True),
-            'lastmod': ten_days_ago, # Ideally fetch latest update for barangay
+            'lastmod': last_update, # Ideally fetch latest update for barangay
             'changefreq': 'weekly',
             'priority': '0.7'
         })
