@@ -350,7 +350,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const dragHandle = document.getElementById('drag-handle');
     const contentArea = document.getElementById('content-area');
 
-    if (window.innerWidth <= 768 && sidebar && dragHandle) {
+    if (sidebar && dragHandle) {
         let startY = 0;
         let currentY = 0;
         let initialTranslateY = 0;
@@ -366,8 +366,14 @@ document.addEventListener('DOMContentLoaded', function () {
         // Helper to get current transform Y value
         const getTransformY = () => {
             const style = window.getComputedStyle(sidebar);
-            const matrix = new WebKitCSSMatrix(style.transform);
-            return matrix.m42;
+            try {
+                if (window.DOMMatrix) {
+                    return new DOMMatrix(style.transform).m42;
+                }
+                return new WebKitCSSMatrix(style.transform).m42;
+            } catch (e) {
+                return 0;
+            }
         };
 
         dragHandle.addEventListener('touchstart', (e) => {
@@ -417,6 +423,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 sidebar.classList.remove('is-open');
                 // Disable content scrolling to prevent weirdness when collapsed
                 contentArea.style.overflowY = 'hidden';
+            }
+        });
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                if (sidebar.style.transform) {
+                    sidebar.style.transform = '';
+                    sidebar.classList.remove('is-open', 'is-dragging');
+                    contentArea.style.overflowY = '';
+                }
             }
         });
     }
