@@ -329,26 +329,26 @@ def verify_site():
     return render_template("google364b8336ce52ae86.html")
 
     
-@public_bp.route('/robots.txt')
-def robots():
-    """
-    Generate robots.txt configuration.
+# @public_bp.route('/robots.txt')
+# def robots():
+#     """
+#     Generate robots.txt configuration.
 
-    Returns:
-        Text response with robots.txt content.
-    """
-    from flask import make_response, url_for
+#     Returns:
+#         Text response with robots.txt content.
+#     """
+#     from flask import make_response, url_for
 
-    sitemap_url = url_for('public.sitemap', _external=True)
+#     sitemap_url = url_for('public.sitemap', _external=True)
 
-    robots_txt = f"""User-agent: *
-Allow: /
-Disallow: /admin/
-Disallow: /barangay-admin/
-Disallow: /pull
-Disallow: /pull/
-Sitemap: {sitemap_url}
-"""
-    response = make_response(robots_txt)
-    response.headers["Content-Type"] = "text/plain"
-    return response
+#     robots_txt = f"""User-agent: *
+# Allow: /
+# Disallow: /admin/
+# Disallow: /barangay-admin/
+# Disallow: /pull
+# Disallow: /pull/
+# Sitemap: {sitemap_url}
+# """
+#     response = make_response(robots_txt)
+#     response.headers["Content-Type"] = "text/plain"
+#     return response
