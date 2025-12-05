@@ -335,7 +335,90 @@ document.addEventListener('DOMContentLoaded', function () {
     // ========================================
     // 9. FLOATING ROUTES TOGGLE
     // ========================================
+    // ========================================
+    // 9. FLOATING ROUTES TOGGLE
+    // ========================================
     const routesToggle = document.getElementById('routes-toggle');
-    routesToggle.addEventListener('click', () => switchTab('routes'));
+    if (routesToggle) {
+        routesToggle.addEventListener('click', () => switchTab('routes'));
+    }
+
+    // ========================================
+    // 10. MOBILE BOTTOM SHEET LOGIC
+    // ========================================
+    const sidebar = document.getElementById('attractions-sidebar');
+    const dragHandle = document.getElementById('drag-handle');
+    const contentArea = document.getElementById('content-area');
+
+    if (window.innerWidth <= 768 && sidebar && dragHandle) {
+        let startY = 0;
+        let currentY = 0;
+        let initialTranslateY = 0;
+        const headerHeight = 140; // Approx height of header + tabs + filters
+        const sheetHeight = sidebar.offsetHeight;
+
+        // Calculate the initial collapsed state (showing only header)
+        // transform is set in CSS to: translateY(calc(100% - 140px))
+        // We need to manage this via JS for dragging
+
+        let isDragging = false;
+
+        // Helper to get current transform Y value
+        const getTransformY = () => {
+            const style = window.getComputedStyle(sidebar);
+            const matrix = new WebKitCSSMatrix(style.transform);
+            return matrix.m42;
+        };
+
+        dragHandle.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            startY = e.touches[0].clientY;
+            initialTranslateY = getTransformY();
+            sidebar.classList.add('is-dragging');
+        }, { passive: false });
+
+        document.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            e.preventDefault(); // Prevent page scroll while dragging sheet
+
+            const deltaY = e.touches[0].clientY - startY;
+            const newY = initialTranslateY + deltaY;
+
+            // Constrain movement
+            // Max Up: 0 (fully expanded)
+            // Max Down: sheetHeight - headerHeight (collapsed)
+
+            const maxDown = sheetHeight - headerHeight;
+
+            if (newY >= 0 && newY <= maxDown) {
+                sidebar.style.transform = `translateY(${newY}px)`;
+            }
+        }, { passive: false });
+
+        document.addEventListener('touchend', (e) => {
+            if (!isDragging) return;
+            isDragging = false;
+            sidebar.classList.remove('is-dragging');
+
+            const currentTransform = getTransformY();
+            const maxDown = sheetHeight - headerHeight;
+            const threshold = maxDown / 2;
+
+            // Snap logic
+            if (currentTransform < threshold) {
+                // Snap to top (Open)
+                sidebar.style.transform = 'translateY(0)';
+                sidebar.classList.add('is-open');
+                // Enable content scrolling
+                contentArea.style.overflowY = 'auto';
+            } else {
+                // Snap to bottom (Collapsed)
+                sidebar.style.transform = `translateY(calc(100% - ${headerHeight}px))`;
+                sidebar.classList.remove('is-open');
+                // Disable content scrolling to prevent weirdness when collapsed
+                contentArea.style.overflowY = 'hidden';
+            }
+        });
+    }
 
 });
