@@ -234,21 +234,39 @@
     {% block scripts %}{% endblock %}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
     <script>
-        // Handle Flask Flash Messages with SweetAlert2
-        {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        {% for message in messages %}
-        Swal.fire({
-            toast: true,
-            position: 'top-end',
-            icon: 'success',
-            title: '{{ message }}',
-            showConfirmButton: false,
-            timer: 3000
+        document.addEventListener('DOMContentLoaded', function () {
+            // Handle Flask Flash Messages with SweetAlert2
+            {% with messages = get_flashed_messages(with_categories = True) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            {% if category == 'error' %}
+            Swal.fire({
+                icon: 'error',
+                title: 'Error!',
+                text: '{{ message }}',
+                confirmButtonColor: '#d33'
+            });
+            {% elif category == 'warning' %}
+            Swal.fire({
+                icon: 'warning',
+                title: 'Notice',
+                text: '{{ message }}',
+                confirmButtonColor: '#f59e0b'
+            });
+            {% else %}
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'success', // Default to success for generic messages
+                title: '{{ message }}',
+                showConfirmButton: false,
+                timer: 3000
+            });
+            {% endif %}
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
         });
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
 
         // Global Delete Confirmation
         function confirmDelete(url) {

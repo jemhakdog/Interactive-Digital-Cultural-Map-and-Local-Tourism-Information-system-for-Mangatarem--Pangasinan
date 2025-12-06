@@ -60,9 +60,10 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.barangay }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.email }}</td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="{{ url_for('approve_user', id=user.id) }}"
+                            <a href="{{ url_for('admin.approve_user', id=user.id) }}"
                                 class="text-green-600 hover:text-green-900 mr-4 font-bold">Approve</a>
-                            <a href="{{ url_for('reject_user', id=user.id) }}" class="text-red-600 hover:text-red-900"
+                            <a href="{{ url_for('admin.reject_user', id=user.id) }}"
+                                class="text-red-600 hover:text-red-900"
                                 onclick="return confirm('Reject this user?')">Reject</a>
                         </td>
                     </tr>
@@ -104,9 +105,9 @@
                             <a href="{{ item.url }}" target="_blank" class="text-blue-600 hover:underline">View</a>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <a href="{{ url_for('approve_gallery', id=item.id) }}"
+                            <a href="{{ url_for('admin.approve_gallery', id=item.id) }}"
                                 class="text-green-600 hover:text-green-900 mr-4 font-bold">Approve</a>
-                            <a href="{{ url_for('reject_gallery', id=item.id) }}"
+                            <a href="{{ url_for('admin.reject_gallery', id=item.id) }}"
                                 class="text-red-600 hover:text-red-900"
                                 onclick="return confirm('Reject this item?')">Reject</a>
                         </td>

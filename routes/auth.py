@@ -25,12 +25,12 @@ def login():
         
         if user and user.check_password(password):
             if user.role == 'contributor' and not user.is_approved:
-                flash('Your account is pending approval by the admin.')
+                flash('Your account is pending approval by the admin.', 'warning')
                 return redirect(url_for('auth.login'))
                 
             login_user(user)
             return redirect(url_for('public.index'))
-        flash('Invalid username or password')
+        flash('Invalid username or password', 'error')
     return render_template('login.html')
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
@@ -52,11 +52,17 @@ def register():
         barangay = request.form.get('barangay')
         
         if User.query.filter_by(username=username).first():
-            flash('Username already exists.')
+            flash('Username already exists.', 'error')
             return redirect(url_for('auth.register'))
             
         if User.query.filter_by(email=email).first():
-            flash('Email already exists.')
+            flash('Email already exists.', 'error')
+            return redirect(url_for('auth.register'))
+        
+        # Enforce one contributor per barangay
+        existing_rep = User.query.filter_by(barangay=barangay, role='contributor', is_approved=True).first()
+        if existing_rep:
+            flash('This Barangay already has a registered representative.', 'error')
             return redirect(url_for('auth.register'))
             
         user = User(username=username, email=email, role='contributor', barangay=barangay, is_approved=False)
@@ -64,7 +70,7 @@ def register():
         db.session.add(user)
         db.session.commit()
         
-        flash('Registration successful! Please wait for admin approval.')
+        flash('Registration successful! Please wait for admin approval.', 'success')
         return redirect(url_for('auth.login'))
         
     return render_template('register.html')
