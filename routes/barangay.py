@@ -246,6 +246,7 @@ def barangay_add_event():
             title=request.form['title'],
             date=datetime.strptime(request.form['date'], '%Y-%m-%d').date(),
             location=request.form['location'],
+            category=request.form['category'],
             description=request.form['description'],
             image_url=image_url,
             barangay=current_user.barangay,
@@ -288,6 +289,7 @@ def barangay_edit_event(id):
         event.title = request.form['title']
         event.date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         event.location = request.form['location']
+        event.category = request.form['category']
         event.description = request.form['description']
         
         # Handle file upload

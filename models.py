@@ -43,6 +43,7 @@ class Event(db.Model):
     image_url = db.Column(db.String(200), nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     status = db.Column(db.String(20), default='pending') # 'pending', 'approved'
+    category = db.Column(db.String(50), nullable=False, default='Civic')  # 'Religious', 'Civic', 'Entertainment'
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 class GalleryItem(db.Model):

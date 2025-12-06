@@ -7,7 +7,8 @@
     <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg">
         <h1 class="text-2xl font-bold text-gray-800 mb-6">Edit Event</h1>
 
-        <form action="{{ url_for('barangay.barangay_edit_event', id=event.id) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ url_for('barangay.barangay_edit_event', id=event.id) }}" method="POST"
+            enctype="multipart/form-data">
             <div class="space-y-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Title</label>
@@ -25,6 +26,18 @@
                     <label class="block text-sm font-medium text-gray-700">Location</label>
                     <input type="text" name="location" value="{{ event.location }}" required
                         class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium text-gray-700">Category</label>
+                    <select name="category" required
+                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2">
+                        <option value="Civic" {% if event.category=='Civic' %}selected{% endif %}>Civic</option>
+                        <option value="Religious" {% if event.category=='Religious' %}selected{% endif %}>Religious
+                        </option>
+                        <option value="Entertainment" {% if event.category=='Entertainment' %}selected{% endif %}>
+                            Entertainment</option>
+                    </select>
                 </div>
 
                 <div>
