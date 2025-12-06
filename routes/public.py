@@ -41,27 +41,6 @@ def map_view():
 
     return render_template('map.html', barangays=barangay_list)
 
-@public_bp.route('/map1')
-def map1_view():
-    """
-    Display the Google Maps version of the interactive map.
-
-    Provides an alternative map view using Google Maps iframe 
-    showing Mangatarem's tourism spots and cultural attractions.
-
-    Returns:
-        Rendered map1 template with list of barangays for filtering.
-    """
-    # Get list of unique barangays from approved attractions for the filter
-    barangays = db.session.query(Attraction.barangay).filter(
-        Attraction.status == 'approved',
-        Attraction.barangay != None
-    ).distinct().order_by(Attraction.barangay).all()
-
-    barangay_list = [b[0] for b in barangays]
-
-    return render_template('map1.html', barangays=barangay_list)
-
 @public_bp.route('/attraction/<int:id>')
 def attraction_detail(id):
     """
