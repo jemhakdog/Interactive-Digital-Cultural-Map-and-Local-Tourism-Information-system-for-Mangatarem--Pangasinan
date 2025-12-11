@@ -1,5 +1,7 @@
 from flask import Blueprint, render_template, jsonify, request
-from models import db, User, Attraction, Event, GalleryItem, BarangayInfo
+from models import db, User, Attraction, Event, GalleryItem, BarangayInfo, PageView
+from flask_login import current_user
+from datetime import datetime
 
 public_bp = Blueprint('public', __name__)
 
@@ -13,9 +15,32 @@ def index():
     Returns:
         Rendered index template with featured attractions.
     """
+    # Record view
+    record_view('page', page_name='home')
+
     # Get featured attractions (limit 3)
     featured = Attraction.query.filter_by(status='approved').limit(3).all()
     return render_template('index.html', featured=featured)
+
+def record_view(view_type, item_id=None, page_name=None):
+    """
+    Helper function to record a page view.
+    """
+    try:
+        user_id = current_user.id if current_user.is_authenticated else None
+        view = PageView(
+            view_type=view_type,
+            item_id=item_id,
+            page_name=page_name,
+            user_id=user_id,
+            timestamp=datetime.utcnow()
+        )
+        db.session.add(view)
+        db.session.commit()
+    except Exception as e:
+        # Silently fail to not disrupt user experience
+        print(f"Error recording view: {e}")
+        db.session.rollback()
 
 @public_bp.route('/map')
 def map_view():
@@ -30,6 +55,9 @@ def map_view():
     """
     # Pass all approved attractions to the map
     attractions = Attraction.query.filter_by(status='approved').all()
+    
+    # Record view
+    record_view('page', page_name='map')
 
     # Get list of unique barangays from approved attractions for the filter
     barangays = db.session.query(Attraction.barangay).filter(
@@ -53,6 +81,9 @@ def attraction_detail(id):
         Rendered detail template with attraction information.
     """
     attraction = Attraction.query.get_or_404(id)
+    # Record view
+    record_view('attraction', item_id=id)
+    
     return render_template('detail.html', attraction=attraction)
 
 @public_bp.route('/events')
@@ -66,6 +97,9 @@ def events():
     Returns:
         Rendered events template with list of events.
     """
+    # Record view
+    record_view('page', page_name='events')
+    
     events = Event.query.filter_by(status='approved').order_by(Event.date.asc()).all()
     return render_template('events.html', events=events)
 
@@ -80,6 +114,9 @@ def gallery():
     Returns:
         Rendered gallery template with approved media items.
     """
+    # Record view
+    record_view('page', page_name='gallery')
+    
     items = GalleryItem.query.filter_by(status='approved').order_by(GalleryItem.uploaded_at.desc()).all()
 
     # Get list of unique barangays from approved gallery items for the filter
@@ -145,6 +182,9 @@ def barangays():
     Returns:
         Rendered barangays directory template with barangay list.
     """
+    # Record view
+    record_view('page', page_name='barangays_list')
+    
     # Get list of barangays that have active contributors
     # We use a set to ensure uniqueness
     barangay_names = db.session.query(User.barangay).filter(
@@ -210,6 +250,9 @@ def barangay_profile(name):
     Returns:
         Rendered barangay profile template with all content for the barangay.
     """
+    # Record view
+    record_view('page', page_name='barangay_profile', item_id=None) # We could count specific barangays if we had IDs
+
     # Get all approved content for this barangay
     attractions = Attraction.query.filter_by(barangay=name, status='approved').all()
     events = Event.query.filter_by(barangay=name, status='approved').order_by(Event.date.asc()).all()

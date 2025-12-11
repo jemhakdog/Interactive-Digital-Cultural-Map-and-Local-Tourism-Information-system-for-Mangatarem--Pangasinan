@@ -1,8 +1,9 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from models import db, User, Attraction, Event, GalleryItem
-from datetime import datetime
+from models import db, User, Attraction, Event, GalleryItem, PageView
+from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
+from sqlalchemy import func
 import os
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
@@ -15,6 +16,7 @@ def admin_dashboard():
     
     Shows counts of attractions, events, and gallery items, along with
     pending user registrations and gallery items awaiting approval.
+    Also shows analytics: most viewed attractions and engagement trends.
     
     Returns:
         Rendered admin dashboard template with stats and pending items.
@@ -30,10 +32,53 @@ def admin_dashboard():
         'gallery': GalleryItem.query.count()
     }
 
+    # Analytics: Most Viewed Attractions
+    top_attractions_query = db.session.query(
+        Attraction.name, 
+        func.count(PageView.id).label('view_count')
+    ).join(PageView, PageView.item_id == Attraction.id).filter(
+        PageView.view_type == 'attraction'
+    ).group_by(Attraction.id).order_by(func.count(PageView.id).desc()).limit(5).all()
+
+    top_attractions = [{'name': name, 'views': count} for name, count in top_attractions_query]
+
+    # Analytics: Engagement Trends (Last 7 Days)
+    seven_days_ago = datetime.utcnow() - timedelta(days=7)
+    # SQLite has limited date functions, this works for many, but for SQLite specifically:
+    # We might need to handle date extraction carefully if using SQLite directly.
+    # Flask-SQLAlchemy usually handles dialects but func.date() in SQLite returns string 'YYYY-MM-DD'
+    daily_views_query = db.session.query(
+        func.date(PageView.timestamp).label('date'),
+        func.count(PageView.id).label('count')
+    ).filter(
+        PageView.timestamp >= seven_days_ago
+    ).group_by(func.date(PageView.timestamp)).all()
+
+    daily_views_dict = {str(d): c for d, c in daily_views_query}
+    
+    trend_dates = []
+    trend_counts = []
+    
+    for i in range(6, -1, -1):
+        d = (datetime.utcnow() - timedelta(days=i)).date()
+        d_str = str(d)
+        trend_dates.append(d.strftime('%b %d'))
+        trend_counts.append(daily_views_dict.get(d_str, 0))
+
+    engagement_data = {
+        'dates': trend_dates,
+        'counts': trend_counts
+    }
+
     pending_users = User.query.filter_by(is_approved=False, role='contributor').all()
     pending_gallery = GalleryItem.query.filter_by(status='pending').all()
     
-    return render_template('admin/dashboard.html', stats=stats, pending_users=pending_users, pending_gallery=pending_gallery)
+    return render_template('admin/dashboard.html', 
+                         stats=stats, 
+                         pending_users=pending_users, 
+                         pending_gallery=pending_gallery,
+                         top_attractions=top_attractions,
+                         engagement_data=engagement_data)
 
 @admin_bp.route('/users/approve/<int:id>')
 @login_required

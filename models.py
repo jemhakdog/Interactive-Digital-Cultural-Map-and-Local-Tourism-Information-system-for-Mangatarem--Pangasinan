@@ -65,3 +65,11 @@ class BarangayInfo(db.Model):
     unique_features = db.Column(db.Text, nullable=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+class PageView(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    view_type = db.Column(db.String(50), nullable=False) # 'attraction', 'event', 'page'
+    item_id = db.Column(db.Integer, nullable=True) # ID of the attraction or event, if applicable
+    page_name = db.Column(db.String(100), nullable=True) # Name of the page (e.g., 'home', 'map', 'events')
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    user_id = db.Column(db.Integer, nullable=True) # Optional, if logged in
