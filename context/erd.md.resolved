@@ -1,0 +1,80 @@
+# Entity Relationship Diagram
+
+Based on [models.py](file:///c:/Users/jem/Desktop/Interactive%20Digital%20Cultural%20Map%20and%20Local%20Tourism%20Information%20system%20for%20Mangatarem,%20Pangasinan/models.py), here is the Entity Relationship Diagram (ERD) for the project.
+
+```mermaid
+erDiagram
+    User {
+        Integer id PK
+        String username
+        String email
+        String password_hash
+        String role "admin, contributor"
+        String barangay
+        Boolean is_approved
+    }
+
+    Attraction {
+        Integer id PK
+        String name
+        Text description
+        String category
+        String barangay
+        Float lat
+        Float lng
+        String image_url
+        String status "pending, approved"
+        Integer user_id FK
+        DateTime created_at
+    }
+
+    Event {
+        Integer id PK
+        String title
+        Text description
+        DateTime date
+        String location
+        String barangay
+        String image_url
+        Integer user_id FK
+        String status "pending, approved"
+        String category "Civic, Religious, Entertainment"
+        DateTime created_at
+    }
+
+    GalleryItem {
+        Integer id PK
+        String type "photo, video"
+        String url
+        String caption
+        Integer user_id FK
+        String status "pending, approved"
+        DateTime uploaded_at
+    }
+
+    BarangayInfo {
+        Integer id PK
+        String barangay_name
+        Text history
+        Text cultural_assets
+        Text traditions
+        Text local_practices
+        Text unique_features
+        Integer user_id FK
+        DateTime updated_at
+    }
+
+    User ||--o{ Attraction : "creates"
+    User ||--o{ Event : "organizes"
+    User ||--o{ GalleryItem : "uploads"
+    User ||--o{ BarangayInfo : "updates"
+```
+
+## Notes
+- **User**: Central entity for authentication and authorization. Can be an 'admin' or 'contributor'.
+- **Relationships**:
+    - A [User](file:///c:/Users/jem/Desktop/Interactive%20Digital%20Cultural%20Map%20and%20Local%20Tourism%20Information%20system%20for%20Mangatarem,%20Pangasinan/models.py#8-22) can create multiple [Attraction](file:///c:/Users/jem/Desktop/Interactive%20Digital%20Cultural%20Map%20and%20Local%20Tourism%20Information%20system%20for%20Mangatarem,%20Pangasinan/models.py#23-35)s.
+    - A [User](file:///c:/Users/jem/Desktop/Interactive%20Digital%20Cultural%20Map%20and%20Local%20Tourism%20Information%20system%20for%20Mangatarem,%20Pangasinan/models.py#8-22) can create multiple [Event](file:///c:/Users/jem/Desktop/Interactive%20Digital%20Cultural%20Map%20and%20Local%20Tourism%20Information%20system%20for%20Mangatarem,%20Pangasinan/models.py#36-48)s.
+    - A [User](file:///c:/Users/jem/Desktop/Interactive%20Digital%20Cultural%20Map%20and%20Local%20Tourism%20Information%20system%20for%20Mangatarem,%20Pangasinan/models.py#8-22) can upload multiple [GalleryItem](file:///c:/Users/jem/Desktop/Interactive%20Digital%20Cultural%20Map%20and%20Local%20Tourism%20Information%20system%20for%20Mangatarem,%20Pangasinan/models.py#49-57)s.
+    - A [User](file:///c:/Users/jem/Desktop/Interactive%20Digital%20Cultural%20Map%20and%20Local%20Tourism%20Information%20system%20for%20Mangatarem,%20Pangasinan/models.py#8-22) can update [BarangayInfo](file:///c:/Users/jem/Desktop/Interactive%20Digital%20Cultural%20Map%20and%20Local%20Tourism%20Information%20system%20for%20Mangatarem,%20Pangasinan/models.py#58-68).
+- **Logical Links**: While not enforced by a foreign key constraint in [models.py](file:///c:/Users/jem/Desktop/Interactive%20Digital%20Cultural%20Map%20and%20Local%20Tourism%20Information%20system%20for%20Mangatarem,%20Pangasinan/models.py), the `barangay` field in [Attraction](file:///c:/Users/jem/Desktop/Interactive%20Digital%20Cultural%20Map%20and%20Local%20Tourism%20Information%20system%20for%20Mangatarem,%20Pangasinan/models.py#23-35) and [Event](file:///c:/Users/jem/Desktop/Interactive%20Digital%20Cultural%20Map%20and%20Local%20Tourism%20Information%20system%20for%20Mangatarem,%20Pangasinan/models.py#36-48) logically relates to `BarangayInfo.barangay_name` and `User.barangay`.

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, jsonify
+from flask import Blueprint, render_template, jsonify, request
 from models import db, User, Attraction, Event, GalleryItem, BarangayInfo
 
 public_bp = Blueprint('public', __name__)
@@ -92,6 +92,37 @@ def gallery():
     barangay_list = [b[0] for b in barangays]
 
     return render_template('gallery.html', gallery_items=items, barangays=barangay_list)
+
+@public_bp.route('/search')
+def search():
+    """
+    Search for attractions and events.
+
+    Args:
+        q (str): The search query.
+
+    Returns:
+        Rendered search results template.
+    """
+    query = request.args.get('q', '')
+    
+    if not query:
+        return render_template('search_results.html', query=query, attractions=[], events=[])
+    
+    # Case-insensitive search using ilike (for SQLite, like is case-insensitive usually, but strict mapping might depend on DB)
+    # Using SQLAlchemys ilike for robustness
+    attractions = Attraction.query.filter(
+        (Attraction.name.ilike(f'%{query}%')) | 
+        (Attraction.description.ilike(f'%{query}%')) |
+        (Attraction.category.ilike(f'%{query}%'))
+    ).filter_by(status='approved').all()
+
+    events = Event.query.filter(
+        (Event.title.ilike(f'%{query}%')) | 
+        (Event.description.ilike(f'%{query}%'))
+    ).filter_by(status='approved').all()
+
+    return render_template('search_results.html', query=query, attractions=attractions, events=events)
 
 @public_bp.route('/routes')
 def routes():

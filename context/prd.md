@@ -7,13 +7,15 @@
 * **Project Name:** Interactive Digital Cultural Map and Local Tourism Information System  
 * **Type:** Web Application  
 * **Purpose:** This platform helps users find cultural spots and tourism highlights in the city. It consolidates data onto one interactive map to boost local pride, assist tourists, and aid student research.
+* **Problem Statement:** The LGU Mangatarem Tourism Office currently faces challenges with fragmented, manual information management and irregularly updated content. This leads to inconsistent data and difficulties in disseminating accurate tourism information, hindering the promotion of local heritage.
 
 ### **2\. Target Audience**
 
 * **Tourists:** Visitors needing navigation, food recommendations, and attraction details.  
 * **Residents:** Locals interested in community events or discovering other barangays.  
 * **Students/Researchers:** Users looking for historical data and cultural heritage info.  
-* **Admin/Contributors:** Barangay officials or tourism staff who update content.
+* **LGU Tourism Office (Admins):** Staff responsible for approving content and monitoring system health.
+* **Barangay Representatives (Contributors):** Designated individuals from each of the 82 barangays responsible for submitting local updates.
 
 ### **3\. User Stories**
 
@@ -61,7 +63,7 @@
 
 * **Role-Based Access Control (RBAC):**  
   * **Admin:** Full access to approve/reject/delete all content.  
-  * **Contributor:** Can create/edit their own content; submissions require Admin approval.  
+  * **Contributor:** Can create/edit their own content; submissions require Admin approval. This facilitates coordination across all 82 barangays to standardize tourism information.  
 * **Dashboard:** specialized views for Admins (system-wide stats) and Contributors (personal submissions).  
 * **Authentication:** Secure login and registration flows.
 
@@ -73,6 +75,7 @@
 #### **4.8 Analytics Dashboard**
 
 * **Content Stats:** Counters for Total Attractions, Events, and Gallery items.
+* **Engagement Metrics:** Insights on most-viewed locations to help identify popular spots and improve promotional strategies.
 
 ### **5\. Non-Functional Requirements**
 
