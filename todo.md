@@ -7,12 +7,18 @@ Here is the breakdown of the discrepancies:
 * **What the Code Shows:** The `admin_dashboard` function in `routes/admin.py` only counts the *total* number of attractions, events, and gallery items. It does not track views, clicks, or user engagement trends.
 * **Verdict:** The analytics feature is incomplete. It is currently just a "counter" rather than a true analytics tool.
 
+
+
+
+
 ### 2. Suggested Routes (Incomplete)
 * **What the Docs Say:** The "Tourist Guide and Suggested Routes" module should offer recommended itineraries and potentially "Interactive line drawing on the map".
 * **What the Code Shows:**
     * The `templates/routes.html` file is static. It lists text for a "Nature Trail" and "Heritage Walk" but does not actively guide the user on the map.
     * In `templates/map.html`, the "Suggested Routes" tab actually displays a "Coming Soon" message.
 * **Verdict:** This feature is largely a placeholder in the code.
+
+
 
 ### 3. Frontend Performance (Technical Mismatch)
 * **What the Docs Say:** The Performance Analysis document explicitly warns that loading Tailwind CSS via CDN is a "Critical Issue" and recommends switching to a local build.

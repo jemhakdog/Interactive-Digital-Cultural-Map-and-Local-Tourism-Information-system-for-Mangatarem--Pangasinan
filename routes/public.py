@@ -133,33 +133,56 @@ def gallery():
 @public_bp.route('/search')
 def search():
     """
-    Search for attractions and events.
-
+    Search for attractions and events with advanced filtering.
     Args:
         q (str): The search query.
-
-    Returns:
-        Rendered search results template.
+        category (str): Filter by category (Nature, Historical, etc.)
+        barangay (str): Filter by barangay location.
     """
     query = request.args.get('q', '')
+    category_filter = request.args.get('category', '')
+    barangay_filter = request.args.get('barangay', '')
     
-    if not query:
-        return render_template('search_results.html', query=query, attractions=[], events=[])
-    
-    # Case-insensitive search using ilike (for SQLite, like is case-insensitive usually, but strict mapping might depend on DB)
-    # Using SQLAlchemys ilike for robustness
-    attractions = Attraction.query.filter(
-        (Attraction.name.ilike(f'%{query}%')) | 
-        (Attraction.description.ilike(f'%{query}%')) |
-        (Attraction.category.ilike(f'%{query}%'))
-    ).filter_by(status='approved').all()
+    # Start with base approved query
+    attractions_query = Attraction.query.filter_by(status='approved')
+    events_query = Event.query.filter_by(status='approved')
 
-    events = Event.query.filter(
-        (Event.title.ilike(f'%{query}%')) | 
-        (Event.description.ilike(f'%{query}%'))
-    ).filter_by(status='approved').all()
+    # Apply Text Search if exists
+    if query:
+        attractions_query = attractions_query.filter(
+            (Attraction.name.ilike(f'%{query}%')) | 
+            (Attraction.description.ilike(f'%{query}%'))
+        )
+        events_query = events_query.filter(
+            (Event.title.ilike(f'%{query}%')) | 
+            (Event.description.ilike(f'%{query}%'))
+        )
 
-    return render_template('search_results.html', query=query, attractions=attractions, events=events)
+    # Apply Category Filter
+    if category_filter and category_filter != 'all':
+        attractions_query = attractions_query.filter(Attraction.category == category_filter)
+        events_query = events_query.filter(Event.category == category_filter)
+
+    # Apply Barangay Filter
+    if barangay_filter and barangay_filter != 'all':
+        attractions_query = attractions_query.filter(Attraction.barangay == barangay_filter)
+        events_query = events_query.filter(Event.barangay == barangay_filter)
+
+    attractions = attractions_query.all()
+    events = events_query.all()
+
+    # Fetch unique options for the filter dropdowns
+    available_categories = db.session.query(Attraction.category).distinct().all()
+    available_barangays = db.session.query(Attraction.barangay).filter(Attraction.barangay != None).distinct().all()
+
+    return render_template('search_results.html', 
+                         query=query, 
+                         attractions=attractions, 
+                         events=events,
+                         categories=[c[0] for c in available_categories],
+                         barangays=[b[0] for b in available_barangays],
+                         selected_category=category_filter,
+                         selected_barangay=barangay_filter)
 
 @public_bp.route('/routes')
 def routes():

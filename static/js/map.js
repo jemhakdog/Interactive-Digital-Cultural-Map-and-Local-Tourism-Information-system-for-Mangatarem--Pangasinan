@@ -436,4 +436,61 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // ========================================
+    // 11. SUGGESTED ROUTES LOGIC (NEW)
+    // ========================================
+
+    // Define the paths using [Lat, Lng] coordinates
+    // These coordinates match your attractions.json data
+    const routeData = {
+        nature: [
+            [15.6667, 120.2833], // Manleluag Spring
+            [15.6500, 120.2200], // Timmanguyob Falls
+            [15.7000, 120.2500]  // Daang Kalikasan
+        ],
+        heritage: [
+            [15.7889, 120.2986], // St. Raymund Church
+            [15.7895, 120.2990], // Example: Town Plaza (Approx)
+            [15.7900, 120.3000]  // Example: Old Municipal Hall (Approx)
+        ]
+    };
+
+    let currentRouteLine = null;
+
+    // Make these functions available globally so HTML can call them
+    window.drawRoute = function (type) {
+        // 1. Remove existing line if any
+        if (currentRouteLine) {
+            map.removeLayer(currentRouteLine);
+        }
+
+        // 2. Get coordinates
+        const path = routeData[type];
+        if (!path) return;
+
+        // 3. Define color based on type
+        const color = type === 'nature' ? '#10b981' : '#f59e0b'; // Green or Orange
+
+        // 4. Draw the Polyline using Leaflet
+        currentRouteLine = L.polyline(path, {
+            color: color,
+            weight: 5,
+            opacity: 0.8,
+            dashArray: '10, 10', // Makes it a dashed line for "walking/travel" feel
+            lineCap: 'round'
+        }).addTo(map);
+
+        // 5. Zoom map to fit the route
+        map.fitBounds(currentRouteLine.getBounds(), { padding: [50, 50] });
+    };
+
+    window.clearRoutes = function () {
+        if (currentRouteLine) {
+            map.removeLayer(currentRouteLine);
+            currentRouteLine = null;
+        }
+        // Reset view to default
+        map.flyTo([15.7889, 120.2986], 13);
+    };
+
 });

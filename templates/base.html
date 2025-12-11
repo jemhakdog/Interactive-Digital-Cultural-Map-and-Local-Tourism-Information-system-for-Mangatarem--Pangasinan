@@ -6,14 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}GoMangatarem Information System{% endblock %}</title>
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tailwind CSS (CDN - Fallback) -->
+    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
 
-    <!-- Resource Hints -->
-    <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
+    <!-- Custom CSS (Local - Uncomment after running: npm run build:css) -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
     <link rel="dns-prefetch" href="https://unpkg.com">
     <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
-    <link rel="preconnect" href="https://cdn.tailwindcss.com" crossorigin>
 
     <!-- SEO Meta Tags -->
     {% block meta_description %}
