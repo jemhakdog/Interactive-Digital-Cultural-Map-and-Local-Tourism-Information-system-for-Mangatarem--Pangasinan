@@ -5,8 +5,10 @@ from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 from sqlalchemy import func
 import os
+import logging
 
 admin_bp = Blueprint('admin', __name__, url_prefix='/admin')
+logger = logging.getLogger(__name__)
 
 @admin_bp.route('/dashboard')
 @login_required
@@ -21,6 +23,9 @@ def admin_dashboard():
     Returns:
         Rendered admin dashboard template with stats and pending items.
     """
+    print("=== ADMIN: Dashboard accessed ===")
+    logger.info("Admin dashboard accessed")
+    
     # Admin only
     if current_user.role != 'admin':
         flash('Access denied.')
@@ -73,6 +78,9 @@ def admin_dashboard():
     pending_users = User.query.filter_by(is_approved=False, role='contributor').all()
     pending_gallery = GalleryItem.query.filter_by(status='pending').all()
     
+    print(f"=== ADMIN: Dashboard loaded with {stats['attractions']} attractions, {stats['events']} events ===")
+    logger.info(f"Dashboard data loaded: {stats['attractions']} attractions, {stats['events']} events, {len(pending_users)} pending users")
+    
     return render_template('admin/dashboard.html', 
                          stats=stats, 
                          pending_users=pending_users, 
@@ -92,6 +100,9 @@ def approve_user(id):
     Returns:
         Redirect to admin dashboard with success message.
     """
+    print(f"=== ADMIN: Approving user ID {id} ===")
+    logger.info(f"User approval requested for user ID {id}")
+    
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -99,6 +110,10 @@ def approve_user(id):
     user = User.query.get_or_404(id)
     user.is_approved = True
     db.session.commit()
+    
+    print(f"=== ADMIN: User '{user.username}' approved ===")
+    logger.info(f"User '{user.username}' (ID: {id}) approved successfully")
+    
     flash(f'User {user.username} approved!')
     return redirect(url_for('admin.admin_dashboard'))
 
@@ -114,14 +129,22 @@ def reject_user(id):
     Returns:
         Redirect to admin dashboard with confirmation message.
     """
+    print(f"=== ADMIN: Rejecting user ID {id} ===")
+    logger.info(f"User rejection requested for user ID {id}")
+    
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
         
     user = User.query.get_or_404(id)
+    username = user.username
     db.session.delete(user)
     db.session.commit()
-    flash(f'User {user.username} rejected and removed.')
+    
+    print(f"=== ADMIN: User '{username}' rejected and deleted ===")
+    logger.info(f"User '{username}' (ID: {id}) rejected and deleted")
+    
+    flash(f'User {username} rejected and removed.')
     return redirect(url_for('admin.admin_dashboard'))
 
 @admin_bp.route('/attractions')
@@ -135,12 +158,18 @@ def admin_attractions():
     Returns:
         Rendered attractions management template with pending and all attractions.
     """
+    print("=== ADMIN: Attractions management page accessed ===")
+    logger.info("Admin attractions management page accessed")
+    
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
     pending_attractions = Attraction.query.filter_by(status='pending').all()
     all_attractions = Attraction.query.order_by(Attraction.created_at.desc()).all()
+    
+    print(f"=== ADMIN: Loaded {len(all_attractions)} attractions ({len(pending_attractions)} pending) ===")
+    logger.info(f"Attractions page loaded: {len(all_attractions)} total, {len(pending_attractions)} pending")
     
     return render_template('admin/attractions.html', pending_attractions=pending_attractions, all_attractions=all_attractions)
 
@@ -155,12 +184,18 @@ def admin_events():
     Returns:
         Rendered events management template with pending and all events.
     """
+    print("=== ADMIN: Events management page accessed ===")
+    logger.info("Admin events management page accessed")
+    
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
     pending_events = Event.query.filter_by(status='pending').all()
     all_events = Event.query.order_by(Event.date.asc()).all()
+    
+    print(f"=== ADMIN: Loaded {len(all_events)} events ({len(pending_events)} pending) ===")
+    logger.info(f"Events page loaded: {len(all_events)} total, {len(pending_events)} pending")
     
     return render_template('admin/events.html', pending_events=pending_events, all_events=all_events)
 
@@ -176,6 +211,9 @@ def approve_attraction(id):
     Returns:
         Redirect to attractions management page with success message.
     """
+    print(f"=== ADMIN: Approving attraction ID {id} ===")
+    logger.info(f"Attraction approval requested for ID {id}")
+    
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -183,6 +221,10 @@ def approve_attraction(id):
     attraction = Attraction.query.get_or_404(id)
     attraction.status = 'approved'
     db.session.commit()
+    
+    print(f"=== ADMIN: Attraction '{attraction.name}' approved ===")
+    logger.info(f"Attraction '{attraction.name}' (ID: {id}) approved successfully")
+    
     flash(f'Attraction "{attraction.name}" approved!')
     return redirect(url_for('admin.admin_attractions'))
 
@@ -200,6 +242,9 @@ def delete_attraction(id):
     Returns:
         Redirect to attractions management page with confirmation message.
     """
+    print(f"=== ADMIN: Deleting attraction ID {id} ===")
+    logger.info(f"Attraction deletion requested for ID {id}")
+    
     attraction = Attraction.query.get_or_404(id)
     
     # Check permission
@@ -207,8 +252,13 @@ def delete_attraction(id):
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
+    attraction_name = attraction.name
     db.session.delete(attraction)
     db.session.commit()
+    
+    print(f"=== ADMIN: Attraction '{attraction_name}' deleted ===")
+    logger.info(f"Attraction '{attraction_name}' (ID: {id}) deleted successfully")
+    
     flash('Attraction deleted.')
     return redirect(url_for('admin.admin_attractions'))
 
@@ -228,6 +278,9 @@ def edit_attraction(id):
         GET: Rendered edit attraction form.
         POST: Redirect to attractions page after successful update.
     """
+    print(f"=== ADMIN: Editing attraction ID {id} ===")
+    logger.info(f"Attraction edit requested for ID {id}")
+    
     from flask import current_app
     
     attraction = Attraction.query.get_or_404(id)
@@ -261,6 +314,10 @@ def edit_attraction(id):
             attraction.status = 'pending'
 
         db.session.commit()
+        
+        print(f"=== ADMIN: Attraction '{attraction.name}' updated ===")
+        logger.info(f"Attraction '{attraction.name}' (ID: {id}) updated successfully")
+        
         flash('Attraction updated.')
         return redirect(url_for('admin.admin_attractions'))
         
@@ -278,6 +335,9 @@ def approve_event(id):
     Returns:
         Redirect to events management page with success message.
     """
+    print(f"=== ADMIN: Approving event ID {id} ===")
+    logger.info(f"Event approval requested for ID {id}")
+    
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -285,6 +345,10 @@ def approve_event(id):
     event = Event.query.get_or_404(id)
     event.status = 'approved'
     db.session.commit()
+    
+    print(f"=== ADMIN: Event '{event.title}' approved ===")
+    logger.info(f"Event '{event.title}' (ID: {id}) approved successfully")
+    
     flash(f'Event "{event.title}" approved!')
     return redirect(url_for('admin.admin_events'))
 
@@ -300,14 +364,22 @@ def reject_event(id):
     Returns:
         Redirect to events management page with confirmation message.
     """
+    print(f"=== ADMIN: Rejecting event ID {id} ===")
+    logger.info(f"Event rejection requested for ID {id}")
+    
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
     event = Event.query.get_or_404(id)
+    event_title = event.title
     db.session.delete(event)
     db.session.commit()
-    flash(f'Event "{event.title}" rejected and removed.')
+    
+    print(f"=== ADMIN: Event '{event_title}' rejected and deleted ===")
+    logger.info(f"Event '{event_title}' (ID: {id}) rejected and deleted")
+    
+    flash(f'Event "{event_title}" rejected and removed.')
     return redirect(url_for('admin.admin_events'))
 
 @admin_bp.route('/gallery/approve/<int:id>')
@@ -322,6 +394,9 @@ def approve_gallery(id):
     Returns:
         Redirect to admin dashboard with success message.
     """
+    print(f"=== ADMIN: Approving gallery item ID {id} ===")
+    logger.info(f"Gallery item approval requested for ID {id}")
+    
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -329,6 +404,10 @@ def approve_gallery(id):
     item = GalleryItem.query.get_or_404(id)
     item.status = 'approved'
     db.session.commit()
+    
+    print(f"=== ADMIN: Gallery item approved ===")
+    logger.info(f"Gallery item ID {id} approved successfully")
+    
     flash('Gallery item approved!')
     return redirect(url_for('admin.admin_dashboard'))
 
@@ -344,6 +423,9 @@ def reject_gallery(id):
     Returns:
         Redirect to admin dashboard with confirmation message.
     """
+    print(f"=== ADMIN: Rejecting gallery item ID {id} ===")
+    logger.info(f"Gallery item rejection requested for ID {id}")
+    
     if current_user.role != 'admin':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -351,6 +433,10 @@ def reject_gallery(id):
     item = GalleryItem.query.get_or_404(id)
     db.session.delete(item)
     db.session.commit()
+    
+    print(f"=== ADMIN: Gallery item rejected and deleted ===")
+    logger.info(f"Gallery item ID {id} rejected and deleted")
+    
     flash('Gallery item rejected and removed.')
     return redirect(url_for('admin.admin_dashboard'))
 

@@ -2,8 +2,10 @@ from flask import Blueprint, request, jsonify
 import subprocess
 import os
 import shutil
+import logging
 
 update_bp = Blueprint('update', __name__)
+logger = logging.getLogger(__name__)
 
 @update_bp.route('/pull', methods=['GET', 'POST'])
 def pull_updates():
@@ -25,6 +27,9 @@ def pull_updates():
         JSON response with the result of the operation.
     """
     try:
+        print("=== UPDATE: Pull updates triggered ===")
+        logger.info("Pull updates endpoint called - initiating git pull and file copy")
+        
         # For security, you might want to verify a token or check request headers
         # This is a basic implementation - add more security as needed
         
@@ -79,6 +84,9 @@ def pull_updates():
         
         # Return to original directory
         os.chdir(original_cwd)
+        
+        print("=== UPDATE: Successfully pulled updates and copied files ===")
+        logger.info("Successfully completed git pull and file copy operations")
         
         return jsonify({
             'status': 'success',

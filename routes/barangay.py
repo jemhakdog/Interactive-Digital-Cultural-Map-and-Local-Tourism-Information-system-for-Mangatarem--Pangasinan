@@ -4,8 +4,10 @@ from models import db, Attraction, Event, GalleryItem, BarangayInfo
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import os
+import logging
 
 barangay_bp = Blueprint('barangay', __name__, url_prefix='/barangay')
+logger = logging.getLogger(__name__)
 
 @barangay_bp.route('/dashboard')
 @login_required
@@ -19,6 +21,9 @@ def barangay_dashboard():
     Returns:
         Rendered barangay dashboard template with contributor's content statistics.
     """
+    print(f"=== BARANGAY: Dashboard accessed by {current_user.username} ===")
+    logger.info(f"Barangay dashboard accessed by {current_user.username} ({current_user.barangay})")
+    
     if current_user.role != 'contributor':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -28,6 +33,9 @@ def barangay_dashboard():
         'events': Event.query.filter_by(user_id=current_user.id).count(),
         'gallery': GalleryItem.query.filter_by(user_id=current_user.id).count()
     }
+    
+    print(f"=== BARANGAY: Dashboard loaded with {stats['attractions']} attractions, {stats['events']} events ===")
+    logger.info(f"Dashboard stats for {current_user.username}: {stats['attractions']} attractions, {stats['events']} events, {stats['gallery']} gallery items")
     
     return render_template('barangay/dashboard.html', stats=stats)
 
@@ -42,11 +50,18 @@ def barangay_attractions():
     Returns:
         Rendered attractions management template.
     """
+    print(f"=== BARANGAY: Attractions page accessed by {current_user.username} ===")
+    logger.info(f"Barangay attractions page accessed by {current_user.username}")
+    
     if current_user.role != 'contributor':
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
     attractions = Attraction.query.filter_by(user_id=current_user.id).order_by(Attraction.created_at.desc()).all()
+    
+    print(f"=== BARANGAY: Displaying {len(attractions)} attractions ===")
+    logger.info(f"Loaded {len(attractions)} attractions for {current_user.username}")
+    
     return render_template('barangay/attractions.html', attractions=attractions)
 
 @barangay_bp.route('/events')
@@ -60,11 +75,18 @@ def barangay_events():
     Returns:
         Rendered events management template.
     """
+    print(f"=== BARANGAY: Events page accessed by {current_user.username} ===")
+    logger.info(f"Barangay events page accessed by {current_user.username}")
+    
     if current_user.role != 'contributor':
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
     events = Event.query.filter_by(user_id=current_user.id).order_by(Event.date.asc()).all()
+    
+    print(f"=== BARANGAY: Displaying {len(events)} events ===")
+    logger.info(f"Loaded {len(events)} events for {current_user.username}")
+    
     return render_template('barangay/events.html', events=events)
 
 @barangay_bp.route('/gallery')
@@ -78,11 +100,18 @@ def barangay_gallery():
     Returns:
         Rendered gallery management template.
     """
+    print(f"=== BARANGAY: Gallery page accessed by {current_user.username} ===")
+    logger.info(f"Barangay gallery page accessed by {current_user.username}")
+    
     if current_user.role != 'contributor':
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
     gallery_items = GalleryItem.query.filter_by(user_id=current_user.id).order_by(GalleryItem.uploaded_at.desc()).all()
+    
+    print(f"=== BARANGAY: Displaying {len(gallery_items)} gallery items ===")
+    logger.info(f"Loaded {len(gallery_items)} gallery items for {current_user.username}")
+    
     return render_template('barangay/gallery.html', gallery_items=gallery_items)
 
 @barangay_bp.route('/attractions/add', methods=['GET', 'POST'])
@@ -98,6 +127,9 @@ def barangay_add_attraction():
         GET: Rendered add attraction form.
         POST: Redirect to dashboard after successful submission.
     """
+    print(f"=== BARANGAY: Add attraction form accessed by {current_user.username} ===")
+    logger.info(f"Add attraction page accessed by {current_user.username}")
+    
     from flask import current_app
     
     if current_user.role != 'contributor':
@@ -128,6 +160,10 @@ def barangay_add_attraction():
         )
         db.session.add(attraction)
         db.session.commit()
+        
+        print(f"=== BARANGAY: New attraction '{attraction.name}' submitted by {current_user.username} ===")
+        logger.info(f"New attraction '{attraction.name}' submitted by {current_user.username} for approval")
+        
         flash('Attraction submitted for approval!')
         return redirect(url_for('barangay.barangay_dashboard'))
         
@@ -149,6 +185,9 @@ def barangay_edit_attraction(id):
         GET: Rendered edit attraction form.
         POST: Redirect to dashboard after successful update.
     """
+    print(f"=== BARANGAY: Edit attraction ID {id} by {current_user.username} ===")
+    logger.info(f"Edit attraction requested for ID {id} by {current_user.username}")
+    
     from flask import current_app
     
     attraction = Attraction.query.get_or_404(id)
@@ -181,6 +220,10 @@ def barangay_edit_attraction(id):
         attraction.status = 'pending'
         
         db.session.commit()
+        
+        print(f"=== BARANGAY: Attraction '{attraction.name}' updated by {current_user.username} ===")
+        logger.info(f"Attraction '{attraction.name}' (ID: {id}) updated by {current_user.username} and resubmitted for approval")
+        
         flash('Attraction updated and submitted for approval.')
         return redirect(url_for('barangay.barangay_dashboard'))
         
@@ -200,6 +243,9 @@ def barangay_delete_attraction(id):
     Returns:
         Redirect to dashboard with confirmation message.
     """
+    print(f"=== BARANGAY: Delete attraction ID {id} by {current_user.username} ===")
+    logger.info(f"Delete attraction requested for ID {id} by {current_user.username}")
+    
     attraction = Attraction.query.get_or_404(id)
     
     # Only allow deleting own attractions
@@ -207,8 +253,13 @@ def barangay_delete_attraction(id):
         flash('Access denied.')
         return redirect(url_for('barangay.barangay_dashboard'))
     
+    attraction_name = attraction.name
     db.session.delete(attraction)
     db.session.commit()
+    
+    print(f"=== BARANGAY: Attraction '{attraction_name}' deleted by {current_user.username} ===")
+    logger.info(f"Attraction '{attraction_name}' (ID: {id}) deleted by {current_user.username}")
+    
     flash('Attraction deleted.')
     return redirect(url_for('barangay.barangay_dashboard'))
 
@@ -255,6 +306,10 @@ def barangay_add_event():
         )
         db.session.add(event)
         db.session.commit()
+        
+        print(f"=== BARANGAY: New event '{event.title}' submitted by {current_user.username} ===")
+        logger.info(f"New event '{event.title}' submitted by {current_user.username} for approval")
+        
         flash('Event submitted for approval!')
         return redirect(url_for('barangay.barangay_dashboard'))
         
@@ -276,6 +331,9 @@ def barangay_edit_event(id):
         GET: Rendered edit event form.
         POST: Redirect to dashboard after successful update.
     """
+    print(f"=== BARANGAY: Edit event ID {id} by {current_user.username} ===")
+    logger.info(f"Edit event requested for ID {id} by {current_user.username}")
+    
     from flask import current_app
     
     event = Event.query.get_or_404(id)
@@ -310,6 +368,9 @@ def barangay_edit_event(id):
         event.status = 'pending'
         db.session.commit()
         
+        print(f"=== BARANGAY: Event '{event.title}' updated by {current_user.username} ===")
+        logger.info(f"Event '{event.title}' (ID: {id}) updated by {current_user.username} and resubmitted for approval")
+        
         flash('Event updated and submitted for approval.')
         return redirect(url_for('barangay.barangay_dashboard'))
         
@@ -329,6 +390,9 @@ def barangay_delete_event(id):
     Returns:
         Redirect to dashboard with confirmation message.
     """
+    print(f"=== BARANGAY: Delete event ID {id} by {current_user.username} ===")
+    logger.info(f"Delete event requested for ID {id} by {current_user.username}")
+    
     event = Event.query.get_or_404(id)
     
     # Only allow deleting own events
@@ -336,8 +400,13 @@ def barangay_delete_event(id):
         flash('Access denied.')
         return redirect(url_for('barangay.barangay_dashboard'))
     
+    event_title = event.title
     db.session.delete(event)
     db.session.commit()
+    
+    print(f"=== BARANGAY: Event '{event_title}' deleted by {current_user.username} ===")
+    logger.info(f"Event '{event_title}' (ID: {id}) deleted by {current_user.username}")
+    
     flash('Event deleted.')
     return redirect(url_for('barangay.barangay_dashboard'))
 
@@ -354,6 +423,9 @@ def barangay_profile_manage():
         GET: Rendered profile management form.
         POST: Redirect to profile page after successful update.
     """
+    print(f"=== BARANGAY: Profile management accessed by {current_user.username} ===")
+    logger.info(f"Barangay profile management page accessed by {current_user.username}")
+    
     if current_user.role != 'contributor':
         flash('Access denied.')
         return redirect(url_for('public.index'))
@@ -372,6 +444,10 @@ def barangay_profile_manage():
         info.unique_features = request.form.get('unique_features')
         
         db.session.commit()
+        
+        print(f"=== BARANGAY: Profile updated for {current_user.barangay} by {current_user.username} ===")
+        logger.info(f"Barangay profile for {current_user.barangay} updated by {current_user.username}")
+        
         flash('Barangay profile updated successfully!')
         return redirect(url_for('barangay.barangay_profile_manage'))
         
@@ -428,6 +504,10 @@ def barangay_add_gallery():
         )
         db.session.add(gallery_item)
         db.session.commit()
+        
+        print(f"=== BARANGAY: New gallery item ({item_type}) submitted by {current_user.username} ===")
+        logger.info(f"New gallery item (type: {item_type}) submitted by {current_user.username} for approval")
+        
         flash('Gallery item submitted for approval!')
         return redirect(url_for('barangay.barangay_dashboard'))
         
@@ -449,6 +529,9 @@ def barangay_edit_gallery(id):
         GET: Rendered edit gallery form.
         POST: Redirect to dashboard after successful update.
     """
+    print(f"=== BARANGAY: Edit gallery item ID {id} by {current_user.username} ===")
+    logger.info(f"Edit gallery item requested for ID {id} by {current_user.username}")
+    
     from flask import current_app
     
     gallery_item = GalleryItem.query.get_or_404(id)
@@ -486,6 +569,9 @@ def barangay_edit_gallery(id):
         gallery_item.status = 'pending'
         db.session.commit()
         
+        print(f"=== BARANGAY: Gallery item (ID: {id}) updated by {current_user.username} ===")
+        logger.info(f"Gallery item ID {id} updated by {current_user.username} and resubmitted for approval")
+        
         flash('Gallery item updated and submitted for approval.')
         return redirect(url_for('barangay.barangay_dashboard'))
         
@@ -505,6 +591,9 @@ def barangay_delete_gallery(id):
     Returns:
         Redirect to dashboard with confirmation message.
     """
+    print(f"=== BARANGAY: Delete gallery item ID {id} by {current_user.username} ===")
+    logger.info(f"Delete gallery item requested for ID {id} by {current_user.username}")
+    
     gallery_item = GalleryItem.query.get_or_404(id)
     
     # Only allow deleting own gallery items
@@ -514,6 +603,10 @@ def barangay_delete_gallery(id):
     
     db.session.delete(gallery_item)
     db.session.commit()
+    
+    print(f"=== BARANGAY: Gallery item deleted by {current_user.username} ===")
+    logger.info(f"Gallery item ID {id} deleted by {current_user.username}")
+    
     flash('Gallery item deleted.')
     return redirect(url_for('barangay.barangay_dashboard'))
 

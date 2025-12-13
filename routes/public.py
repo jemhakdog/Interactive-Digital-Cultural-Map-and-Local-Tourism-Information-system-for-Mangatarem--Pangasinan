@@ -2,8 +2,10 @@ from flask import Blueprint, render_template, jsonify, request
 from models import db, User, Attraction, Event, GalleryItem, BarangayInfo, PageView
 from flask_login import current_user
 from datetime import datetime
+import logging
 
 public_bp = Blueprint('public', __name__)
+logger = logging.getLogger(__name__)
 
 @public_bp.route('/')
 def index():
@@ -15,11 +17,18 @@ def index():
     Returns:
         Rendered index template with featured attractions.
     """
+    print("=== PUBLIC: Index/Home page accessed ===")
+    logger.info("Home page accessed")
+    
     # Record view
     record_view('page', page_name='home')
 
     # Get featured attractions (limit 3)
     featured = Attraction.query.filter_by(status='approved').limit(3).all()
+    
+    print(f"=== PUBLIC: Displaying {len(featured)} featured attractions ===")
+    logger.info(f"Home page loaded with {len(featured)} featured attractions")
+    
     return render_template('index.html', featured=featured)
 
 def record_view(view_type, item_id=None, page_name=None):
@@ -53,6 +62,9 @@ def map_view():
     Returns:
         Rendered map template with list of barangays for filtering.
     """
+    print("=== PUBLIC: Map page accessed ===")
+    logger.info("Interactive map page accessed")
+    
     # Pass all approved attractions to the map
     attractions = Attraction.query.filter_by(status='approved').all()
     
@@ -66,6 +78,9 @@ def map_view():
     ).distinct().order_by(Attraction.barangay).all()
 
     barangay_list = [b[0] for b in barangays]
+    
+    print(f"=== PUBLIC: Map loaded with {len(attractions)} attractions, {len(barangay_list)} barangays ===")
+    logger.info(f"Map page loaded with {len(attractions)} attractions and {len(barangay_list)} barangays")
 
     return render_template('map.html', barangays=barangay_list)
 
@@ -80,9 +95,15 @@ def attraction_detail(id):
     Returns:
         Rendered detail template with attraction information.
     """
+    print(f"=== PUBLIC: Attraction detail page accessed for ID {id} ===")
+    logger.info(f"Attraction detail page accessed for ID {id}")
+    
     attraction = Attraction.query.get_or_404(id)
     # Record view
     record_view('attraction', item_id=id)
+    
+    print(f"=== PUBLIC: Displaying attraction '{attraction.name}' ===")
+    logger.info(f"Showing attraction '{attraction.name}' (ID: {id})")
     
     return render_template('detail.html', attraction=attraction)
 
@@ -97,10 +118,17 @@ def events():
     Returns:
         Rendered events template with list of events.
     """
+    print("=== PUBLIC: Events page accessed ===")
+    logger.info("Events page accessed")
+    
     # Record view
     record_view('page', page_name='events')
     
     events = Event.query.filter_by(status='approved').order_by(Event.date.asc()).all()
+    
+    print(f"=== PUBLIC: Displaying {len(events)} approved events ===")
+    logger.info(f"Events page loaded with {len(events)} approved events")
+    
     return render_template('events.html', events=events)
 
 @public_bp.route('/gallery')
@@ -114,6 +142,9 @@ def gallery():
     Returns:
         Rendered gallery template with approved media items.
     """
+    print("=== PUBLIC: Gallery page accessed ===")
+    logger.info("Gallery page accessed")
+    
     # Record view
     record_view('page', page_name='gallery')
     
@@ -127,6 +158,9 @@ def gallery():
     ).distinct().order_by(User.barangay).all()
 
     barangay_list = [b[0] for b in barangays]
+    
+    print(f"=== PUBLIC: Gallery loaded with {len(items)} items from {len(barangay_list)} barangays ===")
+    logger.info(f"Gallery page loaded with {len(items)} approved items")
 
     return render_template('gallery.html', gallery_items=items, barangays=barangay_list)
 
@@ -139,6 +173,9 @@ def search():
         category (str): Filter by category (Nature, Historical, etc.)
         barangay (str): Filter by barangay location.
     """
+    print(f"=== PUBLIC: Search page accessed with query='{request.args.get('q', '')}' ===")
+    logger.info(f"Search page accessed with query: {request.args.get('q', '')}")
+    
     query = request.args.get('q', '')
     category_filter = request.args.get('category', '')
     barangay_filter = request.args.get('barangay', '')
@@ -174,6 +211,9 @@ def search():
     # Fetch unique options for the filter dropdowns
     available_categories = db.session.query(Attraction.category).distinct().all()
     available_barangays = db.session.query(Attraction.barangay).filter(Attraction.barangay != None).distinct().all()
+    
+    print(f"=== PUBLIC: Search found {len(attractions)} attractions, {len(events)} events ===")
+    logger.info(f"Search results: {len(attractions)} attractions, {len(events)} events for query '{query}'")
 
     return render_template('search_results.html', 
                          query=query, 
@@ -192,6 +232,8 @@ def routes():
     Returns:
         Rendered routes template.
     """
+    print("=== PUBLIC: Routes page accessed ===")
+    logger.info("Tourism routes page accessed")
     return render_template('routes.html')
 
 @public_bp.route('/barangays')
@@ -205,6 +247,9 @@ def barangays():
     Returns:
         Rendered barangays directory template with barangay list.
     """
+    print("=== PUBLIC: Barangays directory page accessed ===")
+    logger.info("Barangays directory page accessed")
+    
     # Record view
     record_view('page', page_name='barangays_list')
     
@@ -256,6 +301,9 @@ def barangays():
 
     # Sort by name
     barangay_list.sort(key=lambda x: x['name'])
+    
+    print(f"=== PUBLIC: Barangays directory loaded with {len(barangay_list)} barangays ===")
+    logger.info(f"Barangays directory page loaded with {len(barangay_list)} barangays")
 
     return render_template('barangays.html', barangays=barangay_list)
 
@@ -273,6 +321,9 @@ def barangay_profile(name):
     Returns:
         Rendered barangay profile template with all content for the barangay.
     """
+    print(f"=== PUBLIC: Barangay profile page accessed for '{name}' ===")
+    logger.info(f"Barangay profile page accessed for barangay '{name}'")
+    
     # Record view
     record_view('page', page_name='barangay_profile', item_id=None) # We could count specific barangays if we had IDs
 
@@ -308,6 +359,9 @@ def barangay_profile(name):
             'lng': a.lng,
             'image_url': a.image_url
         })
+    
+    print(f"=== PUBLIC: Barangay '{name}' profile loaded with {len(attractions)} attractions, {len(events)} events ===")
+    logger.info(f"Barangay profile for '{name}': {len(attractions)} attractions, {len(events)} events, {len(gallery_items)} gallery items")
 
     return render_template('barangay_profile.html',
                          barangay_name=name,
@@ -409,6 +463,9 @@ def sitemap():
             'changefreq': 'weekly',
             'priority': '0.7'
         })
+    
+    print(f"=== PUBLIC: Sitemap generated with {len(pages)} pages ===")
+    logger.info(f"Sitemap.xml generated with {len(pages)} total pages")
 
     sitemap_xml = render_template('sitemap.xml', pages=pages)
     response = make_response(sitemap_xml)
@@ -430,6 +487,8 @@ def verify_site():
     Returns:
         Rendered verification template file.
     """
+    print("=== PUBLIC: Google verification file accessed ===")
+    logger.info("Google Search Console verification file accessed")
     return render_template("google364b8336ce52ae86.html")
 
     

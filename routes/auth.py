@@ -1,8 +1,10 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required
 from models import db, User
+import logging
 
 auth_bp = Blueprint('auth', __name__)
+logger = logging.getLogger(__name__)
 
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
@@ -18,6 +20,9 @@ def login():
         GET: Rendered login template.
         POST: Redirect to home page on success, or login page with error.
     """
+    print("=== AUTH: Login attempt ===")
+    logger.info("Login page accessed")
+    
     if request.method == 'POST':
         username = request.form.get('username')
         password = request.form.get('password')
@@ -28,6 +33,8 @@ def login():
                 flash('Your account is pending approval by the admin.', 'warning')
                 return redirect(url_for('auth.login'))
                 
+            print(f"=== AUTH: User '{username}' logged in successfully ===")
+            logger.info(f"User '{username}' with role '{user.role}' logged in successfully")
             login_user(user)
             return redirect(url_for('public.index'))
         flash('Invalid username or password', 'error')
@@ -45,6 +52,9 @@ def register():
         GET: Rendered registration template.
         POST: Redirect to login page with confirmation message.
     """
+    print("=== AUTH: Registration attempt ===")
+    logger.info("Registration page accessed")
+    
     if request.method == 'POST':
         username = request.form.get('username')
         email = request.form.get('email')
@@ -70,6 +80,9 @@ def register():
         db.session.add(user)
         db.session.commit()
         
+        print(f"=== AUTH: New user '{username}' registered for barangay '{barangay}' ===")
+        logger.info(f"New contributor user '{username}' registered for barangay '{barangay}', awaiting approval")
+        
         flash('Registration successful! Please wait for admin approval.', 'success')
         return redirect(url_for('auth.login'))
         
@@ -84,5 +97,7 @@ def logout():
     Returns:
         Redirect to home page.
     """
+    print(f"=== AUTH: User logged out ===")
+    logger.info("User logged out successfully")
     logout_user()
     return redirect(url_for('public.index'))

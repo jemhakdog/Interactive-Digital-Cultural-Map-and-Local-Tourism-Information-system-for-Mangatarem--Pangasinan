@@ -1,7 +1,9 @@
 from flask import Blueprint, jsonify
 from models import Attraction
+import logging
 
 api_bp = Blueprint('api', __name__, url_prefix='/api')
+logger = logging.getLogger(__name__)
 
 @api_bp.route('/attractions')
 def api_attractions():
@@ -15,6 +17,9 @@ def api_attractions():
     Returns:
         JSON: List of approved attractions with their details.
     """
+    print("=== API: Fetching attractions ===")
+    logger.info("API endpoint /api/attractions called")
+    
     attractions = Attraction.query.filter_by(status='approved').all()
     result = []
     for a in attractions:
@@ -29,4 +34,7 @@ def api_attractions():
             'image': a.image_url,
             'rating': 4.5  # Placeholder rating until we implement reviews
         })
+    
+    print(f"=== API: Returning {len(result)} attractions ===")
+    logger.info(f"Returning {len(result)} approved attractions")
     return jsonify(result)
