@@ -1,0 +1,12 @@
+[project]
+name = ""
+version = "0.0.1"
+dependencies = [
+    "flask",
+    "flask-sqlalchemy",
+    "flask-login",
+    "email-validator",
+]
+
+[tool.uv]
+package = false
