@@ -70,6 +70,7 @@ from routes import register_blueprints
 register_blueprints(app)
 
 if __name__ == '__main__':
+    print(app.url_map)
     with app.app_context():
         db.create_all()
         seed_database()

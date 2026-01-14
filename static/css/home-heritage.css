@@ -1,0 +1,408 @@
+/* ==============================================
+   PREMIUM HERITAGE DESIGN SYSTEM
+   ============================================== */
+
+:root {
+    /* Heritage Color Palette */
+    --heritage-green: #064E3B;
+    --heritage-green-light: #065F46;
+    --heritage-gold: #D4AF37;
+    --heritage-gold-dark: #B45309;
+    --heritage-cream: #FDFBF7;
+    --heritage-terracotta: #B45309;
+    --heritage-text: #111827;
+    --heritage-text-muted: #4B5563;
+
+    /* System Colors mapping */
+    --heritage-green-50: #f0fdf4;
+    --heritage-green-900: #064E3B;
+}
+
+/* Typography Refinements are now handled globally in style.css */
+/* We keep custom overrides here if needed */
+
+/* Heritage Utility Classes */
+.bg-heritage-green {
+    background-color: var(--heritage-green) !important;
+}
+
+.bg-heritage-cream {
+    background-color: var(--heritage-cream) !important;
+}
+
+.text-heritage-gold {
+    color: var(--heritage-gold) !important;
+}
+
+
+/* Paper Texture Overlay */
+.paper-texture {
+    position: relative;
+}
+
+.paper-texture::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    opacity: 0.05;
+    pointer-events: none;
+    background-image: url("https://www.transparenttextures.com/patterns/felt.png");
+    z-index: 1;
+}
+
+/* Glassmorphism Utilities */
+.glass-effect {
+    background: rgba(253, 251, 247, 0.8);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(180, 83, 9, 0.1);
+}
+
+.glass-dark {
+    background: rgba(6, 78, 59, 0.85);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+/* Modern Hover Effects */
+.hover-lift {
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(6, 78, 59, 0.15);
+}
+
+/* Heritage Decorative Elements */
+.heritage-border {
+    border: 2px solid var(--heritage-green);
+    position: relative;
+    padding: 2rem;
+}
+
+.heritage-border::after {
+    content: '';
+    position: absolute;
+    inset: 8px;
+    border: 1px solid var(--heritage-gold);
+    pointer-events: none;
+}
+
+/* Premium Button Overrides */
+.btn-heritage {
+    background: var(--heritage-green);
+    color: white;
+    padding: 1rem 2rem;
+    border-radius: 4px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: 1px solid var(--heritage-gold);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.btn-heritage:hover {
+    background: var(--heritage-green-light);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(6, 78, 59, 0.2);
+    border-color: white;
+}
+
+.btn-heritage-outline {
+    background: transparent;
+    color: var(--heritage-green);
+    padding: 1rem 2rem;
+    border-radius: 4px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    border: 2px solid var(--heritage-green);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.btn-heritage-outline:hover {
+    background: var(--heritage-green);
+    color: white;
+}
+
+/* Existing Home Heritage Styles */
+/* ==============================================
+   HOME PAGE - HERITAGE NARRATIVE STYLES
+   ============================================== */
+
+/* Hero Section */
+.hero-heritage {
+    position: relative;
+    height: 100vh;
+    min-height: 700px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    background: var(--heritage-green);
+}
+
+.hero-video-bg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0.6;
+    z-index: 1;
+}
+
+.hero-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom,
+            rgba(6, 78, 59, 0.4) 0%,
+            rgba(6, 78, 59, 0.8) 100%);
+    z-index: 2;
+}
+
+.hero-content-wrap {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    max-width: 900px;
+    padding: 2rem;
+    margin-top: -5vh;
+    /* Slightly offset upwards to leave more space at bottom */
+}
+
+.hero-title {
+    font-size: clamp(3rem, 8vw, 6rem);
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    transform: translateY(30px);
+    animation: fadeInUp 1s cubic-bezier(0.2, 0.6, 0.2, 1) forwards;
+}
+
+.hero-subtitle {
+    font-size: clamp(1.2rem, 2vw, 1.5rem);
+    font-weight: 300;
+    margin-bottom: 2rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeInUp 1s cubic-bezier(0.2, 0.6, 0.2, 1) 0.3s forwards;
+}
+
+/* Specific button refinement for Hero background */
+.hero-heritage .btn-heritage-outline {
+    border-color: white;
+    color: white;
+}
+
+.hero-heritage .btn-heritage-outline:hover {
+    background: white;
+    color: var(--heritage-green);
+}
+
+.hero-heritage .btn-heritage {
+    background: var(--heritage-gold);
+    border-color: var(--heritage-gold);
+}
+
+.hero-heritage .btn-heritage:hover {
+    background: white;
+    color: var(--heritage-green);
+    border-color: white;
+}
+
+/* Featured Section - Heritage Spotlight */
+#featured {
+    padding-top: 10rem;
+    /* Increased top padding for better separation from Hero */
+}
+
+.spotlight-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 3rem;
+    margin-top: 4rem;
+    position: relative;
+    z-index: 20;
+}
+
+.spotlight-card {
+    grid-column: span 12;
+    background: white;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 15px 45px rgba(6, 78, 59, 0.1);
+}
+
+@media (min-width: 1024px) {
+    .spotlight-card:nth-child(1) {
+        grid-column: 1 / span 7;
+        grid-row: 1;
+    }
+
+    .spotlight-card:nth-child(2) {
+        grid-column: 8 / span 5;
+        grid-row: 1;
+        margin-top: 8rem;
+    }
+
+    .spotlight-card:nth-child(3) {
+        grid-column: 4 / span 6;
+        grid-row: 2;
+        margin-top: -4rem;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    .spotlight-card:nth-child(odd) {
+        grid-column: span 12;
+    }
+
+    .spotlight-card:nth-child(even) {
+        grid-column: span 12;
+    }
+}
+
+.spotlight-img-wrap {
+    height: 350px;
+    overflow: hidden;
+    position: relative;
+}
+
+.spotlight-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+.spotlight-card:hover .spotlight-img {
+    transform: scale(1.08);
+}
+
+.spotlight-content {
+    padding: 2.5rem;
+}
+
+/* Editorial Experiences */
+.experience-editorial {
+    display: flex;
+    flex-direction: column;
+    gap: 8rem;
+    padding: 8rem 0;
+}
+
+.editorial-row {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    align-items: center;
+    gap: 4rem;
+}
+
+.editorial-row:nth-child(even) .editorial-media {
+    grid-column: 7 / span 6;
+    order: 2;
+}
+
+.editorial-row:nth-child(even) .editorial-text {
+    grid-column: 1 / span 5;
+    order: 1;
+}
+
+.editorial-media {
+    grid-column: 1 / span 6;
+    position: relative;
+}
+
+.editorial-text {
+    grid-column: 8 / span 5;
+}
+
+.media-main {
+    width: 100%;
+    aspect-ratio: 4/5;
+    object-fit: cover;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.1);
+}
+
+.media-accent {
+    position: absolute;
+    width: 60%;
+    aspect-ratio: 1;
+    bottom: -15%;
+    right: -10%;
+    object-fit: cover;
+    border: 10px solid var(--heritage-cream);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.editorial-row:nth-child(even) .media-accent {
+    right: auto;
+    left: -10%;
+}
+
+.caption-serif {
+    font-size: 0.9rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--heritage-gold-dark);
+    margin-bottom: 1rem;
+    display: block;
+    font-weight: 600;
+}
+
+/* Map Teaser Integrated */
+.map-teaser-full {
+    background: var(--heritage-green);
+    color: white;
+    padding: 12rem 0;
+    position: relative;
+    border-top: 1px solid var(--heritage-gold);
+    border-bottom: 1px solid var(--heritage-gold);
+}
+
+.map-teaser-bg {
+    position: absolute;
+    inset: 0;
+    opacity: 0.15;
+    background-image: url("https://www.transparenttextures.com/patterns/natural-paper.png");
+    pointer-events: none;
+}
+
+/* Animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Reveal on Scroll */
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 1s cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}

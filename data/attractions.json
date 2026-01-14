@@ -7,7 +7,7 @@
     "description": "A protected area containing natural hot springs and a diverse forest ecosystem. Perfect for nature lovers and relaxation.",
     "lat": 15.6667,
     "lng": 120.2833,
-    "image": "https://placehold.co/600x400?text=Manleluag+Spring",
+    "image": "/static/img/manleluag_spring.png",
     "rating": 4.8
   },
   {
@@ -18,7 +18,7 @@
     "description": "A scenic road offering breathtaking views of the mountains and rolling hills. A popular spot for road trips and photography.",
     "lat": 15.7000,
     "lng": 120.2500,
-    "image": "https://placehold.co/600x400?text=Daang+Kalikasan",
+    "image": "/static/img/daang_kalikasan.png",
     "rating": 4.7
   },
   {
@@ -29,7 +29,7 @@
     "description": "A historic church with Spanish colonial architecture. A significant cultural and religious landmark in Mangatarem.",
     "lat": 15.7889,
     "lng": 120.2986,
-    "image": "https://placehold.co/600x400?text=St.+Raymund+Church",
+    "image": "/static/img/st_raymund_church.png",
     "rating": 4.6
   },
   {

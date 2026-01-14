@@ -1,20 +1,74 @@
 /* Custom styles to supplement Tailwind */
 
-/* Prevent horizontal overflow globally */
+/* Typography */
+:root {
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-accent: 'Lora', serif;
+}
+
 html {
     overflow-x: hidden;
     scroll-behavior: smooth;
+    font-family: var(--font-body);
 }
 
 body {
     overflow-x: hidden;
     width: 100%;
     max-width: 100vw;
+    font-family: var(--font-body);
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.font-heading {
+    font-family: var(--font-heading);
+}
+
+.font-body {
+    font-family: var(--font-body);
+}
+
+.caption-serif {
+    font-family: var(--font-accent);
+    font-style: italic;
+}
+
+/* Premium Footer Link Hover Effect */
+.footer-link {
+    position: relative;
+    transition: color 0.3s ease;
+}
+
+.footer-link::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 1px;
+    bottom: -2px;
+    left: 0;
+    background-color: #22c55e;
+    transition: width 0.3s ease;
+}
+
+.footer-link:hover {
+    color: #22c55e;
+}
+
+.footer-link:hover::after {
+    width: 100%;
+}
+
+/* Map Popup Enhancements */
 .leaflet-popup-content-wrapper {
-    border-radius: 0.5rem;
-    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    border-radius: 1rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 .leaflet-popup-content {
@@ -30,30 +84,20 @@ body {
     padding: 0 !important;
 }
 
-.leaflet-tooltip-top:before,
-.leaflet-tooltip-bottom:before,
-.leaflet-tooltip-left:before,
-.leaflet-tooltip-right:before {
-    display: none !important;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
 }
 
-/* Typing Animation Cursor */
-.cursor {
-    display: inline-block;
-    width: 3px;
-    background-color: white;
-    animation: blink 1s infinite;
-    margin-left: 2px;
+::-webkit-scrollbar-track {
+    background: #111827;
 }
 
-@keyframes blink {
+::-webkit-scrollbar-thumb {
+    background: #15803d;
+    border-radius: 5px;
+}
 
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0;
-    }
+::-webkit-scrollbar-thumb:hover {
+    background: #16a34a;
 }
