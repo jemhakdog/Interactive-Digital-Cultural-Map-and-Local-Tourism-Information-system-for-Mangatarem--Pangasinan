@@ -23,14 +23,16 @@ def admin_dashboard():
     Returns:
         Rendered admin dashboard template with stats and pending items.
     """
-    print("=== ADMIN: Dashboard accessed ===")
+    print(f"[PROGRESSIVE LOG] [admin] > admin_dashboard > ENTRY: user='{current_user.username}'")
     logger.info("Admin dashboard accessed")
     
     # Admin only
     if current_user.role != 'admin':
+        print(f"[PROGRESSIVE LOG] [admin] > admin_dashboard > ERROR: Access denied for role='{current_user.role}'")
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
+    print(f"[PROGRESSIVE LOG] [admin] > admin_dashboard > QUERY: Fetching basic stats")
     stats = {
         'attractions': Attraction.query.count(),
         'events': Event.query.count(),
@@ -78,9 +80,10 @@ def admin_dashboard():
     pending_users = User.query.filter_by(is_approved=False, role='contributor').all()
     pending_gallery = GalleryItem.query.filter_by(status='pending').all()
     
-    print(f"=== ADMIN: Dashboard loaded with {stats['attractions']} attractions, {stats['events']} events ===")
+    print(f"[PROGRESSIVE LOG] [admin] > admin_dashboard > SUCCESS: Dashboard loaded with {stats['attractions']} attractions, {stats['events']} events")
     logger.info(f"Dashboard data loaded: {stats['attractions']} attractions, {stats['events']} events, {len(pending_users)} pending users")
     
+    print(f"[PROGRESSIVE LOG] [admin] > admin_dashboard > RENDER: Rendering admin/dashboard.html")
     return render_template('admin/dashboard.html', 
                          stats=stats, 
                          pending_users=pending_users, 
@@ -100,18 +103,20 @@ def approve_user(id):
     Returns:
         Redirect to admin dashboard with success message.
     """
-    print(f"=== ADMIN: Approving user ID {id} ===")
+    print(f"[PROGRESSIVE LOG] [admin] > approve_user > ENTRY: id={id}")
     logger.info(f"User approval requested for user ID {id}")
     
     if current_user.role != 'admin':
+        print(f"[PROGRESSIVE LOG] [admin] > approve_user > ERROR: Access denied for user ID={current_user.id}")
         flash('Access denied.')
         return redirect(url_for('public.index'))
         
+    print(f"[PROGRESSIVE LOG] [admin] > approve_user > QUERY: Fetching user ID {id}")
     user = User.query.get_or_404(id)
     user.is_approved = True
     db.session.commit()
     
-    print(f"=== ADMIN: User '{user.username}' approved ===")
+    print(f"[PROGRESSIVE LOG] [admin] > approve_user > SUCCESS: User '{user.username}' approved")
     logger.info(f"User '{user.username}' (ID: {id}) approved successfully")
     
     flash(f'User {user.username} approved!')
@@ -129,19 +134,21 @@ def reject_user(id):
     Returns:
         Redirect to admin dashboard with confirmation message.
     """
-    print(f"=== ADMIN: Rejecting user ID {id} ===")
+    print(f"[PROGRESSIVE LOG] [admin] > reject_user > ENTRY: id={id}")
     logger.info(f"User rejection requested for user ID {id}")
     
     if current_user.role != 'admin':
+        print(f"[PROGRESSIVE LOG] [admin] > reject_user > ERROR: Access denied for user ID={current_user.id}")
         flash('Access denied.')
         return redirect(url_for('public.index'))
         
+    print(f"[PROGRESSIVE LOG] [admin] > reject_user > QUERY: Fetching user ID {id}")
     user = User.query.get_or_404(id)
     username = user.username
     db.session.delete(user)
     db.session.commit()
     
-    print(f"=== ADMIN: User '{username}' rejected and deleted ===")
+    print(f"[PROGRESSIVE LOG] [admin] > reject_user > SUCCESS: User '{username}' rejected and deleted")
     logger.info(f"User '{username}' (ID: {id}) rejected and deleted")
     
     flash(f'User {username} rejected and removed.')
@@ -158,19 +165,22 @@ def admin_attractions():
     Returns:
         Rendered attractions management template with pending and all attractions.
     """
-    print("=== ADMIN: Attractions management page accessed ===")
+    print(f"[PROGRESSIVE LOG] [admin] > admin_attractions > ENTRY")
     logger.info("Admin attractions management page accessed")
     
     if current_user.role != 'admin':
+        print(f"[PROGRESSIVE LOG] [admin] > admin_attractions > ERROR: Access denied")
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
+    print(f"[PROGRESSIVE LOG] [admin] > admin_attractions > QUERY: Fetching all attractions")
     pending_attractions = Attraction.query.filter_by(status='pending').all()
     all_attractions = Attraction.query.order_by(Attraction.created_at.desc()).all()
     
-    print(f"=== ADMIN: Loaded {len(all_attractions)} attractions ({len(pending_attractions)} pending) ===")
+    print(f"[PROGRESSIVE LOG] [admin] > admin_attractions > SUCCESS: Loaded {len(all_attractions)} total, {len(pending_attractions)} pending")
     logger.info(f"Attractions page loaded: {len(all_attractions)} total, {len(pending_attractions)} pending")
     
+    print(f"[PROGRESSIVE LOG] [admin] > admin_attractions > RENDER: Rendering admin/attractions.html")
     return render_template('admin/attractions.html', pending_attractions=pending_attractions, all_attractions=all_attractions)
 
 @admin_bp.route('/events')
@@ -184,19 +194,22 @@ def admin_events():
     Returns:
         Rendered events management template with pending and all events.
     """
-    print("=== ADMIN: Events management page accessed ===")
+    print(f"[PROGRESSIVE LOG] [admin] > admin_events > ENTRY")
     logger.info("Admin events management page accessed")
     
     if current_user.role != 'admin':
+        print(f"[PROGRESSIVE LOG] [admin] > admin_events > ERROR: Access denied")
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
+    print(f"[PROGRESSIVE LOG] [admin] > admin_events > QUERY: Fetching all events")
     pending_events = Event.query.filter_by(status='pending').all()
     all_events = Event.query.order_by(Event.date.asc()).all()
     
-    print(f"=== ADMIN: Loaded {len(all_events)} events ({len(pending_events)} pending) ===")
+    print(f"[PROGRESSIVE LOG] [admin] > admin_events > SUCCESS: Loaded {len(all_events)} total, {len(pending_events)} pending")
     logger.info(f"Events page loaded: {len(all_events)} total, {len(pending_events)} pending")
     
+    print(f"[PROGRESSIVE LOG] [admin] > admin_events > RENDER: Rendering admin/events.html")
     return render_template('admin/events.html', pending_events=pending_events, all_events=all_events)
 
 @admin_bp.route('/attractions/approve/<int:id>')
@@ -211,18 +224,20 @@ def approve_attraction(id):
     Returns:
         Redirect to attractions management page with success message.
     """
-    print(f"=== ADMIN: Approving attraction ID {id} ===")
+    print(f"[PROGRESSIVE LOG] [admin] > approve_attraction > ENTRY: id={id}")
     logger.info(f"Attraction approval requested for ID {id}")
     
     if current_user.role != 'admin':
+        print(f"[PROGRESSIVE LOG] [admin] > approve_attraction > ERROR: Access denied")
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
+    print(f"[PROGRESSIVE LOG] [admin] > approve_attraction > QUERY: Fetching attraction ID {id}")
     attraction = Attraction.query.get_or_404(id)
     attraction.status = 'approved'
     db.session.commit()
     
-    print(f"=== ADMIN: Attraction '{attraction.name}' approved ===")
+    print(f"[PROGRESSIVE LOG] [admin] > approve_attraction > SUCCESS: Attraction '{attraction.name}' approved")
     logger.info(f"Attraction '{attraction.name}' (ID: {id}) approved successfully")
     
     flash(f'Attraction "{attraction.name}" approved!')
@@ -242,13 +257,15 @@ def delete_attraction(id):
     Returns:
         Redirect to attractions management page with confirmation message.
     """
-    print(f"=== ADMIN: Deleting attraction ID {id} ===")
+    print(f"[PROGRESSIVE LOG] [admin] > delete_attraction > ENTRY: id={id}")
     logger.info(f"Attraction deletion requested for ID {id}")
     
+    print(f"[PROGRESSIVE LOG] [admin] > delete_attraction > QUERY: Fetching attraction ID {id}")
     attraction = Attraction.query.get_or_404(id)
     
     # Check permission
     if current_user.role != 'admin' and attraction.user_id != current_user.id:
+        print(f"[PROGRESSIVE LOG] [admin] > delete_attraction > ERROR: Access denied for user ID={current_user.id}")
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
@@ -256,7 +273,7 @@ def delete_attraction(id):
     db.session.delete(attraction)
     db.session.commit()
     
-    print(f"=== ADMIN: Attraction '{attraction_name}' deleted ===")
+    print(f"[PROGRESSIVE LOG] [admin] > delete_attraction > SUCCESS: Attraction '{attraction_name}' deleted")
     logger.info(f"Attraction '{attraction_name}' (ID: {id}) deleted successfully")
     
     flash('Attraction deleted.')
@@ -278,19 +295,22 @@ def edit_attraction(id):
         GET: Rendered edit attraction form.
         POST: Redirect to attractions page after successful update.
     """
-    print(f"=== ADMIN: Editing attraction ID {id} ===")
+    print(f"[PROGRESSIVE LOG] [admin] > edit_attraction > ENTRY: id={id}, method={request.method}")
     logger.info(f"Attraction edit requested for ID {id}")
     
     from flask import current_app
     
+    print(f"[PROGRESSIVE LOG] [admin] > edit_attraction > QUERY: Fetching attraction ID {id}")
     attraction = Attraction.query.get_or_404(id)
     
     # Check permission
     if current_user.role != 'admin' and attraction.user_id != current_user.id:
+        print(f"[PROGRESSIVE LOG] [admin] > edit_attraction > ERROR: Access denied for user ID={current_user.id}")
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
     if request.method == 'POST':
+        print(f"[PROGRESSIVE LOG] [admin] > edit_attraction > LOGIC: Processing form data for '{request.form.get('name')}'")
         attraction.name = request.form.get('name')
         attraction.category = request.form.get('category')
         attraction.description = request.form.get('description')
@@ -309,18 +329,20 @@ def edit_attraction(id):
         if request.form.get('image_url'):
              attraction.image_url = request.form.get('image_url')
 
-        # Reset status to pending if edited by contributor
         if current_user.role == 'contributor':
+            print(f"[PROGRESSIVE LOG] [admin] > edit_attraction > LOGIC: Contributor edited, resetting status to pending")
             attraction.status = 'pending'
 
         db.session.commit()
         
-        print(f"=== ADMIN: Attraction '{attraction.name}' updated ===")
+        print(f"[PROGRESSIVE LOG] [admin] > edit_attraction > SUCCESS: Attraction '{attraction.name}' updated")
         logger.info(f"Attraction '{attraction.name}' (ID: {id}) updated successfully")
         
+        print(f"[PROGRESSIVE LOG] [admin] > edit_attraction > REDIRECT: Redirecting to admin.admin_attractions")
         flash('Attraction updated.')
         return redirect(url_for('admin.admin_attractions'))
         
+    print(f"[PROGRESSIVE LOG] [admin] > edit_attraction > RENDER: Rendering admin/edit_attraction.html")
     return render_template('admin/edit_attraction.html', attraction=attraction)
 
 @admin_bp.route('/events/approve/<int:id>')
@@ -335,18 +357,20 @@ def approve_event(id):
     Returns:
         Redirect to events management page with success message.
     """
-    print(f"=== ADMIN: Approving event ID {id} ===")
+    print(f"[PROGRESSIVE LOG] [admin] > approve_event > ENTRY: id={id}")
     logger.info(f"Event approval requested for ID {id}")
     
     if current_user.role != 'admin':
+        print(f"[PROGRESSIVE LOG] [admin] > approve_event > ERROR: Access denied")
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
+    print(f"[PROGRESSIVE LOG] [admin] > approve_event > QUERY: Fetching event ID {id}")
     event = Event.query.get_or_404(id)
     event.status = 'approved'
     db.session.commit()
     
-    print(f"=== ADMIN: Event '{event.title}' approved ===")
+    print(f"[PROGRESSIVE LOG] [admin] > approve_event > SUCCESS: Event '{event.title}' approved")
     logger.info(f"Event '{event.title}' (ID: {id}) approved successfully")
     
     flash(f'Event "{event.title}" approved!')
@@ -364,19 +388,21 @@ def reject_event(id):
     Returns:
         Redirect to events management page with confirmation message.
     """
-    print(f"=== ADMIN: Rejecting event ID {id} ===")
+    print(f"[PROGRESSIVE LOG] [admin] > reject_event > ENTRY: id={id}")
     logger.info(f"Event rejection requested for ID {id}")
     
     if current_user.role != 'admin':
+        print(f"[PROGRESSIVE LOG] [admin] > reject_event > ERROR: Access denied")
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
+    print(f"[PROGRESSIVE LOG] [admin] > reject_event > QUERY: Fetching event ID {id}")
     event = Event.query.get_or_404(id)
     event_title = event.title
     db.session.delete(event)
     db.session.commit()
     
-    print(f"=== ADMIN: Event '{event_title}' rejected and deleted ===")
+    print(f"[PROGRESSIVE LOG] [admin] > reject_event > SUCCESS: Event '{event_title}' rejected and deleted")
     logger.info(f"Event '{event_title}' (ID: {id}) rejected and deleted")
     
     flash(f'Event "{event_title}" rejected and removed.')
@@ -394,18 +420,20 @@ def approve_gallery(id):
     Returns:
         Redirect to admin dashboard with success message.
     """
-    print(f"=== ADMIN: Approving gallery item ID {id} ===")
+    print(f"[PROGRESSIVE LOG] [admin] > approve_gallery > ENTRY: id={id}")
     logger.info(f"Gallery item approval requested for ID {id}")
     
     if current_user.role != 'admin':
+        print(f"[PROGRESSIVE LOG] [admin] > approve_gallery > ERROR: Access denied")
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
+    print(f"[PROGRESSIVE LOG] [admin] > approve_gallery > QUERY: Fetching gallery item ID {id}")
     item = GalleryItem.query.get_or_404(id)
     item.status = 'approved'
     db.session.commit()
     
-    print(f"=== ADMIN: Gallery item approved ===")
+    print(f"[PROGRESSIVE LOG] [admin] > approve_gallery > SUCCESS: Gallery item ID {id} approved")
     logger.info(f"Gallery item ID {id} approved successfully")
     
     flash('Gallery item approved!')
@@ -423,18 +451,20 @@ def reject_gallery(id):
     Returns:
         Redirect to admin dashboard with confirmation message.
     """
-    print(f"=== ADMIN: Rejecting gallery item ID {id} ===")
+    print(f"[PROGRESSIVE LOG] [admin] > reject_gallery > ENTRY: id={id}")
     logger.info(f"Gallery item rejection requested for ID {id}")
     
     if current_user.role != 'admin':
+        print(f"[PROGRESSIVE LOG] [admin] > reject_gallery > ERROR: Access denied")
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
+    print(f"[PROGRESSIVE LOG] [admin] > reject_gallery > QUERY: Fetching gallery item ID {id}")
     item = GalleryItem.query.get_or_404(id)
     db.session.delete(item)
     db.session.commit()
     
-    print(f"=== ADMIN: Gallery item rejected and deleted ===")
+    print(f"[PROGRESSIVE LOG] [admin] > reject_gallery > SUCCESS: Gallery item ID {id} rejected and deleted")
     logger.info(f"Gallery item ID {id} rejected and deleted")
     
     flash('Gallery item rejected and removed.')

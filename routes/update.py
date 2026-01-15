@@ -27,7 +27,7 @@ def pull_updates():
         JSON response with the result of the operation.
     """
     try:
-        print("=== UPDATE: Pull updates triggered ===")
+        print(f"[PROGRESSIVE LOG] [update] > pull_updates > ENTRY")
         logger.info("Pull updates endpoint called - initiating git pull and file copy")
         
         # For security, you might want to verify a token or check request headers
@@ -40,20 +40,24 @@ def pull_updates():
         
         # Change directory to the source repository
         original_cwd = os.getcwd()
+        print(f"[PROGRESSIVE LOG] [update] > pull_updates > LOGIC: Changing directory to '{source_repo}'")
         os.chdir(source_repo)
         
         # Pull the latest changes from GitHub
+        print(f"[PROGRESSIVE LOG] [update] > pull_updates > LOGIC: Executing git pull")
         result = subprocess.run(['git', 'pull'], 
                                 capture_output=True, 
                                 text=True)
         
         if result.returncode != 0:
+            print(f"[PROGRESSIVE LOG] [update] > pull_updates > ERROR: Git pull failed: {result.stderr}")
             return jsonify({
                 'status': 'error',
                 'message': f'Git pull failed: {result.stderr}'
             }), 500
         
         # Copy all files and folders to dest1 by updating existing files
+        print(f"[PROGRESSIVE LOG] [update] > pull_updates > LOGIC: Copying files to '{dest1}'")
         if not os.path.exists(dest1):
             os.makedirs(dest1)
 
@@ -76,6 +80,7 @@ def pull_updates():
                 shutil.copy2(source_file, dest1_file)
 
         # Copy only files (not folders) to dest2
+        print(f"[PROGRESSIVE LOG] [update] > pull_updates > LOGIC: Copying shell files to '{dest2}'")
         for item in os.listdir(source_repo):
             source_item = os.path.join(source_repo, item)
             dest2_item = os.path.join(dest2, item)
@@ -85,7 +90,7 @@ def pull_updates():
         # Return to original directory
         os.chdir(original_cwd)
         
-        print("=== UPDATE: Successfully pulled updates and copied files ===")
+        print(f"[PROGRESSIVE LOG] [update] > pull_updates > SUCCESS: Pulled updates and synchronized files")
         logger.info("Successfully completed git pull and file copy operations")
         
         return jsonify({

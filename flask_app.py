@@ -65,6 +65,11 @@ def seed_database():
         db.session.commit()
         print("Default contributor created.")
 
+# Make config available in all templates
+@app.context_processor
+def inject_config():
+    return dict(config=app.config)
+
 # Register all blueprints
 from routes import register_blueprints
 register_blueprints(app)

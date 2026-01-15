@@ -85,6 +85,13 @@
                 <div class="text-center text-gray-500 py-4">Loading attractions...</div>
             </div>
 
+            <!-- Loading indicator for infinite scroll -->
+            <div id="loading-indicator" class="hidden flex justify-center p-4">
+                <div class="spinner-border animate-spin inline-block w-6 h-6 border-4 border-t-transparent border-blue-500 rounded-full" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+            </div>
+
             <!-- Routes Tab Content (Hidden by default) -->
             <div id="routes-content" class="p-4 space-y-4 hidden">
                 <div class="space-y-3">
@@ -207,5 +214,5 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.5.3/dist/MarkerCluster.Default.css" />
 <script src="https://unpkg.com/leaflet.markercluster@1.5.3/dist/leaflet.markercluster.js"></script>
 
-<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script src="{{ url_for('static', filename='js/map.min.js' if not debug else 'js/map.js') }}"></script>
 {% endblock %}

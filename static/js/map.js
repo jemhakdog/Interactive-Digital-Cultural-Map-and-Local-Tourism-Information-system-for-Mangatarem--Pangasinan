@@ -43,6 +43,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // 3. DATA & MARKER MANAGEMENT
     // ========================================
     let attractionsData = [];
+
+    // Initialize filter variables at the top to avoid temporal dead zone
+    let currentCategory = 'all';
+    let currentBarangay = 'all';
+    let currentSearchTerm = '';
+
     let markersLayer = L.markerClusterGroup({
         maxClusterRadius: 50,
         spiderfyOnMaxZoom: true,
@@ -96,14 +102,139 @@ document.addEventListener('DOMContentLoaded', function () {
     // ========================================
     // 5. FETCH & RENDER ATTRACTIONS
     // ========================================
-    fetch('/api/attractions')
-        .then(response => response.json())
-        .then(data => {
-            attractionsData = data;
-            renderAttractions(data);
-            addMarkers(data);
-        })
-        .catch(error => console.error('Error fetching attractions:', error));
+    let currentPage = 1;
+    let totalPages = 1;
+    let isLoading = false;
+    let hasMorePages = true;
+    const loadingIndicator = document.getElementById('loading-indicator');
+
+    // Generate cache key based on parameters
+    function getCacheKey(page, category, barangay) {
+        return `attractions_${page}_${category || 'all'}_${barangay || 'all'}`;
+    }
+
+    // Check if data is in cache and not expired
+    function getCachedData(cacheKey) {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+            const parsed = JSON.parse(cached);
+            const now = Date.now();
+
+            // Check if cache is still valid (5 minutes)
+            if (now - parsed.timestamp < 5 * 60 * 1000) {
+                return parsed.data;
+            } else {
+                // Remove expired cache
+                localStorage.removeItem(cacheKey);
+            }
+        }
+        return null;
+    }
+
+    // Save data to cache
+    function setCachedData(cacheKey, data) {
+        const cacheObj = {
+            data: data,
+            timestamp: Date.now()
+        };
+        try {
+            localStorage.setItem(cacheKey, JSON.stringify(cacheObj));
+        } catch (e) {
+            // Storage might be full, clear some old entries
+            console.warn('Could not cache data:', e);
+        }
+    }
+
+    async function fetchAttractions(page = 1, reset = false) {
+        if (isLoading) return;
+
+        isLoading = true;
+
+        // Generate cache key
+        const cacheKey = getCacheKey(page, currentCategory, currentBarangay);
+
+        // Check if data is in cache
+        const cachedData = getCachedData(cacheKey);
+        if (cachedData && page === 1 && reset) {
+            // Use cached data for initial load
+            attractionsData = cachedData.attractions;
+            totalPages = cachedData.pagination.pages;
+            currentPage = cachedData.pagination.page;
+            hasMorePages = cachedData.pagination.has_next;
+
+            renderAttractions(attractionsData);
+            addMarkers(attractionsData);
+            isLoading = false;
+            return;
+        }
+
+        // Show loading indicator
+        if (page === 1 && reset) {
+            const listContainer = document.getElementById('places-content');
+            listContainer.innerHTML = '<div class="text-center text-gray-500 py-4">Loading attractions...</div>';
+        } else if (!reset && loadingIndicator) {
+            // Show loading indicator at bottom for infinite scroll
+            loadingIndicator.classList.remove('hidden');
+        }
+
+        try {
+            const params = new URLSearchParams({
+                page: page,
+                per_page: 20
+            });
+
+            // Add filter parameters if they exist
+            if (currentCategory && currentCategory !== 'all') {
+                params.append('category', currentCategory);
+            }
+            if (currentBarangay && currentBarangay !== 'all') {
+                params.append('barangay', currentBarangay);
+            }
+            if (currentSearchTerm) {
+                // Note: search is handled client-side for now, but could be moved to server
+            }
+
+            const response = await fetch(`/api/attractions?${params}`);
+            const result = await response.json();
+
+            if (reset) {
+                attractionsData = result.attractions;
+                totalPages = result.pagination.pages;
+                currentPage = result.pagination.page;
+                hasMorePages = result.pagination.has_next;
+
+                renderAttractions(attractionsData);
+                addMarkers(attractionsData);
+
+                // Cache the data for initial page
+                if (page === 1) {
+                    setCachedData(cacheKey, result);
+                }
+            } else {
+                // Append new data to existing data
+                attractionsData = [...attractionsData, ...result.attractions];
+                totalPages = result.pagination.pages;
+                currentPage = result.pagination.page;
+                hasMorePages = result.pagination.has_next;
+
+                // Only render the new attractions if we're doing infinite scroll
+                // For now, we'll re-render all for consistency
+                renderAttractions(attractionsData);
+            }
+
+        } catch (error) {
+            console.error('Error fetching attractions:', error);
+        } finally {
+            isLoading = false;
+            // Hide loading indicator
+            if (loadingIndicator) {
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+    }
+
+    // Initial fetch
+    fetchAttractions(1, true);
 
     // ========================================
     // 10. CARD MANAGEMENT
@@ -168,6 +299,8 @@ document.addEventListener('DOMContentLoaded', function () {
         // Clear existing markers
         markersLayer.clearLayers();
 
+        // Batch add markers for better performance
+        const markersToAdd = [];
         attractions.forEach(attraction => {
             const icon = getCustomIcon(attraction.category);
             const marker = L.marker([attraction.lat, attraction.lng], { icon: icon });
@@ -184,11 +317,14 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             // Add to cluster layer
-            markersLayer.addLayer(marker);
+            markersToAdd.push(marker);
 
             // Store reference for flyTo
             markerMap[attraction.id] = marker;
         });
+
+        // Add all markers at once for better performance
+        markersLayer.addLayers(markersToAdd);
     }
 
     function renderAttractions(attractions) {
@@ -242,22 +378,30 @@ document.addEventListener('DOMContentLoaded', function () {
     const filterBtns = document.querySelectorAll('.filter-btn');
     const barangayFilter = document.getElementById('barangay-filter');
 
-    let currentCategory = 'all';
-    let currentBarangay = 'all';
+    // Debounced search function to reduce API calls
+    let searchTimeout;
+    function debounce(func, wait) {
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(searchTimeout);
+                func(...args);
+            };
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(later, wait);
+        };
+    }
+
+    const debouncedFilterAttractions = debounce(() => {
+        currentPage = 1; // Reset to first page when filtering
+        fetchAttractions(currentPage, true);
+    }, 300); // Wait 300ms after user stops typing
 
     function filterAttractions() {
-        const term = searchInput.value.toLowerCase();
+        // Update current search term
+        currentSearchTerm = searchInput.value.toLowerCase();
 
-        const filtered = attractionsData.filter(a => {
-            const matchesSearch = a.name.toLowerCase().includes(term) || a.description.toLowerCase().includes(term);
-            const matchesCategory = currentCategory === 'all' || a.category === currentCategory;
-            const matchesBarangay = currentBarangay === 'all' || a.barangay === currentBarangay;
-
-            return matchesSearch && matchesCategory && matchesBarangay;
-        });
-
-        renderAttractions(filtered);
-        addMarkers(filtered);
+        // Fetch new data based on filters
+        debouncedFilterAttractions();
     }
 
     searchInput.addEventListener('input', filterAttractions);
@@ -274,7 +418,8 @@ document.addEventListener('DOMContentLoaded', function () {
             btn.classList.add('bg-green-600', 'text-white');
 
             currentCategory = btn.dataset.category;
-            filterAttractions();
+            currentPage = 1; // Reset to first page when changing category
+            fetchAttractions(currentPage, true);
         });
     });
 
@@ -282,12 +427,36 @@ document.addEventListener('DOMContentLoaded', function () {
     if (barangayFilter) {
         barangayFilter.addEventListener('change', (e) => {
             currentBarangay = e.target.value;
-            filterAttractions();
+            currentPage = 1; // Reset to first page when changing barangay
+            fetchAttractions(currentPage, true);
         });
     }
 
     // ========================================
-    // 8. GEOLOCATION "NEAR ME" FEATURE
+    // 8. INFINITE SCROLL FOR ATTRACTION LIST
+    // ========================================
+    const contentArea = document.getElementById('content-area');
+
+    let scrollTimeout;
+    contentArea.addEventListener('scroll', () => {
+        // Clear the previous timeout
+        clearTimeout(scrollTimeout);
+
+        // Set a new timeout
+        scrollTimeout = setTimeout(() => {
+            const { scrollTop, scrollHeight, clientHeight } = contentArea;
+
+            // Check if user has scrolled near the bottom
+            if (scrollTop + clientHeight >= scrollHeight - 100 && hasMorePages && !isLoading) {
+                // Load next page
+                currentPage++;
+                fetchAttractions(currentPage, false);
+            }
+        }, 200); // Delay to prevent too many calls
+    });
+
+    // ========================================
+    // 9. GEOLOCATION "NEAR ME" FEATURE
     // ========================================
     const locateBtn = document.getElementById('locate-me');
     let userLocationMarker = null;
@@ -348,7 +517,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // ========================================
     const sidebar = document.getElementById('attractions-sidebar');
     const dragHandle = document.getElementById('drag-handle');
-    const contentArea = document.getElementById('content-area');
+    // contentArea is already defined in the infinite scroll section above
 
     if (sidebar && dragHandle) {
         let startY = 0;

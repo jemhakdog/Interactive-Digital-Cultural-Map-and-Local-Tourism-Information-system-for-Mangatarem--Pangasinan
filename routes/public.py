@@ -17,18 +17,21 @@ def index():
     Returns:
         Rendered index template with featured attractions.
     """
-    print("=== PUBLIC: Index/Home page accessed ===")
+    print(f"[PROGRESSIVE LOG] [public] > index > ENTRY")
     logger.info("Home page accessed")
     
     # Record view
+    print(f"[PROGRESSIVE LOG] [public] > index > LOGIC: Recording view")
     record_view('page', page_name='home')
 
     # Get featured attractions (limit 3)
+    print(f"[PROGRESSIVE LOG] [public] > index > QUERY: Fetching featured attractions")
     featured = Attraction.query.filter_by(status='approved').limit(3).all()
     
-    print(f"=== PUBLIC: Displaying {len(featured)} featured attractions ===")
+    print(f"[PROGRESSIVE LOG] [public] > index > SUCCESS: Displaying {len(featured)} featured attractions")
     logger.info(f"Home page loaded with {len(featured)} featured attractions")
     
+    print(f"[PROGRESSIVE LOG] [public] > index > RENDER: Rendering index.html")
     return render_template('index.html', featured=featured)
 
 def record_view(view_type, item_id=None, page_name=None):
@@ -48,7 +51,7 @@ def record_view(view_type, item_id=None, page_name=None):
         db.session.commit()
     except Exception as e:
         # Silently fail to not disrupt user experience
-        print(f"Error recording view: {e}")
+        print(f"[PROGRESSIVE LOG] [public] > record_view > ERROR: {e}")
         db.session.rollback()
 
 @public_bp.route('/map')
@@ -62,27 +65,30 @@ def map_view():
     Returns:
         Rendered map template with list of barangays for filtering.
     """
-    print("=== PUBLIC: Map page accessed ===")
+    print(f"[PROGRESSIVE LOG] [public] > map_view > ENTRY")
     logger.info("Interactive map page accessed")
-    
-    # Pass all approved attractions to the map
-    attractions = Attraction.query.filter_by(status='approved').all()
-    
+
+    # Get count of approved attractions for initial display
+    print(f"[PROGRESSIVE LOG] [public] > map_view > QUERY: Counting approved attractions")
+    attractions_count = Attraction.query.filter_by(status='approved').count()
+
     # Record view
     record_view('page', page_name='map')
 
     # Get list of unique barangays from approved attractions for the filter
+    print(f"[PROGRESSIVE LOG] [public] > map_view > QUERY: Fetching unique barangays")
     barangays = db.session.query(Attraction.barangay).filter(
         Attraction.status == 'approved',
         Attraction.barangay != None
     ).distinct().order_by(Attraction.barangay).all()
 
     barangay_list = [b[0] for b in barangays]
-    
-    print(f"=== PUBLIC: Map loaded with {len(attractions)} attractions, {len(barangay_list)} barangays ===")
-    logger.info(f"Map page loaded with {len(attractions)} attractions and {len(barangay_list)} barangays")
 
-    return render_template('map.html', barangays=barangay_list)
+    print(f"[PROGRESSIVE LOG] [public] > map_view > SUCCESS: Map loaded with {attractions_count} attractions, {len(barangay_list)} barangays")
+    logger.info(f"Map page loaded with {attractions_count} attractions and {len(barangay_list)} barangays")
+
+    print(f"[PROGRESSIVE LOG] [public] > map_view > RENDER: Rendering map.html")
+    return render_template('map.html', barangays=barangay_list, attractions_count=attractions_count)
 
 @public_bp.route('/attraction/<int:id>')
 def attraction_detail(id):
@@ -95,16 +101,18 @@ def attraction_detail(id):
     Returns:
         Rendered detail template with attraction information.
     """
-    print(f"=== PUBLIC: Attraction detail page accessed for ID {id} ===")
+    print(f"[PROGRESSIVE LOG] [public] > attraction_detail > ENTRY: id={id}")
     logger.info(f"Attraction detail page accessed for ID {id}")
     
+    print(f"[PROGRESSIVE LOG] [public] > attraction_detail > QUERY: Fetching attraction ID {id}")
     attraction = Attraction.query.get_or_404(id)
     # Record view
     record_view('attraction', item_id=id)
     
-    print(f"=== PUBLIC: Displaying attraction '{attraction.name}' ===")
+    print(f"[PROGRESSIVE LOG] [public] > attraction_detail > SUCCESS: Displaying attraction '{attraction.name}'")
     logger.info(f"Showing attraction '{attraction.name}' (ID: {id})")
     
+    print(f"[PROGRESSIVE LOG] [public] > attraction_detail > RENDER: Rendering detail.html")
     return render_template('detail.html', attraction=attraction)
 
 @public_bp.route('/events')
@@ -118,17 +126,19 @@ def events():
     Returns:
         Rendered events template with list of events.
     """
-    print("=== PUBLIC: Events page accessed ===")
+    print(f"[PROGRESSIVE LOG] [public] > events > ENTRY")
     logger.info("Events page accessed")
     
     # Record view
     record_view('page', page_name='events')
     
+    print(f"[PROGRESSIVE LOG] [public] > events > QUERY: Fetching approved events")
     events = Event.query.filter_by(status='approved').order_by(Event.date.asc()).all()
     
-    print(f"=== PUBLIC: Displaying {len(events)} approved events ===")
+    print(f"[PROGRESSIVE LOG] [public] > events > SUCCESS: Displaying {len(events)} approved events")
     logger.info(f"Events page loaded with {len(events)} approved events")
     
+    print(f"[PROGRESSIVE LOG] [public] > events > RENDER: Rendering events.html")
     return render_template('events.html', events=events)
 
 @public_bp.route('/gallery')
@@ -142,16 +152,17 @@ def gallery():
     Returns:
         Rendered gallery template with approved media items.
     """
-    print("=== PUBLIC: Gallery page accessed ===")
+    print(f"[PROGRESSIVE LOG] [public] > gallery > ENTRY")
     logger.info("Gallery page accessed")
     
     # Record view
     record_view('page', page_name='gallery')
     
+    print(f"[PROGRESSIVE LOG] [public] > gallery > QUERY: Fetching approved gallery items")
     items = GalleryItem.query.filter_by(status='approved').order_by(GalleryItem.uploaded_at.desc()).all()
 
     # Get list of unique barangays from approved gallery items for the filter
-    # We need to join with User table to get the barangay
+    print(f"[PROGRESSIVE LOG] [public] > gallery > QUERY: Fetching unique barangays for gallery")
     barangays = db.session.query(User.barangay).join(GalleryItem).filter(
         GalleryItem.status == 'approved',
         User.barangay != None
@@ -159,9 +170,10 @@ def gallery():
 
     barangay_list = [b[0] for b in barangays]
     
-    print(f"=== PUBLIC: Gallery loaded with {len(items)} items from {len(barangay_list)} barangays ===")
+    print(f"[PROGRESSIVE LOG] [public] > gallery > SUCCESS: Gallery loaded with {len(items)} items from {len(barangay_list)} barangays")
     logger.info(f"Gallery page loaded with {len(items)} approved items")
 
+    print(f"[PROGRESSIVE LOG] [public] > gallery > RENDER: Rendering gallery.html")
     return render_template('gallery.html', gallery_items=items, barangays=barangay_list)
 
 @public_bp.route('/search')
@@ -173,7 +185,7 @@ def search():
         category (str): Filter by category (Nature, Historical, etc.)
         barangay (str): Filter by barangay location.
     """
-    print(f"=== PUBLIC: Search page accessed with query='{request.args.get('q', '')}' ===")
+    print(f"[PROGRESSIVE LOG] [public] > search > ENTRY: q='{request.args.get('q', '')}', category='{request.args.get('category', '')}', barangay='{request.args.get('barangay', '')}'")
     logger.info(f"Search page accessed with query: {request.args.get('q', '')}")
     
     query = request.args.get('q', '')
@@ -181,11 +193,13 @@ def search():
     barangay_filter = request.args.get('barangay', '')
     
     # Start with base approved query
+    print(f"[PROGRESSIVE LOG] [public] > search > QUERY: Initializing attractions and events base queries")
     attractions_query = Attraction.query.filter_by(status='approved')
     events_query = Event.query.filter_by(status='approved')
 
     # Apply Text Search if exists
     if query:
+        print(f"[PROGRESSIVE LOG] [public] > search > LOGIC: Applying text search for '{query}'")
         attractions_query = attractions_query.filter(
             (Attraction.name.ilike(f'%{query}%')) | 
             (Attraction.description.ilike(f'%{query}%'))
@@ -197,24 +211,29 @@ def search():
 
     # Apply Category Filter
     if category_filter and category_filter != 'all':
+        print(f"[PROGRESSIVE LOG] [public] > search > LOGIC: Applying category filter '{category_filter}'")
         attractions_query = attractions_query.filter(Attraction.category == category_filter)
         events_query = events_query.filter(Event.category == category_filter)
 
     # Apply Barangay Filter
     if barangay_filter and barangay_filter != 'all':
+        print(f"[PROGRESSIVE LOG] [public] > search > LOGIC: Applying barangay filter '{barangay_filter}'")
         attractions_query = attractions_query.filter(Attraction.barangay == barangay_filter)
         events_query = events_query.filter(Event.barangay == barangay_filter)
 
+    print(f"[PROGRESSIVE LOG] [public] > search > QUERY: Executing filtered queries")
     attractions = attractions_query.all()
     events = events_query.all()
 
     # Fetch unique options for the filter dropdowns
+    print(f"[PROGRESSIVE LOG] [public] > search > QUERY: Fetching filter context (categories, barangays)")
     available_categories = db.session.query(Attraction.category).distinct().all()
     available_barangays = db.session.query(Attraction.barangay).filter(Attraction.barangay != None).distinct().all()
     
-    print(f"=== PUBLIC: Search found {len(attractions)} attractions, {len(events)} events ===")
+    print(f"[PROGRESSIVE LOG] [public] > search > SUCCESS: Found {len(attractions)} attractions, {len(events)} events")
     logger.info(f"Search results: {len(attractions)} attractions, {len(events)} events for query '{query}'")
 
+    print(f"[PROGRESSIVE LOG] [public] > search > RENDER: Rendering search_results.html")
     return render_template('search_results.html', 
                          query=query, 
                          attractions=attractions, 
@@ -232,8 +251,9 @@ def routes():
     Returns:
         Rendered routes template.
     """
-    print("=== PUBLIC: Routes page accessed ===")
+    print(f"[PROGRESSIVE LOG] [public] > routes > ENTRY")
     logger.info("Tourism routes page accessed")
+    print(f"[PROGRESSIVE LOG] [public] > routes > RENDER: Rendering routes.html")
     return render_template('routes.html')
 
 @public_bp.route('/barangays')
@@ -247,13 +267,14 @@ def barangays():
     Returns:
         Rendered barangays directory template with barangay list.
     """
-    print("=== PUBLIC: Barangays directory page accessed ===")
+    print(f"[PROGRESSIVE LOG] [public] > barangays > ENTRY")
     logger.info("Barangays directory page accessed")
     
     # Record view
     record_view('page', page_name='barangays_list')
     
     # Get list of barangays that have active contributors
+    print(f"[PROGRESSIVE LOG] [public] > barangays > QUERY: Fetching list of approved contributors' barangays")
     # We use a set to ensure uniqueness
     barangay_names = db.session.query(User.barangay).filter(
         User.role == 'contributor',
@@ -261,6 +282,7 @@ def barangays():
         User.barangay != None
     ).distinct().all()
 
+    print(f"[PROGRESSIVE LOG] [public] > barangays > LOGIC: Processing metadata for {len(barangay_names)} barangays")
     barangay_list = []
     for b in barangay_names:
         name = b[0]
@@ -302,9 +324,10 @@ def barangays():
     # Sort by name
     barangay_list.sort(key=lambda x: x['name'])
     
-    print(f"=== PUBLIC: Barangays directory loaded with {len(barangay_list)} barangays ===")
+    print(f"[PROGRESSIVE LOG] [public] > barangays > SUCCESS: Loaded {len(barangay_list)} barangays")
     logger.info(f"Barangays directory page loaded with {len(barangay_list)} barangays")
 
+    print(f"[PROGRESSIVE LOG] [public] > barangays > RENDER: Rendering barangays.html")
     return render_template('barangays.html', barangays=barangay_list)
 
 @public_bp.route('/barangay/<name>')
@@ -321,13 +344,14 @@ def barangay_profile(name):
     Returns:
         Rendered barangay profile template with all content for the barangay.
     """
-    print(f"=== PUBLIC: Barangay profile page accessed for '{name}' ===")
+    print(f"[PROGRESSIVE LOG] [public] > barangay_profile > ENTRY: name='{name}'")
     logger.info(f"Barangay profile page accessed for barangay '{name}'")
     
     # Record view
     record_view('page', page_name='barangay_profile', item_id=None) # We could count specific barangays if we had IDs
 
     # Get all approved content for this barangay
+    print(f"[PROGRESSIVE LOG] [public] > barangay_profile > QUERY: Fetching attractions, events, gallery, and info for '{name}'")
     attractions = Attraction.query.filter_by(barangay=name, status='approved').all()
     events = Event.query.filter_by(barangay=name, status='approved').order_by(Event.date.asc()).all()
 
@@ -341,6 +365,7 @@ def barangay_profile(name):
     barangay_info = BarangayInfo.query.filter_by(barangay_name=name).first()
 
     # Calculate center coordinates for map (average of all attraction coordinates)
+    print(f"[PROGRESSIVE LOG] [public] > barangay_profile > LOGIC: Calculating map center")
     center_lat, center_lng = 15.9949, 120.4869  # Default: Mangatarem coordinates
     if attractions:
         center_lat = sum(a.lat for a in attractions) / len(attractions)
@@ -360,9 +385,10 @@ def barangay_profile(name):
             'image_url': a.image_url
         })
     
-    print(f"=== PUBLIC: Barangay '{name}' profile loaded with {len(attractions)} attractions, {len(events)} events ===")
+    print(f"[PROGRESSIVE LOG] [public] > barangay_profile > SUCCESS: Profile for '{name}' loaded ({len(attractions)} attractions, {len(events)} events)")
     logger.info(f"Barangay profile for '{name}': {len(attractions)} attractions, {len(events)} events, {len(gallery_items)} gallery items")
 
+    print(f"[PROGRESSIVE LOG] [public] > barangay_profile > RENDER: Rendering barangay_profile.html")
     return render_template('barangay_profile.html',
                          barangay_name=name,
                          attractions=attractions,
@@ -464,7 +490,7 @@ def sitemap():
             'priority': '0.7'
         })
     
-    print(f"=== PUBLIC: Sitemap generated with {len(pages)} pages ===")
+    print(f"[PROGRESSIVE LOG] [public] > sitemap > SUCCESS: Sitemap generated with {len(pages)} pages")
     logger.info(f"Sitemap.xml generated with {len(pages)} total pages")
 
     sitemap_xml = render_template('sitemap.xml', pages=pages)
@@ -487,7 +513,7 @@ def verify_site():
     Returns:
         Rendered verification template file.
     """
-    print("=== PUBLIC: Google verification file accessed ===")
+    print(f"[PROGRESSIVE LOG] [public] > verify_site > ENTRY")
     logger.info("Google Search Console verification file accessed")
     return render_template("google364b8336ce52ae86.html")
 

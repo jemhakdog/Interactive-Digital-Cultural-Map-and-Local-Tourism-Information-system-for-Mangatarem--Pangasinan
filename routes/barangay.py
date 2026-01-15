@@ -21,22 +21,25 @@ def barangay_dashboard():
     Returns:
         Rendered barangay dashboard template with contributor's content statistics.
     """
-    print(f"=== BARANGAY: Dashboard accessed by {current_user.username} ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_dashboard > ENTRY: user='{current_user.username}'")
     logger.info(f"Barangay dashboard accessed by {current_user.username} ({current_user.barangay})")
     
     if current_user.role != 'contributor':
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_dashboard > ERROR: Access denied for role='{current_user.role}'")
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_dashboard > QUERY: Fetching contributor stats")
     stats = {
         'attractions': Attraction.query.filter_by(user_id=current_user.id).count(),
         'events': Event.query.filter_by(user_id=current_user.id).count(),
         'gallery': GalleryItem.query.filter_by(user_id=current_user.id).count()
     }
     
-    print(f"=== BARANGAY: Dashboard loaded with {stats['attractions']} attractions, {stats['events']} events ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_dashboard > SUCCESS: Dashboard loaded with {stats['attractions']} attractions, {stats['events']} events")
     logger.info(f"Dashboard stats for {current_user.username}: {stats['attractions']} attractions, {stats['events']} events, {stats['gallery']} gallery items")
     
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_dashboard > RENDER: Rendering barangay/dashboard.html")
     return render_template('barangay/dashboard.html', stats=stats)
 
 @barangay_bp.route('/attractions')
@@ -50,18 +53,21 @@ def barangay_attractions():
     Returns:
         Rendered attractions management template.
     """
-    print(f"=== BARANGAY: Attractions page accessed by {current_user.username} ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_attractions > ENTRY: user='{current_user.username}'")
     logger.info(f"Barangay attractions page accessed by {current_user.username}")
     
     if current_user.role != 'contributor':
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_attractions > ERROR: Access denied")
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_attractions > QUERY: Fetching owner's attractions")
     attractions = Attraction.query.filter_by(user_id=current_user.id).order_by(Attraction.created_at.desc()).all()
     
-    print(f"=== BARANGAY: Displaying {len(attractions)} attractions ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_attractions > SUCCESS: Displaying {len(attractions)} attractions")
     logger.info(f"Loaded {len(attractions)} attractions for {current_user.username}")
     
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_attractions > RENDER: Rendering barangay/attractions.html")
     return render_template('barangay/attractions.html', attractions=attractions)
 
 @barangay_bp.route('/events')
@@ -75,18 +81,21 @@ def barangay_events():
     Returns:
         Rendered events management template.
     """
-    print(f"=== BARANGAY: Events page accessed by {current_user.username} ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_events > ENTRY: user='{current_user.username}'")
     logger.info(f"Barangay events page accessed by {current_user.username}")
     
     if current_user.role != 'contributor':
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_events > ERROR: Access denied")
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_events > QUERY: Fetching owner's events")
     events = Event.query.filter_by(user_id=current_user.id).order_by(Event.date.asc()).all()
     
-    print(f"=== BARANGAY: Displaying {len(events)} events ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_events > SUCCESS: Displaying {len(events)} events")
     logger.info(f"Loaded {len(events)} events for {current_user.username}")
     
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_events > RENDER: Rendering barangay/events.html")
     return render_template('barangay/events.html', events=events)
 
 @barangay_bp.route('/gallery')
@@ -100,18 +109,21 @@ def barangay_gallery():
     Returns:
         Rendered gallery management template.
     """
-    print(f"=== BARANGAY: Gallery page accessed by {current_user.username} ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_gallery > ENTRY: user='{current_user.username}'")
     logger.info(f"Barangay gallery page accessed by {current_user.username}")
     
     if current_user.role != 'contributor':
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_gallery > ERROR: Access denied")
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_gallery > QUERY: Fetching owner's gallery items")
     gallery_items = GalleryItem.query.filter_by(user_id=current_user.id).order_by(GalleryItem.uploaded_at.desc()).all()
     
-    print(f"=== BARANGAY: Displaying {len(gallery_items)} gallery items ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_gallery > SUCCESS: Displaying {len(gallery_items)} gallery items")
     logger.info(f"Loaded {len(gallery_items)} gallery items for {current_user.username}")
     
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_gallery > RENDER: Rendering barangay/gallery.html")
     return render_template('barangay/gallery.html', gallery_items=gallery_items)
 
 @barangay_bp.route('/attractions/add', methods=['GET', 'POST'])
@@ -127,16 +139,18 @@ def barangay_add_attraction():
         GET: Rendered add attraction form.
         POST: Redirect to dashboard after successful submission.
     """
-    print(f"=== BARANGAY: Add attraction form accessed by {current_user.username} ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_add_attraction > ENTRY: user='{current_user.username}', method={request.method}")
     logger.info(f"Add attraction page accessed by {current_user.username}")
     
     from flask import current_app
     
     if current_user.role != 'contributor':
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_add_attraction > ERROR: Access denied")
         flash('Access denied.')
         return redirect(url_for('public.index'))
         
     if request.method == 'POST':
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_add_attraction > LOGIC: Processing POST data for '{request.form.get('name')}'")
         image_url = request.form.get('image_url')
         
         # Handle file upload
@@ -161,12 +175,14 @@ def barangay_add_attraction():
         db.session.add(attraction)
         db.session.commit()
         
-        print(f"=== BARANGAY: New attraction '{attraction.name}' submitted by {current_user.username} ===")
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_add_attraction > SUCCESS: New attraction '{attraction.name}' submitted by {current_user.username}")
         logger.info(f"New attraction '{attraction.name}' submitted by {current_user.username} for approval")
         
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_add_attraction > REDIRECT: Redirecting to barangay.barangay_dashboard")
         flash('Attraction submitted for approval!')
         return redirect(url_for('barangay.barangay_dashboard'))
         
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_add_attraction > RENDER: Rendering barangay/add_attraction.html")
     return render_template('barangay/add_attraction.html')
 
 @barangay_bp.route('/attractions/edit/<int:id>', methods=['GET', 'POST'])
@@ -185,19 +201,22 @@ def barangay_edit_attraction(id):
         GET: Rendered edit attraction form.
         POST: Redirect to dashboard after successful update.
     """
-    print(f"=== BARANGAY: Edit attraction ID {id} by {current_user.username} ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_attraction > ENTRY: user='{current_user.username}', id={id}, method={request.method}")
     logger.info(f"Edit attraction requested for ID {id} by {current_user.username}")
     
     from flask import current_app
     
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_attraction > QUERY: Fetching attraction ID {id}")
     attraction = Attraction.query.get_or_404(id)
     
     # Only allow editing own attractions
     if attraction.user_id != current_user.id:
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_attraction > ERROR: Access denied for owner ID={attraction.user_id}")
         flash('Access denied.')
         return redirect(url_for('barangay.barangay_dashboard'))
     
     if request.method == 'POST':
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_attraction > LOGIC: Processing updates for '{request.form.get('name')}'")
         attraction.name = request.form['name']
         attraction.category = request.form['category']
         attraction.description = request.form['description']
@@ -221,12 +240,14 @@ def barangay_edit_attraction(id):
         
         db.session.commit()
         
-        print(f"=== BARANGAY: Attraction '{attraction.name}' updated by {current_user.username} ===")
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_attraction > SUCCESS: Attraction '{attraction.name}' updated by {current_user.username}")
         logger.info(f"Attraction '{attraction.name}' (ID: {id}) updated by {current_user.username} and resubmitted for approval")
         
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_attraction > REDIRECT: Redirecting to barangay.barangay_dashboard")
         flash('Attraction updated and submitted for approval.')
         return redirect(url_for('barangay.barangay_dashboard'))
         
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_attraction > RENDER: Rendering barangay/edit_attraction.html")
     return render_template('barangay/edit_attraction.html', attraction=attraction)
 
 @barangay_bp.route('/attractions/delete/<int:id>')
@@ -243,13 +264,15 @@ def barangay_delete_attraction(id):
     Returns:
         Redirect to dashboard with confirmation message.
     """
-    print(f"=== BARANGAY: Delete attraction ID {id} by {current_user.username} ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_delete_attraction > ENTRY: user='{current_user.username}', id={id}")
     logger.info(f"Delete attraction requested for ID {id} by {current_user.username}")
     
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_delete_attraction > QUERY: Fetching attraction ID {id}")
     attraction = Attraction.query.get_or_404(id)
     
     # Only allow deleting own attractions
     if attraction.user_id != current_user.id:
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_delete_attraction > ERROR: Access denied for owner ID={attraction.user_id}")
         flash('Access denied.')
         return redirect(url_for('barangay.barangay_dashboard'))
     
@@ -257,7 +280,7 @@ def barangay_delete_attraction(id):
     db.session.delete(attraction)
     db.session.commit()
     
-    print(f"=== BARANGAY: Attraction '{attraction_name}' deleted by {current_user.username} ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_delete_attraction > SUCCESS: Attraction '{attraction_name}' deleted by {current_user.username}")
     logger.info(f"Attraction '{attraction_name}' (ID: {id}) deleted by {current_user.username}")
     
     flash('Attraction deleted.')
@@ -278,11 +301,14 @@ def barangay_add_event():
     """
     from flask import current_app
     
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_add_event > ENTRY: user='{current_user.username}', method={request.method}")
     if current_user.role != 'contributor':
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_add_event > ERROR: Access denied")
         flash('Access denied.')
         return redirect(url_for('public.index'))
         
     if request.method == 'POST':
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_add_event > LOGIC: Processing POST data for '{request.form.get('title')}'")
         image_url = request.form.get('image_url')
         
         # Handle file upload
@@ -307,12 +333,17 @@ def barangay_add_event():
         db.session.add(event)
         db.session.commit()
         
-        print(f"=== BARANGAY: New event '{event.title}' submitted by {current_user.username} ===")
+        db.session.add(event)
+        db.session.commit()
+        
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_add_event > SUCCESS: New event '{event.title}' submitted by {current_user.username}")
         logger.info(f"New event '{event.title}' submitted by {current_user.username} for approval")
         
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_add_event > REDIRECT: Redirecting to barangay.barangay_dashboard")
         flash('Event submitted for approval!')
         return redirect(url_for('barangay.barangay_dashboard'))
         
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_add_event > RENDER: Rendering barangay/add_event.html")
     return render_template('barangay/add_event.html')
 
 @barangay_bp.route('/events/edit/<int:id>', methods=['GET', 'POST'])
@@ -331,19 +362,22 @@ def barangay_edit_event(id):
         GET: Rendered edit event form.
         POST: Redirect to dashboard after successful update.
     """
-    print(f"=== BARANGAY: Edit event ID {id} by {current_user.username} ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_event > ENTRY: user='{current_user.username}', id={id}, method={request.method}")
     logger.info(f"Edit event requested for ID {id} by {current_user.username}")
     
     from flask import current_app
     
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_event > QUERY: Fetching event ID {id}")
     event = Event.query.get_or_404(id)
     
     # Only allow editing own events
     if event.user_id != current_user.id:
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_event > ERROR: Access denied for owner ID={event.user_id}")
         flash('Access denied.')
         return redirect(url_for('barangay.barangay_dashboard'))
     
     if request.method == 'POST':
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_event > LOGIC: Processing updates for '{request.form.get('title')}'")
         event.title = request.form['title']
         event.date = datetime.strptime(request.form['date'], '%Y-%m-%d').date()
         event.location = request.form['location']
@@ -368,12 +402,16 @@ def barangay_edit_event(id):
         event.status = 'pending'
         db.session.commit()
         
-        print(f"=== BARANGAY: Event '{event.title}' updated by {current_user.username} ===")
+        db.session.commit()
+        
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_event > SUCCESS: Event '{event.title}' updated by {current_user.username}")
         logger.info(f"Event '{event.title}' (ID: {id}) updated by {current_user.username} and resubmitted for approval")
         
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_event > REDIRECT: Redirecting to barangay.barangay_dashboard")
         flash('Event updated and submitted for approval.')
         return redirect(url_for('barangay.barangay_dashboard'))
         
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_event > RENDER: Rendering barangay/edit_event.html")
     return render_template('barangay/edit_event.html', event=event)
 
 @barangay_bp.route('/events/delete/<int:id>')
@@ -390,13 +428,15 @@ def barangay_delete_event(id):
     Returns:
         Redirect to dashboard with confirmation message.
     """
-    print(f"=== BARANGAY: Delete event ID {id} by {current_user.username} ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_delete_event > ENTRY: user='{current_user.username}', id={id}")
     logger.info(f"Delete event requested for ID {id} by {current_user.username}")
     
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_delete_event > QUERY: Fetching event ID {id}")
     event = Event.query.get_or_404(id)
     
     # Only allow deleting own events
     if event.user_id != current_user.id:
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_delete_event > ERROR: Access denied for owner ID={event.user_id}")
         flash('Access denied.')
         return redirect(url_for('barangay.barangay_dashboard'))
     
@@ -404,7 +444,7 @@ def barangay_delete_event(id):
     db.session.delete(event)
     db.session.commit()
     
-    print(f"=== BARANGAY: Event '{event_title}' deleted by {current_user.username} ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_delete_event > SUCCESS: Event '{event_title}' deleted by {current_user.username}")
     logger.info(f"Event '{event_title}' (ID: {id}) deleted by {current_user.username}")
     
     flash('Event deleted.')
@@ -423,17 +463,21 @@ def barangay_profile_manage():
         GET: Rendered profile management form.
         POST: Redirect to profile page after successful update.
     """
-    print(f"=== BARANGAY: Profile management accessed by {current_user.username} ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_profile_manage > ENTRY: user='{current_user.username}', method={request.method}")
     logger.info(f"Barangay profile management page accessed by {current_user.username}")
     
     if current_user.role != 'contributor':
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_profile_manage > ERROR: Access denied")
         flash('Access denied.')
         return redirect(url_for('public.index'))
     
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_profile_manage > QUERY: Fetching profile info for '{current_user.barangay}'")
     info = BarangayInfo.query.filter_by(barangay_name=current_user.barangay).first()
     
     if request.method == 'POST':
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_profile_manage > LOGIC: Updating profile for '{current_user.barangay}'")
         if not info:
+            print(f"[PROGRESSIVE LOG] [barangay] > barangay_profile_manage > LOGIC: Creating new profile entry")
             info = BarangayInfo(barangay_name=current_user.barangay, user_id=current_user.id)
             db.session.add(info)
             
@@ -445,12 +489,16 @@ def barangay_profile_manage():
         
         db.session.commit()
         
-        print(f"=== BARANGAY: Profile updated for {current_user.barangay} by {current_user.username} ===")
+        db.session.commit()
+        
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_profile_manage > SUCCESS: Profile for {current_user.barangay} updated")
         logger.info(f"Barangay profile for {current_user.barangay} updated by {current_user.username}")
         
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_profile_manage > REDIRECT: Redirecting back to management")
         flash('Barangay profile updated successfully!')
         return redirect(url_for('barangay.barangay_profile_manage'))
         
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_profile_manage > RENDER: Rendering barangay/profile.html")
     return render_template('barangay/profile.html', info=info)
 
 @barangay_bp.route('/gallery/add', methods=['GET', 'POST'])
@@ -505,12 +553,17 @@ def barangay_add_gallery():
         db.session.add(gallery_item)
         db.session.commit()
         
-        print(f"=== BARANGAY: New gallery item ({item_type}) submitted by {current_user.username} ===")
+        db.session.add(gallery_item)
+        db.session.commit()
+        
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_add_gallery > SUCCESS: New gallery item ({item_type}) submitted by {current_user.username}")
         logger.info(f"New gallery item (type: {item_type}) submitted by {current_user.username} for approval")
         
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_add_gallery > REDIRECT: Redirecting to dashboard")
         flash('Gallery item submitted for approval!')
         return redirect(url_for('barangay.barangay_dashboard'))
         
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_add_gallery > RENDER: Rendering barangay/add_gallery.html")
     return render_template('barangay/add_gallery.html')
 
 @barangay_bp.route('/gallery/edit/<int:id>', methods=['GET', 'POST'])
@@ -529,19 +582,22 @@ def barangay_edit_gallery(id):
         GET: Rendered edit gallery form.
         POST: Redirect to dashboard after successful update.
     """
-    print(f"=== BARANGAY: Edit gallery item ID {id} by {current_user.username} ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_gallery > ENTRY: user='{current_user.username}', id={id}, method={request.method}")
     logger.info(f"Edit gallery item requested for ID {id} by {current_user.username}")
     
     from flask import current_app
     
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_gallery > QUERY: Fetching gallery item ID {id}")
     gallery_item = GalleryItem.query.get_or_404(id)
     
     # Only allow editing own gallery items
     if gallery_item.user_id != current_user.id:
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_gallery > ERROR: Access denied for owner ID={gallery_item.user_id}")
         flash('Access denied.')
         return redirect(url_for('barangay.barangay_dashboard'))
     
     if request.method == 'POST':
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_gallery > LOGIC: Processing updates for item ID {id}")
         gallery_item.caption = request.form.get('caption')
         
         # Handle file replacement
@@ -569,12 +625,16 @@ def barangay_edit_gallery(id):
         gallery_item.status = 'pending'
         db.session.commit()
         
-        print(f"=== BARANGAY: Gallery item (ID: {id}) updated by {current_user.username} ===")
+        db.session.commit()
+        
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_gallery > SUCCESS: Gallery item (ID: {id}) updated by {current_user.username}")
         logger.info(f"Gallery item ID {id} updated by {current_user.username} and resubmitted for approval")
         
+        print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_gallery > REDIRECT: Redirecting to dashboard")
         flash('Gallery item updated and submitted for approval.')
         return redirect(url_for('barangay.barangay_dashboard'))
         
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_edit_gallery > RENDER: Rendering barangay/edit_gallery.html")
     return render_template('barangay/edit_gallery.html', gallery_item=gallery_item)
 
 @barangay_bp.route('/gallery/delete/<int:id>')
@@ -604,7 +664,7 @@ def barangay_delete_gallery(id):
     db.session.delete(gallery_item)
     db.session.commit()
     
-    print(f"=== BARANGAY: Gallery item deleted by {current_user.username} ===")
+    print(f"[PROGRESSIVE LOG] [barangay] > barangay_delete_gallery > SUCCESS: Gallery item deleted by {current_user.username}")
     logger.info(f"Gallery item ID {id} deleted by {current_user.username}")
     
     flash('Gallery item deleted.')

@@ -22,16 +22,16 @@ class User(UserMixin, db.Model):
 
 class Attraction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(100), nullable=False, index=True)
     description = db.Column(db.Text, nullable=False)
-    category = db.Column(db.String(50), nullable=False) # Nature, Historical, Religious, etc.
-    barangay = db.Column(db.String(100), nullable=True)
+    category = db.Column(db.String(50), nullable=False, index=True) # Nature, Historical, Religious, etc.
+    barangay = db.Column(db.String(100), nullable=True, index=True)
     lat = db.Column(db.Float, nullable=False)
     lng = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(200), nullable=True)
-    status = db.Column(db.String(20), default='pending') # 'pending', 'approved'
-    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    status = db.Column(db.String(20), default='pending', index=True) # 'pending', 'approved'
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=True, index=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
 
 class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
