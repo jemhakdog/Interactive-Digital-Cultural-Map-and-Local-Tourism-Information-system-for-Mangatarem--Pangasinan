@@ -1,6 +1,7 @@
-from flask_app import app, db
+from app import app, db
 from models import Event
 from datetime import datetime, timedelta
+
 
 def seed_events():
     with app.app_context():
@@ -17,7 +18,7 @@ def seed_events():
                 location="St. Raymond's Church",
                 barangay="Poblacion",
                 status="approved",
-                image_url="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DSC_0054.jpg"
+                image_url="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DSC_0054.jpg",
             ),
             Event(
                 title="Battle of the Bands",
@@ -26,7 +27,7 @@ def seed_events():
                 location="Public Plaza",
                 barangay="Poblacion",
                 status="approved",
-                image_url="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DSC_0098.jpg"
+                image_url="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DSC_0098.jpg",
             ),
             Event(
                 title="Civic Parade",
@@ -35,15 +36,16 @@ def seed_events():
                 location="Mangatarem Streets",
                 barangay="Poblacion",
                 status="approved",
-                image_url="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DSC_0123.jpg"
-            )
+                image_url="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DSC_0123.jpg",
+            ),
         ]
 
         for event in events:
             db.session.add(event)
-        
+
         db.session.commit()
         print("Added 3 sample events.")
+
 
 if __name__ == "__main__":
     seed_events()
