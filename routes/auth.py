@@ -151,7 +151,14 @@ def google_login():
     """
     print("[PROGRESSIVE LOG] [auth] > google_login > ENTRY")
     token = request.form.get("credential")
-
+    print(f"[PROGRESSIVE LOG] [auth] > google_login > QUERY: Received token: {token}")
+    print(
+        f"[PROGRESSIVE LOG] [auth] > google_login > QUERY: Received method: {request.method}"
+    )
+    print(
+        f"[PROGRESSIVE LOG] [auth] > google_login > QUERY: Received form: {request.form}"
+    )
+    return request.form
     if not token:
         print("[PROGRESSIVE LOG] [auth] > google_login > ERROR: No credential provided")
         flash("No Google credential received.", "error")
@@ -160,7 +167,7 @@ def google_login():
     try:
         # Client ID from the provided secret file
         CLIENT_ID = (
-            "1057278995974-s4iudqalctcj4fumh4m0b9ni5fs4vkls.apps.googleusercontent.com"
+            "794547070676-80dbt1j3a724hacci5684s7b7v93j1fh.apps.googleusercontent.com"
         )
         idinfo = id_token.verify_oauth2_token(
             token, google_requests.Request(), CLIENT_ID
