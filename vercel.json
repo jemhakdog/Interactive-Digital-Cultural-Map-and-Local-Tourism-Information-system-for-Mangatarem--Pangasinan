@@ -1,27 +1,10 @@
 {
     "version": 2,
-    "builds": [
+    "buildCommand": "pip install uv && uv pip install -r requirements.txt --system",
+    "rewrites": [
         {
-            "src": "flask_app.py",
-            "use": "@vercel/python",
-            "config": {
-                "includeFiles": [
-                    "templates/**",
-                    "static/**",
-                    "routes/**",
-                    "utils/**",
-                    "data/**",
-                    "context/**"
-                ]
-            }
+            "source": "/(.*)",
+            "destination": "/api/flask_app"
         }
-    ],
-    "routes": [
-        {
-            "src": "/(.*)",
-            "dest": "flask_app.py"
-        }
-    ],
-    "installCommand": "curl -LsSf https://astral.sh/uv/install.sh | sh && uv sync",
-    "buildCommand": "uv sync"
+    ]
 }
