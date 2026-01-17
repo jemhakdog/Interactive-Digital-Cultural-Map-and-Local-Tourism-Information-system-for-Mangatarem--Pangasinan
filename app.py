@@ -2,7 +2,7 @@ import json
 import os
 import shutil
 
-from dotenv import load_dotenv
+# from dotenv import load_dotenv
 from flask import Flask, url_for, render_template
 from flask_login import LoginManager
 from extensions import limiter
@@ -11,7 +11,7 @@ from models import Attraction, User, db
 from routes import register_blueprints
 
 # Load environment variables from .ENV file
-load_dotenv()
+# load_dotenv()
 
 # Determine if we are running on Vercel
 IS_VERCEL = "VERCEL" in os.environ
