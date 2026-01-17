@@ -82,6 +82,7 @@ def register():
         username = request.form.get("username")
         email = request.form.get("email")
         password = request.form.get("password")
+        role = request.form.get("role", "user")
         barangay = request.form.get("barangay")
 
         print(
@@ -101,19 +102,20 @@ def register():
             flash("Email already exists.", "error")
             return redirect(url_for("auth.register"))
 
-        # Enforce one contributor per barangay
-        print(
-            f"[PROGRESSIVE LOG] [auth] > register > QUERY: Checking existing representative for '{barangay}'"
-        )
-        existing_rep = User.query.filter_by(
-            barangay=barangay, role="contributor", is_approved=True
-        ).first()
-        if existing_rep:
+        # Enforce one contributor per barangay ONLY if selected role is contributor
+        if role == "contributor":
             print(
-                f"[PROGRESSIVE LOG] [auth] > register > ERROR: Representative already exists for '{barangay}'"
+                f"[PROGRESSIVE LOG] [auth] > register > QUERY: Checking existing representative for '{barangay}'"
             )
-            flash("This Barangay already has a registered representative.", "error")
-            return redirect(url_for("auth.register"))
+            existing_rep = User.query.filter_by(
+                barangay=barangay, role="contributor", is_approved=True
+            ).first()
+            if existing_rep:
+                print(
+                    f"[PROGRESSIVE LOG] [auth] > register > ERROR: Representative already exists for '{barangay}'"
+                )
+                flash("This Barangay already has a registered representative.", "error")
+                return redirect(url_for("auth.register"))
 
         print(
             f"[PROGRESSIVE LOG] [auth] > register > LOGIC: Creating new user '{username}'"
@@ -121,9 +123,9 @@ def register():
         user = User(
             username=username,
             email=email,
-            role="contributor",
-            barangay=barangay,
-            is_approved=False,
+            role=role,
+            barangay=barangay if role == "contributor" else None,
+            is_approved=(role == "user"),  # Auto-approve regular users
         )
         user.set_password(password)
         db.session.add(user)
@@ -136,7 +138,10 @@ def register():
             f"New contributor user '{username}' registered for barangay '{barangay}', awaiting approval"
         )
 
-        flash("Registration successful! Please wait for admin approval.", "success")
+        if role == "contributor":
+            flash("Registration successful! Please wait for admin approval.", "success")
+        else:
+            flash("Registration successful! You can now log in.", "success")
         return redirect(url_for("auth.login"))
 
     print("[PROGRESSIVE LOG] [auth] > register > RENDER: Rendering register.html")

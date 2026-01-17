@@ -71,16 +71,40 @@
                 <p class="text-xs text-gray-400 mt-1 ml-1">Must be at least 8 characters long.</p>
             </div>
 
+            <div class="space-y-1">
+                <label class="block text-sm font-medium text-gray-700 ml-1">I am a...</label>
+                <div class="grid grid-cols-2 gap-4">
+                    <label
+                        class="relative flex items-center justify-center p-4 rounded-xl border-2 border-gray-100 bg-gray-50 cursor-pointer hover:border-green-200 transition-all group has-[:checked]:border-green-600 has-[:checked]:bg-green-50">
+                        <input type="radio" name="role" value="user" checked class="sr-only peer"
+                            onchange="toggleBarangay(this)">
+                        <div class="text-center">
+                            <span class="block text-xl mb-1 group-hover:scale-110 transition-transform">🎒</span>
+                            <span class="block text-sm font-bold text-gray-700">Visitor</span>
+                        </div>
+                    </label>
+                    <label
+                        class="relative flex items-center justify-center p-4 rounded-xl border-2 border-gray-100 bg-gray-50 cursor-pointer hover:border-green-200 transition-all group has-[:checked]:border-green-600 has-[:checked]:bg-green-50">
+                        <input type="radio" name="role" value="contributor" class="sr-only peer"
+                            onchange="toggleBarangay(this)">
+                        <div class="text-center">
+                            <span class="block text-xl mb-1 group-hover:scale-110 transition-transform">🏛️</span>
+                            <span class="block text-sm font-bold text-gray-700">Contributor</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
             <hr class="border-gray-100 my-4">
 
-            <div class="space-y-1">
+            <div id="barangay-section" class="space-y-1 hidden">
                 <div class="flex items-center justify-between">
                     <label class="block text-sm font-medium text-gray-700 ml-1">Designated Barangay</label>
-                    <span
-                        class="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-medium">Required</span>
+                    <span class="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-medium">Required for
+                        Contributors</span>
                 </div>
                 <div class="relative">
-                    <select name="barangay" required
+                    <select name="barangay" id="barangay-select"
                         class="block w-full px-4 py-3 pr-10 rounded-xl border-gray-200 bg-gray-50 text-gray-900 focus:bg-white focus:border-green-500 focus:ring-green-500 transition-all duration-200 cursor-pointer">
                         <option value="" disabled selected>Select your Barangay location...</option>
                         <option value="Andangin">Andangin</option>
@@ -167,6 +191,20 @@
                     </select>
                 </div>
             </div>
+
+            <script>
+                function toggleBarangay(input) {
+                    const section = document.getElementById('barangay-section');
+                    const select = document.getElementById('barangay-select');
+                    if (input.value === 'contributor') {
+                        section.classList.remove('hidden');
+                        select.required = true;
+                    } else {
+                        section.classList.add('hidden');
+                        select.required = false;
+                    }
+                }
+            </script>
 
             <div class="pt-4">
                 <button type="submit"
