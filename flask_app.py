@@ -15,6 +15,7 @@ load_dotenv()
 
 # Determine if we are running on Vercel
 IS_VERCEL = "VERCEL" in os.environ
+print("IS_VERCEL: ", IS_VERCEL)
 
 # Determine absolute paths for templates and static folders
 # On Vercel, the code is deployed to /var/task/
@@ -25,7 +26,9 @@ else:
 
 template_dir = os.path.join(BASE_DIR, "templates")
 static_dir = os.path.join(BASE_DIR, "static")
-
+print("template_dir: ", template_dir)
+print("static_dir: ", static_dir)
+print("BASE_DIR: ", BASE_DIR)
 # Debug: Print paths for troubleshooting
 print(f"BASE_DIR: {BASE_DIR}")
 print(f"template_dir: {template_dir}")
