@@ -20,6 +20,7 @@
         appearance: none;
     }
 </style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 {% endblock %}
 
 {% block content %}
@@ -176,6 +177,23 @@
                             d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
                     </svg>
                 </button>
+            </div>
+
+            <div class="relative py-4">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-200"></div>
+                </div>
+                <div class="relative flex justify-center text-xs uppercase">
+                    <span class="bg-white px-2 text-gray-500">Or Quick Sign-up with</span>
+                </div>
+            </div>
+
+            <div id="g_id_onload"
+                data-client_id="1057278995974-s4iudqalctcj4fumh4m0b9ni5fs4vkls.apps.googleusercontent.com"
+                data-login_uri="{{ url_for('auth.google_login', _external=True) }}" data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline"
+                data-text="signup_with" data-size="large" data-logo_alignment="left" data-width="592">
             </div>
 
             <p class="text-center text-sm text-gray-500 mt-6">

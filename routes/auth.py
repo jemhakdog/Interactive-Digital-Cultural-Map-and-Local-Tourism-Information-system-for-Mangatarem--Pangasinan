@@ -2,6 +2,9 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from models import db, User
 from extensions import limiter  # Import from shared extensions
+from google.oauth2 import id_token
+from google.auth.transport import requests as google_requests
+from datetime import datetime
 import logging
 
 auth_bp = Blueprint("auth", __name__)
@@ -55,7 +58,7 @@ def login():
             f"[PROGRESSIVE LOG] [auth] > login > ERROR: Invalid credentials for '{username}'"
         )
         flash("Invalid username or password", "error")
-    print(f"[PROGRESSIVE LOG] [auth] > login > RENDER: Rendering login.html")
+    print("[PROGRESSIVE LOG] [auth] > login > RENDER: Rendering login.html")
     return render_template("auth/login.html")
 
 
@@ -136,8 +139,83 @@ def register():
         flash("Registration successful! Please wait for admin approval.", "success")
         return redirect(url_for("auth.login"))
 
-    print(f"[PROGRESSIVE LOG] [auth] > register > RENDER: Rendering register.html")
+    print("[PROGRESSIVE LOG] [auth] > register > RENDER: Rendering register.html")
     return render_template("auth/register.html")
+
+
+@auth_bp.route("/google-login", methods=["POST"])
+def google_login():
+    """
+    Handle Google Sign-In response.
+    Verifies the JWT and either logs in the existing user or creates a new one.
+    """
+    print("[PROGRESSIVE LOG] [auth] > google_login > ENTRY")
+    token = request.form.get("credential")
+
+    if not token:
+        print("[PROGRESSIVE LOG] [auth] > google_login > ERROR: No credential provided")
+        flash("No Google credential received.", "error")
+        return redirect(url_for("auth.login"))
+
+    try:
+        # Client ID from the provided secret file
+        CLIENT_ID = (
+            "1057278995974-s4iudqalctcj4fumh4m0b9ni5fs4vkls.apps.googleusercontent.com"
+        )
+        idinfo = id_token.verify_oauth2_token(
+            token, google_requests.Request(), CLIENT_ID
+        )
+
+        email = idinfo.get("email")
+        # name = idinfo.get("name") # Currently unused
+        print(
+            f"[PROGRESSIVE LOG] [auth] > google_login > SUCCESS: Verified token for {email}"
+        )
+
+        user = User.query.filter_by(email=email).first()
+
+        if not user:
+            print(
+                f"[PROGRESSIVE LOG] [auth] > google_login > LOGIC: Creating new user for {email}"
+            )
+            # Generate a username if not already exists
+            username = email.split("@")[0]
+            if User.query.filter_by(username=username).first():
+                username = f"{username}_{int(datetime.utcnow().timestamp())}"
+
+            user = User(
+                username=username,
+                email=email,
+                role="user",
+                is_approved=True,  # Regular users don't need approval
+            )
+            db.session.add(user)
+            db.session.commit()
+            print(
+                f"[PROGRESSIVE LOG] [auth] > google_login > SUCCESS: Created and logging in {email}"
+            )
+            login_user(user)
+            return redirect(url_for("public.index"))
+
+        # Explicitly restrict Google Sign-In to the 'user' role
+        if user.role in ["admin", "contributor"]:
+            print(
+                f"[PROGRESSIVE LOG] [auth] > google_login > ERROR: Role '{user.role}' restricted from Google Sign-In"
+            )
+            flash(
+                "Google Sign-In is only available for regular users. Please log in with your credentials.",
+                "error",
+            )
+            return redirect(url_for("auth.login"))
+
+        print(f"[PROGRESSIVE LOG] [auth] > google_login > SUCCESS: Logging in {email}")
+        login_user(user)
+        return redirect(url_for("public.index"))
+
+    except ValueError as e:
+        print(f"[PROGRESSIVE LOG] [auth] > google_login > ERROR: {str(e)}")
+        flash("Invalid Google token.", "error")
+        return redirect(url_for("auth.login"))
 
 
 @auth_bp.route("/logout")
@@ -152,5 +230,5 @@ def logout():
     print(f"[PROGRESSIVE LOG] [auth] > logout > ENTRY: user='{current_user.username}'")
     logger.info("User logged out successfully")
     logout_user()
-    print(f"[PROGRESSIVE LOG] [auth] > logout > REDIRECT: Redirecting to home")
+    print("[PROGRESSIVE LOG] [auth] > logout > REDIRECT: Redirecting to home")
     return redirect(url_for("public.index"))

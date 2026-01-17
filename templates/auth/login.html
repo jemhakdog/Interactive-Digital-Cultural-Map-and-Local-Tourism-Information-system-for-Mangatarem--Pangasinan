@@ -17,6 +17,7 @@
         opacity: 0.6;
     }
 </style>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
 {% endblock %}
 
 {% block content %}
@@ -89,6 +90,23 @@
                     class="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-sm text-sm font-bold text-white bg-green-700 hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors duration-200">
                     Sign In
                 </button>
+            </div>
+
+            <div class="relative py-4">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-200"></div>
+                </div>
+                <div class="relative flex justify-center text-xs uppercase">
+                    <span class="bg-white px-2 text-gray-500">Or continue with</span>
+                </div>
+            </div>
+
+            <div id="g_id_onload"
+                data-client_id="1057278995974-s4iudqalctcj4fumh4m0b9ni5fs4vkls.apps.googleusercontent.com"
+                data-login_uri="{{ url_for('auth.google_login', _external=True) }}" data-auto_prompt="false">
+            </div>
+            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline"
+                data-text="signin_with" data-size="large" data-logo_alignment="left" data-width="384">
             </div>
 
             <div class="text-center mt-4">

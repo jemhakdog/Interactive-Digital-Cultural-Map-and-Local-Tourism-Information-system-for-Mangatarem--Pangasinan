@@ -12,6 +12,8 @@ dependencies = [
     "pocketbase>=0.15.0",
     "python-dotenv>=1.0.0",
     "werkzeug>=3.0.0",
+    "google-auth>=2.0.0",
+    "requests>=2.32.5",
 ]
 
 [tool.uv]
