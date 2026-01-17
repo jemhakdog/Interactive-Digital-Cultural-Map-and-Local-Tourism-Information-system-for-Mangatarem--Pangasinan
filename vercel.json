@@ -5,7 +5,19 @@
     "builds": [
         {
             "src": "flask_app.py",
-            "use": "@vercel/python"
+            "use": "@vercel/python",
+            "config": {
+                "includeFiles": [
+                    "templates/**",
+                    "static/**",
+                    "data/**",
+                    "instance/**",
+                    "routes/**",
+                    "utils/**",
+                    "models.py",
+                    "extensions.py"
+                ]
+            }
         }
     ],
     "routes": [
