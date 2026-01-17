@@ -3,7 +3,7 @@ import os
 import shutil
 
 from dotenv import load_dotenv
-from flask import Flask, url_for, render_template, request
+from flask import Flask, url_for, render_template
 from flask_login import LoginManager
 from extensions import limiter
 
@@ -13,19 +13,34 @@ from routes import register_blueprints
 # Load environment variables from .ENV file
 load_dotenv()
 
+# Determine if we are running on Vercel
+IS_VERCEL = "VERCEL" in os.environ
+
 # Determine absolute paths for templates and static folders
-BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+# On Vercel, the code is deployed to /var/task/
+if IS_VERCEL:
+    BASE_DIR = "/var/task"
+else:
+    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
 template_dir = os.path.join(BASE_DIR, "templates")
 static_dir = os.path.join(BASE_DIR, "static")
 
+# Debug: Print paths for troubleshooting
+print(f"BASE_DIR: {BASE_DIR}")
+print(f"template_dir: {template_dir}")
+print(f"template_dir exists: {os.path.exists(template_dir)}")
+if os.path.exists(template_dir):
+    print(f"template_dir contents: {os.listdir(template_dir)}")
+
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
+
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "your-secret-key-here")
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["UPLOAD_FOLDER"] = os.path.join(static_dir, "uploads")
 app.config["ALLOWED_EXTENSIONS"] = {"png", "jpg", "jpeg", "gif", "mp4"}
 
 # Handle SQLite database path for Vercel
-IS_VERCEL = "VERCEL" in os.environ
 if IS_VERCEL:
     # On Vercel, the filesystem is read-only except for /tmp/
     db_path = "/tmp/mangatarem.db"
