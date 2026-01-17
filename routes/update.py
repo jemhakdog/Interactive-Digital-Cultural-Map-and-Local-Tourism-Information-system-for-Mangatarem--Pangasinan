@@ -1,19 +1,12 @@
 from flask import Blueprint, request, jsonify
+from extensions import limiter
 import subprocess
 import os
 import shutil
 import logging
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 update_bp = Blueprint("update", __name__)
 logger = logging.getLogger(__name__)
-
-# Initialize limiter for this blueprint
-limiter = Limiter(
-    get_remote_address,
-    storage_uri="memory://",
-)
 
 
 @update_bp.route("/pull", methods=["GET", "POST"])

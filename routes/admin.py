@@ -1,22 +1,15 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from models import db, User, Attraction, Event, GalleryItem, PageView
+from extensions import limiter
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
 from sqlalchemy import func
 import os
 import logging
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
 logger = logging.getLogger(__name__)
-
-# Initialize limiter for this blueprint
-limiter = Limiter(
-    get_remote_address,
-    storage_uri="memory://",
-)
 
 
 @admin_bp.route("/dashboard")

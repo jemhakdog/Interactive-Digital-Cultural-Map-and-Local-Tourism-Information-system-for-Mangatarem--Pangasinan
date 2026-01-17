@@ -1,19 +1,12 @@
 from flask import Blueprint, render_template, jsonify, request
 from models import db, User, Attraction, Event, GalleryItem, BarangayInfo, PageView
 from flask_login import current_user
+from extensions import limiter
 from datetime import datetime
 import logging
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 public_bp = Blueprint("public", __name__)
 logger = logging.getLogger(__name__)
-
-# Initialize limiter for this blueprint
-limiter = Limiter(
-    get_remote_address,
-    storage_uri="memory://",
-)
 
 
 @public_bp.route("/")

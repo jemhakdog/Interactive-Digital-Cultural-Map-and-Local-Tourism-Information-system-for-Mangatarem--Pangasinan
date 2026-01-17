@@ -1,19 +1,11 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, make_response
 from models import Attraction, db
+from extensions import limiter
 import logging
 from datetime import datetime, timedelta
-from flask import make_response
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
 logger = logging.getLogger(__name__)
-
-# Initialize limiter for this blueprint
-limiter = Limiter(
-    get_remote_address,
-    storage_uri="memory://",
-)
 
 
 @api_bp.route("/attractions")

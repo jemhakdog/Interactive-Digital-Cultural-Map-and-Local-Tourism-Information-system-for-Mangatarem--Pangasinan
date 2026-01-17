@@ -1,14 +1,13 @@
 import json
 import os
-from datetime import datetime
 
 from dotenv import load_dotenv
-from flask import Flask, url_for
+from flask import Flask, url_for, render_template
 from flask_login import LoginManager
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
+from extensions import limiter
 
 from models import Attraction, User, db
+from routes import register_blueprints
 
 # Load environment variables from .ENV file
 load_dotenv()
@@ -31,13 +30,8 @@ with app.app_context():
     db.create_all()
 
 # Initialize rate limiter
-# Default limit: 100 requests per minute for general public pages
-limiter = Limiter(
-    get_remote_address,
-    app=app,
-    default_limits=["100 per minute"],
-    storage_uri="memory://",
-)
+# Default limits are defined in extensions.py
+limiter.init_app(app)
 
 # Initialize login manager
 login_manager = LoginManager()
@@ -105,9 +99,44 @@ def inject_config():
 
 
 # Register all blueprints
-from routes import register_blueprints
-
 register_blueprints(app)
+
+
+# Error Handlers
+@app.errorhandler(400)
+def bad_request(e):
+    return render_template("errors/400.html"), 400
+
+
+@app.errorhandler(401)
+def unauthorized(e):
+    return render_template("errors/401.html"), 401
+
+
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template("errors/403.html"), 403
+
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template("errors/404.html"), 404
+
+
+@app.errorhandler(408)
+def request_timeout(e):
+    return render_template("errors/408.html"), 408
+
+
+@app.errorhandler(429)
+def too_many_requests(e):
+    return render_template("errors/429.html"), 429
+
+
+@app.errorhandler(451)
+def legal_reasons(e):
+    return render_template("errors/451.html"), 451
+
 
 if __name__ == "__main__":
     print(app.url_map)

@@ -1,18 +1,11 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from models import db, User
+from extensions import limiter  # Import from shared extensions
 import logging
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 auth_bp = Blueprint("auth", __name__)
 logger = logging.getLogger(__name__)
-
-# Get limiter instance from app (will be initialized in flask_app.py)
-limiter = Limiter(
-    get_remote_address,
-    storage_uri="memory://",
-)
 
 
 @auth_bp.route("/login", methods=["GET", "POST"])

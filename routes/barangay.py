@@ -1,21 +1,14 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from models import db, Attraction, Event, GalleryItem, BarangayInfo
+from extensions import limiter
 from datetime import datetime
 from werkzeug.utils import secure_filename
 import os
 import logging
-from flask_limiter import Limiter
-from flask_limiter.util import get_remote_address
 
 barangay_bp = Blueprint("barangay", __name__, url_prefix="/barangay")
 logger = logging.getLogger(__name__)
-
-# Initialize limiter for this blueprint
-limiter = Limiter(
-    get_remote_address,
-    storage_uri="memory://",
-)
 
 
 @barangay_bp.route("/dashboard")
