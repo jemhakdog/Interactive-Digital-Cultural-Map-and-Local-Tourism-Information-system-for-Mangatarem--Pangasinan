@@ -5,11 +5,11 @@ from extensions import limiter
 from datetime import datetime
 import logging
 
-pagez_bp = Blueprint("pagez", __name__)
+public_bp = Blueprint("public", __name__)
 logger = logging.getLogger(__name__)
 
 
-@pagez_bp.route("/")
+@public_bp.route("/")
 def index():
     print("Host URL: ", request.host_url)
     """
@@ -61,7 +61,7 @@ def record_view(view_type, item_id=None, page_name=None):
         db.session.rollback()
 
 
-@pagez_bp.route("/map")
+@public_bp.route("/map")
 def map_view():
     """
     Display the interactive map with all approved attractions.
@@ -109,7 +109,7 @@ def map_view():
     )
 
 
-@pagez_bp.route("/attraction/<int:id>")
+@public_bp.route("/attraction/<int:id>")
 def attraction_detail(id):
     """
     Display detailed information about a specific attraction.
@@ -141,7 +141,7 @@ def attraction_detail(id):
     return render_template("pagez/detail.html", attraction=attraction)
 
 
-@pagez_bp.route("/events")
+@public_bp.route("/events")
 def events():
     """
     Display all approved events in chronological order.
@@ -170,7 +170,7 @@ def events():
     return render_template("pagez/events.html", events=events)
 
 
-@pagez_bp.route("/gallery")
+@public_bp.route("/gallery")
 def gallery():
     """
     Display the photo and video gallery.
@@ -222,7 +222,7 @@ def gallery():
     )
 
 
-@pagez_bp.route("/search")
+@public_bp.route("/search")
 @limiter.limit("20 per minute")
 def search():
     """
@@ -317,7 +317,7 @@ def search():
     )
 
 
-@pagez_bp.route("/routes")
+@public_bp.route("/routes")
 def routes():
     """
     Display suggested tourism routes.
@@ -331,7 +331,7 @@ def routes():
     return render_template("pagez/routes.html")
 
 
-@pagez_bp.route("/barangays")
+@public_bp.route("/barangays")
 def barangays():
     """
     Display directory of all barangays with active contributors.
@@ -416,7 +416,7 @@ def barangays():
     return render_template("pagez/barangays.html", barangays=barangay_list)
 
 
-@pagez_bp.route("/barangay/<name>")
+@public_bp.route("/barangay/<name>")
 def barangay_profile(name):
     """
     Display a barangay's cultural and tourism profile page.
@@ -508,7 +508,7 @@ def barangay_profile(name):
     )
 
 
-@pagez_bp.route("/sitemap.xml")
+@public_bp.route("/sitemap.xml")
 def sitemap():
     """
     Generate a dynamic sitemap.xml for SEO.
@@ -632,7 +632,7 @@ def sitemap():
     return response
 
 
-@pagez_bp.route("/google364b8336ce52ae86.html")
+@public_bp.route("/google364b8336ce52ae86.html")
 def verify_site():
     """
     Serve Google Search Console verification file.
@@ -649,7 +649,7 @@ def verify_site():
     return render_template("google364b8336ce52ae86.html")
 
 
-# @pagez_bp.route('/robots.txt')
+# @public_bp.route('/robots.txt')
 # def robots():
 #     """
 #     Generate robots.txt configuration.
