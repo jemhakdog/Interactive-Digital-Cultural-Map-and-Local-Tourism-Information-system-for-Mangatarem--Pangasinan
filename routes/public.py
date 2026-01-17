@@ -9,6 +9,7 @@ logger = logging.getLogger(__name__)
 
 @public_bp.route('/')
 def index():
+    print("Host URL: ",request.host_url)
     """
     Render the home page with featured attractions.
 
@@ -32,7 +33,7 @@ def index():
     logger.info(f"Home page loaded with {len(featured)} featured attractions")
     
     print(f"[PROGRESSIVE LOG] [public] > index > RENDER: Rendering index.html")
-    return render_template('index.html', featured=featured)
+    return render_template('public/index.html', featured=featured)
 
 def record_view(view_type, item_id=None, page_name=None):
     """
@@ -88,7 +89,7 @@ def map_view():
     logger.info(f"Map page loaded with {attractions_count} attractions and {len(barangay_list)} barangays")
 
     print(f"[PROGRESSIVE LOG] [public] > map_view > RENDER: Rendering map.html")
-    return render_template('map.html', barangays=barangay_list, attractions_count=attractions_count)
+    return render_template('public/map.html', barangays=barangay_list, attractions_count=attractions_count)
 
 @public_bp.route('/attraction/<int:id>')
 def attraction_detail(id):
@@ -113,7 +114,7 @@ def attraction_detail(id):
     logger.info(f"Showing attraction '{attraction.name}' (ID: {id})")
     
     print(f"[PROGRESSIVE LOG] [public] > attraction_detail > RENDER: Rendering detail.html")
-    return render_template('detail.html', attraction=attraction)
+    return render_template('public/detail.html', attraction=attraction)
 
 @public_bp.route('/events')
 def events():
@@ -139,7 +140,7 @@ def events():
     logger.info(f"Events page loaded with {len(events)} approved events")
     
     print(f"[PROGRESSIVE LOG] [public] > events > RENDER: Rendering events.html")
-    return render_template('events.html', events=events)
+    return render_template('public/events.html', events=events)
 
 @public_bp.route('/gallery')
 def gallery():
@@ -174,7 +175,7 @@ def gallery():
     logger.info(f"Gallery page loaded with {len(items)} approved items")
 
     print(f"[PROGRESSIVE LOG] [public] > gallery > RENDER: Rendering gallery.html")
-    return render_template('gallery.html', gallery_items=items, barangays=barangay_list)
+    return render_template('public/gallery.html', gallery_items=items, barangays=barangay_list)
 
 @public_bp.route('/search')
 def search():
@@ -234,7 +235,7 @@ def search():
     logger.info(f"Search results: {len(attractions)} attractions, {len(events)} events for query '{query}'")
 
     print(f"[PROGRESSIVE LOG] [public] > search > RENDER: Rendering search_results.html")
-    return render_template('search_results.html', 
+    return render_template('public/search_results.html', 
                          query=query, 
                          attractions=attractions, 
                          events=events,
@@ -254,7 +255,7 @@ def routes():
     print(f"[PROGRESSIVE LOG] [public] > routes > ENTRY")
     logger.info("Tourism routes page accessed")
     print(f"[PROGRESSIVE LOG] [public] > routes > RENDER: Rendering routes.html")
-    return render_template('routes.html')
+    return render_template('public/routes.html')
 
 @public_bp.route('/barangays')
 def barangays():
@@ -328,7 +329,7 @@ def barangays():
     logger.info(f"Barangays directory page loaded with {len(barangay_list)} barangays")
 
     print(f"[PROGRESSIVE LOG] [public] > barangays > RENDER: Rendering barangays.html")
-    return render_template('barangays.html', barangays=barangay_list)
+    return render_template('public/barangays.html', barangays=barangay_list)
 
 @public_bp.route('/barangay/<name>')
 def barangay_profile(name):
@@ -389,7 +390,7 @@ def barangay_profile(name):
     logger.info(f"Barangay profile for '{name}': {len(attractions)} attractions, {len(events)} events, {len(gallery_items)} gallery items")
 
     print(f"[PROGRESSIVE LOG] [public] > barangay_profile > RENDER: Rendering barangay_profile.html")
-    return render_template('barangay_profile.html',
+    return render_template('public/barangay_profile.html',
                          barangay_name=name,
                          attractions=attractions,
                          attractions_json=attractions_json,

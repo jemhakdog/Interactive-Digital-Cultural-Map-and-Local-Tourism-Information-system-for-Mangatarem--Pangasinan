@@ -43,7 +43,7 @@ def login():
         print(f"[PROGRESSIVE LOG] [auth] > login > ERROR: Invalid credentials for '{username}'")
         flash('Invalid username or password', 'error')
     print(f"[PROGRESSIVE LOG] [auth] > login > RENDER: Rendering login.html")
-    return render_template('login.html')
+    return render_template('auth/login.html')
 
 @auth_bp.route('/register', methods=['GET', 'POST'])
 def register():
@@ -98,7 +98,7 @@ def register():
         return redirect(url_for('auth.login'))
         
     print(f"[PROGRESSIVE LOG] [auth] > register > RENDER: Rendering register.html")
-    return render_template('register.html')
+    return render_template('auth/register.html')
 
 @auth_bp.route('/logout')
 @login_required

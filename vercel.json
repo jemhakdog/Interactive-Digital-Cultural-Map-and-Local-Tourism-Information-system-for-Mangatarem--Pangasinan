@@ -1,5 +1,7 @@
 {
     "version": 2,
+    "buildCommand": "curl -LsSf https://astral.sh/uv/install.sh | sh && export PATH=\"$HOME/.cargo/bin:$PATH\" && uv sync --frozen --no-dev && npm install && npm run build:css",
+    "installCommand": "echo 'Using custom buildCommand'",
     "builds": [
         {
             "src": "flask_app.py",

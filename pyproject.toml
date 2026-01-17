@@ -1,12 +1,18 @@
 [project]
-name = ""
+name = "mangatarem-cultural-map"
 version = "0.0.1"
+description = "Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan"
+requires-python = ">=3.11"
 dependencies = [
-    "flask",
-    "flask-sqlalchemy",
-    "flask-login",
-    "email-validator",
+    "flask>=3.0.0",
+    "flask-sqlalchemy>=3.1.0",
+    "flask-login>=0.6.0",
+    "email-validator>=2.0.0",
+    "pocketbase>=0.15.0",
+    "python-dotenv>=1.0.0",
+    "werkzeug>=3.0.0",
 ]
 
 [tool.uv]
 package = false
+
