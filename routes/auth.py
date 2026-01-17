@@ -55,7 +55,7 @@ def login():
             logger.info(
                 f"User '{username}' with role '{user.role}' logged in successfully"
             )
-            login_user(user)
+            login_user(user, remember=True)  # Keep user logged in across sessions
             return redirect(url_for("public.index"))
         print(
             f"[PROGRESSIVE LOG] [auth] > login > ERROR: Invalid credentials for '{username}'"

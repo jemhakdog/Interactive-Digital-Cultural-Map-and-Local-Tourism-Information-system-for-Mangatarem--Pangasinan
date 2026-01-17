@@ -77,6 +77,11 @@ else:
 # Flask will dynamically determine the host from incoming request headers.
 app.config["SERVER_NAME"] = None
 
+# Session Cookie Configuration
+app.config["SESSION_COOKIE_HTTPONLY"] = True  # Prevent JavaScript access
+app.config["PERMANENT_SESSION_LIFETIME"] = 86400 * 7  # 7 days in seconds
+app.config["REMEMBER_COOKIE_DURATION"] = 86400 * 30  # 30 days for remember me
+
 if IS_VERCEL:
     # Production (HTTPS)
     app.config["SESSION_COOKIE_SECURE"] = True
@@ -100,6 +105,8 @@ limiter.init_app(app)
 # Initialize login manager
 login_manager = LoginManager()
 login_manager.login_view = "auth.login"
+login_manager.login_message = "Please log in to access this page."
+login_manager.login_message_category = "error"
 login_manager.init_app(app)
 
 
@@ -170,6 +177,15 @@ with app.app_context():
 @app.context_processor
 def inject_config():
     return dict(config=app.config)
+
+
+# Session Persistence Handler
+@app.before_request
+def make_session_permanent():
+    """Make all sessions permanent to persist across browser restarts"""
+    from flask import session
+
+    session.permanent = True
 
 
 # Register all blueprints

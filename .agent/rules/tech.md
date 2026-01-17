@@ -2,8 +2,9 @@
 trigger: always_on
 ---
 
-tech stack
+tech stack:
 python
 uv
 sqlite
 boostrap
+
