@@ -68,16 +68,26 @@ else:
     )
 
 # Server URL configuration for external URL generation
-raw_server_name = os.environ.get("SERVER_NAME")
-if raw_server_name:
-    # Sanitize: Remove protocol (http:// or https://) and trailing slash
-    sanitized_server_name = (
-        raw_server_name.replace("http://", "").replace("https://", "").rstrip("/")
-    )
-    app.config["SERVER_NAME"] = sanitized_server_name
-    print(f"Sanitized SERVER_NAME: {sanitized_server_name}")
+if IS_VERCEL:
+    raw_server_name = os.environ.get("SERVER_NAME")
+    if raw_server_name:
+        # Sanitize: Remove protocol (http:// or https://) and trailing slash
+        sanitized_server_name = (
+            raw_server_name.replace("http://", "").replace("https://", "").rstrip("/")
+        )
+        app.config["SERVER_NAME"] = sanitized_server_name
+        # On Vercel, ensure secure session cookies
+        app.config["SESSION_COOKIE_SECURE"] = True
+        print(f"Vercel production mode: SERVER_NAME set to {sanitized_server_name}")
+    else:
+        app.config["SERVER_NAME"] = None
 else:
+    # Local development settings
     app.config["SERVER_NAME"] = None
+    app.config["SESSION_COOKIE_DOMAIN"] = None
+    app.config["SESSION_COOKIE_SECURE"] = False  # Allow cookies over HTTP
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"  # Standard for redirects
+    print("Local development mode: Session settings optimized for HTTP.")
 
 app.config["PREFERRED_URL_SCHEME"] = os.environ.get("PREFERRED_URL_SCHEME", "http")
 
@@ -219,12 +229,8 @@ if __name__ == "__main__":
         except RuntimeError:
             print("Could not build URL outside of request context")
 
-    # Clear SERVER_NAME before running to avoid routing issues in development
-    # unless we are on Vercel or it's explicitly set to something else than the production default
+    # Local development Detected message
     if not IS_VERCEL:
-        print(
-            "Local development detected: Clearing SERVER_NAME to allow local routing."
-        )
-        app.config["SERVER_NAME"] = None
+        print("Starting in local development mode.")
 
     app.run(host=host, port=port, debug=True)
