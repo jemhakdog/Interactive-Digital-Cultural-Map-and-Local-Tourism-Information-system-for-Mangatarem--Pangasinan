@@ -68,7 +68,17 @@ else:
     )
 
 # Server URL configuration for external URL generation
-app.config["SERVER_NAME"] = os.environ.get("SERVER_NAME")
+raw_server_name = os.environ.get("SERVER_NAME")
+if raw_server_name:
+    # Sanitize: Remove protocol (http:// or https://) and trailing slash
+    sanitized_server_name = (
+        raw_server_name.replace("http://", "").replace("https://", "").rstrip("/")
+    )
+    app.config["SERVER_NAME"] = sanitized_server_name
+    print(f"Sanitized SERVER_NAME: {sanitized_server_name}")
+else:
+    app.config["SERVER_NAME"] = None
+
 app.config["PREFERRED_URL_SCHEME"] = os.environ.get("PREFERRED_URL_SCHEME", "http")
 
 # Initialize database
@@ -210,7 +220,11 @@ if __name__ == "__main__":
             print("Could not build URL outside of request context")
 
     # Clear SERVER_NAME before running to avoid routing issues in development
-    if os.environ.get("SERVER_NAME") is None:
+    # unless we are on Vercel or it's explicitly set to something else than the production default
+    if not IS_VERCEL:
+        print(
+            "Local development detected: Clearing SERVER_NAME to allow local routing."
+        )
         app.config["SERVER_NAME"] = None
 
     app.run(host=host, port=port, debug=True)

@@ -4,7 +4,6 @@ from models import db, User
 from extensions import limiter  # Import from shared extensions
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
-from datetime import datetime
 import logging
 
 auth_bp = Blueprint("auth", __name__)
@@ -157,16 +156,10 @@ def google_login():
     """
     Handle Google Sign-In response.
     Verifies the JWT and either logs in the existing user or creates a new one.
+    Ensures seamless "Continue with Google" flow.
     """
     print("[PROGRESSIVE LOG] [auth] > google_login > ENTRY")
     token = request.form.get("credential")
-    print(f"[PROGRESSIVE LOG] [auth] > google_login > QUERY: Received token: {token}")
-    print(
-        f"[PROGRESSIVE LOG] [auth] > google_login > QUERY: Received method: {request.method}"
-    )
-    print(
-        f"[PROGRESSIVE LOG] [auth] > google_login > QUERY: Received form: {request.form}"
-    )
 
     if not token:
         print("[PROGRESSIVE LOG] [auth] > google_login > ERROR: No credential provided")
@@ -174,7 +167,7 @@ def google_login():
         return redirect(url_for("auth.login"))
 
     try:
-        # Client ID from the provided secret file
+        # Client ID used in both login and register templates
         CLIENT_ID = (
             "794547070676-80dbt1j3a724hacci5684s7b7v93j1fh.apps.googleusercontent.com"
         )
@@ -183,54 +176,88 @@ def google_login():
         )
 
         email = idinfo.get("email")
-        # name = idinfo.get("name") # Currently unused
+        name = idinfo.get("name")  # Google full name
         print(
-            f"[PROGRESSIVE LOG] [auth] > google_login > SUCCESS: Verified token for {email}"
+            f"[PROGRESSIVE LOG] [auth] > google_login > SUCCESS: Verified token for {email} ({name})"
         )
 
         user = User.query.filter_by(email=email).first()
 
         if not user:
             print(
-                f"[PROGRESSIVE LOG] [auth] > google_login > LOGIC: Creating new user for {email}"
+                f"[PROGRESSIVE LOG] [auth] > google_login > LOGIC: User not found, creating new account for {email}"
             )
-            # Generate a username if not already exists
-            username = email.split("@")[0]
-            if User.query.filter_by(username=username).first():
-                username = f"{username}_{int(datetime.utcnow().timestamp())}"
 
-            user = User(
-                username=username,
-                email=email,
-                role="user",
-                is_approved=True,  # Regular users don't need approval
-            )
-            db.session.add(user)
-            db.session.commit()
+            # 1. Start with name-based username, fall back to email prefix
+            base_username = ""
+            if name:
+                base_username = name.lower().replace(" ", "")
+            else:
+                base_username = email.split("@")[0]
+
+            username = base_username
+            # 2. Check for collisions and append unique suffix if needed
+            counter = 1
+            while User.query.filter_by(username=username).first():
+                username = f"{base_username}_{counter}"
+                counter += 1
+
+            try:
+                user = User(
+                    username=username,
+                    email=email,
+                    role="user",
+                    is_approved=True,  # Regular users don't need approval
+                )
+                db.session.add(user)
+                db.session.commit()
+                print(
+                    f"[PROGRESSIVE LOG] [auth] > google_login > SUCCESS: Created new user '{username}' for '{email}'"
+                )
+            except Exception as e:
+                db.session.rollback()
+                print(
+                    f"[PROGRESSIVE LOG] [auth] > google_login > ERROR: DB Commit failed: {str(e)}"
+                )
+                flash(
+                    "An error occurred while creating your account. Please try again.",
+                    "error",
+                )
+                return redirect(url_for("auth.login"))
+
             print(
-                f"[PROGRESSIVE LOG] [auth] > google_login > SUCCESS: Created and logging in {email}"
+                f"[PROGRESSIVE LOG] [auth] > google_login > SUCCESS: Logged in NEW user '{username}' (ID: {user.id})"
             )
-            login_user(user)
+            login_user(user, remember=True)
+            flash(f"Welcome to GoMangatarem, {name or username}!", "success")
             return redirect(url_for("public.index"))
 
-        # Explicitly restrict Google Sign-In to the 'user' role
+        # Explicitly restrict Google Sign-In for existing administrative roles
         if user.role in ["admin", "contributor"]:
             print(
                 f"[PROGRESSIVE LOG] [auth] > google_login > ERROR: Role '{user.role}' restricted from Google Sign-In"
             )
             flash(
-                "Google Sign-In is only available for regular users. Please log in with your credentials.",
+                "Google Sign-In is only available for regular visitor accounts. Please use your credentials to log in.",
                 "error",
             )
             return redirect(url_for("auth.login"))
 
-        print(f"[PROGRESSIVE LOG] [auth] > google_login > SUCCESS: Logging in {email}")
-        login_user(user)
+        print(
+            f"[PROGRESSIVE LOG] [auth] > google_login > SUCCESS: Logging in existing user {email} (ID: {user.id})"
+        )
+        login_user(user, remember=True)
         return redirect(url_for("public.index"))
 
     except ValueError as e:
-        print(f"[PROGRESSIVE LOG] [auth] > google_login > ERROR: {str(e)}")
-        flash("Invalid Google token.", "error")
+        print(
+            f"[PROGRESSIVE LOG] [auth] > google_login > ERROR: Invalid token: {str(e)}"
+        )
+        flash("Invalid Google token. Please try again.", "error")
+        return redirect(url_for("auth.login"))
+    except Exception as e:
+        print(f"[PROGRESSIVE LOG] [auth] > google_login > UNEXPECTED ERROR: {str(e)}")
+        flash("An unexpected error occurred. Please try again.", "error")
         return redirect(url_for("auth.login"))
 
 
