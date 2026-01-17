@@ -1,6 +1,6 @@
 {
     "version": 2,
-    "buildCommand": "pip install uv && uv sync && uv add dotenv",
+    "buildCommand": "pip install uv && uv sync && pip install dotenv && pip install -r requirements.txt",
     "rewrites": [
         {
             "source": "/(.*)",
