@@ -5,6 +5,8 @@ from datetime import datetime
 from dotenv import load_dotenv
 from flask import Flask, url_for
 from flask_login import LoginManager
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 from models import Attraction, User, db
 
@@ -27,6 +29,15 @@ print(os.environ.get("SERVER_NAME"))
 db.init_app(app)
 with app.app_context():
     db.create_all()
+
+# Initialize rate limiter
+# Default limit: 100 requests per minute for general public pages
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["100 per minute"],
+    storage_uri="memory://",
+)
 
 # Initialize login manager
 login_manager = LoginManager()

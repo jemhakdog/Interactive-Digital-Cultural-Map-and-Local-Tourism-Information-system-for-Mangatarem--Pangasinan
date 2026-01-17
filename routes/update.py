@@ -3,11 +3,21 @@ import subprocess
 import os
 import shutil
 import logging
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
-update_bp = Blueprint('update', __name__)
+update_bp = Blueprint("update", __name__)
 logger = logging.getLogger(__name__)
 
-@update_bp.route('/pull', methods=['GET', 'POST'])
+# Initialize limiter for this blueprint
+limiter = Limiter(
+    get_remote_address,
+    storage_uri="memory://",
+)
+
+
+@update_bp.route("/pull", methods=["GET", "POST"])
+@limiter.limit("1 per minute")
 def pull_updates():
     """
     Pull updates from GitHub repository and copy files to specified locations.
@@ -29,42 +39,45 @@ def pull_updates():
     try:
         print(f"[PROGRESSIVE LOG] [update] > pull_updates > ENTRY")
         logger.info("Pull updates endpoint called - initiating git pull and file copy")
-        
+
         # For security, you might want to verify a token or check request headers
         # This is a basic implementation - add more security as needed
-        
+
         # Define paths
         source_repo = "/home/GoMangatarem/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan"
         dest1 = "/home/GoMangatarem/mysite"
         dest2 = "/home/GoMangatarem"
-        
+
         # Change directory to the source repository
         original_cwd = os.getcwd()
-        print(f"[PROGRESSIVE LOG] [update] > pull_updates > LOGIC: Changing directory to '{source_repo}'")
+        print(
+            f"[PROGRESSIVE LOG] [update] > pull_updates > LOGIC: Changing directory to '{source_repo}'"
+        )
         os.chdir(source_repo)
-        
+
         # Pull the latest changes from GitHub
         print(f"[PROGRESSIVE LOG] [update] > pull_updates > LOGIC: Executing git pull")
-        result = subprocess.run(['git', 'pull'], 
-                                capture_output=True, 
-                                text=True)
-        
+        result = subprocess.run(["git", "pull"], capture_output=True, text=True)
+
         if result.returncode != 0:
-            print(f"[PROGRESSIVE LOG] [update] > pull_updates > ERROR: Git pull failed: {result.stderr}")
-            return jsonify({
-                'status': 'error',
-                'message': f'Git pull failed: {result.stderr}'
-            }), 500
-        
+            print(
+                f"[PROGRESSIVE LOG] [update] > pull_updates > ERROR: Git pull failed: {result.stderr}"
+            )
+            return jsonify(
+                {"status": "error", "message": f"Git pull failed: {result.stderr}"}
+            ), 500
+
         # Copy all files and folders to dest1 by updating existing files
-        print(f"[PROGRESSIVE LOG] [update] > pull_updates > LOGIC: Copying files to '{dest1}'")
+        print(
+            f"[PROGRESSIVE LOG] [update] > pull_updates > LOGIC: Copying files to '{dest1}'"
+        )
         if not os.path.exists(dest1):
             os.makedirs(dest1)
 
         # Use rsync-like behavior: copy files and overwrite existing ones
         for root, dirs, files in os.walk(source_repo):
             # Skip .git directory to avoid copying git metadata
-            dirs[:] = [d for d in dirs if d != '.git']
+            dirs[:] = [d for d in dirs if d != ".git"]
 
             for file in files:
                 source_file = os.path.join(root, file)
@@ -80,27 +93,30 @@ def pull_updates():
                 shutil.copy2(source_file, dest1_file)
 
         # Copy only files (not folders) to dest2
-        print(f"[PROGRESSIVE LOG] [update] > pull_updates > LOGIC: Copying shell files to '{dest2}'")
+        print(
+            f"[PROGRESSIVE LOG] [update] > pull_updates > LOGIC: Copying shell files to '{dest2}'"
+        )
         for item in os.listdir(source_repo):
             source_item = os.path.join(source_repo, item)
             dest2_item = os.path.join(dest2, item)
             if os.path.isfile(source_item):
                 shutil.copy2(source_item, dest2_item)
-        
+
         # Return to original directory
         os.chdir(original_cwd)
-        
-        print(f"[PROGRESSIVE LOG] [update] > pull_updates > SUCCESS: Pulled updates and synchronized files")
+
+        print(
+            f"[PROGRESSIVE LOG] [update] > pull_updates > SUCCESS: Pulled updates and synchronized files"
+        )
         logger.info("Successfully completed git pull and file copy operations")
-        
-        return jsonify({
-            'status': 'success',
-            'message': 'Successfully pulled updates and copied files',
-            'git_output': result.stdout
-        })
-        
+
+        return jsonify(
+            {
+                "status": "success",
+                "message": "Successfully pulled updates and copied files",
+                "git_output": result.stdout,
+            }
+        )
+
     except Exception as e:
-        return jsonify({
-            'status': 'error',
-            'message': str(e)
-        }), 500
+        return jsonify({"status": "error", "message": str(e)}), 500

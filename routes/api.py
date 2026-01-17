@@ -3,11 +3,21 @@ from models import Attraction, db
 import logging
 from datetime import datetime, timedelta
 from flask import make_response
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
-api_bp = Blueprint('api', __name__, url_prefix='/api')
+api_bp = Blueprint("api", __name__, url_prefix="/api")
 logger = logging.getLogger(__name__)
 
-@api_bp.route('/attractions')
+# Initialize limiter for this blueprint
+limiter = Limiter(
+    get_remote_address,
+    storage_uri="memory://",
+)
+
+
+@api_bp.route("/attractions")
+@limiter.limit("20 per minute")
 def api_attractions():
     """
     API endpoint to retrieve approved attractions with pagination.
@@ -29,14 +39,18 @@ def api_attractions():
     logger.info("API endpoint /api/attractions called")
 
     # Get pagination parameters
-    page = request.args.get('page', 1, type=int)
-    per_page = min(request.args.get('per_page', 20, type=int), 100)  # Cap at 100 per page
+    page = request.args.get("page", 1, type=int)
+    per_page = min(
+        request.args.get("per_page", 20, type=int), 100
+    )  # Cap at 100 per page
 
     # Get filter parameters
-    category = request.args.get('category')
-    barangay = request.args.get('barangay')
+    category = request.args.get("category")
+    barangay = request.args.get("barangay")
 
-    print(f"[PROGRESSIVE LOG] [api] > api_attractions > QUERY: Fetching attractions with pagination (page={page}, per_page={per_page})")
+    print(
+        f"[PROGRESSIVE LOG] [api] > api_attractions > QUERY: Fetching attractions with pagination (page={page}, per_page={per_page})"
+    )
 
     # Build query with filters and only select needed columns
     query = db.session.query(
@@ -47,12 +61,12 @@ def api_attractions():
         Attraction.description,
         Attraction.lat,
         Attraction.lng,
-        Attraction.image_url
-    ).filter(Attraction.status == 'approved')
+        Attraction.image_url,
+    ).filter(Attraction.status == "approved")
 
-    if category and category != 'all':
+    if category and category != "all":
         query = query.filter(Attraction.category == category)
-    if barangay and barangay != 'all':
+    if barangay and barangay != "all":
         query = query.filter(Attraction.barangay == barangay)
 
     # Paginate the results
@@ -62,36 +76,44 @@ def api_attractions():
 
     result = []
     for a in paginated_attractions.items:
-        result.append({
-            'id': a[0],  # id
-            'name': a[1],  # name
-            'category': a[2],  # category
-            'barangay': a[3],  # barangay
-            'description': a[4],  # description
-            'lat': a[5],  # lat
-            'lng': a[6],  # lng
-            'image': a[7],  # image_url
-            'rating': 4.5  # Placeholder rating until we implement reviews
-        })
+        result.append(
+            {
+                "id": a[0],  # id
+                "name": a[1],  # name
+                "category": a[2],  # category
+                "barangay": a[3],  # barangay
+                "description": a[4],  # description
+                "lat": a[5],  # lat
+                "lng": a[6],  # lng
+                "image": a[7],  # image_url
+                "rating": 4.5,  # Placeholder rating until we implement reviews
+            }
+        )
 
     response_data = {
-        'attractions': result,
-        'pagination': {
-            'page': page,
-            'per_page': per_page,
-            'total': paginated_attractions.total,
-            'pages': paginated_attractions.pages,
-            'has_next': paginated_attractions.has_next,
-            'has_prev': paginated_attractions.has_prev
-        }
+        "attractions": result,
+        "pagination": {
+            "page": page,
+            "per_page": per_page,
+            "total": paginated_attractions.total,
+            "pages": paginated_attractions.pages,
+            "has_next": paginated_attractions.has_next,
+            "has_prev": paginated_attractions.has_prev,
+        },
     }
 
-    print(f"[PROGRESSIVE LOG] [api] > api_attractions > SUCCESS: Returning {len(result)} attractions (page {page}/{paginated_attractions.pages})")
-    logger.info(f"Returning {len(result)} approved attractions (page {page}/{paginated_attractions.pages})")
+    print(
+        f"[PROGRESSIVE LOG] [api] > api_attractions > SUCCESS: Returning {len(result)} attractions (page {page}/{paginated_attractions.pages})"
+    )
+    logger.info(
+        f"Returning {len(result)} approved attractions (page {page}/{paginated_attractions.pages})"
+    )
 
     # Create response with caching headers
     response = make_response(jsonify(response_data))
-    response.headers['Cache-Control'] = 'public, max-age=300'  # Cache for 5 minutes
-    response.headers['Expires'] = (datetime.utcnow() + timedelta(minutes=5)).strftime('%a, %d %b %Y %H:%M:%S GMT')
+    response.headers["Cache-Control"] = "public, max-age=300"  # Cache for 5 minutes
+    response.headers["Expires"] = (datetime.utcnow() + timedelta(minutes=5)).strftime(
+        "%a, %d %b %Y %H:%M:%S GMT"
+    )
 
     return response
