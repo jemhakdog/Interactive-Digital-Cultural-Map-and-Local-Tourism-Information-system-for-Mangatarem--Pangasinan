@@ -163,7 +163,7 @@ def google_login():
     print(
         f"[PROGRESSIVE LOG] [auth] > google_login > QUERY: Received form: {request.form}"
     )
-    return request.form
+
     if not token:
         print("[PROGRESSIVE LOG] [auth] > google_login > ERROR: No credential provided")
         flash("No Google credential received.", "error")
