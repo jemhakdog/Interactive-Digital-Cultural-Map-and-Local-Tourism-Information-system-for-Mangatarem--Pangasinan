@@ -56,6 +56,7 @@
 </head>
 
 <body class="bg-gray-50 text-gray-800 flex flex-col {% block body_height %}min-h-screen{% endblock %}">
+    <!-- AUTH_DEBUG: is_authenticated={{ current_user.is_authenticated }}, role={{ current_user.role if current_user.is_authenticated else 'anonymous' }} -->
 
     <!-- Navigation -->
     {% block navbar %}
@@ -157,7 +158,7 @@
     {% block footer %}
     <footer class="bg-gray-900 text-white pt-24 pb-12 border-t border-gray-800">
         <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-20">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-20 mt-20">
                 <div class="space-y-8">
                     <a href="{{ url_for('public.index') }}"
                         class="text-3xl font-bold flex items-center gap-3 text-white group">

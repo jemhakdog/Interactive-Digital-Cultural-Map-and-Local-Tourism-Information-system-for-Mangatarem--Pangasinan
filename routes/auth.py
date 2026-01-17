@@ -34,6 +34,10 @@ def login():
         password = request.form.get("password")
         print(f"[PROGRESSIVE LOG] [auth] > login > QUERY: Fetching user '{username}'")
         user = User.query.filter_by(username=username).first()
+        if user:
+            print(
+                f"[PROGRESSIVE LOG] [auth] > login > LOGIC: Found user '{username}' with role '{user.role}'"
+            )
 
         if user and user.check_password(password):
             print(
@@ -118,7 +122,7 @@ def register():
                 return redirect(url_for("auth.register"))
 
         print(
-            f"[PROGRESSIVE LOG] [auth] > register > LOGIC: Creating new user '{username}'"
+            f"[PROGRESSIVE LOG] [auth] > register > LOGIC: Creating new user '{username}' with role '{role}'"
         )
         user = User(
             username=username,
