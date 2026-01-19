@@ -7,8 +7,8 @@
     <title>{% block title %}GoMangatarem Information System{% endblock %}</title>
     <!-- google verification -->
     <meta name="google-site-verification" content="4mfuNe7nRXoBiOxX-xs1-UC63vsLiUy8xOSBQQWUVEI" />
-    <!-- Tailwind CSS (CDN - Fallback) -->
-    <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
     <!-- Custom CSS (Local - Uncomment after running: npm run build:css) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
@@ -156,146 +156,188 @@
 
     <!-- Footer -->
     {% block footer %}
-    <footer class="bg-gray-900 text-white pt-24 pb-12 border-t border-gray-800">
-        <div class="container mx-auto px-6">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 mb-20 mt-20">
-                <div class="space-y-8">
-                    <a href="{{ url_for('public.index') }}"
-                        class="text-3xl font-bold flex items-center gap-3 text-white group">
-                        <span
-                            class="text-4xl transform group-hover:rotate-12 transition-transform duration-500">🌿</span>
-                        <span class="tracking-tight font-heading">GoMangatarem</span>
-                    </a>
-                    <p class="text-gray-400 text-lg max-w-lg leading-relaxed font-body">
-                        Discover the cultural identity, community highlights, and hidden gems of our 82 barangays.
-                        Your interactive guide to the heritage of Mangatarem, Pangasinan.
-                    </p>
-                    <div class="flex gap-4">
-                        <a href="https://facebook.com"
-                            class="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center hover:bg-green-700 transition duration-300 shadow-lg"
-                            aria-label="Facebook">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" />
-                            </svg>
+    <footer class="relative bg-emerald-950 text-emerald-50 pt-32 pb-12 overflow-hidden border-t border-emerald-900/50"
+        style="background-color: #022c22;">
+        <!-- Heritage Horizon: Topographic Line Effect -->
+        <div class="absolute top-0 left-0 w-full h-full opacity-[0.05] pointer-events-none select-none overflow-hidden"
+            aria-hidden="true">
+            <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg" class="w-full h-full fill-emerald-500">
+                <path d="M0,500 C200,450 400,550 600,500 C800,450 1000,550 1000,500 L1000,1000 L0,1000 Z" />
+                <path d="M0,600 C250,550 500,650 750,600 C900,580 1000,620 1000,600 L1000,1000 L0,1000 Z"
+                    opacity="0.5" />
+                <path d="M0,700 C300,650 600,750 900,700 C950,690 1000,710 1000,700 L1000,1000 L0,1000 Z"
+                    opacity="0.3" />
+            </svg>
+        </div>
+
+        <!-- Large Typographic Background -->
+        <div class="absolute -bottom-10 -left-10 text-[15rem] font-bold text-emerald-400/[0.03] leading-none pointer-events-none select-none font-heading uppercase tracking-tighter"
+            aria-hidden="true">
+            Mangatarem
+        </div>
+
+        <div class="container mx-auto px-6 relative z-10">
+            <div class="flex flex-col lg:flex-row gap-16 lg:gap-24 mb-24">
+                <!-- Brand Section -->
+                <div class="lg:w-1/3 space-y-10">
+                    <div class="space-y-6">
+                        <a href="{{ url_for('public.index') }}" class="inline-flex items-center gap-4 group">
+                            <div
+                                class="w-16 h-16 rounded-2xl bg-emerald-800/40 backdrop-blur-md border border-emerald-700/50 flex items-center justify-center transform group-hover:rotate-6 transition-all duration-500 shadow-2xl">
+                                <span class="text-3xl">🌿</span>
+                            </div>
+                            <div>
+                                <h2 class="text-3xl font-bold text-white tracking-tight font-heading leading-tight">
+                                    GoMangatarem</h2>
+                                <p class="text-emerald-400 font-medium text-sm uppercase tracking-widest">Heritage
+                                    Portal</p>
+                            </div>
                         </a>
-                        <a href="https://twitter.com"
-                            class="w-12 h-12 rounded-full bg-gray-800 flex items-center justify-center hover:bg-green-700 transition duration-300 shadow-lg"
-                            aria-label="Twitter">
-                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
-                            </svg>
+                        <p class="text-emerald-100/70 text-lg leading-relaxed font-body max-w-sm">
+                            Mapping the soul of 82 barangays. A digital sanctuary for the cultural heritage and natural
+                            wonders of Mangatarem, Pangasinan.
+                        </p>
+                    </div>
+
+                    <div class="flex items-center gap-6">
+                        <a href="#" class="group" aria-label="Facebook">
+                            <div
+                                class="w-10 h-10 rounded-full border border-emerald-800/50 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-500 transition-all duration-300">
+                                <svg class="w-5 h-5 text-emerald-400 group-hover:text-white" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z" />
+                                </svg>
+                            </div>
+                        </a>
+                        <a href="#" class="group" aria-label="Twitter">
+                            <div
+                                class="w-10 h-10 rounded-full border border-emerald-800/50 flex items-center justify-center group-hover:bg-emerald-600 group-hover:border-emerald-500 transition-all duration-300">
+                                <svg class="w-5 h-5 text-emerald-400 group-hover:text-white" fill="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path
+                                        d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z" />
+                                </svg>
+                            </div>
                         </a>
                     </div>
                 </div>
 
-                <div class="flex flex-col justify-center lg:items-end">
-                    <div class="w-full max-w-md">
-                        <span
-                            class="text-green-500 font-bold tracking-widest uppercase text-sm mb-3 block font-body">Stay
-                            Connected</span>
-                        <h3 class="text-4xl font-bold mb-8 font-heading">Plan your visit today.</h3>
-                        <form
-                            class="flex w-full group overflow-hidden rounded-xl border border-gray-700 focus-within:border-green-500 transition-colors"
-                            onsubmit="return handleNewsletterSubmit(event)">
-                            <input type="email" placeholder="Enter your email..." required
-                                class="w-full px-6 py-4 bg-gray-800 text-white border-none outline-none placeholder-gray-500 font-body" />
-                            <button type="submit"
-                                class="bg-green-600 hover:bg-green-700 text-white font-bold px-8 transition-all active:scale-95 flex items-center">
-                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
-                                </svg>
-                            </button>
-                        </form>
-                        <p class="text-gray-500 text-sm mt-4 font-body">Join the archive for festivals and cultural
-                            updates.</p>
+                <!-- Link Sections -->
+                <div class="flex-grow grid grid-cols-2 md:grid-cols-3 gap-12 text-sm">
+                    <div class="space-y-6 lg:mt-12">
+                        <h4 class="text-emerald-400 font-bold uppercase tracking-widest font-heading">Explore</h4>
+                        <ul class="space-y-4 font-body">
+                            <li><a href="{{ url_for('public.map_view') }}"
+                                    class="text-emerald-100/60 hover:text-white hover:translate-x-1 transition-all inline-block">Interactive
+                                    Map</a></li>
+                            <li><a href="{{ url_for('public.barangays') }}"
+                                    class="text-emerald-100/60 hover:text-white hover:translate-x-1 transition-all inline-block">Local
+                                    Barangays</a></li>
+                            <li><a href="{{ url_for('public.routes') }}"
+                                    class="text-emerald-100/60 hover:text-white hover:translate-x-1 transition-all inline-block">Hero's
+                                    Routes</a></li>
+                            <li><a href="{{ url_for('public.gallery') }}"
+                                    class="text-emerald-100/60 hover:text-white hover:translate-x-1 transition-all inline-block">Visual
+                                    Archive</a></li>
+                        </ul>
+                    </div>
+                    <div class="space-y-6 lg:mt-0">
+                        <h4 class="text-emerald-400 font-bold uppercase tracking-widest font-heading">Heritage</h4>
+                        <ul class="space-y-4 font-body">
+                            <li><a href="{{ url_for('public.events') }}"
+                                    class="text-emerald-100/60 hover:text-white hover:translate-x-1 transition-all inline-block">Festivals</a>
+                            </li>
+                            <li><a href="{{ url_for('public.index') }}#featured"
+                                    class="text-emerald-100/60 hover:text-white hover:translate-x-1 transition-all inline-block">Top
+                                    Attractions</a></li>
+                            <li><a href="{{ url_for('public.gallery') }}"
+                                    class="text-emerald-100/60 hover:text-white hover:translate-x-1 transition-all inline-block">Traditions</a>
+                            </li>
+                            <li><a href="#"
+                                    class="text-emerald-100/60 hover:text-white hover:translate-x-1 transition-all inline-block">Preservation</a>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="space-y-6 lg:mt-24">
+                        <h4 class="text-emerald-400 font-bold uppercase tracking-widest font-heading">Connect</h4>
+                        <ul class="space-y-4 font-body">
+                            <li><a href="{{ url_for('auth.login') }}"
+                                    class="text-emerald-100/60 hover:text-white hover:translate-x-1 transition-all inline-block">Contributor
+                                    Portal</a></li>
+                            <li><a href="mailto:contact@mangatarem.gov.ph"
+                                    class="text-emerald-100/60 hover:text-white hover:translate-x-1 transition-all inline-block">Official
+                                    Support</a></li>
+                            <li><a href="{{ url_for('public.index') }}"
+                                    class="text-emerald-100/60 hover:text-white hover:translate-x-1 transition-all inline-block">Terms
+                                    & Privacy</a></li>
+                            <li><a href="{{ url_for('admin.admin_dashboard') }}"
+                                    class="text-emerald-800/80 hover:text-emerald-400 transition-all inline-block italic">Admin
+                                    Access</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
 
-            <hr class="border-gray-800 mb-16">
-
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
-                <div>
-                    <h4 class="text-white font-bold mb-6 font-heading uppercase tracking-wider text-sm">Explore</h4>
-                    <ul class="space-y-4 font-body">
-                        <li><a href="{{ url_for('public.map_view') }}"
-                                class="text-gray-400 hover:text-green-500 transition-colors footer-link">Interactive
-                                Map</a></li>
-                        <li><a href="{{ url_for('public.barangays') }}"
-                                class="text-gray-400 hover:text-green-500 transition-colors footer-link">Local
-                                Barangays</a></li>
-                        <li><a href="{{ url_for('public.routes') }}"
-                                class="text-gray-400 hover:text-green-500 transition-colors footer-link">Hero's
-                                Routes</a></li>
-                        <li><a href="{{ url_for('public.gallery') }}"
-                                class="text-gray-400 hover:text-green-500 transition-colors footer-link">Visual
-                                Gallery</a></li>
-                    </ul>
+            <!-- Barangay Marquee -->
+            <div class="relative py-8 border-y border-emerald-900/40 mb-8 overflow-hidden group">
+                <div class="flex whitespace-nowrap animate-marquee group-hover:pause">
+                    {% set b_names = ["Malabobo", "Poblacion", "Cabaluyan", "Bogtong", "Calit", "Casay", "Dorongan",
+                    "Macayocayo", "Naguilayan", "Ole", "Parian", "Quetegan", "Salavante", "Tococ"] %}
+                    <div
+                        class="flex gap-16 items-center px-8 text-emerald-800 font-heading font-medium uppercase tracking-[0.2em] text-xs">
+                        {% for i in range(3) %}
+                        {% for name in b_names %}
+                        <span class="hover:text-emerald-400 transition-colors cursor-default">{{ name }}</span>
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-900/50"></span>
+                        {% endfor %}
+                        {% endfor %}
+                    </div>
                 </div>
-                <div>
-                    <h4 class="text-white font-bold mb-6 font-heading uppercase tracking-wider text-sm">Culture</h4>
-                    <ul class="space-y-4 font-body">
-                        <li><a href="{{ url_for('public.events') }}"
-                                class="text-gray-400 hover:text-green-500 transition-colors footer-link">Festivals &
-                                Events</a></li>
-                        <li><a href="{{ url_for('public.index') }}#featured"
-                                class="text-gray-400 hover:text-green-500 transition-colors footer-link">Heritage
-                                Spotlight</a></li>
-                        <li><a href="{{ url_for('public.gallery') }}"
-                                class="text-gray-400 hover:text-green-500 transition-colors footer-link">Traditions
-                                Archive</a></li>
-                        <li><a href="{{ url_for('public.barangays') }}"
-                                class="text-gray-400 hover:text-green-500 transition-colors footer-link">Barangay
-                                Highlights</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-white font-bold mb-6 font-heading uppercase tracking-wider text-sm">Information</h4>
-                    <ul class="space-y-4 font-body">
-                        <li><a href="{{ url_for('public.index') }}"
-                                class="text-gray-400 hover:text-green-500 transition-colors footer-link">About
-                                GoMangatarem</a></li>
-                        <li><a href="{{ url_for('public.search') }}"
-                                class="text-gray-400 hover:text-green-500 transition-colors footer-link">Search
-                                Attractions</a></li>
-                        <li><a href="#" class="text-gray-400 hover:text-green-500 transition-colors footer-link">Tourist
-                                Guidelines</a></li>
-                        <li><a href="#"
-                                class="text-gray-400 hover:text-green-500 transition-colors footer-link">Emergency
-                                Contacts</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <h4 class="text-white font-bold mb-6 font-heading uppercase tracking-wider text-sm">Connect</h4>
-                    <ul class="space-y-4 font-body">
-                        <li><a href="{{ url_for('auth.login') }}"
-                                class="text-gray-400 hover:text-green-500 transition-colors footer-link">Contributor
-                                Access</a></li>
-                        <li><a href="{{ url_for('admin.admin_dashboard') }}"
-                                class="text-gray-400 hover:text-green-500 transition-colors footer-link">Admin
-                                Portal</a></li>
-                        <li><a href="mailto:contact@mangatarem.gov.ph"
-                                class="text-gray-400 hover:text-green-500 transition-colors footer-link">Contact
-                                Support</a></li>
-                    </ul>
-                </div>
+                <!-- Gradient Fades -->
+                <div class="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#022c22] to-transparent z-10"></div>
+                <div class="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#022c22] to-transparent z-10"></div>
             </div>
 
             <div
-                class="pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-6 font-body">
-                <p class="text-gray-500 text-sm">&copy; 2025 <span class="text-gray-300 font-medium">GoMangatarem
-                        IS</span>. All rights reserved.</p>
-                <div class="flex gap-8 text-sm text-gray-500">
-                    <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
-                    <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
+                class="flex flex-col md:flex-row justify-between items-center gap-6 pt-8 text-emerald-800/80 font-medium text-xs tracking-widest uppercase">
+                <p>&copy; 2025 GoMangatarem Heritage System. All rights reserved.</p>
+                <div class="flex gap-12">
+                    <span>Mangatarem, Pangasinan</span>
+                    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+                        class="hover:text-emerald-400 transition-colors flex items-center gap-2">
+                        Back to top
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M5 10l7-7m0 0l7 7m-7-7v18"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
         </div>
-    </footer>
 
+        <style>
+            @keyframes marquee {
+                0% {
+                    transform: translateX(0);
+                }
+
+                100% {
+                    transform: translateX(-50%);
+                }
+            }
+
+            .animate-marquee {
+                display: flex;
+                width: max-content;
+                animation: marquee 60s linear infinite;
+            }
+
+            .pause {
+                animation-play-state: paused;
+            }
+        </style>
+    </footer>
     {% endblock %}
 
     {% block scripts %}{% endblock %}

@@ -41,13 +41,10 @@ h11==0.16.0
     # via httpcore
 httpcore==1.0.9
     # via httpx
-httpx==0.28.1
-    # via pocketbase
 idna==3.11
     # via
     #   anyio
     #   email-validator
-    #   httpx
     #   requests
 itsdangerous==2.2.0
     # via flask
@@ -64,8 +61,6 @@ ordered-set==4.1.0
     # via flask-limiter
 packaging==25.0
     # via limits
-pocketbase==0.15.0
-    # via mangatarem-cultural-map (pyproject.toml)
 pyasn1==0.6.2
     # via
     #   pyasn1-modules

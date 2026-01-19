@@ -1,6 +1,16 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
-from models import db, User, Attraction, Event, GalleryItem, PageView
+from models import (
+    db,
+    User,
+    Attraction,
+    Event,
+    GalleryItem,
+    PageView,
+    Review,
+    Favorite,
+    EventInterest,
+)
 from extensions import limiter
 from datetime import datetime, timedelta
 from werkzeug.utils import secure_filename
@@ -43,6 +53,9 @@ def admin_dashboard():
         "attractions": Attraction.query.count(),
         "events": Event.query.count(),
         "gallery": GalleryItem.query.count(),
+        "reviews": Review.query.count(),
+        "pending_reviews": Review.query.filter_by(status="pending").count(),
+        "favorites": Favorite.query.count(),
     }
 
     # Analytics: Most Viewed Attractions
@@ -90,6 +103,22 @@ def admin_dashboard():
 
     pending_users = User.query.filter_by(is_approved=False, role="contributor").all()
     pending_gallery = GalleryItem.query.filter_by(status="pending").all()
+    pending_reviews = (
+        Review.query.filter_by(status="pending").join(User).join(Attraction).all()
+    )
+
+    # Recent activity for dashboard feed
+    recent_reviews = Review.query.order_by(Review.created_at.desc()).limit(5).all()
+
+    # Top rated attractions
+    top_rated = (
+        db.session.query(Attraction, func.avg(Review.rating).label("avg_rating"))
+        .join(Review)
+        .group_by(Attraction.id)
+        .order_by(func.avg(Review.rating).desc())
+        .limit(5)
+        .all()
+    )
 
     print(
         f"[PROGRESSIVE LOG] [admin] > admin_dashboard > SUCCESS: Dashboard loaded with {stats['attractions']} attractions, {stats['events']} events"
@@ -106,8 +135,11 @@ def admin_dashboard():
         stats=stats,
         pending_users=pending_users,
         pending_gallery=pending_gallery,
+        pending_reviews=pending_reviews,
         top_attractions=top_attractions,
         engagement_data=engagement_data,
+        recent_activity=recent_reviews,
+        top_rated=top_rated,
     )
 
 
@@ -573,6 +605,42 @@ def reject_gallery(id):
     logger.info(f"Gallery item ID {id} rejected and deleted")
 
     flash("Gallery item rejected and removed.")
+    return redirect(url_for("admin.admin_dashboard"))
+
+
+@admin_bp.route("/reviews/approve/<int:id>")
+@login_required
+@limiter.limit("10 per minute")
+def approve_review(id):
+    """
+    Approve a pending review submission.
+    """
+    if current_user.role != "admin":
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+
+    review = Review.query.get_or_404(id)
+    review.status = "approved"
+    db.session.commit()
+    flash("Review approved!")
+    return redirect(url_for("admin.admin_dashboard"))
+
+
+@admin_bp.route("/reviews/reject/<int:id>")
+@login_required
+@limiter.limit("10 per minute")
+def reject_review(id):
+    """
+    Reject and delete a pending review.
+    """
+    if current_user.role != "admin":
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+
+    review = Review.query.get_or_404(id)
+    db.session.delete(review)
+    db.session.commit()
+    flash("Review rejected and removed.")
     return redirect(url_for("admin.admin_dashboard"))
 
 

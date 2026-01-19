@@ -10,9 +10,6 @@ Debugging utility for template rendering issues. Use this to test and troublesho
 ### `fix_index.py`
 Index fixing utility. Repairs and rebuilds database indices if needed.
 
-### `pocketbasesample.py`
-Sample script demonstrating PocketBase integration. Reference implementation for PocketBase client usage.
-
 ### `seed_events.py`
 Database seeding script for events. Populates the database with sample event data for testing and development.
 
