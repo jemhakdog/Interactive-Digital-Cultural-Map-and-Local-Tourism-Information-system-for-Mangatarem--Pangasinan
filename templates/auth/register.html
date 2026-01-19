@@ -1,247 +1,342 @@
 {% extends 'base.html' %}
 
-{% block title %}Register - GoMangatarem{% endblock %}
+{% block title %}Join the Heritage - GoMangatarem Heritage Portal{% endblock %}
 
 {% block head %}
 <style>
-    /* Reusing the soft pattern from the Login page */
-    .bg-pattern-dots {
-        background-image: radial-gradient(#e5e7eb 2px, transparent 2px);
-        background-size: 24px 24px;
+    .bg-pattern {
+        background-color: #022c22;
+        background-image:
+            radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.1) 0px, transparent 50%),
+            radial-gradient(at 100% 0%, rgba(5, 150, 105, 0.1) 0px, transparent 50%);
     }
 
-    /* Smooth transition for the select dropdown chevron */
-    select {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    .topographic-overlay {
+        mask-image: linear-gradient(to bottom, black, transparent);
+        -webkit-mask-image: linear-gradient(to bottom, black, transparent);
+    }
+
+    @keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0) scale(1);
+        }
+
+        50% {
+            transform: translateY(-20px) scale(1.05);
+        }
+    }
+
+    .animate-float {
+        animation: float 10s ease-in-out infinite;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.03);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    }
+
+    .input-glass {
+        background: rgba(2, 44, 34, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: white;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .input-glass:focus {
+        background: rgba(2, 44, 34, 0.6);
+        border-color: #10b981;
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+    }
+
+    .gold-shimmer {
+        background: linear-gradient(45deg, #10b981, #34d399, #10b981);
+        background-size: 200% auto;
+        animation: shimmer 3s linear infinite;
+    }
+
+    @keyframes shimmer {
+        to {
+            background-position: 200% center;
+        }
+    }
+
+    /* Custom Radio Styling for Dark Theme */
+    .role-card input:checked+.role-content {
+        border-color: #10b981;
+        background-color: rgba(16, 185, 129, 0.1);
+        transform: translateY(-4px);
+        box-shadow: 0 15px 30px -5px rgba(16, 185, 129, 0.2);
+    }
+
+    .role-card input:checked+.role-content .role-icon {
+        transform: scale(1.1);
+        filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5));
+    }
+
+    .role-card input:checked+.role-content .role-check {
+        opacity: 1;
+    }
+
+    /* Select styling */
+    select.input-glass {
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2310b981' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
         background-position: right 1rem center;
         background-repeat: no-repeat;
         background-size: 1.5em 1.5em;
         -webkit-appearance: none;
         appearance: none;
     }
+
+    @keyframes fadeInDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-fade-in {
+        animation: fadeInDown 0.5s ease-out forwards;
+    }
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 {% endblock %}
 
 {% block content %}
-<div
-    class="relative min-h-[calc(100vh-80px)] bg-[#FDFBF7] bg-pattern-dots flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 overflow-hidden">
+<div class="relative min-h-[calc(100vh-80px)] bg-pattern flex items-center justify-center overflow-hidden py-16 px-4">
 
-    <div
-        class="absolute top-0 left-0 w-64 h-64 bg-green-200 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob">
-    </div>
-    <div
-        class="absolute top-0 right-0 w-64 h-64 bg-yellow-200 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob animation-delay-2000">
-    </div>
-    <div
-        class="absolute -bottom-32 left-20 w-64 h-64 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-60 animate-blob animation-delay-4000">
+    <!-- Topographic Background Layer -->
+    <div class="absolute inset-0 opacity-[0.07] topographic-overlay pointer-events-none" aria-hidden="true">
+        <svg viewBox="0 0 1000 1000" xmlns="http://www.w3.org/2000/svg" class="w-full h-full fill-emerald-500">
+            <path d="M0,500 C200,450 400,550 600,500 C800,450 1000,550 1000,500 L1000,1000 L0,1000 Z" />
+            <path d="M0,600 C250,550 500,650 750,600 C900,580 1000,620 1000,600 L1000,1000 L0,1000 Z" opacity="0.5" />
+            <path d="M0,700 C300,650 600,750 900,700 C950,690 1000,710 1000,700 L1000,1000 L0,1000 Z" opacity="0.3" />
+        </svg>
     </div>
 
-    <div
-        class="relative w-full max-w-2xl bg-white p-8 sm:p-10 rounded-3xl shadow-[0_20px_50px_rgba(8,_112,_184,_0.07)] z-10 border border-gray-100">
+    <!-- Animated Glow Blobs -->
+    <div class="absolute top-1/4 -left-20 w-80 h-80 bg-emerald-600/20 rounded-full blur-[100px] animate-float"></div>
+    <div class="absolute bottom-1/4 -right-20 w-80 h-80 bg-teal-600/20 rounded-full blur-[100px] animate-float"
+        style="animation-delay: -5s;"></div>
 
-        <div class="text-center mb-10">
-            <h1 class="text-3xl font-bold text-gray-900 tracking-tight flex items-center justify-center gap-3">
-                <span class="text-green-600">🌿</span>
-                Join the Community
-            </h1>
-            <p class="mt-2 text-gray-500">Create an account to contribute to the Digital Cultural Map</p>
-        </div>
-
-        <form action="{{ url_for('auth.register') }}" method="POST" class="space-y-6">
-
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="space-y-1">
-                    <label class="block text-sm font-medium text-gray-700 ml-1">Username</label>
-                    <input type="text" name="username" required placeholder="Choose a username"
-                        class="block w-full px-4 py-3 rounded-xl border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 focus:bg-white focus:border-green-500 focus:ring-green-500 transition-all duration-200">
-                </div>
-
-                <div class="space-y-1">
-                    <label class="block text-sm font-medium text-gray-700 ml-1">Email Address</label>
-                    <input type="email" name="email" required placeholder="name@example.com"
-                        class="block w-full px-4 py-3 rounded-xl border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 focus:bg-white focus:border-green-500 focus:ring-green-500 transition-all duration-200">
+    <div class="relative w-full max-w-2xl z-10">
+        <div class="glass-card rounded-[2.5rem] p-8 md:p-12">
+            <!-- Heritage Icon -->
+            <div class="flex justify-center mb-10">
+                <div
+                    class="w-20 h-20 rounded-3xl bg-emerald-800/40 backdrop-blur-xl border border-white/10 flex items-center justify-center shadow-2xl transform rotate-3 hover:rotate-0 transition-transform duration-500 group">
+                    <span
+                        class="text-4xl filter drop-shadow-lg group-hover:scale-110 transition-transform duration-300">🌿</span>
                 </div>
             </div>
 
-            <div class="space-y-1">
-                <label class="block text-sm font-medium text-gray-700 ml-1">Password</label>
-                <input type="password" name="password" required placeholder="Create a strong password"
-                    class="block w-full px-4 py-3 rounded-xl border-gray-200 bg-gray-50 text-gray-900 placeholder-gray-400 focus:bg-white focus:border-green-500 focus:ring-green-500 transition-all duration-200">
-                <p class="text-xs text-gray-400 mt-1 ml-1">Must be at least 8 characters long.</p>
+            <div class="text-center mb-10">
+                <h1 class="font-heading text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight">
+                    Join the <span class="text-emerald-400">Legacy</span>
+                </h1>
+                <p class="text-emerald-100/60 font-body text-lg italic">Create your sanctuary in our digital cultural
+                    map</p>
             </div>
 
-            <div class="space-y-1">
-                <label class="block text-sm font-medium text-gray-700 ml-1">I am a...</label>
-                <div class="grid grid-cols-2 gap-4">
-                    <label
-                        class="relative flex items-center justify-center p-4 rounded-xl border-2 border-gray-100 bg-gray-50 cursor-pointer hover:border-green-200 transition-all group has-[:checked]:border-green-600 has-[:checked]:bg-green-50">
-                        <input type="radio" name="role" value="user" checked class="sr-only peer"
-                            onchange="toggleBarangay(this)">
-                        <div class="text-center">
-                            <span class="block text-xl mb-1 group-hover:scale-110 transition-transform">🎒</span>
-                            <span class="block text-sm font-bold text-gray-700">Visitor</span>
-                        </div>
+            <form action="{{ url_for('auth.register') }}" method="POST" class="space-y-8">
+
+                <!-- Role Selection -->
+                <div class="space-y-4">
+                    <label class="block text-sm font-bold text-emerald-200/80 uppercase tracking-widest ml-1">Begin your
+                        journey as...</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <!-- Explorer -->
+                        <label class="role-card relative cursor-pointer group">
+                            <input type="radio" name="role" value="user" checked class="sr-only"
+                                onchange="toggleBarangay(this)">
+                            <div
+                                class="role-content p-6 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 hover:border-emerald-500/50 flex flex-col items-center text-center">
+                                <span class="role-icon text-3xl mb-3 transition-transform duration-300">🎒</span>
+                                <h3 class="text-lg font-bold text-white">Explorer</h3>
+                                <p class="text-xs text-emerald-100/60 mt-1">Discover, favorite, and review cultural
+                                    landmarks.</p>
+                                <div class="role-check absolute top-3 right-3 opacity-0 transition-opacity">
+                                    <div class="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
+                                        <svg class="w-3 h-3 text-emerald-950" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+
+                        <!-- Heritage Guardian -->
+                        <label class="role-card relative cursor-pointer group">
+                            <input type="radio" name="role" value="contributor" class="sr-only"
+                                onchange="toggleBarangay(this)">
+                            <div
+                                class="role-content p-6 rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md transition-all duration-300 hover:border-emerald-500/50 flex flex-col items-center text-center">
+                                <span class="role-icon text-3xl mb-3 transition-transform duration-300">🏛️</span>
+                                <h3 class="text-lg font-bold text-white">Heritage Guardian</h3>
+                                <p class="text-xs text-emerald-100/60 mt-1">Submit new insights for your designated
+                                    barangay.</p>
+                                <div class="role-check absolute top-3 right-3 opacity-0 transition-opacity">
+                                    <div class="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center">
+                                        <svg class="w-3 h-3 text-emerald-950" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3"
+                                                d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="barangay-section" class="space-y-2 hidden">
+                    <label class="block text-sm font-bold text-emerald-200/80 uppercase tracking-widest ml-1">
+                        Designated Barangay
+                        <span
+                            class="ml-2 text-[10px] bg-emerald-500 text-emerald-950 px-2 py-0.5 rounded-full font-bold">Verification
+                            Required</span>
                     </label>
-                    <label
-                        class="relative flex items-center justify-center p-4 rounded-xl border-2 border-gray-100 bg-gray-50 cursor-pointer hover:border-green-200 transition-all group has-[:checked]:border-green-600 has-[:checked]:bg-green-50">
-                        <input type="radio" name="role" value="contributor" class="sr-only peer"
-                            onchange="toggleBarangay(this)">
-                        <div class="text-center">
-                            <span class="block text-xl mb-1 group-hover:scale-110 transition-transform">🏛️</span>
-                            <span class="block text-sm font-bold text-gray-700">Contributor</span>
-                        </div>
-                    </label>
-                </div>
-            </div>
-
-            <hr class="border-gray-100 my-4">
-
-            <div id="barangay-section" class="space-y-1 hidden">
-                <div class="flex items-center justify-between">
-                    <label class="block text-sm font-medium text-gray-700 ml-1">Designated Barangay</label>
-                    <span class="text-xs text-green-600 bg-green-50 px-2 py-0.5 rounded-full font-medium">Required for
-                        Contributors</span>
-                </div>
-                <div class="relative">
                     <select name="barangay" id="barangay-select"
-                        class="block w-full px-4 py-3 pr-10 rounded-xl border-gray-200 bg-gray-50 text-gray-900 focus:bg-white focus:border-green-500 focus:ring-green-500 transition-all duration-200 cursor-pointer">
-                        <option value="" disabled selected>Select your Barangay location...</option>
-                        <option value="Andangin">Andangin</option>
-                        <option value="Arellano Street (Poblacion)">Arellano Street (Poblacion)</option>
-                        <option value="Bantay">Bantay</option>
-                        <option value="Bantocaling">Bantocaling</option>
-                        <option value="Baracbac">Baracbac</option>
-                        <option value="Peania Pedania (Bedania)">Peania Pedania (Bedania)</option>
-                        <option value="Bogtong Bolo">Bogtong Bolo</option>
-                        <option value="Bogtong Bunao">Bogtong Bunao</option>
-                        <option value="Bogtong Centro">Bogtong Centro</option>
-                        <option value="Bogtong Niog">Bogtong Niog</option>
-                        <option value="Bogtong Silag">Bogtong Silag</option>
-                        <option value="Buaya">Buaya</option>
-                        <option value="Buenlag">Buenlag</option>
-                        <option value="Bueno">Bueno</option>
-                        <option value="Bunagan">Bunagan</option>
-                        <option value="Bunlalacao">Bunlalacao</option>
-                        <option value="Burgos Street (Poblacion)">Burgos Street (Poblacion)</option>
-                        <option value="Cabaluyan 1st">Cabaluyan 1st</option>
-                        <option value="Cabaluyan 2nd">Cabaluyan 2nd</option>
-                        <option value="Cabarabuan">Cabarabuan</option>
-                        <option value="Cabaruan">Cabaruan</option>
-                        <option value="Cabayaoasan">Cabayaoasan</option>
-                        <option value="Cabayugan">Cabayugan</option>
-                        <option value="Cacaoiten">Cacaoiten</option>
-                        <option value="Calomboyan Norte">Calomboyan Norte</option>
-                        <option value="Calomboyan Sur">Calomboyan Sur</option>
-                        <option value="Calvo (Poblacion)">Calvo (Poblacion)</option>
-                        <option value="Casilagan">Casilagan</option>
-                        <option value="Catarataraan">Catarataraan</option>
-                        <option value="Caturay Norte">Caturay Norte</option>
-                        <option value="Caturay Sur">Caturay Sur</option>
-                        <option value="Caviernesan">Caviernesan</option>
-                        <option value="Dorongan Ketaket">Dorongan Ketaket</option>
-                        <option value="Dorongan Linmansangan">Dorongan Linmansangan</option>
-                        <option value="Dorongan Punta">Dorongan Punta</option>
-                        <option value="Dorongan Sawat">Dorongan Sawat</option>
-                        <option value="Dorongan Valerio">Dorongan Valerio</option>
-                        <option value="General Luna (Poblacion)">General Luna (Poblacion)</option>
-                        <option value="Historia">Historia</option>
-                        <option value="Lawak Langka">Lawak Langka</option>
-                        <option value="Linmansangan">Linmansangan</option>
-                        <option value="Lopez (Poblacion)">Lopez (Poblacion)</option>
-                        <option value="Mabini (Poblacion)">Mabini (Poblacion)</option>
-                        <option value="Macarang">Macarang</option>
-                        <option value="Malabobo">Malabobo</option>
-                        <option value="Malibong">Malibong</option>
-                        <option value="Malunec">Malunec</option>
-                        <option value="Maravilla (Poblacion)">Maravilla (Poblacion)</option>
-                        <option value="Maravilla-Arellano Ext. (Pob)">Maravilla-Arellano Ext. (Pob)</option>
-                        <option value="Muelang">Muelang</option>
-                        <option value="Naguilayan East">Naguilayan East</option>
-                        <option value="Naguilayan West">Naguilayan West</option>
-                        <option value="Nancasalan Cabison-Bulaney-Niog">Nancasalan Cabison-Bulaney-Niog</option>
-                        <option value="Olegario-Caoile (Poblacion)">Olegario-Caoile (Poblacion)</option>
-                        <option value="Olo Cacamposan">Olo Cacamposan</option>
-                        <option value="Olo Cafabrosan">Olo Cafabrosan</option>
-                        <option value="Olo Cagarlitan">Olo Cagarlitan</option>
-                        <option value="Osmeña (Poblacion)">Osmeña (Poblacion)</option>
-                        <option value="Pacalat">Pacalat</option>
-                        <option value="Pampano">Pampano</option>
-                        <option value="Parian">Parian</option>
-                        <option value="Paul">Paul</option>
-                        <option value="Pogon-Aniat">Pogon-Aniat</option>
-                        <option value="Pogon-Lomboy (Poblacion)">Pogon-Lomboy (Poblacion)</option>
-                        <option value="Ponglo-Baleg">Ponglo-Baleg</option>
-                        <option value="Ponglo-Muelag">Ponglo-Muelag</option>
-                        <option value="Quetegan">Quetegan</option>
-                        <option value="Quezon (Poblacion)">Quezon (Poblacion)</option>
-                        <option value="Salavante">Salavante</option>
-                        <option value="Sapang">Sapang</option>
-                        <option value="Sonson Ongkit">Sonson Ongkit</option>
-                        <option value="Suaco">Suaco</option>
-                        <option value="Tagac">Tagac</option>
-                        <option value="Takipan">Takipan</option>
-                        <option value="Talogtog">Talogtog</option>
-                        <option value="Tococ Barikir">Tococ Barikir</option>
-                        <option value="Torre 1st">Torre 1st</option>
-                        <option value="Torre 2nd">Torre 2nd</option>
-                        <option value="Torres Bugallon (Poblacion)">Torres Bugallon (Poblacion)</option>
-                        <option value="Umangan">Umangan</option>
-                        <option value="Zamora (Poblacion)">Zamora (Poblacion)</option>
+                        class="input-glass block w-full px-5 py-4 rounded-2xl focus:outline-none cursor-pointer font-medium">
+                        <option value="" disabled selected>Select your territory...</option>
+                        {% for b in ["Andangin", "Arellano Street (Poblacion)", "Bantay", "Bantocaling", "Baracbac",
+                        "Peania Pedania (Bedania)", "Bogtong Bolo", "Bogtong Bunao", "Bogtong Centro", "Bogtong Niog",
+                        "Bogtong Silag", "Buaya", "Buenlag", "Bueno", "Bunagan", "Bunlalacao", "Burgos Street
+                        (Poblacion)", "Cabaluyan 1st", "Cabaluyan 2nd", "Cabarabuan", "Cabaruan", "Cabayaoasan",
+                        "Cabayugan", "Cacaoiten", "Calomboyan Norte", "Calomboyan Sur", "Calvo (Poblacion)",
+                        "Casilagan", "Catarataraan", "Caturay Norte", "Caturay Sur", "Caviernesan", "Dorongan Ketaket",
+                        "Dorongan Linmansangan", "Dorongan Punta", "Dorongan Sawat", "Dorongan Valerio", "General Luna
+                        (Poblacion)", "Historia", "Lawak Langka", "Linmansangan", "Lopez (Poblacion)", "Mabini
+                        (Poblacion)", "Macarang", "Malabobo", "Malibong", "Malunec", "Maravilla (Poblacion)",
+                        "Maravilla-Arellano Ext. (Pob)", "Muelang", "Naguilayan East", "Naguilayan West", "Nancasalan
+                        Cabison-Bulaney-Niog", "Olegario-Caoile (Poblacion)", "Olo Cacamposan", "Olo Cafabrosan", "Olo
+                        Cagarlitan", "Osmeña (Poblacion)", "Pacalat", "Pampano", "Parian", "Paul", "Pogon-Aniat",
+                        "Pogon-Lomboy (Poblacion)", "Ponglo-Baleg", "Ponglo-Muelag", "Quetegan", "Quezon (Poblacion)",
+                        "Salavante", "Sapang", "Sonson Ongkit", "Suaco", "Tagac", "Takipan", "Talogtog", "Tococ
+                        Barikir", "Torre 1st", "Torre 2nd", "Torres Bugallon (Poblacion)", "Umangan", "Zamora
+                        (Poblacion)"] %}
+                        <option value="{{ b }}">{{ b }}</option>
+                        {% endfor %}
                     </select>
                 </div>
-            </div>
 
-            <script>
-                function toggleBarangay(input) {
-                    const section = document.getElementById('barangay-section');
-                    const select = document.getElementById('barangay-select');
-                    if (input.value === 'contributor') {
-                        section.classList.remove('hidden');
-                        select.required = true;
-                    } else {
-                        section.classList.add('hidden');
-                        select.required = false;
-                    }
-                }
-            </script>
+                <!-- Personal Info -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label
+                            class="block text-sm font-bold text-emerald-200/80 uppercase tracking-widest ml-1">Username</label>
+                        <input type="text" name="username" required placeholder="NatureSpirit99"
+                            class="input-glass block w-full px-5 py-4 rounded-2xl focus:outline-none">
+                    </div>
 
-            <div class="pt-4">
-                <button type="submit"
-                    class="w-full flex justify-center items-center py-3.5 px-4 border border-transparent rounded-xl shadow-md text-sm font-bold text-white bg-green-700 hover:bg-green-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transform transition hover:-translate-y-0.5 duration-200">
-                    Create Account
-                    <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="space-y-2">
+                        <label
+                            class="block text-sm font-bold text-emerald-200/80 uppercase tracking-widest ml-1">Email</label>
+                        <input type="email" name="email" required placeholder="heritage@example.com"
+                            class="input-glass block w-full px-5 py-4 rounded-2xl focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-sm font-bold text-emerald-200/80 uppercase tracking-widest ml-1">Secret
+                        Key</label>
+                    <input type="password" name="password" required placeholder="••••••••••••"
+                        class="input-glass block w-full px-5 py-4 rounded-2xl focus:outline-none">
+                    <p class="text-[10px] text-emerald-100/40 font-bold uppercase tracking-wider mt-2 ml-1">8+
+                        characters recommended for a secure sanctuary.</p>
+                </div>
+
+                <!-- Flask Flash Messages Fallback -->
+                {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                <div
+                    class="bg-red-500/10 border border-red-500/20 text-red-200 px-4 py-3 rounded-2xl text-sm flex items-start gap-3 backdrop-blur-md">
+                    <svg class="w-5 h-5 flex-shrink-0 text-red-500" fill="none" stroke="currentColor"
+                        viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                            d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
-                </button>
-            </div>
-
-            <div class="relative py-4">
-                <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-gray-200"></div>
+                    <span>{{ messages[0] }}</span>
                 </div>
-                <div class="relative flex justify-center text-xs uppercase">
-                    <span class="bg-white px-2 text-gray-500">Or Quick Sign-up with</span>
+                {% endif %}
+                {% endwith %}
+
+                <div class="pt-6">
+                    <button type="submit"
+                        class="w-full gold-shimmer py-5 rounded-2xl text-white font-bold text-lg shadow-[0_10px_20px_-5px_rgba(16,185,129,0.3)] hover:shadow-[0_20px_40px_-10px_rgba(16,185,129,0.4)] hover:-translate-y-1 transition-all duration-300 active:scale-95">
+                        Initialize Membership
+                    </button>
                 </div>
-            </div>
 
-            <div id="g_id_onload"
-                data-client_id="794547070676-80dbt1j3a724hacci5684s7b7v93j1fh.apps.googleusercontent.com"
-                data-login_uri="{{ url_for('auth.google_login', _external=True) }}" data-auto_prompt="false">
-            </div>
-            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline"
-                data-text="signup_with" data-size="large" data-logo_alignment="left" data-width="592">
-            </div>
+                <!-- Divider -->
+                <div class="relative py-4 flex items-center">
+                    <div class="flex-grow border-t border-white/10"></div>
+                    <span
+                        class="flex-shrink mx-4 text-emerald-500/50 text-xs font-bold uppercase tracking-[0.2em]">Heritage
+                        Identity</span>
+                    <div class="flex-grow border-t border-white/10"></div>
+                </div>
 
-            <p class="text-center text-sm text-gray-500 mt-6">
-                Already have an account?
-                <a href="{{ url_for('auth.login') }}"
-                    class="font-semibold text-green-700 hover:text-green-800 hover:underline transition-colors">
-                    Log in here
-                </a>
-            </p>
-        </form>
+                <!-- Google Sign-up -->
+                <div class="flex justify-center">
+                    <div id="g_id_onload"
+                        data-client_id="794547070676-80dbt1j3a724hacci5684s7b7v93j1fh.apps.googleusercontent.com"
+                        data-login_uri="{{ url_for('auth.google_login', _external=True) }}" data-auto_prompt="false">
+                    </div>
+                    <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="filled_black"
+                        data-text="signup_with" data-size="large" data-logo_alignment="left" data-width="400">
+                    </div>
+                </div>
+
+                <p class="text-center text-sm font-medium text-emerald-100/40 mt-8">
+                    Returning to your roots?
+                    <a href="{{ url_for('auth.login') }}"
+                        class="font-bold text-emerald-400 hover:text-emerald-300 transition-colors">
+                        Log in here
+                    </a>
+                </p>
+
+                <div class="text-center mt-6">
+                    <a href="{{ url_for('public.index') }}"
+                        class="inline-flex items-center gap-2 text-xs font-bold text-emerald-600/60 hover:text-emerald-400 transition-all group">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-4 w-4 transform group-hover:-translate-x-1 transition-transform" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Return to Map
+                    </a>
+                </div>
+            </form>
+        </div>
     </div>
 </div>
+
+<script>
+    function toggleBarangay(input) {
+        const section = document.getElementById('barangay-section');
+        const select = document.getElementById('barangay-select');
+        if (input.value === 'contributor') {
+            section.classList.remove('hidden');
+            section.classList.add('animate-fade-in');
+            select.required = true;
+        } else {
+            section.classList.add('hidden');
+            section.classList.remove('animate-fade-in');
+            select.required = false;
+        }
+    }
+</script>
 {% endblock %}

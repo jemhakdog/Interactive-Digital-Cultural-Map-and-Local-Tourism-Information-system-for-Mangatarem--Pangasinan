@@ -60,21 +60,22 @@
 
     <!-- Navigation -->
     {% block navbar %}
-    <nav class="bg-gray-900/95 backdrop-blur-md border-b border-gray-800 sticky top-0 z-50 transition-all duration-300">
+    <nav
+        class="bg-emerald-950/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50 transition-all duration-300">
         <div class="container mx-auto px-6 py-4">
             <div class="flex justify-between items-center">
 
                 <a href="{{ url_for('public.index') }}"
                     class="text-2xl font-bold text-white flex items-center gap-2 group">
                     <span
-                        class="transform group-hover:rotate-12 transition-transform duration-300 text-green-500">🌿</span>
-                    <span class="tracking-tight">GoMangatarem</span>
+                        class="transform group-hover:rotate-12 transition-transform duration-300 text-emerald-500">🌿</span>
+                    <span class="tracking-tight font-heading">GoMangatarem</span>
                 </a>
 
                 <div class="hidden md:flex space-x-8 items-center text-sm font-medium text-gray-300">
                     <form action="{{ url_for('public.search') }}" method="GET" class="relative group">
                         <input type="text" name="q" placeholder="Search..."
-                            class="bg-gray-800 text-gray-300 text-sm rounded-full px-4 py-1.5 focus:outline-none focus:ring-2 focus:ring-green-500 w-32 focus:w-48 transition-all duration-300">
+                            class="bg-emerald-900/40 text-emerald-100 placeholder-emerald-500/50 text-sm rounded-full px-4 py-1.5 focus:outline-none focus:ring-2 focus:ring-emerald-500 w-32 focus:w-48 transition-all duration-300 border border-white/5">
                         <button type="submit" class="absolute right-3 top-1.5 text-gray-400 hover:text-white">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -112,7 +113,7 @@
             <div class="px-6 py-4 space-y-3 flex flex-col text-gray-300">
                 <form action="{{ url_for('public.search') }}" method="GET" class="mb-4 relative">
                     <input type="text" name="q" placeholder="Search attractions & events..."
-                        class="w-full bg-gray-700 text-gray-300 text-sm rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-green-500">
+                        class="w-full bg-emerald-900/40 text-emerald-100 placeholder-emerald-500/50 text-sm rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500 border border-white/5">
                     <button type="submit" class="absolute right-3 top-2.5 text-gray-400 hover:text-white">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

@@ -48,7 +48,7 @@ def admin_dashboard():
         flash("Access denied.")
         return redirect(url_for("public.index"))
 
-    print(f"[PROGRESSIVE LOG] [admin] > admin_dashboard > QUERY: Fetching basic stats")
+    print("[PROGRESSIVE LOG] [admin] > admin_dashboard > QUERY: Fetching basic stats")
     stats = {
         "attractions": Attraction.query.count(),
         "events": Event.query.count(),
@@ -128,7 +128,7 @@ def admin_dashboard():
     )
 
     print(
-        f"[PROGRESSIVE LOG] [admin] > admin_dashboard > RENDER: Rendering admin/dashboard.html"
+        "[PROGRESSIVE LOG] [admin] > admin_dashboard > RENDER: Rendering admin/dashboard.html"
     )
     return render_template(
         "admin/dashboard.html",
@@ -229,7 +229,7 @@ def admin_attractions():
     Returns:
         Rendered attractions management template with pending and all attractions.
     """
-    print(f"[PROGRESSIVE LOG] [admin] > admin_attractions > ENTRY")
+    print("[PROGRESSIVE LOG] [admin] > admin_attractions > ENTRY")
     logger.info("Admin attractions management page accessed")
 
     if current_user.role != "admin":
@@ -271,7 +271,7 @@ def admin_events():
     Returns:
         Rendered events management template with pending and all events.
     """
-    print(f"[PROGRESSIVE LOG] [admin] > admin_events > ENTRY")
+    print("[PROGRESSIVE LOG] [admin] > admin_events > ENTRY")
     logger.info("Admin events management page accessed")
 
     if current_user.role != "admin":
@@ -531,6 +531,154 @@ def reject_event(id):
     logger.info(f"Event '{event_title}' (ID: {id}) rejected and deleted")
 
     flash(f'Event "{event_title}" rejected and removed.')
+    return redirect(url_for("admin.admin_events"))
+
+
+@admin_bp.route("/events/add", methods=["GET", "POST"])
+@login_required
+@limiter.limit("10 per minute")
+def add_event():
+    """
+    Add a new event from the admin panel.
+    """
+    print(
+        f"[PROGRESSIVE LOG] [admin] > add_event > ENTRY: user='{current_user.username}', method={request.method}"
+    )
+    logger.info(f"Add event page accessed by admin {current_user.username}")
+
+    from flask import current_app
+
+    if current_user.role != "admin":
+        print(f"[PROGRESSIVE LOG] [admin] > add_event > ERROR: Access denied")
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+
+    if request.method == "POST":
+        print(
+            f"[PROGRESSIVE LOG] [admin] > add_event > LOGIC: Processing POST data for '{request.form.get('title')}'"
+        )
+        image_url = request.form.get("image_url")
+
+        # Handle file upload
+        if "image" in request.files:
+            file = request.files["image"]
+            if file and file.filename and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
+                image_url = url_for("static", filename="uploads/" + filename)
+
+        event = Event(
+            title=request.form["title"],
+            date=datetime.strptime(request.form["date"], "%Y-%m-%d"),
+            location=request.form["location"],
+            category=request.form["category"],
+            description=request.form["description"],
+            image_url=image_url,
+            barangay=request.form.get("barangay", "Mangatarem"),
+            user_id=current_user.id,
+            status="approved",  # Admin events are auto-approved
+        )
+        db.session.add(event)
+        db.session.commit()
+
+        print(
+            f"[PROGRESSIVE LOG] [admin] > add_event > SUCCESS: New event '{event.title}' added by admin"
+        )
+        logger.info(f"New event '{event.title}' added by admin {current_user.username}")
+
+        flash("Event added successfully!")
+        return redirect(url_for("admin.admin_events"))
+
+    return render_template("admin/add_event.html")
+
+
+@admin_bp.route("/events/edit/<int:id>", methods=["GET", "POST"])
+@login_required
+@limiter.limit("10 per minute")
+def edit_event(id):
+    """
+    Edit an existing event from the admin panel.
+    """
+    print(
+        f"[PROGRESSIVE LOG] [admin] > edit_event > ENTRY: id={id}, method={request.method}"
+    )
+    logger.info(f"Event edit requested for ID {id}")
+
+    from flask import current_app
+
+    print(f"[PROGRESSIVE LOG] [admin] > edit_event > QUERY: Fetching event ID {id}")
+    event = Event.query.get_or_404(id)
+
+    if current_user.role != "admin":
+        print(f"[PROGRESSIVE LOG] [admin] > edit_event > ERROR: Access denied")
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+
+    if request.method == "POST":
+        print(
+            f"[PROGRESSIVE LOG] [admin] > edit_event > LOGIC: Processing updates for '{request.form.get('title')}'"
+        )
+        event.title = request.form["title"]
+        event.date = datetime.strptime(request.form["date"], "%Y-%m-%d")
+        event.location = request.form["location"]
+        event.category = request.form["category"]
+        event.description = request.form["description"]
+        event.barangay = request.form.get("barangay", event.barangay)
+
+        # Handle file upload
+        if "image" in request.files:
+            file = request.files["image"]
+            if file and file.filename and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
+                event.image_url = url_for("static", filename="uploads/" + filename)
+
+        # Fallback to URL if provided and no file uploaded
+        if request.form.get("image_url") and not (
+            "image" in request.files and request.files["image"].filename
+        ):
+            event.image_url = request.form.get("image_url")
+
+        db.session.commit()
+
+        print(
+            f"[PROGRESSIVE LOG] [admin] > edit_event > SUCCESS: Event '{event.title}' updated"
+        )
+        logger.info(f"Event '{event.title}' (ID: {id}) updated successfully")
+
+        flash("Event updated successfully!")
+        return redirect(url_for("admin.admin_events"))
+
+    return render_template("admin/edit_event.html", event=event)
+
+
+@admin_bp.route("/events/delete/<int:id>")
+@login_required
+@limiter.limit("10 per minute")
+def delete_event(id):
+    """
+    Delete an event from the admin panel.
+    """
+    print(f"[PROGRESSIVE LOG] [admin] > delete_event > ENTRY: id={id}")
+    logger.info(f"Event deletion requested for ID {id}")
+
+    if current_user.role != "admin":
+        print(f"[PROGRESSIVE LOG] [admin] > delete_event > ERROR: Access denied")
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+
+    print(f"[PROGRESSIVE LOG] [admin] > delete_event > QUERY: Fetching event ID {id}")
+    event = Event.query.get_or_404(id)
+    event_title = event.title
+    db.session.delete(event)
+    db.session.commit()
+
+    print(
+        f"[PROGRESSIVE LOG] [admin] > delete_event > SUCCESS: Event '{event_title}' deleted"
+    )
+    logger.info(f"Event '{event_title}' (ID: {id}) deleted successfully")
+
+    flash("Event deleted successfully!")
     return redirect(url_for("admin.admin_events"))
 
 

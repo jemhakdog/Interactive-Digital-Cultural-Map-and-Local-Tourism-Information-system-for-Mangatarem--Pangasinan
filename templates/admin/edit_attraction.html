@@ -4,39 +4,291 @@
 Edit Attraction - {% if current_user.role == 'admin' %}Admin{% else %}Barangay{% endif %}
 {% endblock %}
 
+{% block head %}
+<style>
+    .glass-card {
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.08);
+    }
+
+    .heritage-gradient {
+        background: linear-gradient(135deg, #065f46 0%, #059669 100%);
+    }
+
+    .input-focus {
+        transition: all 0.3s ease;
+    }
+
+    .input-focus:focus {
+        border-color: #10b981;
+        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+    }
+
+    .image-preview-container {
+        position: relative;
+        overflow: hidden;
+        border-radius: 1.5rem;
+        aspect-ratio: 16/9;
+        background: #f1f5f9;
+        border: 2px dashed #cbd5e1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .image-preview-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2">
-</div>
-<div>
-    <label class="block text-sm font-medium text-gray-700">Longitude</label>
-    <input type="number" step="any" name="lng" value="{{ attraction.lng }}" required
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2">
-</div>
-</div>
+<div class="min-h-screen bg-[#f8fafc] pb-20">
+    <!-- Header -->
+    <div class="heritage-gradient pt-16 pb-32 px-6">
+        <div class="container mx-auto max-w-4xl">
+            <div class="flex items-center gap-4 text-emerald-100/80 mb-4">
+                <a href="{{ url_for('admin.admin_attractions') }}"
+                    class="hover:text-white transition-colors flex items-center gap-2 text-sm font-bold uppercase tracking-widest">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Attractions
+                </a>
+            </div>
+            <h1 class="text-4xl font-black text-white font-heading tracking-tight">
+                Refine Heritage
+            </h1>
+            <p class="text-emerald-100/80 mt-2 font-medium">
+                Updating "{{ attraction.name }}" in our digital archive.
+            </p>
+        </div>
+    </div>
 
-<div>
-    <label class="block text-sm font-medium text-gray-700">Current Image</label>
-    {% if attraction.image_url %}
-    <img src="{{ attraction.image_url }}" class="h-32 w-auto mb-2 rounded">
-    {% endif %}
+    <!-- Edit Form -->
+    <div class="container mx-auto px-6 -mt-20">
+        <div class="max-w-4xl mx-auto">
+            <form action="{{ url_for('admin.edit_attraction', id=attraction.id) }}" method="POST"
+                enctype="multipart/form-data">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Left Column: Basic Info -->
+                    <div class="lg:col-span-2 space-y-8">
+                        <div class="glass-card p-8 rounded-[2rem] space-y-6">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="p-2 bg-emerald-100 rounded-xl text-emerald-700">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-emerald-950">Basic Information</h3>
+                            </div>
 
-    <label class="block text-sm font-medium text-gray-700 mt-2">Upload New Image</label>
-    <input type="file" name="image" accept="image/*"
-        class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
+                            <div class="space-y-4">
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-emerald-900/40 uppercase tracking-widest mb-2">Attraction
+                                        Name</label>
+                                    <input type="text" name="name" value="{{ attraction.name }}" required
+                                        class="w-full bg-white/50 border border-emerald-900/10 rounded-2xl px-5 py-4 text-emerald-950 font-bold input-focus outline-none"
+                                        placeholder="Enter attraction name">
+                                </div>
 
-    <label class="block text-sm font-medium text-gray-700 mt-2">Or Image URL</label>
-    <input type="url" name="image_url" value="{{ attraction.image_url }}"
-        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2">
-</div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-emerald-900/40 uppercase tracking-widest mb-2">Category</label>
+                                        <select name="category" required
+                                            class="w-full bg-white/50 border border-emerald-900/10 rounded-2xl px-5 py-4 text-emerald-950 font-bold input-focus outline-none appearance-none">
+                                            <option value="Nature" {% if attraction.category=='Nature' %}selected{%
+                                                endif %}>Nature</option>
+                                            <option value="Historical" {% if attraction.category=='Historical'
+                                                %}selected{% endif %}>Historical</option>
+                                            <option value="Religious" {% if attraction.category=='Religious'
+                                                %}selected{% endif %}>Religious</option>
+                                            <option value="Culinray" {% if attraction.category=='Culinray' %}selected{%
+                                                endif %}>Culinary</option>
+                                            <option value="Culture" {% if attraction.category=='Culture' %}selected{%
+                                                endif %}>Culture</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-emerald-900/40 uppercase tracking-widest mb-2">Barangay</label>
+                                        <input type="text" value="{{ attraction.barangay }}" disabled
+                                            class="w-full bg-emerald-50/50 border border-emerald-900/10 rounded-2xl px-5 py-4 text-emerald-900/40 font-bold outline-none cursor-not-allowed">
+                                    </div>
+                                </div>
 
-<div class="flex justify-end gap-4">
-    <a href="{{ url_for('admin.admin_dashboard') }}"
-        class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</a>
-    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Update
-        Attraction</button>
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-emerald-900/40 uppercase tracking-widest mb-2">Description</label>
+                                    <textarea name="description" rows="5" required
+                                        class="w-full bg-white/50 border border-emerald-900/10 rounded-2xl px-5 py-4 text-emerald-950 font-medium input-focus outline-none resize-none"
+                                        placeholder="Describe this cultural landmark...">{{ attraction.description }}</textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Location Section -->
+                        <div class="glass-card p-8 rounded-[2rem] space-y-6">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="p-2 bg-blue-100 rounded-xl text-blue-700">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-emerald-950">Coordinates</h3>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-emerald-900/40 uppercase tracking-widest mb-2">Latitude</label>
+                                    <input type="number" step="any" name="lat" value="{{ attraction.lat }}" required
+                                        class="w-full bg-white/50 border border-emerald-900/10 rounded-2xl px-5 py-4 text-emerald-950 font-bold input-focus outline-none">
+                                </div>
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-emerald-900/40 uppercase tracking-widest mb-2">Longitude</label>
+                                    <input type="number" step="any" name="lng" value="{{ attraction.lng }}" required
+                                        class="w-full bg-white/50 border border-emerald-900/10 rounded-2xl px-5 py-4 text-emerald-950 font-bold input-focus outline-none">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Media -->
+                    <div class="space-y-8">
+                        <div class="glass-card p-8 rounded-[2rem] space-y-6 sticky top-8">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="p-2 bg-purple-100 rounded-xl text-purple-700">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-emerald-950">Media Archive</h3>
+                            </div>
+
+                            <div class="space-y-6">
+                                <div class="image-preview-container" id="imagePreviewContainer">
+                                    {% if attraction.image_url %}
+                                    <img src="{{ attraction.image_url }}" alt="Preview" id="imagePreview">
+                                    {% else %}
+                                    <div class="text-center p-6" id="previewPlaceholder">
+                                        <svg class="w-12 h-12 text-slate-300 mx-auto mb-2" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest">No image
+                                            selected</p>
+                                    </div>
+                                    <img src="" alt="Preview" id="imagePreview" class="hidden">
+                                    {% endif %}
+                                </div>
+
+                                <div class="space-y-4">
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-emerald-900/40 uppercase tracking-widest mb-2">Upload
+                                            New Photo</label>
+                                        <label
+                                            class="w-full flex flex-col items-center px-4 py-6 bg-white border border-emerald-900/10 rounded-2xl text-emerald-600 font-bold cursor-pointer hover:bg-emerald-50 transition-colors">
+                                            <svg class="w-8 h-8 mb-2" fill="none" stroke="currentColor"
+                                                viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                                            </svg>
+                                            <span class="text-sm">Click to upload</span>
+                                            <input type="file" name="image" accept="image/*" class="hidden"
+                                                id="imageUpload">
+                                        </label>
+                                    </div>
+
+                                    <div class="relative">
+                                        <div class="absolute inset-0 flex items-center" aria-hidden="true">
+                                            <div class="w-full border-t border-emerald-900/10"></div>
+                                        </div>
+                                        <div
+                                            class="relative flex justify-center text-xs uppercase font-black text-emerald-900/20">
+                                            <span class="bg-[#fcfdfd] px-2 tracking-widest">OR</span>
+                                        </div>
+                                    </div>
+
+                                    <div>
+                                        <label
+                                            class="block text-xs font-bold text-emerald-900/40 uppercase tracking-widest mb-2">Image
+                                            URL</label>
+                                        <input type="url" name="image_url" id="imageUrlInput"
+                                            value="{{ attraction.image_url }}"
+                                            class="w-full bg-white/50 border border-emerald-900/10 rounded-2xl px-5 py-4 text-emerald-950 font-bold text-sm input-focus outline-none"
+                                            placeholder="https://example.com/image.jpg">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="pt-6 space-y-3">
+                                <button type="submit"
+                                    class="w-full py-4 bg-emerald-600 text-white font-black rounded-2xl hover:bg-emerald-700 transition shadow-lg shadow-emerald-600/20 uppercase tracking-widest text-sm">
+                                    Update Heritage
+                                </button>
+                                <a href="{{ url_for('admin.admin_attractions') }}"
+                                    class="block w-full py-4 bg-white text-emerald-950 font-black rounded-2xl border border-emerald-900/10 text-center hover:bg-slate-50 transition uppercase tracking-widest text-sm">
+                                    Cancel Changes
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
-</div>
-</form>
-</div>
-</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const imageUpload = document.getElementById('imageUpload');
+        const imageUrlInput = document.getElementById('imageUrlInput');
+        const imagePreview = document.getElementById('imagePreview');
+        const placeholder = document.getElementById('previewPlaceholder');
+
+        function updatePreview(src) {
+            if (src) {
+                imagePreview.src = src;
+                imagePreview.classList.remove('hidden');
+                if (placeholder) placeholder.classList.add('hidden');
+            }
+        }
+
+        imageUpload.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    updatePreview(event.target.result);
+                }
+                reader.readAsDataURL(file);
+            }
+        });
+
+        imageUrlInput.addEventListener('input', function () {
+            if (this.value) {
+                updatePreview(this.value);
+            }
+        });
+    });
+</script>
 {% endblock %}
