@@ -1,5 +1,7 @@
-import json
+# import json
 import os
+import shutil
+import json
 
 # from dotenv import load_dotenv
 from flask import Flask, url_for, render_template
@@ -9,8 +11,6 @@ from extensions import limiter
 
 from models import Attraction, User, db
 from routes import register_blueprints
-from flask_migrate import Migrate
-from utils.db_manager import get_database_uri, get_db_config
 
 # Load environment variables from .ENV file
 # load_dotenv()
@@ -49,34 +49,29 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["UPLOAD_FOLDER"] = os.path.join(static_dir, "uploads")
 app.config["ALLOWED_EXTENSIONS"] = {"png", "jpg", "jpeg", "gif", "mp4"}
 
-# --- DATABASE CONFIGURATION ---
-try:
-    app.config["SQLALCHEMY_DATABASE_URI"] = get_database_uri()
-    app = get_db_config(app)
-    print(f" * Database configured for: {os.getenv('DB_PROVIDER', 'sqlite')}")
+# Handle SQLite database path for Vercel
+if IS_VERCEL:
+    # On Vercel, the filesystem is read-only except for /tmp/
+    db_path = "/tmp/mangatarem.db"
+    source_db = os.path.join(BASE_DIR, "instance", "mangatarem.db")
 
-    # Environment-specific cookie settings (moved from hardcoded blocks)
-    if (
-        "postgresql" in app.config["SQLALCHEMY_DATABASE_URI"]
-        or "mysql" in app.config["SQLALCHEMY_DATABASE_URI"]
-    ):
-        app.config["SESSION_COOKIE_SECURE"] = True
-    else:
-        app.config["SESSION_COOKIE_SECURE"] = False
-    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+    # Copy the database to /tmp if it doesn't exist there yet
+    if os.path.exists(source_db) and not os.path.exists(db_path):
+        try:
+            shutil.copy2(source_db, db_path)
+            print(f"Database copied to {db_path}")
+        except Exception as e:
+            print(f"Error copying database: {e}")
 
-except Exception as e:
-    print(f" ! Database Configuration Error: {e}")
-    # Fallback to local SQLite if everything fails
+    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
+else:
+    # Local development
     instance_path = os.path.join(BASE_DIR, "instance")
     if not os.path.exists(instance_path):
         os.makedirs(instance_path)
     app.config["SQLALCHEMY_DATABASE_URI"] = (
         f"sqlite:///{os.path.join(instance_path, 'mangatarem.db')}"
     )
-    app.config["SESSION_COOKIE_SECURE"] = False
-    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
-# --- END DATABASE CONFIGURATION ---
 
 # Server & Session Configuration
 # We avoid setting SERVER_NAME globally as it can interfere with cookie domains.
@@ -88,13 +83,22 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True  # Prevent JavaScript access
 app.config["PERMANENT_SESSION_LIFETIME"] = 86400 * 7  # 7 days in seconds
 app.config["REMEMBER_COOKIE_DURATION"] = 86400 * 30  # 30 days for remember me
 
+if IS_VERCEL:
+    # Production (HTTPS)
+    app.config["SESSION_COOKIE_SECURE"] = True
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+else:
+    # Local Development (HTTP)
+    app.config["SESSION_COOKIE_SECURE"] = False
+    app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
+    app.config["SESSION_COOKIE_DOMAIN"] = None
+
 app.config["PREFERRED_URL_SCHEME"] = os.environ.get(
     "PREFERRED_URL_SCHEME", "https" if IS_VERCEL else "http"
 )
 
-# Initialize database and migrations
+# Initialize database
 db.init_app(app)
-migrate = Migrate(app, db)
 
 # Rate limiter initialization
 limiter.init_app(app)
