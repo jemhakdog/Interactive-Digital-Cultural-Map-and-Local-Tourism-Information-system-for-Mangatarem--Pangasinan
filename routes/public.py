@@ -20,15 +20,15 @@ def index():
     Returns:
         Rendered index template with featured attractions.
     """
-    print(f"[PROGRESSIVE LOG] [pagez] > index > ENTRY")
+    print("[PROGRESSIVE LOG] [pagez] > index > ENTRY")
     logger.info("Home page accessed")
 
     # Record view
-    print(f"[PROGRESSIVE LOG] [pagez] > index > LOGIC: Recording view")
+    print("[PROGRESSIVE LOG] [pagez] > index > LOGIC: Recording view")
     record_view("page", page_name="home")
 
     # Get featured attractions (limit 3)
-    print(f"[PROGRESSIVE LOG] [pagez] > index > QUERY: Fetching featured attractions")
+    print("[PROGRESSIVE LOG] [pagez] > index > QUERY: Fetching featured attractions")
     featured = Attraction.query.filter_by(status="approved").limit(3).all()
 
     print(
@@ -36,7 +36,7 @@ def index():
     )
     logger.info(f"Home page loaded with {len(featured)} featured attractions")
 
-    print(f"[PROGRESSIVE LOG] [pagez] > index > RENDER: Rendering index.html")
+    print("[PROGRESSIVE LOG] [pagez] > index > RENDER: Rendering index.html")
     return render_template("pagez/index.html", featured=featured)
 
 
@@ -72,23 +72,21 @@ def map_view():
     Returns:
         Rendered map template with list of barangays for filtering.
     """
-    print(f"[PROGRESSIVE LOG] [pagez] > map_view > ENTRY")
+    print("[PROGRESSIVE LOG] [pagez] > map_view > ENTRY")
     logger.info("Interactive map page accessed")
 
     # Get count of approved attractions for initial display
-    print(
-        f"[PROGRESSIVE LOG] [pagez] > map_view > QUERY: Counting approved attractions"
-    )
+    print("[PROGRESSIVE LOG] [pagez] > map_view > QUERY: Counting approved attractions")
     attractions_count = Attraction.query.filter_by(status="approved").count()
 
     # Record view
     record_view("page", page_name="map")
 
     # Get list of unique barangays from approved attractions for the filter
-    print(f"[PROGRESSIVE LOG] [pagez] > map_view > QUERY: Fetching unique barangays")
+    print("[PROGRESSIVE LOG] [pagez] > map_view > QUERY: Fetching unique barangays")
     barangays = (
         db.session.query(Attraction.barangay)
-        .filter(Attraction.status == "approved", Attraction.barangay != None)
+        .filter(Attraction.status == "approved", Attraction.barangay is not None)
         .distinct()
         .order_by(Attraction.barangay)
         .all()
@@ -103,7 +101,7 @@ def map_view():
         f"Map page loaded with {attractions_count} attractions and {len(barangay_list)} barangays"
     )
 
-    print(f"[PROGRESSIVE LOG] [pagez] > map_view > RENDER: Rendering map.html")
+    print("[PROGRESSIVE LOG] [pagez] > map_view > RENDER: Rendering map.html")
     return render_template(
         "pagez/map.html", barangays=barangay_list, attractions_count=attractions_count
     )
@@ -136,7 +134,7 @@ def attraction_detail(id):
     logger.info(f"Showing attraction '{attraction.name}' (ID: {id})")
 
     print(
-        f"[PROGRESSIVE LOG] [pagez] > attraction_detail > RENDER: Rendering detail.html"
+        "[PROGRESSIVE LOG] [pagez] > attraction_detail > RENDER: Rendering detail.html"
     )
     return render_template("pagez/detail.html", attraction=attraction)
 
@@ -152,13 +150,13 @@ def events():
     Returns:
         Rendered events template with list of events.
     """
-    print(f"[PROGRESSIVE LOG] [pagez] > events > ENTRY")
+    print("[PROGRESSIVE LOG] [pagez] > events > ENTRY")
     logger.info("Events page accessed")
 
     # Record view
     record_view("page", page_name="events")
 
-    print(f"[PROGRESSIVE LOG] [pagez] > events > QUERY: Fetching approved events")
+    print("[PROGRESSIVE LOG] [pagez] > events > QUERY: Fetching approved events")
     events = Event.query.filter_by(status="approved").order_by(Event.date.asc()).all()
 
     print(
@@ -166,7 +164,7 @@ def events():
     )
     logger.info(f"Events page loaded with {len(events)} approved events")
 
-    print(f"[PROGRESSIVE LOG] [pagez] > events > RENDER: Rendering events.html")
+    print("[PROGRESSIVE LOG] [pagez] > events > RENDER: Rendering events.html")
     return render_template("pagez/events.html", events=events)
 
 
@@ -181,14 +179,14 @@ def gallery():
     Returns:
         Rendered gallery template with approved media items.
     """
-    print(f"[PROGRESSIVE LOG] [pagez] > gallery > ENTRY")
+    print("[PROGRESSIVE LOG] [pagez] > gallery > ENTRY")
     logger.info("Gallery page accessed")
 
     # Record view
     record_view("page", page_name="gallery")
 
     print(
-        f"[PROGRESSIVE LOG] [pagez] > gallery > QUERY: Fetching approved gallery items"
+        "[PROGRESSIVE LOG] [pagez] > gallery > QUERY: Fetching approved gallery items"
     )
     items = (
         GalleryItem.query.filter_by(status="approved")
@@ -198,12 +196,12 @@ def gallery():
 
     # Get list of unique barangays from approved gallery items for the filter
     print(
-        f"[PROGRESSIVE LOG] [pagez] > gallery > QUERY: Fetching unique barangays for gallery"
+        "[PROGRESSIVE LOG] [pagez] > gallery > QUERY: Fetching unique barangays for gallery"
     )
     barangays = (
         db.session.query(User.barangay)
         .join(GalleryItem)
-        .filter(GalleryItem.status == "approved", User.barangay != None)
+        .filter(GalleryItem.status == "approved", User.barangay is not None)
         .distinct()
         .order_by(User.barangay)
         .all()
@@ -216,7 +214,7 @@ def gallery():
     )
     logger.info(f"Gallery page loaded with {len(items)} approved items")
 
-    print(f"[PROGRESSIVE LOG] [pagez] > gallery > RENDER: Rendering gallery.html")
+    print("[PROGRESSIVE LOG] [pagez] > gallery > RENDER: Rendering gallery.html")
     return render_template(
         "pagez/gallery.html", gallery_items=items, barangays=barangay_list
     )
@@ -226,92 +224,108 @@ def gallery():
 @limiter.limit("20 per minute")
 def search():
     """
-    Search for attractions and events with advanced filtering.
-    Args:
-        q (str): The search query.
-        category (str): Filter by category (Nature, Historical, etc.)
-        barangay (str): Filter by barangay location.
+    Search for attractions, events, and barangay info with advanced filtering.
     """
     print(
         f"[PROGRESSIVE LOG] [pagez] > search > ENTRY: q='{request.args.get('q', '')}', category='{request.args.get('category', '')}', barangay='{request.args.get('barangay', '')}'"
     )
     logger.info(f"Search page accessed with query: {request.args.get('q', '')}")
 
-    query = request.args.get("q", "")
+    query = request.args.get("q", "").strip()
     category_filter = request.args.get("category", "")
     barangay_filter = request.args.get("barangay", "")
 
-    # Start with base approved query
-    print(
-        f"[PROGRESSIVE LOG] [pagez] > search > QUERY: Initializing attractions and events base queries"
-    )
+    # Start with base queries
     attractions_query = Attraction.query.filter_by(status="approved")
     events_query = Event.query.filter_by(status="approved")
+    barangays_info_query = BarangayInfo.query
 
     # Apply Text Search if exists
     if query:
-        print(
-            f"[PROGRESSIVE LOG] [pagez] > search > LOGIC: Applying text search for '{query}'"
-        )
+        search_terms = f"%{query}%"
         attractions_query = attractions_query.filter(
-            (Attraction.name.ilike(f"%{query}%"))
-            | (Attraction.description.ilike(f"%{query}%"))
+            (Attraction.name.ilike(search_terms))
+            | (Attraction.description.ilike(search_terms))
+            | (Attraction.category.ilike(search_terms))
         )
         events_query = events_query.filter(
-            (Event.title.ilike(f"%{query}%")) | (Event.description.ilike(f"%{query}%"))
+            (Event.title.ilike(search_terms))
+            | (Event.description.ilike(search_terms))
+            | (Event.category.ilike(search_terms))
+        )
+        barangays_info_query = barangays_info_query.filter(
+            (BarangayInfo.barangay_name.ilike(search_terms))
+            | (BarangayInfo.history.ilike(search_terms))
+            | (BarangayInfo.cultural_assets.ilike(search_terms))
         )
 
-    # Apply Category Filter
+    # Apply Category Filter (only for attractions and events)
     if category_filter and category_filter != "all":
-        print(
-            f"[PROGRESSIVE LOG] [pagez] > search > LOGIC: Applying category filter '{category_filter}'"
-        )
         attractions_query = attractions_query.filter(
             Attraction.category == category_filter
         )
         events_query = events_query.filter(Event.category == category_filter)
+        # BarangayInfo doesn't have category, so we might hide/clear it when category filter is active
+        if query and not (
+            barangay_filter and barangay_filter != "all"
+        ):  # Only clear if not filtering by barangay too
+            pass
 
     # Apply Barangay Filter
     if barangay_filter and barangay_filter != "all":
-        print(
-            f"[PROGRESSIVE LOG] [pagez] > search > LOGIC: Applying barangay filter '{barangay_filter}'"
-        )
         attractions_query = attractions_query.filter(
             Attraction.barangay == barangay_filter
         )
         events_query = events_query.filter(Event.barangay == barangay_filter)
+        barangays_info_query = barangays_info_query.filter(
+            BarangayInfo.barangay_name == barangay_filter
+        )
 
-    print(f"[PROGRESSIVE LOG] [pagez] > search > QUERY: Executing filtered queries")
+    # Execute queries
     attractions = attractions_query.all()
     events = events_query.all()
+    barangays_info = (
+        barangays_info_query.all()
+        if query or (barangay_filter and barangay_filter != "all")
+        else []
+    )
 
     # Fetch unique options for the filter dropdowns
-    print(
-        f"[PROGRESSIVE LOG] [pagez] > search > QUERY: Fetching filter context (categories, barangays)"
-    )
-    available_categories = db.session.query(Attraction.category).distinct().all()
-    available_barangays = (
-        db.session.query(Attraction.barangay)
-        .filter(Attraction.barangay != None)
+    available_categories = (
+        db.session.query(Attraction.category)
+        .filter(Attraction.status == "approved")
         .distinct()
         .all()
     )
-
-    print(
-        f"[PROGRESSIVE LOG] [pagez] > search > SUCCESS: Found {len(attractions)} attractions, {len(events)} events"
+    # Also add event categories if different
+    event_categories = (
+        db.session.query(Event.category)
+        .filter(Event.status == "approved")
+        .distinct()
+        .all()
     )
-    logger.info(
-        f"Search results: {len(attractions)} attractions, {len(events)} events for query '{query}'"
+    all_categories = sorted(
+        list(
+            set([c[0] for c in available_categories] + [c[0] for c in event_categories])
+        )
     )
 
-    print(f"[PROGRESSIVE LOG] [pagez] > search > RENDER: Rendering search_results.html")
+    available_barangays = (
+        db.session.query(Attraction.barangay)
+        .filter(Attraction.status == "approved", Attraction.barangay != None)
+        .distinct()
+        .all()
+    )
+    all_barangays = sorted([b[0] for b in available_barangays if b[0] is not None])
+
     return render_template(
         "pagez/search_results.html",
         query=query,
         attractions=attractions,
         events=events,
-        categories=[c[0] for c in available_categories],
-        barangays=[b[0] for b in available_barangays],
+        barangays_info=barangays_info,
+        categories=all_categories,
+        barangays=all_barangays,
         selected_category=category_filter,
         selected_barangay=barangay_filter,
     )
