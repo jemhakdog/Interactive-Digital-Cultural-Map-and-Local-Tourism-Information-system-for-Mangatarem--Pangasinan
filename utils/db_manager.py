@@ -24,6 +24,11 @@ def get_database_uri():
 
     logger.info(f"Configuring database for provider: {provider}")
 
+    # Visible print for terminal output
+    print("\n🚀 DATABASE CONFIGURATION:")
+    print(f"   Provider: {provider.upper()}")
+    print(f"   Status: {'READY' if provider != 'sqlite' else 'LOCAL (SQLite)'}")
+    print("-" * 30 + "\n")
     if provider in ["supabase", "postgres", "postgresql"]:
         # Supabase/Postgres connection
         db_url = os.getenv("DATABASE_URL")
