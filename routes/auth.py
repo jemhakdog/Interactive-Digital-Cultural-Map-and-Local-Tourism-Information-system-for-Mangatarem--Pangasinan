@@ -56,6 +56,8 @@ def login():
                 f"User '{username}' with role '{user.role}' logged in successfully"
             )
             login_user(user, remember=True)  # Keep user logged in across sessions
+            if user.role == "user":
+                return redirect(url_for("user.dashboard"))
             return redirect(url_for("public.index"))
         print(
             f"[PROGRESSIVE LOG] [auth] > login > ERROR: Invalid credentials for '{username}'"
@@ -230,7 +232,7 @@ def google_login():
             )
             login_user(user, remember=True)
             flash(f"Welcome to GoMangatarem, {name or username}!", "success")
-            return redirect(url_for("public.index"))
+            return redirect(url_for("user.dashboard"))
 
         # Explicitly restrict Google Sign-In for existing administrative roles
         if user.role in ["admin", "contributor"]:
@@ -247,7 +249,7 @@ def google_login():
             f"[PROGRESSIVE LOG] [auth] > google_login > SUCCESS: Logging in existing user {email} (ID: {user.id})"
         )
         login_user(user, remember=True)
-        return redirect(url_for("public.index"))
+        return redirect(url_for("user.dashboard"))
 
     except ValueError as e:
         print(
