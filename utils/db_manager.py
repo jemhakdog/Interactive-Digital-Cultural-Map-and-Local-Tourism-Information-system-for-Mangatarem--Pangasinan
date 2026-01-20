@@ -78,10 +78,6 @@ def get_database_uri():
 
             db_url = f"postgresql+psycopg2://{user}:{password if password else ''}@{host}:{port}/{dbname}?sslmode=require"
 
-            # Add pgbouncer flag if using the pooler port
-            if port == "6543":
-                db_url += "&pgbouncer=true"
-
             logger.info(f"Constructed URI from components (Port: {port})")
             return db_url
 
@@ -104,9 +100,6 @@ def get_database_uri():
                 "Updating DATABASE_URL to use Supabase Transaction Pooler (Port 6543)"
             )
             db_url = db_url.replace(":5432", ":6543")
-            if "pgbouncer=true" not in db_url:
-                separator = "&" if "?" in db_url else "?"
-                db_url += f"{separator}pgbouncer=true"
 
         db_url = _encode_password_in_url(db_url)
         return db_url
