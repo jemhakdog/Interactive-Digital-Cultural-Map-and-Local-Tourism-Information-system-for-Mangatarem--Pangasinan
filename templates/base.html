@@ -7,8 +7,8 @@
     <title>{% block title %}GoMangatarem Information System{% endblock %}</title>
     <!-- google verification -->
     <meta name="google-site-verification" content="4mfuNe7nRXoBiOxX-xs1-UC63vsLiUy8xOSBQQWUVEI" />
-    <!-- Tailwind CSS (CDN) -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- Tailwind CSS (Build-time) -->
 
     <!-- Custom CSS (Local - Uncomment after running: npm run build:css) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">

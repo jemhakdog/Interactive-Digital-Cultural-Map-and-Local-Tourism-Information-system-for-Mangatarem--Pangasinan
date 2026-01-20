@@ -58,43 +58,57 @@ def get_database_uri():
     print(f"   Status: {'READY' if provider != 'sqlite' else 'LOCAL (SQLite)'}")
     print("-" * 30 + "\n")
     if provider in ["supabase", "postgres", "postgresql"]:
-        # Try individual environment variables first (as used in testsupabase.py)
+        # Try individual environment variables first
         user = os.getenv("user")
         password = os.getenv("password")
         host = os.getenv("host")
         port = os.getenv("port", "5432")
         dbname = os.getenv("dbname")
 
+        # Automatic Transaction Pooler switch for Vercel + Supabase
+        if os.getenv("VERCEL") and host and "supabase.com" in host and port == "5432":
+            logger.info(
+                "Auto-switching to Supabase Transaction Pooler (Port 6543) for Vercel"
+            )
+            port = "6543"
+
         if all([user, host, dbname]):
-            # Construct from individual vars
-            # URL-encode the password if it exists
             if password:
                 password = quote_plus(password)
 
             db_url = f"postgresql+psycopg2://{user}:{password if password else ''}@{host}:{port}/{dbname}?sslmode=require"
-            logger.info(
-                "Constructed Supabase/Postgres URI from component environment variables"
-            )
+
+            # Add pgbouncer flag if using the pooler port
+            if port == "6543":
+                db_url += "&pgbouncer=true"
+
+            logger.info(f"Constructed URI from components (Port: {port})")
             return db_url
 
         # Fallback to DATABASE_URL env var
         db_url = os.getenv("DATABASE_URL")
         if not db_url:
             raise ValueError(
-                "DATABASE_URL or individual DB vars (user, host, dbname) are required for Supabase/Postgres. "
+                "DATABASE_URL or individual DB vars (user, host, dbname) are required."
             )
 
-        # SQLAlchemy requires 'postgresql://', but some providers give 'postgres://'
+        # SQLAlchemy standardizations
         if db_url.startswith("postgres://"):
             db_url = db_url.replace("postgres://", "postgresql://", 1)
-
-        # Ensure we're using the synchronous internal driver if not specified
         if "postgresql://" in db_url and "+psycopg2" not in db_url:
             db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
 
-        # URL-encode password to handle special characters (@, #, !, etc.)
-        db_url = _encode_password_in_url(db_url)
+        # Ensure Vercel uses the transaction pooler if possible
+        if os.getenv("VERCEL") and ":5432" in db_url and "supabase.co" in db_url:
+            logger.info(
+                "Updating DATABASE_URL to use Supabase Transaction Pooler (Port 6543)"
+            )
+            db_url = db_url.replace(":5432", ":6543")
+            if "pgbouncer=true" not in db_url:
+                separator = "&" if "?" in db_url else "?"
+                db_url += f"{separator}pgbouncer=true"
 
+        db_url = _encode_password_in_url(db_url)
         return db_url
 
     elif provider == "mysql":
@@ -159,17 +173,21 @@ def get_db_config(app):
         is_serverless = os.getenv("VERCEL") or os.getenv("IS_VERCEL")
 
         if is_serverless:
-            # Serverless environments (Vercel) shouldn't use pooling
-            # because connections don't persist across invocations.
+            # Serverless environments (Vercel) shouldn't use traditional pooling
             app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
                 "poolclass": NullPool,
+                "engine_logging": False,
+                # Connect timeout is crucial for cold starts
+                "connect_args": {
+                    "connect_timeout": 10,
+                },
             }
         else:
             app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-                "pool_pre_ping": True,  # Handles disconnected connections gracefully
-                "pool_recycle": 300,  # Recycle connections every 5 minutes
-                "pool_size": 10,  # Connection pool size
-                "max_overflow": 20,
+                "pool_pre_ping": True,
+                "pool_recycle": 1800,  # Increased recycle time for non-serverless
+                "pool_size": 15,
+                "max_overflow": 25,
             }
     else:
         # SQLite settings (Low overhead for local)

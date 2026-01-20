@@ -1,15 +1,11 @@
-# import json
 import os
-import json
-
-# from dotenv import load_dotenv
 from flask import Flask, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager
 from extensions import limiter
 from flask_migrate import Migrate
 
-from models import Attraction, User, db
+from models import db
 from routes import register_blueprints
 from utils.db_manager import get_database_uri, get_db_config
 
@@ -94,11 +90,16 @@ login_manager.init_app(app)
 
 @login_manager.user_loader
 def load_user(user_id):
+    from models import User
+
     return User.query.get(int(user_id))
 
 
 def seed_database():
     """Seed the database with initial data"""
+    from models import Attraction, User
+    import json
+
     # Check if attractions exist
     if Attraction.query.first() is None:
         data_path = os.path.join(BASE_DIR, "data", "attractions.json")
