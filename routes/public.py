@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, jsonify, request
+from flask import Blueprint, render_template, request
 from models import db, User, Attraction, Event, GalleryItem, BarangayInfo, PageView
 from flask_login import current_user
 from extensions import limiter
@@ -11,32 +11,18 @@ logger = logging.getLogger(__name__)
 
 @public_bp.route("/")
 def index():
-    print("Host URL: ", request.host_url)
     """
     Render the home page with featured attractions.
-
-    Displays the top 3 approved attractions as featured content.
-
-    Returns:
-        Rendered index template with featured attractions.
     """
-    print("[PROGRESSIVE LOG] [pagez] > index > ENTRY")
     logger.info("Home page accessed")
 
     # Record view
-    print("[PROGRESSIVE LOG] [pagez] > index > LOGIC: Recording view")
     record_view("page", page_name="home")
 
     # Get featured attractions (limit 3)
-    print("[PROGRESSIVE LOG] [pagez] > index > QUERY: Fetching featured attractions")
     featured = Attraction.query.filter_by(status="approved").limit(3).all()
 
-    print(
-        f"[PROGRESSIVE LOG] [pagez] > index > SUCCESS: Displaying {len(featured)} featured attractions"
-    )
     logger.info(f"Home page loaded with {len(featured)} featured attractions")
-
-    print("[PROGRESSIVE LOG] [pagez] > index > RENDER: Rendering index.html")
     return render_template("pagez/index.html", featured=featured)
 
 
@@ -57,7 +43,7 @@ def record_view(view_type, item_id=None, page_name=None):
         db.session.commit()
     except Exception as e:
         # Silently fail to not disrupt user experience
-        print(f"[PROGRESSIVE LOG] [pagez] > record_view > ERROR: {e}")
+        logger.error(f"Error recording view: {e}")
         db.session.rollback()
 
 
@@ -65,28 +51,19 @@ def record_view(view_type, item_id=None, page_name=None):
 def map_view():
     """
     Display the interactive map with all approved attractions.
-
-    Provides a filterable map view showing all tourism spots and
-    cultural attractions across Mangatarem's barangays.
-
-    Returns:
-        Rendered map template with list of barangays for filtering.
     """
-    print("[PROGRESSIVE LOG] [pagez] > map_view > ENTRY")
     logger.info("Interactive map page accessed")
 
     # Get count of approved attractions for initial display
-    print("[PROGRESSIVE LOG] [pagez] > map_view > QUERY: Counting approved attractions")
     attractions_count = Attraction.query.filter_by(status="approved").count()
 
     # Record view
     record_view("page", page_name="map")
 
     # Get list of unique barangays from approved attractions for the filter
-    print("[PROGRESSIVE LOG] [pagez] > map_view > QUERY: Fetching unique barangays")
     barangays = (
         db.session.query(Attraction.barangay)
-        .filter(Attraction.status == "approved", Attraction.barangay is not None)
+        .filter(Attraction.status == "approved", Attraction.barangay.is_not(None))
         .distinct()
         .order_by(Attraction.barangay)
         .all()
@@ -94,14 +71,9 @@ def map_view():
 
     barangay_list = [b[0] for b in barangays]
 
-    print(
-        f"[PROGRESSIVE LOG] [pagez] > map_view > SUCCESS: Map loaded with {attractions_count} attractions, {len(barangay_list)} barangays"
-    )
     logger.info(
         f"Map page loaded with {attractions_count} attractions and {len(barangay_list)} barangays"
     )
-
-    print("[PROGRESSIVE LOG] [pagez] > map_view > RENDER: Rendering map.html")
     return render_template(
         "pagez/map.html", barangays=barangay_list, attractions_count=attractions_count
     )
@@ -312,7 +284,7 @@ def search():
 
     available_barangays = (
         db.session.query(Attraction.barangay)
-        .filter(Attraction.status == "approved", Attraction.barangay != None)
+        .filter(Attraction.status == "approved", Attraction.barangay.is_not(None))
         .distinct()
         .all()
     )
@@ -339,9 +311,8 @@ def routes():
     Returns:
         Rendered routes template.
     """
-    print(f"[PROGRESSIVE LOG] [pagez] > routes > ENTRY")
     logger.info("Tourism routes page accessed")
-    print(f"[PROGRESSIVE LOG] [pagez] > routes > RENDER: Rendering routes.html")
+    logger.info("Rendering routes.html")
     return render_template("pagez/routes.html")
 
 
@@ -349,63 +320,53 @@ def routes():
 def barangays():
     """
     Display directory of all barangays with active contributors.
-
-    Shows a list of barangays that have approved contributors,
-    with representative images from their attractions.
-
-    Returns:
-        Rendered barangays directory template with barangay list.
     """
-    print(f"[PROGRESSIVE LOG] [pagez] > barangays > ENTRY")
     logger.info("Barangays directory page accessed")
 
     # Record view
     record_view("page", page_name="barangays_list")
 
     # Get list of barangays that have active contributors
-    print(
-        f"[PROGRESSIVE LOG] [pagez] > barangays > QUERY: Fetching list of approved contributors' barangays"
-    )
-    # We use a set to ensure uniqueness
-    barangay_names = (
+    barangay_names_query = (
         db.session.query(User.barangay)
         .filter(
-            User.role == "contributor", User.is_approved == True, User.barangay != None
+            User.role == "contributor", User.is_approved, User.barangay.is_not(None)
         )
         .distinct()
         .all()
     )
+    barangay_names = [b[0] for b in barangay_names_query]
 
-    print(
-        f"[PROGRESSIVE LOG] [pagez] > barangays > LOGIC: Processing metadata for {len(barangay_names)} barangays"
-    )
+    if not barangay_names:
+        return render_template("pagez/barangays.html", barangays=[])
+
+    # Optimize: Fetch all relevant attractions in one query instead of a loop
+    all_attractions = Attraction.query.filter(
+        Attraction.barangay.in_(barangay_names), Attraction.status == "approved"
+    ).all()
+
+    # Group attractions by barangay
+    from collections import defaultdict
+
+    barangay_data = defaultdict(list)
+    for a in all_attractions:
+        barangay_data[a.barangay].append(a)
+
     barangay_list = []
-    for b in barangay_names:
-        name = b[0]
-        # Get all approved attractions for this barangay to calculate metadata
-        attractions = Attraction.query.filter(
-            Attraction.barangay == name, Attraction.status == "approved"
-        ).all()
+    for name in barangay_names:
+        attractions = barangay_data.get(name, [])
 
-        # Find a representative image (first attraction with an image)
-        image_url = None
-        for attraction in attractions:
-            if attraction.image_url:
-                image_url = attraction.image_url
-                break
+        # Find a representative image
+        image_url = next((a.image_url for a in attractions if a.image_url), None)
 
         # Calculate center coordinates (centroid)
-        lat = 15.9949  # Default
-        lng = 120.4869  # Default
+        lat, lng = 15.9949, 120.4869  # Default
         if attractions:
             lat = sum(a.lat for a in attractions) / len(attractions)
             lng = sum(a.lng for a in attractions) / len(attractions)
 
         # Collect unique categories as tags
         tags = list(set(a.category for a in attractions))
-
-        # Count attractions
-        attraction_count = len(attractions)
 
         barangay_list.append(
             {
@@ -414,19 +375,14 @@ def barangays():
                 "lat": lat,
                 "lng": lng,
                 "tags": tags,
-                "attraction_count": attraction_count,
+                "attraction_count": len(attractions),
             }
         )
 
     # Sort by name
     barangay_list.sort(key=lambda x: x["name"])
 
-    print(
-        f"[PROGRESSIVE LOG] [pagez] > barangays > SUCCESS: Loaded {len(barangay_list)} barangays"
-    )
     logger.info(f"Barangays directory page loaded with {len(barangay_list)} barangays")
-
-    print(f"[PROGRESSIVE LOG] [pagez] > barangays > RENDER: Rendering barangays.html")
     return render_template("pagez/barangays.html", barangays=barangay_list)
 
 
@@ -475,9 +431,6 @@ def barangay_profile(name):
     barangay_info = BarangayInfo.query.filter_by(barangay_name=name).first()
 
     # Calculate center coordinates for map (average of all attraction coordinates)
-    print(
-        f"[PROGRESSIVE LOG] [pagez] > barangay_profile > LOGIC: Calculating map center"
-    )
     center_lat, center_lng = 15.9949, 120.4869  # Default: Mangatarem coordinates
     if attractions:
         center_lat = sum(a.lat for a in attractions) / len(attractions)
@@ -506,9 +459,7 @@ def barangay_profile(name):
         f"Barangay profile for '{name}': {len(attractions)} attractions, {len(events)} events, {len(gallery_items)} gallery items"
     )
 
-    print(
-        f"[PROGRESSIVE LOG] [pagez] > barangay_profile > RENDER: Rendering barangay_profile.html"
-    )
+    logger.info(f"Rendering barangay_profile.html")
     return render_template(
         "pagez/barangay_profile.html",
         barangay_name=name,
@@ -533,10 +484,8 @@ def sitemap():
         XML response containing the sitemap.
     """
     from flask import make_response, url_for
-    from datetime import datetime, timedelta
-
-    host_components = url_for("pagez.index", _external=True).split("/")
-    host_url = "/".join(host_components[:3])  # e.g., http://localhost:5000
+    from datetime import datetime
+    # host_url = "/".join(host_components[:3])  # e.g., http://localhost:5000
 
     pages = []
     import subprocess
@@ -571,7 +520,7 @@ def sitemap():
             # For simplicity, we just want the date part YYYY-MM-DD
             # Simple ISO date format from git log is usually YYYY-MM-DD HH:MM:SS +/-TZ
             return result.stdout.strip().split(" ")[0]
-        except Exception as e:
+        except Exception:
             # Fallback to today's date if anything fails
             return datetime.now().date().isoformat()
 
@@ -618,7 +567,7 @@ def sitemap():
     barangay_names = (
         db.session.query(User.barangay)
         .filter(
-            User.role == "contributor", User.is_approved == True, User.barangay != None
+            User.role == "contributor", User.is_approved, User.barangay.is_not(None)
         )
         .distinct()
         .all()

@@ -151,8 +151,10 @@ with app.app_context():
         db.create_all()
         seed_database()
     else:
-        # On Vercel, we only create tables if they don't exist in /tmp
-        db.create_all()
+        # On Vercel, we NEVER run create_all() or seed_database() in the main flow.
+        # These should be handled by migrations or a manual trigger.
+        # Running them on every cold start adds several seconds of latency.
+        pass
 
 
 # Make config available in all templates

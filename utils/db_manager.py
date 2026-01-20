@@ -2,6 +2,7 @@ import os
 import logging
 import re
 from urllib.parse import quote_plus
+from sqlalchemy.pool import NullPool
 from supabase import create_client, Client
 
 # Configure logging
@@ -155,12 +156,21 @@ def get_db_config(app):
 
     if provider in ["supabase", "postgres", "mysql", "xampp", "laragon"]:
         # Production-grade settings
-        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-            "pool_pre_ping": True,  # Handles disconnected connections gracefully
-            "pool_recycle": 300,  # Recycle connections every 5 minutes
-            "pool_size": 10,  # Connection pool size
-            "max_overflow": 20,
-        }
+        is_serverless = os.getenv("VERCEL") or os.getenv("IS_VERCEL")
+
+        if is_serverless:
+            # Serverless environments (Vercel) shouldn't use pooling
+            # because connections don't persist across invocations.
+            app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+                "poolclass": NullPool,
+            }
+        else:
+            app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+                "pool_pre_ping": True,  # Handles disconnected connections gracefully
+                "pool_recycle": 300,  # Recycle connections every 5 minutes
+                "pool_size": 10,  # Connection pool size
+                "max_overflow": 20,
+            }
     else:
         # SQLite settings (Low overhead for local)
         app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {}
