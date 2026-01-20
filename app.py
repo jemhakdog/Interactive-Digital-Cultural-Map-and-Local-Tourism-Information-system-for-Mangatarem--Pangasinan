@@ -1,6 +1,5 @@
 # import json
 import os
-import shutil
 import json
 
 # from dotenv import load_dotenv
@@ -8,9 +7,11 @@ from flask import Flask, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager
 from extensions import limiter
+from flask_migrate import Migrate
 
 from models import Attraction, User, db
 from routes import register_blueprints
+from utils.db_manager import get_database_uri, get_db_config
 
 # Load environment variables from .ENV file
 # load_dotenv()
@@ -45,33 +46,12 @@ if IS_VERCEL:
     app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
 app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "your-secret-key-here")
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["UPLOAD_FOLDER"] = os.path.join(static_dir, "uploads")
 app.config["ALLOWED_EXTENSIONS"] = {"png", "jpg", "jpeg", "gif", "mp4"}
 
-# Handle SQLite database path for Vercel
-if IS_VERCEL:
-    # On Vercel, the filesystem is read-only except for /tmp/
-    db_path = "/tmp/mangatarem.db"
-    source_db = os.path.join(BASE_DIR, "instance", "mangatarem.db")
-
-    # Copy the database to /tmp if it doesn't exist there yet
-    if os.path.exists(source_db) and not os.path.exists(db_path):
-        try:
-            shutil.copy2(source_db, db_path)
-            print(f"Database copied to {db_path}")
-        except Exception as e:
-            print(f"Error copying database: {e}")
-
-    app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
-else:
-    # Local development
-    instance_path = os.path.join(BASE_DIR, "instance")
-    if not os.path.exists(instance_path):
-        os.makedirs(instance_path)
-    app.config["SQLALCHEMY_DATABASE_URI"] = (
-        f"sqlite:///{os.path.join(instance_path, 'mangatarem.db')}"
-    )
+# Database Configuration via db_manager (supports SQLite, MySQL, Supabase/PostgreSQL)
+app.config["SQLALCHEMY_DATABASE_URI"] = get_database_uri()
+get_db_config(app)  # Applies engine options & TRACK_MODIFICATIONS
 
 # Server & Session Configuration
 # We avoid setting SERVER_NAME globally as it can interfere with cookie domains.
@@ -97,8 +77,9 @@ app.config["PREFERRED_URL_SCHEME"] = os.environ.get(
     "PREFERRED_URL_SCHEME", "https" if IS_VERCEL else "http"
 )
 
-# Initialize database
+# Initialize database and migrations
 db.init_app(app)
+migrate = Migrate(app, db)
 
 # Rate limiter initialization
 limiter.init_app(app)
