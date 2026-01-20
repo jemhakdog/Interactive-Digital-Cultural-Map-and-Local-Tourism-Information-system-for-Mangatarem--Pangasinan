@@ -176,7 +176,6 @@ def get_db_config(app):
             # Serverless environments (Vercel) shouldn't use traditional pooling
             app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
                 "poolclass": NullPool,
-                "engine_logging": False,
                 # Connect timeout is crucial for cold starts
                 "connect_args": {
                     "connect_timeout": 10,
