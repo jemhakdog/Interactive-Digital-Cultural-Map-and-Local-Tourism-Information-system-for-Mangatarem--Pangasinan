@@ -193,6 +193,14 @@ def make_session_permanent():
 register_blueprints(app)
 
 
+@app.after_request
+def add_security_headers(response):
+    """Add security headers to all responses"""
+    # Allow Google Sign-In popup to communicate with the main window
+    response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
+    return response
+
+
 # Error Handlers
 @app.errorhandler(400)
 def bad_request(e):
