@@ -109,6 +109,15 @@
         gap: 0.5rem;
         border: 1px solid rgba(255, 255, 255, 0.1);
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        max-width: 90vw;
+        overflow-x: auto;
+        scrollbar-width: none;
+        /* Firefox */
+    }
+
+    .filter-container::-webkit-scrollbar {
+        display: none;
+        /* Safari and Chrome */
     }
 
     .filter-btn {
@@ -121,6 +130,7 @@
         padding: 0.75rem 1.5rem;
         transition: all 0.3s ease;
         border-radius: 50px;
+        white-space: nowrap;
     }
 
     .filter-btn.active {
@@ -423,6 +433,14 @@
         text-transform: uppercase;
         opacity: 0.6;
         z-index: 10;
+        transition: opacity 0.3s ease;
+    }
+
+    @media (max-width: 768px) {
+        .scroll-hint {
+            bottom: 6rem;
+            opacity: 0.4;
+        }
     }
 
     .mouse {

@@ -99,7 +99,7 @@
             class="w-full h-full object-cover">
     </div>
 
-    <div class="hero-content-wrap">
+    <div class="hero-content-wrap page-fade-in">
         <span class="hero-subtitle">The Heart of Pangasinan</span>
         <h1 class="hero-title !text-5xl md:!text-7xl">82 Barangays</h1>
         <p class="text-xl text-white/90 font-light max-w-2xl mx-auto leading-relaxed">
@@ -110,25 +110,30 @@
 </section>
 
 <!-- Main Directory Section -->
-<div class="bg-heritage-cream paper-texture min-h-screen py-24">
-    <div class="container mx-auto px-6">
+<div class="bg-heritage-cream paper-texture aurora-bg min-h-screen py-24 page-fade-in">
+    <!-- Aurora Glows -->
+    <div class="aurora-glow glow-1"></div>
+    <div class="aurora-glow glow-2"></div>
+    <div class="aurora-glow glow-3"></div>
+
+    <div class="container mx-auto px-6 relative z-10">
 
         <!-- Search & Filters - Editorial Style -->
         <div class="barangay-search-wrap mb-12 reveal">
-            <div class="max-w-4xl mx-auto bg-white p-8 md:p-12 shadow-2xl heritage-border">
+            <div class="max-w-4xl mx-auto glass-effect p-8 md:p-12 shadow-2xl rounded-2xl border-heritage-gold/20">
                 <div class="grid md:grid-cols-12 gap-8 items-end">
                     <div class="md:col-span-6">
-                        <label for="barangaySearch" class="caption-serif !mb-2">Find a Location</label>
+                        <label for="barangaySearch" class="caption-serif !mb-2 opacity-60">Find a Location</label>
                         <div class="relative">
                             <input type="text" id="barangaySearch" placeholder="Search by name..."
-                                class="w-full border-b-2 border-heritage-green/20 focus:border-heritage-green py-3 bg-transparent outline-none text-xl font-serif italic transition-all">
+                                class="w-full border-b border-heritage-green/20 focus:border-heritage-green py-3 bg-transparent outline-none text-xl font-serif italic transition-all placeholder:text-heritage-green/30">
                         </div>
                     </div>
 
                     <div class="md:col-span-4">
-                        <label for="categoryFilter" class="caption-serif !mb-2">Filter by Spirit</label>
+                        <label for="categoryFilter" class="caption-serif !mb-2 opacity-60">Filter by Spirit</label>
                         <select id="categoryFilter"
-                            class="w-full border-b-2 border-heritage-green/10 focus:border-heritage-green py-3 bg-transparent outline-none cursor-pointer">
+                            class="w-full border-b border-heritage-green/10 focus:border-heritage-green py-3 bg-transparent outline-none cursor-pointer font-serif italic">
                             <option value="all">All Experiences</option>
                             <option value="Nature">Nature & Springs</option>
                             <option value="History">Heritage & History</option>
@@ -139,7 +144,7 @@
 
                     <div class="md:col-span-2">
                         <button
-                            class="w-full btn-heritage !py-3 !px-0 flex justify-center hover:!bg-heritage-green-light">
+                            class="w-full btn-heritage !py-3 !px-0 flex justify-center hover:!bg-heritage-green-light !rounded-xl">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -190,10 +195,10 @@
             {% if barangays %}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
                 {% for barangay in barangays %}
-                <div class="barangay-card-refined group" data-aos="fade-up"
-                    data-aos-delay="{{ (loop.index0 % 4) * 100 }}">
+                <div class="barangay-card-refined group glass-effect !border-none !rounded-2xl shadow-xl"
+                    data-aos="fade-up" data-aos-delay="{{ (loop.index0 % 4) * 100 }}">
                     <a href="{{ url_for('public.barangay_profile', name=barangay.name) }}" class="block p-4">
-                        <div class="aspect-[4/5] overflow-hidden relative mb-6">
+                        <div class="aspect-[4/5] overflow-hidden relative mb-6 rounded-xl">
                             {% if barangay.image_url %}
                             <img src="{{ barangay.image_url }}" alt="{{ barangay.name }}"
                                 class="w-full h-full object-cover transform duration-700 group-hover:scale-110">
@@ -211,23 +216,24 @@
                             <!-- Category Badge -->
                             <div class="absolute top-4 left-4">
                                 <span
-                                    class="barangay-tag-badge bg-white/90 backdrop-blur-md px-3 py-1 text-[10px] font-bold uppercase tracking-widest text-heritage-green">
+                                    class="barangay-tag-badge bg-white/90 backdrop-blur-md px-3 py-1 text-[10px] font-extrabold uppercase tracking-widest text-heritage-green rounded-lg shadow-sm">
                                     {{ barangay.tags[0] if barangay.tags else 'Discovery' }}
                                 </span>
                             </div>
                         </div>
 
                         <div class="text-center px-4 pb-4">
-                            <span class="caption-serif !text-[11px] !mb-1">Archival entry {{ loop.index }}</span>
+                            <span class="caption-serif !text-[11px] !mb-1 opacity-40">Archival entry {{ loop.index
+                                }}</span>
                             <h3
-                                class="text-2xl font-bold text-heritage-green group-hover:text-heritage-gold transition-colors duration-300">
+                                class="text-2xl font-bold font-serif text-heritage-green group-hover:text-heritage-gold transition-colors duration-300">
                                 {{ barangay.name }}
                             </h3>
                             <div
-                                class="mt-4 pt-4 border-t border-heritage-green/5 flex justify-center items-center gap-4 text-heritage-green/40 text-xs uppercase tracking-widest font-bold">
-                                <span>{{ barangay.attraction_count }} Attractions</span>
-                                <span class="w-1 h-1 bg-heritage-gold rounded-full"></span>
-                                <span>Explore</span>
+                                class="mt-4 pt-4 border-t border-heritage-green/5 flex justify-center items-center gap-4 text-heritage-green/40 text-[10px] uppercase tracking-[0.2em] font-bold">
+                                <span>{{ barangay.attraction_count }} Spots</span>
+                                <span class="w-1 h-1 bg-heritage-gold/40 rounded-full"></span>
+                                <span>Enter</span>
                             </div>
                         </div>
                     </a>
@@ -248,7 +254,8 @@
         <div id="barangays-data-store" data-barangays='{{ barangays | tojson | safe }}' style="display: none;"></div>
 
         <!-- Map View (Hidden by default) -->
-        <div id="mapView" class="hidden h-[700px] shadow-2xl heritage-border overflow-hidden">
+        <div id="mapView"
+            class="hidden h-[700px] shadow-2xl glass-effect !border-none !rounded-2xl overflow-hidden relative z-10 transition-all duration-500">
             <div id="barangayMap" class="w-full h-full z-0"></div>
         </div>
 
@@ -256,26 +263,32 @@
 </div>
 
 <!-- CTA Section - Newsletter Style -->
-<section class="py-32 bg-heritage-green text-white relative overflow-hidden">
+<section class="py-40 bg-heritage-green text-white relative overflow-hidden">
+    <!-- Aurora Dots for Dark Section -->
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-emerald-500/10 blur-[120px] rounded-full"></div>
+    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-gold-500/5 blur-[120px] rounded-full"></div>
+
     <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/felt.png')]"></div>
     <div class="container mx-auto px-6 text-center relative z-10" data-aos="fade-up">
-        <span class="caption-serif !text-heritage-gold mb-4">Contribute to the Legacy</span>
-        <h2 class="text-4xl md:text-5xl font-bold mb-8">Share your Barangay's Secret</h2>
-        <p class="text-xl mb-12 max-w-2xl mx-auto text-white/80 font-light leading-relaxed font-serif italic">
+        <span class="caption-serif !text-heritage-gold mb-6 block tracking-[0.3em]">Contribute to the Legacy</span>
+        <h2 class="text-5xl md:text-7xl font-bold mb-10 font-serif leading-tight">Share your Barangay's Secret</h2>
+        <p
+            class="text-xl md:text-2xl mb-16 max-w-3xl mx-auto text-white/70 font-light leading-relaxed font-serif italic">
             "Your stories and photographs are the threads that hold our cultural fabric together."
         </p>
 
-        <div class="flex flex-wrap justify-center gap-6">
+        <div class="flex flex-wrap justify-center gap-8">
             <a href="{{ url_for('auth.login') }}"
-                class="btn-heritage !bg-heritage-gold !border-heritage-gold hover:!bg-white hover:!text-heritage-green">
+                class="btn-heritage !bg-heritage-gold !border-heritage-gold hover:!bg-white hover:!text-heritage-green !px-10 !py-4 !rounded-xl text-lg">
                 Login as Contributor
             </a>
             <a href="{{ url_for('public.index') }}#experiences"
-                class="btn-heritage-outline !text-white !border-white hover:!bg-white hover:!text-heritage-green">
+                class="btn-heritage-outline !text-white !border-white hover:!bg-white hover:!text-heritage-green !px-10 !py-4 !rounded-xl text-lg">
                 Browse Experiences
             </a>
         </div>
-        <p class="text-xs mt-12 text-white/30 tracking-widest uppercase">Verified records only. Subject to archival
+        <p class="text-[10px] mt-16 text-white/20 tracking-[0.4em] uppercase font-bold">Verified records only. Subject
+            to archival
             review.</p>
     </div>
 </section>
