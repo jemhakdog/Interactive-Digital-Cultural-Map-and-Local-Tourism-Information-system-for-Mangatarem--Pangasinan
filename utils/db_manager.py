@@ -1,9 +1,36 @@
 import os
 import logging
+import re
+from urllib.parse import quote_plus
 from supabase import create_client, Client
 
 # Configure logging
 logger = logging.getLogger(__name__)
+
+
+def _encode_password_in_url(db_url: str) -> str:
+    """
+    Properly URL-encodes the password in a database connection URL.
+    Handles special characters like @, #, !, etc.
+    """
+    # Pattern to match: scheme://user:password@host:port/database
+    # We need to extract and encode only the password portion
+    pattern = r"^(postgresql(?:\+psycopg2)?|postgres|mysql(?:\+pymysql)?):\/\/([^:]+):(.+)@(.+)$"
+    match = re.match(pattern, db_url)
+
+    if match:
+        scheme = match.group(1)
+        user = match.group(2)
+        password = match.group(3)
+        host_and_db = match.group(4)
+
+        # URL-encode the password
+        encoded_password = quote_plus(password)
+
+        return f"{scheme}://{user}:{encoded_password}@{host_and_db}"
+
+    # If pattern doesn't match, return original URL
+    return db_url
 
 
 def get_database_uri():
@@ -30,12 +57,30 @@ def get_database_uri():
     print(f"   Status: {'READY' if provider != 'sqlite' else 'LOCAL (SQLite)'}")
     print("-" * 30 + "\n")
     if provider in ["supabase", "postgres", "postgresql"]:
-        # Supabase/Postgres connection
+        # Try individual environment variables first (as used in testsupabase.py)
+        user = os.getenv("user")
+        password = os.getenv("password")
+        host = os.getenv("host")
+        port = os.getenv("port", "5432")
+        dbname = os.getenv("dbname")
+
+        if all([user, host, dbname]):
+            # Construct from individual vars
+            # URL-encode the password if it exists
+            if password:
+                password = quote_plus(password)
+
+            db_url = f"postgresql+psycopg2://{user}:{password if password else ''}@{host}:{port}/{dbname}?sslmode=require"
+            logger.info(
+                "Constructed Supabase/Postgres URI from component environment variables"
+            )
+            return db_url
+
+        # Fallback to DATABASE_URL env var
         db_url = os.getenv("DATABASE_URL")
         if not db_url:
             raise ValueError(
-                "DATABASE_URL env var is required for Supabase/Postgres. "
-                "Format: postgresql://postgres:[PASSWORD]@[HOST]:[PORT]/postgres"
+                "DATABASE_URL or individual DB vars (user, host, dbname) are required for Supabase/Postgres. "
             )
 
         # SQLAlchemy requires 'postgresql://', but some providers give 'postgres://'
@@ -45,6 +90,9 @@ def get_database_uri():
         # Ensure we're using the synchronous internal driver if not specified
         if "postgresql://" in db_url and "+psycopg2" not in db_url:
             db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+
+        # URL-encode password to handle special characters (@, #, !, etc.)
+        db_url = _encode_password_in_url(db_url)
 
         return db_url
 
