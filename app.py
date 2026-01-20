@@ -4,7 +4,7 @@ import shutil
 import json
 
 # from dotenv import load_dotenv
-from flask import Flask, url_for, render_template
+from flask import Flask, render_template
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager
 from extensions import limiter
@@ -241,21 +241,12 @@ if __name__ == "__main__":
     host = "0.0.0.0"
     port = 5000
 
-    # Set default SERVER_NAME for local development if not already set
-    if not app.config.get("SERVER_NAME"):
-        app.config["SERVER_NAME"] = f"127.0.0.1:{port}"
-
-    with app.app_context():
-        # Using a request context simulation if needed for url_for
-        # but here we just want to print the base URL
-        try:
-            base_url = url_for("public.index", _external=True)
-            print(f"The host URL is: {base_url}")
-        except RuntimeError:
-            print("Could not build URL outside of request context")
+    # NOTE: Do NOT set SERVER_NAME here - it causes session cookie domain binding issues.
+    # Flask automatically determines the host from incoming request headers.
+    # Setting SERVER_NAME to "127.0.0.1:5000" causes cookies to fail when accessing via "localhost".
 
     # Local development Detected message
     if not IS_VERCEL:
-        print("Starting in local development mode.")
+        print(f"Starting in local development mode on http://{host}:{port}")
 
     app.run(host=host, port=port, debug=True)
