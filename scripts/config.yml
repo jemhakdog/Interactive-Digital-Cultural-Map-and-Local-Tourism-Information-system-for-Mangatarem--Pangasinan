@@ -1,0 +1,7 @@
+tunnel: 6276d956-1624-4be8-adde-3718b034cf31
+credentials-file: C:\Users\jem\.cloudflared\6276d956-1624-4be8-adde-3718b034cf31.json
+
+ingress:
+  - hostname: gomangatarem.com
+    service: http://localhost:5000
+  - service: http_status:404
