@@ -66,9 +66,11 @@
             <div class="flex justify-between items-center">
 
                 <a href="{{ url_for('public.index') }}"
-                    class="text-2xl font-bold text-white flex items-center gap-2 group">
-                    <span
-                        class="transform group-hover:rotate-12 transition-transform duration-300 text-emerald-500">🌿</span>
+                    class="text-2xl font-bold text-white flex items-center gap-2 group leading-none">
+                    <svg class="w-8 h-8 text-emerald-500 transform group-hover:rotate-12 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 21c4.97 0 9-4.03 9-9s-4.03-9-9-9-9 4.03-9 9 4.03 9 9 9zM12 21c-1.5 0-3-1.5-3-3s1.5-3 3-3 3 1.5 3 3-1.5 3-3 3z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15c1.5-1.5 3-3 3-4.5 0-3-3-4.5-3-4.5s-3 1.5-3 4.5c0 1.5 1.5 3 3 4.5z"></path>
+                    </svg>
                     <span class="tracking-tight font-heading">GoMangatarem</span>
                 </a>
 
@@ -187,7 +189,10 @@
                         <a href="{{ url_for('public.index') }}" class="inline-flex items-center gap-4 group">
                             <div
                                 class="w-16 h-16 rounded-2xl bg-emerald-800/40 backdrop-blur-md border border-emerald-700/50 flex items-center justify-center transform group-hover:rotate-6 transition-all duration-500 shadow-2xl">
-                                <span class="text-3xl">🌿</span>
+                                <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 21c4.97 0 9-4.03 9-9s-4.03-9-9-9-9 4.03-9 9 4.03 9 9 9zM12 21c-1.5 0-3-1.5-3-3s1.5-3 3-3 3 1.5 3 3-1.5 3-3 3z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15c1.5-1.5 3-3 3-4.5 0-3-3-4.5-3-4.5s-3 1.5-3 4.5c0 1.5 1.5 3 3 4.5z"></path>
+                                </svg>
                             </div>
                             <div>
                                 <h2 class="text-3xl font-bold text-white tracking-tight font-heading leading-tight">

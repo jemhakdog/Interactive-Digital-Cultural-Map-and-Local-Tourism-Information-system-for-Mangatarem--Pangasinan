@@ -1,6 +1,11 @@
 {% extends 'base.html' %}
 
-{% block title %}Search Results - GoMangatarem{% endblock %}
+{% block title %}{% if query %}{{ query }} - {% endif %}Search Results - GoMangatarem{% endblock %}
+
+{% block meta_description %}
+<meta name="description"
+    content="Search results for {% if query %}'{{ query }}'{% else %}attractions, events, and barangays{% endif %} in Mangatarem, Pangasinan. Find cultural heritage sites, festivals, and local experiences.">
+{% endblock %}
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/home-heritage.css') }}">

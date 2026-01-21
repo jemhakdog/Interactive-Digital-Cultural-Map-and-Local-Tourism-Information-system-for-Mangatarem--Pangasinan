@@ -2,6 +2,43 @@
 
 {% block title %}{{ barangay_name }} Profile - GoMangatarem{% endblock %}
 
+{% block meta_description %}
+<meta name="description"
+    content="Explore {{ barangay_name }}, Mangatarem - discover local attractions, cultural heritage, events, and traditions in this Pangasinan barangay.">
+{% endblock %}
+
+{% block head %}
+<!-- Open Graph for Barangay Profile -->
+<meta property="og:title" content="{{ barangay_name }} | GoMangatarem">
+<meta property="og:description"
+    content="Discover the cultural heritage, attractions, and events in {{ barangay_name }}, Mangatarem, Pangasinan.">
+
+<!-- JSON-LD Structured Data for Place -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Place",
+  "name": "{{ barangay_name }}",
+  "description": "Barangay {{ barangay_name }} in Mangatarem, Pangasinan, Philippines",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Mangatarem",
+    "addressRegion": "Pangasinan",
+    "addressCountry": "PH"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": {{ center_lat }},
+    "longitude": {{ center_lng }}
+  },
+  "containedInPlace": {
+    "@type": "AdministrativeArea",
+    "name": "Mangatarem, Pangasinan"
+  }
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <!-- Premium Aurora Hero Section -->
 <div class="aurora-bg min-h-[50vh] flex items-center justify-center relative pt-16">

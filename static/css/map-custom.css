@@ -139,3 +139,91 @@
 #content-area {
     -webkit-overflow-scrolling: touch;
 }
+
+/* Leaflet controls customization */
+.leaflet-control-zoom {
+    border: none !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+}
+
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
+    background-color: #fff !important;
+    color: #064e3b !important;
+    border: 1px solid #ecfdf5 !important;
+    width: 36px !important;
+    height: 36px !important;
+    line-height: 36px !important;
+    font-weight: bold !important;
+    transition: all 0.2s ease !important;
+}
+
+.leaflet-control-zoom-in:hover,
+.leaflet-control-zoom-out:hover {
+    background-color: #ecfdf5 !important;
+    color: #059669 !important;
+}
+
+.leaflet-control-zoom-in {
+    border-radius: 10px 10px 0 0 !important;
+}
+
+.leaflet-control-zoom-out {
+    border-radius: 0 0 10px 10px !important;
+}
+
+/* Glassmorphism sidebar elements */
+.glass-sidebar-header {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Tab button improvements */
+.tab-btn {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.tab-btn::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 3px;
+    background: #059669;
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+}
+
+.tab-btn.active::after {
+    width: 100%;
+}
+
+/* Filter button active state */
+.filter-btn.active {
+    background-color: #10b981 !important;
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* Custom Scrollbar */
+#content-area::-webkit-scrollbar {
+    width: 6px;
+}
+
+#content-area::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+#content-area::-webkit-scrollbar-thumb {
+    background: rgba(209, 213, 219, 0.5);
+    border-radius: 10px;
+}
+
+#content-area::-webkit-scrollbar-thumb:hover {
+    background: rgba(156, 163, 175, 0.7);
+}

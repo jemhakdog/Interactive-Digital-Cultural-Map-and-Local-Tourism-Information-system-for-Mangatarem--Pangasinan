@@ -2,6 +2,50 @@
 
 {% block title %}{{ attraction.name }} - GoMangatarem{% endblock %}
 
+{% block meta_description %}
+<meta name="description" content="{{ attraction.description[:155] }}...">
+{% endblock %}
+
+{% block head %}
+<!-- Open Graph for Attraction -->
+<meta property="og:title" content="{{ attraction.name }} | GoMangatarem">
+<meta property="og:description" content="{{ attraction.description[:155] }}...">
+<meta property="og:image" content="{{ attraction.image_url }}">
+<meta property="og:type" content="place">
+
+<!-- Twitter Card -->
+<meta name="twitter:title" content="{{ attraction.name }} | GoMangatarem">
+<meta name="twitter:description" content="{{ attraction.description[:155] }}...">
+<meta name="twitter:image" content="{{ attraction.image_url }}">
+
+<!-- JSON-LD Structured Data for TouristAttraction -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TouristAttraction",
+  "name": "{{ attraction.name }}",
+  "description": "{{ attraction.description | replace('"', '\\"') }}",
+  "image": "{{ attraction.image_url }}",
+  "address": {
+    "@type": "PostalAddress",
+    "addressLocality": "Mangatarem",
+    "addressRegion": "Pangasinan",
+    "addressCountry": "PH"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": {{ attraction.lat }},
+    "longitude": {{ attraction.lng }}
+  },
+  "aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ attraction.rating }}",
+    "bestRating": "5"
+  }
+}
+</script>
+{% endblock %}
+
 {% block content %}
 <div class="container mx-auto px-6 py-12">
     <a href="{{ url_for('public.map_view') }}" class="inline-flex items-center text-green-700 hover:underline mb-6">

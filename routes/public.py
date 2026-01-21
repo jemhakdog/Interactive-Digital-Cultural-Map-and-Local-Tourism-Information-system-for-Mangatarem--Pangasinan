@@ -528,12 +528,12 @@ def sitemap():
 
     # Static pages
     static_urls = [
-        "pagez.index",
-        "pagez.map_view",
-        "pagez.events",
-        "pagez.gallery",
-        "pagez.routes",
-        "pagez.barangays",
+        "public.index",
+        "public.map_view",
+        "public.events",
+        "public.gallery",
+        "public.routes",
+        "public.barangays",
     ]
 
     for url in static_urls:
@@ -552,7 +552,7 @@ def sitemap():
         pages.append(
             {
                 "loc": url_for(
-                    "pagez.attraction_detail", id=attraction.id, _external=True
+                    "public.attraction_detail", id=attraction.id, _external=True
                 ),
                 "lastmod": attraction.created_at.date().isoformat()
                 if attraction.created_at
@@ -576,7 +576,7 @@ def sitemap():
     for b in barangay_names:
         pages.append(
             {
-                "loc": url_for("pagez.barangay_profile", name=b[0], _external=True),
+                "loc": url_for("public.barangay_profile", name=b[0], _external=True),
                 "lastmod": last_update,  # Ideally fetch latest update for barangay
                 "changefreq": "weekly",
                 "priority": "0.7",
@@ -612,26 +612,28 @@ def verify_site():
     return render_template("google364b8336ce52ae86.html")
 
 
-# @public_bp.route('/robots.txt')
-# def robots():
-#     """
-#     Generate robots.txt configuration.
+@public_bp.route("/robots.txt")
+def robots():
+    """
+    Generate robots.txt configuration.
 
-#     Returns:
-#         Text response with robots.txt content.
-#     """
-#     from flask import make_response, url_for
+    Returns:
+        Text response with robots.txt content.
+    """
+    from flask import make_response, url_for
 
-#     sitemap_url = url_for('pagez.sitemap', _external=True)
+    sitemap_url = url_for("public.sitemap", _external=True)
 
-#     robots_txt = f"""User-agent: *
-# Allow: /
-# Disallow: /admin/
-# Disallow: /barangay-admin/
-# Disallow: /pull
-# Disallow: /pull/
-# Sitemap: {sitemap_url}
-# """
-#     response = make_response(robots_txt)
-#     response.headers["Content-Type"] = "text/plain"
-#     return response
+    robots_txt = f"""User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /barangay-admin/
+Disallow: /user/
+Disallow: /pull
+Disallow: /pull/
+
+Sitemap: {sitemap_url}
+"""
+    response = make_response(robots_txt)
+    response.headers["Content-Type"] = "text/plain"
+    return response
