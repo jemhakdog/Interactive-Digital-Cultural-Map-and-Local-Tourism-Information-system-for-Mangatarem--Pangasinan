@@ -100,15 +100,40 @@ def attraction_detail(id):
     # Record view
     record_view("attraction", item_id=id)
 
+    # Fetch nearby attractions (same barangay, approved, limit 3, excluding current)
+    nearby = (
+        Attraction.query.filter(
+            Attraction.barangay == attraction.barangay,
+            Attraction.status == "approved",
+            Attraction.id != attraction.id,
+        )
+        .limit(3)
+        .all()
+    )
+
+    # Fetch related gallery items (if any, matching by barangay since we don't have direct link in GalleryItem)
+    # Note: GalleryItem joins with User to check for barangay
+    related_gallery = (
+        GalleryItem.query.join(User)
+        .filter(User.barangay == attraction.barangay, GalleryItem.status == "approved")
+        .limit(6)
+        .all()
+    )
+
     print(
-        f"[PROGRESSIVE LOG] [pagez] > attraction_detail > SUCCESS: Displaying attraction '{attraction.name}'"
+        f"[PROGRESSIVE LOG] [pagez] > attraction_detail > SUCCESS: Displaying attraction '{attraction.name}', Found {len(nearby)} nearby places"
     )
     logger.info(f"Showing attraction '{attraction.name}' (ID: {id})")
 
     print(
         "[PROGRESSIVE LOG] [pagez] > attraction_detail > RENDER: Rendering detail.html"
     )
-    return render_template("pagez/detail.html", attraction=attraction)
+    return render_template(
+        "pagez/detail.html",
+        attraction=attraction,
+        nearby=nearby,
+        related_gallery=related_gallery,
+    )
 
 
 @public_bp.route("/events")
