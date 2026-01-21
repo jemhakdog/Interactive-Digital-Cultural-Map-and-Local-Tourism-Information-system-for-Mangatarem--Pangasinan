@@ -297,8 +297,10 @@
                 data-date="{{ item.uploaded_at.isoformat() }}" onclick="handleItemClick(this)">
 
                 {% if item.type == 'photo' %}
-                <img src="{{ item.url }}" alt="{{ item.caption }}" loading="lazy"
-                    class="w-full h-auto object-cover transform group-hover:scale-[1.03] transition duration-700 ease-out">
+                <div class="w-full aspect-auto overflow-hidden">
+                    <img src="{{ item.url }}" alt="{{ item.caption }}" loading="lazy"
+                        class="w-full h-full object-cover transform group-hover:scale-[1.03] transition duration-700 ease-out">
+                </div>
                 {% else %}
                 <div
                     class="relative w-full aspect-[3/4] sm:aspect-video flex items-center justify-center overflow-hidden bg-emerald-950">

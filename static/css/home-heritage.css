@@ -56,18 +56,94 @@
 }
 
 /* Glassmorphism Utilities */
-.glass-effect {
-    background: rgba(253, 251, 247, 0.8);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(180, 83, 9, 0.1);
+.glass-aura {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(255, 255, 255, 0.02);
+}
+
+.glass-card {
+    background: rgba(255, 255, 255, 0.85);
+    /* Slightly more opaque for readability */
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.1);
 }
 
 .glass-dark {
-    background: rgba(6, 78, 59, 0.85);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(212, 175, 55, 0.2);
+    background: rgba(2, 44, 34, 0.85);
+    /* Much darker for high contrast */
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4);
+}
+
+/* Bento Grid System */
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 220px;
+    /* Fixed base row height for consistency */
+    gap: 1.5rem;
+}
+
+.bento-item {
+    position: relative;
+    border-radius: 1.5rem;
+    overflow: hidden;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    height: 100%;
+    /* Ensure item fills the grid slot */
+    min-height: 220px;
+}
+
+.bento-item:hover {
+    transform: scale(1.02);
+    z-index: 10;
+}
+
+/* Bento Spans */
+.col-span-2 {
+    grid-column: span 2;
+}
+
+.col-span-3 {
+    grid-column: span 3;
+}
+
+.col-span-4 {
+    grid-column: span 4;
+}
+
+.row-span-2 {
+    grid-row: span 2;
+}
+
+.row-span-3 {
+    grid-row: span 3;
+}
+
+@media (max-width: 1024px) {
+    .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .bento-grid {
+        grid-template-columns: 1fr;
+        grid-auto-rows: minmax(200px, auto);
+    }
+
+    .col-span-2,
+    .col-span-3,
+    .col-span-4 {
+        grid-column: span 1;
+    }
 }
 
 /* Aurora Backdrop */
@@ -140,10 +216,11 @@
 
 /* Heritage Decorative Elements */
 .heritage-border {
-    border: 2px solid var(--heritage-green);
+    border: 1px solid rgba(2, 44, 34, 0.1);
     position: relative;
     padding: 2rem;
-    border-radius: 1rem;
+    border-radius: 1.5rem;
+    overflow: hidden;
 }
 
 .heritage-border::after {
@@ -249,10 +326,11 @@
     font-size: clamp(3rem, 8vw, 6rem);
     line-height: 1.1;
     margin-bottom: 1.5rem;
-    opacity: 0;
-    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-    transform: translateY(30px);
-    animation: fadeInUp 1s cubic-bezier(0.2, 0.6, 0.2, 1) forwards;
+    opacity: 1 !important;
+    /* Force visible */
+    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    /* Stronger shadow */
+    transform: translateY(0) !important;
 }
 
 .hero-subtitle {
@@ -350,6 +428,7 @@
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
     transition: transform 0.8s cubic-bezier(0.2, 0.6, 0.2, 1);
 }
 

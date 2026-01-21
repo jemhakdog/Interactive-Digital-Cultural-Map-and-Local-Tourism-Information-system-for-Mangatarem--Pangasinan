@@ -68,67 +68,141 @@
 {% endblock %}
 
 {% block content %}
-<!-- Hero Section - Premium Heritage Narrative -->
-<section class="hero-heritage">
-    <div class="hero-overlay"></div>
-    <!-- Parallax Image Background (Can be changed to video) -->
+<!-- Hero Section - Cinematic Glass Bento -->
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-emerald-950">
+    <!-- Immersive Background -->
     <div class="absolute inset-0 z-0">
         <img src="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DJI_0218.jpg" alt="Mangatarem Landscape"
-            class="w-full h-full object-cover">
+            class="w-full h-full object-cover scale-105 animate-slow-zoom">
+        <div class="absolute inset-0 bg-gradient-to-b from-emerald-950/40 via-transparent to-emerald-950"></div>
     </div>
 
-    <div class="hero-content-wrap">
-        <span class="hero-subtitle">Discover the Spirit of</span>
-        <h1 class="hero-title">Mangatarem</h1>
-        <p class="text-xl md:text-2xl mb-12 max-w-2xl mx-auto text-white/90 font-light leading-relaxed">
-            A tapestry of 82 barangays, woven with history, culture, and the timeless beauty of Pangasinan.
-        </p>
-        <div class="flex flex-wrap justify-center gap-6">
-            <a href="{{ url_for('public.map_view') }}" class="btn-heritage">
-                Explore the Map
-            </a>
-            <a href="#experiences"
-                class="btn-heritage-outline !text-white !border-white hover:!bg-white hover:!text-green-900">
-                The Curated Journey
-            </a>
+    <!-- Hero Glass Card -->
+    <div class="container mx-auto px-6 relative z-10">
+        <div class="max-w-4xl mx-auto glass-aura p-12 md:p-20 rounded-[2.5rem] text-center reveal">
+            <span
+                class="inline-block px-4 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-[0.2em] mb-8 border border-emerald-500/30">
+                Pangasinan's Hidden Sanctuary
+            </span>
+            <h1 class="hero-title text-white !mb-6 !transform-none !opacity-100">
+                Mangatarem
+            </h1>
+            <p class="text-xl md:text-2xl mb-12 text-emerald-50 font-light leading-relaxed max-w-2xl mx-auto">
+                Discover the 82 barangays of a town where history breathes and nature thrives in every corner.
+            </p>
+
+            <!-- Quick Action Bento -->
+            <div class="flex flex-col md:flex-row items-center justify-center gap-6">
+                <a href="{{ url_for('public.map_view') }}" class="btn-heritage group !rounded-full !px-10">
+                    Explore Interactive Map
+                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </a>
+                <form action="{{ url_for('public.search') }}" method="GET" class="relative group min-w-[300px]">
+                    <input type="text" name="q" placeholder="What are you looking for?"
+                        class="w-full bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white rounded-full px-8 py-4 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all">
+                    <button type="submit" class="absolute right-4 top-3 text-white/50 group-hover:text-emerald-400">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </button>
+                </form>
+            </div>
         </div>
+    </div>
+
+    <!-- Scroll Indicator -->
+    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 animate-bounce opacity-50">
+        <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
+        </svg>
     </div>
 </section>
 
-<!-- Heritage Spotlight - Grid breaking layout -->
-<section id="featured" class="py-32 bg-heritage-cream paper-texture">
+<!-- Stats Strip -->
+<div class="relative z-20 -mt-10 mb-20">
     <div class="container mx-auto px-6">
-        <div class="mb-24 reveal">
-            <span class="caption-serif">The Collection</span>
-            <h2 class="text-5xl md:text-6xl font-bold text-gray-900 mt-2">Heritage Spotlight</h2>
-            <p class="text-gray-600 max-w-xl text-lg mt-6 leading-relaxed">
-                A selection of the most significant cultural and natural landmarks that define our town's identity.
-            </p>
+        <div
+            class="glass-card !bg-white/90 p-8 md:p-12 rounded-[2rem] shadow-2xl flex flex-wrap justify-around gap-12 border border-white/50">
+            <div class="text-center group">
+                <span
+                    class="block text-4xl font-bold text-emerald-900 group-hover:scale-110 transition-transform">82</span>
+                <span class="text-xs uppercase tracking-widest text-emerald-600/60 font-bold">Barangays</span>
+            </div>
+            <div class="w-px h-12 bg-emerald-900/10 hidden md:block"></div>
+            <div class="text-center group">
+                <span
+                    class="block text-4xl font-bold text-emerald-900 group-hover:scale-110 transition-transform">1835</span>
+                <span class="text-xs uppercase tracking-widest text-emerald-600/60 font-bold">Established</span>
+            </div>
+            <div class="w-px h-12 bg-emerald-900/10 hidden md:block"></div>
+            <div class="text-center group">
+                <span
+                    class="block text-4xl font-bold text-emerald-900 group-hover:scale-110 transition-transform">150+</span>
+                <span class="text-xs uppercase tracking-widest text-emerald-600/60 font-bold">Heritage Sites</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bento Spotlight - Premium Heritage Collection -->
+<section id="featured" class="py-24 bg-heritage-cream paper-texture overflow-hidden">
+    <div class="container mx-auto px-6">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8 reveal">
+            <div class="max-w-2xl">
+                <span class="caption-serif">Curated Masterpieces</span>
+                <h2 class="text-5xl md:text-6xl font-bold text-emerald-950 mt-4 leading-tight">Heritage Spotlight</h2>
+                <p class="text-gray-600 text-lg mt-6 leading-relaxed">
+                    A collection of the most significant cultural and natural landmarks that define our town's identity.
+                </p>
+            </div>
+            <a href="{{ url_for('public.barangays') }}" class="btn-heritage-outline !rounded-full group">
+                Browse All Places
+                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3">
+                    </path>
+                </svg>
+            </a>
         </div>
 
         {% if featured and featured|length > 0 %}
-        <div class="spotlight-grid">
-            {% for attraction in featured %}
-            <div class="spotlight-card hover-lift reveal">
-                <div class="spotlight-img-wrap">
-                    <img src="{{ attraction.image_url }}" alt="{{ attraction.name }}" class="spotlight-img">
-                    <div class="absolute top-6 left-6 z-10">
-                        <span
-                            class="bg-white/90 backdrop-blur-md px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-green-900">
-                            {{ attraction.category }}
-                        </span>
-                    </div>
+        <div class="bento-grid min-h-[600px]">
+            {% for attraction in featured[:5] %}
+            <div
+                class="bento-item spotlight-card reveal group 
+                {% if loop.index == 1 %}col-span-2 row-span-2{% elif loop.index == 2 %}col-span-2 row-span-1{% elif loop.index == 3 %}col-span-1 row-span-1{% elif loop.index == 4 %}col-span-1 row-span-1{% elif loop.index == 5 %}col-span-2 row-span-1{% endif %}">
+                <img src="{{ attraction.image_url }}" alt="{{ attraction.name }}"
+                    class="w-full h-full object-cover spotlight-img">
+                <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/95 via-emerald-950/40 to-transparent">
                 </div>
-                <div class="spotlight-content">
-                    <h3 class="text-3xl font-bold mb-4 text-gray-900">{{ attraction.name }}</h3>
-                    <p class="text-gray-600 mb-8 line-clamp-3 leading-relaxed">{{ attraction.description }}</p>
+
+                <div class="absolute top-6 left-6">
+                    <span
+                        class="bg-emerald-500 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-white border border-emerald-400">
+                        {{ attraction.category }}
+                    </span>
+                </div>
+
+                <div class="absolute bottom-0 left-0 p-8 w-full group-hover:pb-10 transition-all">
+                    <h3
+                        class="{% if loop.index == 1 %}text-4xl{% else %}text-2xl{% endif %} font-bold text-white mb-3 leading-tight text-shadow-md">
+                        {{ attraction.name }}
+                    </h3>
+                    <p class="text-white/90 text-sm mb-6 line-clamp-2 font-medium">
+                        {{ attraction.description }}
+                    </p>
                     <a href="{{ url_for('public.attraction_detail', id=attraction.id) }}"
-                        class="inline-flex items-center text-green-800 font-bold group">
-                        <span class="border-b-2 border-green-800 pb-1 mr-4 group-hover:mr-6 transition-all">Explore
-                            Detail</span>
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                        class="inline-flex items-center text-emerald-300 hover:text-emerald-400 font-bold text-sm group/link">
+                        <span>Explore Story</span>
+                        <svg class="w-4 h-4 ml-2 group-hover/link:translate-x-1 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
+                            </path>
                         </svg>
                     </a>
                 </div>
@@ -136,155 +210,172 @@
             {% endfor %}
         </div>
         {% else %}
-        <div class="text-center py-24 border-2 border-dashed border-gray-200 reveal">
-            <p class="text-gray-400 italic">Finding the gems of Mangatarem...</p>
+        <div class="text-center py-24 glass-card border-dashed border-2 border-emerald-900/10 reveal">
+            <p class="text-gray-400 italic">Discovering gems in the digital archive...</p>
         </div>
         {% endif %}
     </div>
 </section>
 
 
-<!-- Curated Experiences - Editorial Journal Style -->
-<section id="experiences" class="py-32 bg-white">
+<!-- Curated Experiences - Modern Editorial Bento -->
+<section id="experiences" class="py-24 bg-white overflow-hidden">
     <div class="container mx-auto px-6">
-        <div class="experience-editorial">
+        <div class="mb-16 reveal">
+            <span class="caption-serif">Exploration Tracks</span>
+            <h2 class="text-4xl md:text-5xl font-bold text-emerald-950 mt-4 leading-tight">Curated Journeys</h2>
+        </div>
+
+        <div class="bento-grid">
             <!-- Experience 1: Heritage Walk -->
-            <div class="editorial-row reveal">
-                <div class="editorial-media">
-                    <img src="{{ url_for('static', filename='img/st_raymund_church.webp') }}"
-                        alt="St. Raymond de Penafort Church" class="media-main" loading="lazy" />
-                    <img src="{{ url_for('static', filename='img/daang_kalikasan.webp') }}" alt="Aerial view"
-                        class="media-accent" loading="lazy" />
+            <div class="bento-item col-span-2 row-span-2 reveal group">
+                <img src="{{ url_for('static', filename='img/st_raymund_church.webp') }}" alt="Heritage Walk"
+                    class="w-full h-full object-cover spotlight-img">
+                <div
+                    class="absolute inset-0 bg-emerald-950/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-10">
+                    <span class="caption-serif !text-emerald-400 mb-2">History & Architecture</span>
+                    <h3 class="text-3xl font-bold text-white mb-4">The Heritage Walk</h3>
+                    <p class="text-emerald-50 mb-8 font-light">Explore centuries-old structures that tell the story
+                        of our town's Spanish colonial legacy.</p>
+                    <a href="{{ url_for('public.map_view') }}"
+                        class="btn-heritage !rounded-full !py-3 !text-sm w-max">Start Journey</a>
                 </div>
-                <div class="editorial-text">
-                    <span class="caption-serif">Cultural Journey</span>
-                    <h3 class="text-4xl md:text-5xl font-bold mb-6 text-gray-900 leading-tight">The Heritage Walk</h3>
-                    <p class="text-gray-600 text-lg leading-relaxed mb-8">
-                        Step back in time and explore the Spanish colonial architecture that defines Mangatarem's rich
-                        history. Visit the iconic St. Raymond de Penafort Parish Church, built in the 1800s, and
-                        discover
-                        centuries-old structures that tell the story of our town's legacy.
-                    </p>
-                    <a href="{{ url_for('public.map_view') }}" class="btn-heritage-outline">Explore the Route</a>
+                <div class="absolute bottom-6 left-6 group-hover:opacity-0 transition-opacity">
+                    <h3 class="text-2xl font-bold text-white shadow-sm">Heritage Walk</h3>
                 </div>
             </div>
 
             <!-- Experience 2: Eco-Trail -->
-            <div class="editorial-row reveal">
-                <div class="editorial-media">
-                    <img src="{{ url_for('static', filename='img/manleluag_spring.webp') }}"
-                        alt="Manleluag Spring National Park" class="media-main" loading="lazy" />
-                    <img src="{{ url_for('static', filename='img/manleluag_spring.webp') }}" alt="Spring detail"
-                        class="media-accent" loading="lazy" />
+            <div class="bento-item col-span-2 row-span-2 reveal group">
+                <img src="{{ url_for('static', filename='img/manleluag_spring.webp') }}" alt="Eco-Trail"
+                    class="w-full h-full object-cover spotlight-img">
+                <div
+                    class="absolute inset-0 bg-emerald-950/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-10">
+                    <span class="caption-serif !text-emerald-400 mb-2">Nature & Expedition</span>
+                    <h3 class="text-3xl font-bold text-white mb-4">The Eco-Trail</h3>
+                    <p class="text-emerald-50 mb-8 font-light">Immerse yourself in lush forests and therapeutic hot
+                        springs at Manleluag Spring National Park.</p>
+                    <a href="{{ url_for('public.map_view') }}"
+                        class="btn-heritage !rounded-full !py-3 !text-sm w-max">Plan Your Trek</a>
                 </div>
-                <div class="editorial-text">
-                    <span class="caption-serif">Nature Expedition</span>
-                    <h3 class="text-4xl md:text-5xl font-bold mb-6 text-gray-900 leading-tight">The Eco-Trail</h3>
-                    <p class="text-gray-600 text-lg leading-relaxed mb-8">
-                        Immerse yourself in Mangatarem's natural wonders. Trek through lush forests to hidden
-                        waterfalls,
-                        soak in therapeutic hot springs at Manleluag Spring National Park, and experience the
-                        breathtaking
-                        views from the Zambales Mountain Range.
-                    </p>
-                    <a href="{{ url_for('public.map_view') }}" class="btn-heritage-outline">Plan Your Trek</a>
+                <div class="absolute bottom-6 left-6 group-hover:opacity-0 transition-opacity">
+                    <h3 class="text-2xl font-bold text-white shadow-sm">Eco-Trail</h3>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Interactive Map Teaser - Premium Integrated -->
-<section class="map-teaser-full">
-    <div class="map-teaser-bg"></div>
-    <div class="container mx-auto px-6 text-center relative z-10">
-        <div class="reveal">
-            <span class="caption-serif !text-heritage-gold">Digital Atlas</span>
-            <h2 class="text-5xl md:text-6xl font-bold mb-8 text-white">Navigate the Legacy</h2>
-            <p class="text-xl mb-24 max-w-2xl mx-auto text-white/80 font-light leading-relaxed">
-                Our interactive cultural map provides a window into the 82 barangays. Filter by heritage sites, local
-                eateries, or natural landmarks.
+<!-- Interactive Map Teaser - Premium Glass Bento Integration -->
+<section class="py-24 bg-emerald-950 relative overflow-hidden">
+    <div class="aurora-bg absolute inset-0">
+        <div class="aurora-glow glow-1"></div>
+        <div class="aurora-glow glow-2"></div>
+    </div>
+
+    <div class="container mx-auto px-6 relative z-10">
+        <div class="bento-grid">
+            <div
+                class="col-span-4 row-span-3 glass-aura rounded-[3rem] p-8 md:p-16 flex flex-col md:flex-row items-center gap-16 reveal">
+                <div class="md:w-1/2">
+                    <span class="caption-serif !text-emerald-400">Digital Atlas</span>
+                    <h2 class="text-5xl md:text-6xl font-bold text-white mt-4 mb-8 leading-tight">Navigate the Legacy
+                    </h2>
+                    <p class="text-emerald-50 text-lg mb-12 font-light leading-relaxed">
+                        Our interactive cultural map provides a window into the 82 barangays. Filter by heritage sites,
+                        local eateries, or natural landmarks.
+                    </p>
+                    <a href="{{ url_for('public.map_view') }}" class="btn-heritage !rounded-full !px-12 group">
+                        Open Map Interface
+                        <svg class="w-5 h-5 ml-2 group-hover:rotate-45 transition-transform" fill="none"
+                            stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
+                        </svg>
+                    </a>
+                </div>
+                <div class="md:w-1/2 relative group">
+                    <div
+                        class="absolute -inset-4 bg-emerald-500/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity">
+                    </div>
+                    <img src="{{ url_for('static', filename='img/mangatarem_map_teaser.webp') }}" alt="Map Preview"
+                        class="w-full h-auto aspect-video object-cover rounded-2xl border border-white/10 shadow-2xl relative z-10 transform group-hover:scale-[1.02] transition-transform duration-500">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Community & Events Bento -->
+<section class="py-24 bg-heritage-cream paper-texture">
+    <div class="container mx-auto px-6">
+        <div class="bento-grid">
+            <!-- Events Card -->
+            <div class="col-span-2 row-span-2 glass-card !bg-white p-12 border-l-8 border-emerald-600 reveal group">
+                <span class="caption-serif">Live Culture</span>
+                <h3 class="text-4xl font-bold text-emerald-950 mt-4 mb-6 leading-tight">Upcoming Festivals</h3>
+                <p class="text-gray-600 mb-10 leading-relaxed font-light">
+                    Celebrate the vibrant traditions that bring our 82 barangays together in community and spirit.
+                </p>
+                <a href="{{ url_for('public.events') }}"
+                    class="inline-flex items-center text-emerald-700 font-bold group/link">
+                    <span class="border-b-2 border-emerald-700 pb-1">View Calendar</span>
+                    <svg class="w-5 h-5 ml-4 group-hover/link:translate-x-2 transition-transform" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </a>
+            </div>
+
+            <!-- Gallery Card -->
+            <div class="col-span-2 row-span-2 glass-card !bg-white p-12 border-l-8 border-emerald-300 reveal group">
+                <span class="caption-serif">Visual Archive</span>
+                <h3 class="text-4xl font-bold text-emerald-950 mt-4 mb-6 leading-tight">Community Stories</h3>
+                <p class="text-gray-600 mb-10 leading-relaxed font-light">
+                    Explore a curated collection of memories and moments shared by our residents and guests.
+                </p>
+                <a href="{{ url_for('public.gallery') }}"
+                    class="inline-flex items-center text-emerald-700 font-bold group/link">
+                    <span class="border-b-2 border-emerald-700 pb-1">Browse Gallery</span>
+                    <svg class="w-5 h-5 ml-4 group-hover/link:translate-x-2 transition-transform" fill="none"
+                        stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Newsletter Section - Premium Glassmorphism -->
+<section class="py-32 bg-emerald-950 relative overflow-hidden">
+    <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/felt.png')]"></div>
+    <div class="container mx-auto px-6 text-center relative z-10 reveal">
+        <div class="max-w-3xl mx-auto glass-aura p-16 rounded-[3rem] border-white/5 shadow-inner">
+            <span class="caption-serif !text-emerald-400 mb-6">Stay Connected</span>
+            <h2 class="text-4xl md:text-5xl font-bold text-white mb-8">Join the Digital Archive</h2>
+            <p class="text-emerald-50 text-lg mb-12 font-light max-w-xl mx-auto leading-relaxed">
+                Receive the latest cultural discoveries, festival schedules, and community heritage stories directly in
+                your inbox.
             </p>
 
-            <div
-                class="relative max-w-4xl mx-auto mb-16 rounded-lg overflow-hidden shadow-2xl heritage-border border-white/20 p-0">
-                <img src="{{ url_for('static', filename='img/mangatarem_map_teaser.webp') }}" alt="Map Preview"
-                    class="w-full h-auto block opacity-80" loading="lazy" />
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <a href="{{ url_for('public.map_view') }}" class="btn-heritage">
-                        Open Interactive Map
-                    </a>
+            <form class="max-w-md mx-auto group" onsubmit="return handleNewsletterSubmit(event)">
+                <div
+                    class="relative flex items-center p-1.5 bg-white/10 hover:bg-white/15 border border-white/20 focus-within:ring-2 focus-within:ring-emerald-500/50 rounded-full transition-all">
+                    <input type="email"
+                        class="w-full pl-10 pr-2 py-3 bg-transparent text-white placeholder-white focus:outline-none"
+                        placeholder="Enter your email" required aria-label="Email address" />
+                    <button type="submit"
+                        class="shrink-0 px-8 py-3 bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold rounded-full transition-all text-sm uppercase tracking-widest">
+                        Join
+                    </button>
                 </div>
-            </div>
+            </form>
+            <p class="text-[10px] mt-8 text-white/50 tracking-[0.3em] uppercase">No spam. Only pure Mangatarem heritage.
+            </p>
         </div>
-    </div>
-</section>
-
-<!-- Events & Gallery Teaser -->
-<section class="pt-48 pb-32 bg-heritage-cream">
-    <div class="container mx-auto px-6">
-        <div class="grid md:grid-cols-2 gap-16">
-            <div class="reveal">
-                <div class="bg-white p-12 border-l-4 border-heritage-gold shadow-xl">
-                    <span class="caption-serif">Live Culture</span>
-                    <h3 class="text-3xl font-bold text-gray-900 mb-6">Upcoming Festivals</h3>
-                    <p class="text-gray-600 mb-8 leading-relaxed">
-                        Don't miss the vibrant celebrations and cultural gatherings that bring our 82 barangays together
-                        in community and tradition.
-                    </p>
-                    <a href="{{ url_for('public.events') }}" class="text-green-900 font-bold group flex items-center">
-                        <span class="border-b-2 border-green-900 pb-1">View Calendar</span>
-                        <svg class="w-5 h-5 ml-4 group-hover:ml-6 transition-all" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-            <div class="reveal" style="transition-delay: 0.2s;">
-                <div class="bg-white p-12 border-l-4 border-heritage-green shadow-xl">
-                    <span class="caption-serif">Visual Archive</span>
-                    <h3 class="text-3xl font-bold text-gray-900 mb-6">Community Gallery</h3>
-                    <p class="text-gray-600 mb-8 leading-relaxed">
-                        Explore a curated collection of photographs and stories shared by our residents and visitors,
-                        capturing the soul of Mangatarem.
-                    </p>
-                    <a href="{{ url_for('public.gallery') }}" class="text-green-900 font-bold group flex items-center">
-                        <span class="border-b-2 border-green-900 pb-1">Browse Gallery</span>
-                        <svg class="w-5 h-5 ml-4 group-hover:ml-6 transition-all" fill="none" stroke="currentColor"
-                            viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                        </svg>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-
-<!-- Newsletter Section - Minimalist & Elegant -->
-<section class="py-24 bg-heritage-green text-white relative overflow-hidden">
-    <div class="absolute inset-0 opacity-10 bg-[url('https://www.transparenttextures.com/patterns/felt.png')]"></div>
-    <div class="container mx-auto px-6 text-center relative z-10" data-aos="fade-up">
-        <span class="caption-serif !text-heritage-gold mb-4">Stay Informed</span>
-        <h2 class="text-4xl md:text-5xl font-bold mb-6">Join the Digital Archive</h2>
-        <p class="text-lg mb-12 max-w-xl mx-auto text-white/80 font-light leading-relaxed">
-            Subscribe to receive updates on new cultural discoveries, upcoming festivals, and community stories.
-        </p>
-
-        <form class="max-w-md mx-auto flex flex-col sm:flex-row gap-4" onsubmit="return handleNewsletterSubmit(event)">
-            <input type="email"
-                class="flex-grow px-6 py-4 bg-white/10 border border-white/20 text-white placeholder-white/50 focus:outline-none focus:bg-white/20 transition-all rounded"
-                placeholder="Your email address" required aria-label="Email address" />
-            <button type="submit" class="btn-heritage !py-4">
-                Subscribe
-            </button>
-        </form>
-        <p class="text-xs mt-6 text-white/40 tracking-widest uppercase">We respect your privacy. No spam, just heritage.
-        </p>
     </div>
 </section>
 
@@ -325,7 +416,7 @@
             event.preventDefault();
             const email = event.target.querySelector('input[type="email"]').value;
             // TODO: Implement actual newsletter subscription logic
-            alert('Thank you for subscribing to the Mangatarem Digital Archive!');
+            alert('Welcome to the Mangatarem Digital Archive!');
             event.target.reset();
             return false;
         };
