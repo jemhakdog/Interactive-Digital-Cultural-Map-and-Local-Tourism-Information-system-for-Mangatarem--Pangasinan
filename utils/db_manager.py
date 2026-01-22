@@ -59,11 +59,11 @@ def get_database_uri():
     print("-" * 30 + "\n")
     if provider in ["supabase", "postgres", "postgresql"]:
         # Try individual environment variables first
-        user = os.getenv("user")
-        password = os.getenv("password")
-        host = os.getenv("host")
-        port = os.getenv("port", "5432")
-        dbname = os.getenv("dbname")
+        user = os.getenv("user", "").strip()
+        password = os.getenv("password", "").strip()
+        host = os.getenv("host", "").strip()
+        port = os.getenv("port", "5432").strip()
+        dbname = os.getenv("dbname", "").strip()
 
         # Automatic Transaction Pooler switch for Vercel + Supabase
         if os.getenv("VERCEL") and host and "supabase.com" in host and port == "5432":
