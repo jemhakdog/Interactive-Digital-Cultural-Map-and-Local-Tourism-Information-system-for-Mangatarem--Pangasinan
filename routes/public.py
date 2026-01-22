@@ -9,6 +9,27 @@ public_bp = Blueprint("public", __name__)
 logger = logging.getLogger(__name__)
 
 
+@public_bp.route("/test-supabase")
+def test_supabase():
+    """
+    Demonstrate using the Supabase Python client.
+    """
+    from flask import current_app
+    supabase = current_app.supabase
+    
+    if not supabase:
+        return "Supabase client not initialized. Check your environment variables.", 500
+        
+    try:
+        # Using the same table name from the user's sample
+        # Note: If 'todos' doesn't exist, this will error, but it demonstrates the API
+        response = supabase.table('attraction').select("*").limit(5).execute()
+        data = response.data
+        return {"status": "success", "data": data}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}, 500
+
+
 @public_bp.route("/")
 def index():
     """

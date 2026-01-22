@@ -73,12 +73,13 @@ def get_database_uri():
             port = "6543"
 
         if all([user, host, dbname]):
+            logger.info(f"Targeting Supabase host: {host}")
             if password:
                 password = quote_plus(password)
 
             db_url = f"postgresql+psycopg2://{user}:{password if password else ''}@{host}:{port}/{dbname}?sslmode=require"
 
-            logger.info(f"Constructed URI from components (Port: {port})")
+            logger.info(f"Constructed URI from components (Host: {host}, Port: {port})")
             return db_url
 
         # Fallback to DATABASE_URL env var
@@ -199,7 +200,9 @@ def get_supabase_client() -> Client:
         return None
 
     try:
-        return create_client(url, key)
+        client = create_client(url, key)
+        logger.info(f"Supabase client initialized for: {url}")
+        return client
     except Exception as e:
         logger.error(f"Failed to initialize Supabase client: {e}")
         return None

@@ -7,7 +7,7 @@ from flask_migrate import Migrate
 
 from models import db
 from routes import register_blueprints
-from utils.db_manager import get_database_uri, get_db_config
+from utils.db_manager import get_database_uri, get_db_config, get_supabase_client
 
 # Load environment variables from .ENV file
 # load_dotenv()
@@ -86,7 +86,9 @@ login_manager.login_view = "auth.login"
 login_manager.login_message = "Please log in to access this page."
 login_manager.login_message_category = "error"
 login_manager.init_app(app)
-
+# Initialize Supabase client
+supabase = get_supabase_client()
+app.supabase = supabase
 
 @login_manager.user_loader
 def load_user(user_id):
