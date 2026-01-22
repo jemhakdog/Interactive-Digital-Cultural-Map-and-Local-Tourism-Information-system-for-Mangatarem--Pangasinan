@@ -8,9 +8,9 @@ from flask_migrate import Migrate
 from models import db
 from routes import register_blueprints
 from utils.db_manager import get_database_uri, get_db_config, get_supabase_client
-
+from dotenv import load_dotenv
 # Load environment variables from .ENV file
-# load_dotenv()
+load_dotenv()
 
 # Determine if we are running on Vercel
 IS_VERCEL = "VERCEL" in os.environ

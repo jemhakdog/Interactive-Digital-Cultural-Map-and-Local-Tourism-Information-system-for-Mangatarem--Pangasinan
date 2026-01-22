@@ -44,7 +44,7 @@ def get_database_uri():
     - 'mysql'
     - 'sqlite' (default)
     """
-    provider = os.getenv("DB_PROVIDER", "sqlite").lower()
+    provider = os.getenv("DB_PROVIDER", "supabase").lower()
 
     # Check if we are on Vercel and DATABASE_URL is set - default to supabase if so
     if os.getenv("VERCEL") and os.getenv("DATABASE_URL") and provider == "sqlite":
