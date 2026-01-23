@@ -64,8 +64,18 @@ def get_database_uri():
         host = os.getenv("host", "").strip()
         port = os.getenv("port", "5432").strip()
         dbname = os.getenv("dbname", "").strip()
+        supabase_url = os.getenv("SUPABASE_URL", "")
+
+        # Extract Project ID from SUPABASE_URL if available
+        # Format: https://[project_id].supabase.co
+        project_id = ""
+        if supabase_url and "supabase.co" in supabase_url:
+            match = re.search(r"https?://([^.]+)\.supabase\.co", supabase_url)
+            if match:
+                project_id = match.group(1)
 
         # Automatic Transaction Pooler switch for Vercel + Supabase
+        # Always use 6543 on Vercel for Supabase to avoid connection exhaustion
         if os.getenv("VERCEL") and host and "supabase.com" in host and port == "5432":
             logger.info(
                 "Auto-switching to Supabase Transaction Pooler (Port 6543) for Vercel"
@@ -73,6 +83,11 @@ def get_database_uri():
             port = "6543"
 
         if all([user, host, dbname]):
+            # Fix user formatting for Supabase (requires 'postgres.[project_id]' for pooler)
+            if project_id and user == "postgres":
+                user = f"postgres.{project_id}"
+                logger.info(f"Fixed Supabase user format: {user}")
+
             logger.info(f"Targeting Supabase host: {host}")
             if password:
                 password = quote_plus(password)
