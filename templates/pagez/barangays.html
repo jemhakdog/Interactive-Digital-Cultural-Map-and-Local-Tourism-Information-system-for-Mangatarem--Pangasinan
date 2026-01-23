@@ -9,7 +9,7 @@
 
 {% block head %}
 <!-- AOS Library for Scroll Animations -->
-<link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/aos/aos.css') }}" />
 <!-- Home Page Specific Styles (contains Heritage System) -->
 <link rel="stylesheet" href="{{ url_for('static', filename='css/home-heritage.css') }}">
 
@@ -294,9 +294,9 @@
 </section>
 
 <!-- Scripts -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-<script src="https://unpkg.com/aos@next/dist/aos.js" defer></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet/leaflet.css') }}" />
+<script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/aos/aos.js') }}" defer></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {

@@ -315,8 +315,8 @@
 
 <!-- Map Scripts Integration -->
 {% if attractions %}
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet/leaflet.css') }}" />
+<script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js') }}"></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const map = L.map('barangay-map').setView([{{ center_lat }}, {{ center_lng }}], 14);

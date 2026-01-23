@@ -13,15 +13,8 @@
     <!-- Custom CSS (Local - Uncomment after running: npm run build:css) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='vendor/google/fonts.css') }}">
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Lora:ital,wght@0,400..700;1,400..700&display=swap"
-        rel="stylesheet">
-
-    <link rel="dns-prefetch" href="https://unpkg.com">
-    <link rel="dns-prefetch" href="https://cdn.jsdelivr.net">
 
     <!-- SEO Meta Tags -->
     {% block meta_description %}
@@ -358,7 +351,7 @@
     {% endblock %}
 
     {% block scripts %}{% endblock %}
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11" defer></script>
+    <script src="{{ url_for('static', filename='vendor/sweetalert2/sweetalert2.all.min.js') }}" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             // Handle Flask Flash Messages with SweetAlert2
