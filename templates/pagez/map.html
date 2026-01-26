@@ -270,7 +270,7 @@
             </button>
 
             <!-- Near Me Button -->
-            <button id="locate-me" class="bg-white rounded-lg shadow-md p-2 cursor-pointer hover:bg-green-50 transition"
+            <button id="locate-me" class="bg-white rounded-lg shadow-md p-2 cursor-pointer hover:bg-green-50 transition mb-2"
                 title="Find my location">
                 <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -279,6 +279,22 @@
                         d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                 </svg>
             </button>
+
+            <!-- Map Style Switcher -->
+            <div id="style-switcher" class="bg-white rounded-lg shadow-md p-1 flex flex-col gap-1 border border-gray-100">
+                <button onclick="changeMapStyle('streets-v12')" class="style-btn active p-2 rounded hover:bg-green-50 transition flex flex-col items-center gap-1 group" title="Streets">
+                    <div class="w-8 h-8 rounded bg-blue-100 border border-blue-200 group-hover:border-green-500 transition shadow-sm"></div>
+                    <span class="text-[9px] font-bold text-gray-500 uppercase">Map</span>
+                </button>
+                <button onclick="changeMapStyle('satellite-streets-v12')" class="style-btn p-2 rounded hover:bg-green-50 transition flex flex-col items-center gap-1 group" title="3D Satellite">
+                    <div class="w-8 h-8 rounded bg-green-800 border border-green-900 group-hover:border-green-500 transition shadow-sm"></div>
+                    <span class="text-[9px] font-bold text-gray-500 uppercase">3D Sat</span>
+                </button>
+                <button onclick="changeMapStyle('outdoors-v12')" class="style-btn p-2 rounded hover:bg-green-50 transition flex flex-col items-center gap-1 group" title="Outdoors">
+                    <div class="w-8 h-8 rounded bg-emerald-100 border border-emerald-200 group-hover:border-green-500 transition shadow-sm"></div>
+                    <span class="text-[9px] font-bold text-gray-500 uppercase">Trail</span>
+                </button>
+            </div>
         </div>
     </div>
 
