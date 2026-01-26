@@ -163,7 +163,10 @@ with app.app_context():
 # Make config available in all templates
 @app.context_processor
 def inject_config():
-    return dict(config=app.config)
+    return dict(
+        config=app.config,
+        mapbox_token=os.environ.get("mapbox_token", "")
+    )
 
 
 # Session Persistence Handler

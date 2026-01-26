@@ -60,6 +60,12 @@ python app.py
 ```
 The application will be available at `http://127.0.0.1:5000`.
 
+## 📚 Documentation
+Detailed documentation is available in the [docs/](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/README.md) directory:
+- [Architecture Guide](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/architecture.md)
+- [User Manual](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/user_manual.md)
+- [Administrative Guide](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/admin_guide.md)
+
 ## 📂 Project Structure
 - `/app.py`: Main application entry point.
 - `/models.py`: Database schema and models.

@@ -286,14 +286,14 @@
 {% endblock %}
 
 {% block scripts %}
-<!-- Leaflet Library -->
-<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet/leaflet.css') }}" />
-<script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js') }}"></script>
+<!-- Mapbox GL JS -->
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
 
-<!-- Leaflet MarkerCluster Plugin -->
-<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet-markercluster/MarkerCluster.css') }}" />
-<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet-markercluster/MarkerCluster.Default.css') }}" />
-<script src="{{ url_for('static', filename='vendor/leaflet-markercluster/leaflet.markercluster.js') }}"></script>
+<!-- Pass Mapbox Token to JavaScript -->
+<script>
+    window.MAPBOX_TOKEN = "{{ mapbox_token }}";
+</script>
 
-<script src="{{ url_for('static', filename='js/map.min.js' if not debug else 'js/map.js') }}"></script>
+<script src="{{ url_for('static', filename='js/mapbox-map.js') }}"></script>
 {% endblock %}
