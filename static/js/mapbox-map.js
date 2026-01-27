@@ -849,4 +849,99 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     };
 
+    // ========================================
+    // 17. OFFLINE MAP DOWNLOAD LOGIC
+    // ========================================
+    const offlineDownloadBtn = document.getElementById('offline-download-btn');
+    const downloadCard = document.getElementById('download-card');
+    const downloadProgressBar = document.getElementById('download-progress-bar');
+    const downloadStatus = document.getElementById('download-status');
+    const downloadPercentage = document.getElementById('download-percentage');
+    const cancelDownloadBtn = document.getElementById('cancel-download-btn');
+
+    // Mangatarem Bounding Box
+    const MANGATAREM_BBOX = [120.14, 15.71, 120.37, 15.86];
+
+    function lng2tile(lon, zoom) {
+        return Math.floor((lon + 180) / 360 * Math.pow(2, zoom));
+    }
+
+    function lat2tile(lat, zoom) {
+        return Math.floor((1 - Math.log(Math.tan(lat * Math.PI / 180) + 1 / Math.cos(lat * Math.PI / 180)) / Math.PI) / 2 * Math.pow(2, zoom));
+    }
+
+    function calculateTileUrls(bbox, minZoom, maxZoom) {
+        const urls = [];
+        const accessToken = mapboxgl.accessToken;
+        const styleId = 'streets-v12'; // Default style for offline
+
+        for (let z = minZoom; z <= maxZoom; z++) {
+            const minX = lng2tile(bbox[0], z);
+            const maxX = lng2tile(bbox[2], z);
+            const minY = lat2tile(bbox[3], z);
+            const maxY = lat2tile(bbox[1], z);
+
+            for (let x = minX; x <= maxX; x++) {
+                for (let y = minY; y <= maxY; y++) {
+                    // Vector Tiles
+                    urls.push(`https://api.mapbox.com/v4/mapbox.mapbox-streets-v8/${z}/${x}/${y}.vector.pbf?access_token=${accessToken}`);
+                    // Glyph/Font assets (subset)
+                    if (urls.length % 50 === 0) {
+                        urls.push(`https://api.mapbox.com/fonts/v1/mapbox/DIN%20Offc%20Pro%20Medium,Arial%20Unicode%20MS%20Bold/0-255.pbf?access_token=${accessToken}`);
+                    }
+                }
+            }
+        }
+        return urls;
+    }
+
+    if (offlineDownloadBtn) {
+        offlineDownloadBtn.addEventListener('click', () => {
+            downloadCard.classList.remove('hidden');
+            downloadStatus.textContent = 'Calculating tiles...';
+            
+            const tileUrls = calculateTileUrls(MANGATAREM_BBOX, 13, 16);
+            const totalTiles = tileUrls.length;
+            let downloadedCount = 0;
+
+            downloadStatus.textContent = `Downloading ${totalTiles} tiles...`;
+
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'PREFETCH_TILES',
+                    urls: tileUrls
+                });
+
+                // Listen for progress
+                const progressHandler = (event) => {
+                    if (event.data && event.data.type === 'TILES_PROGRESS') {
+                        downloadedCount++;
+                        const percent = Math.round((downloadedCount / totalTiles) * 100);
+                        downloadProgressBar.style.width = `${percent}%`;
+                        downloadPercentage.textContent = `${percent}%`;
+                        
+                        if (downloadedCount >= totalTiles) {
+                            downloadStatus.textContent = 'Download Complete!';
+                            navigator.serviceWorker.removeEventListener('message', progressHandler);
+                            setTimeout(() => {
+                                downloadCard.classList.add('hidden');
+                            }, 2000);
+                        }
+                    }
+                };
+
+                navigator.serviceWorker.addEventListener('message', progressHandler);
+            } else {
+                downloadStatus.textContent = 'Service Worker not ready.';
+            }
+        });
+    }
+
+    if (cancelDownloadBtn) {
+        cancelDownloadBtn.addEventListener('click', () => {
+            downloadCard.classList.add('hidden');
+        });
+    }
+
 });
+

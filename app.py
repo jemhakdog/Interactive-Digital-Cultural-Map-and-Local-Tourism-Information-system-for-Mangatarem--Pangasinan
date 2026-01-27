@@ -181,6 +181,17 @@ def make_session_permanent():
 # Register all blueprints
 register_blueprints(app)
 
+@app.route('/sw.js')
+def serve_sw():
+    from flask import send_from_directory
+    return send_from_directory(static_dir, 'sw.js', mimetype='application/javascript')
+
+@app.route('/manifest.json')
+def serve_manifest():
+    from flask import send_from_directory
+    return send_from_directory(static_dir, 'manifest.json', mimetype='application/json')
+
+
 
 @app.after_request
 def add_security_headers(response):

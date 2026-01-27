@@ -1,0 +1,143 @@
+<mxfile host="app.diagrams.net" version="29.3.4">
+  <diagram name="Level 0 - Context Diagram" id="DFD-L0-Context">
+    <mxGraphModel dx="1800" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1600" pageHeight="1200" background="#ffffff" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        
+        <!-- Title -->
+        <mxCell id="title-l0" value="Level 0: Context Diagram - Interactive Digital Cultural Map &amp; Tourism Information System" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontStyle=1;fontSize=18;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="400" y="20" width="800" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- External Entities (Rectangles) -->
+        <!-- Tourist/Public User -->
+        <mxCell id="ee-tourist" value="Tourist / Public User" style="shape=rectangle;rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontStyle=1;fontSize=14;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="80" y="300" width="180" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Barangay Contributor -->
+        <mxCell id="ee-contributor" value="Barangay Contributor" style="shape=rectangle;rounded=0;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontStyle=1;fontSize=14;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="80" y="500" width="180" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Administrator -->
+        <mxCell id="ee-admin" value="System Administrator" style="shape=rectangle;rounded=0;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontStyle=1;fontSize=14;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="1320" y="300" width="180" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Google OAuth -->
+        <mxCell id="ee-google" value="Google OAuth Service" style="shape=rectangle;rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1;fontSize=14;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="1320" y="500" width="180" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Mapbox API -->
+        <mxCell id="ee-mapbox" value="Mapbox API" style="shape=rectangle;rounded=0;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=1;fontSize=14;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="700" y="700" width="180" height="80" as="geometry" />
+        </mxCell>
+        
+        <!-- Central Process (Circle) -->
+        <mxCell id="p0" value="0&#xa;&#xa;Interactive Digital Cultural Map&#xa;&amp; Tourism Information System" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=1;fontSize=12;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="600" y="300" width="380" height="180" as="geometry" />
+        </mxCell>
+        
+        <!-- Data Flows -->
+        <!-- Tourist to System -->
+        <mxCell id="df-t1" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#000000;" edge="1" parent="1" source="ee-tourist" target="p0">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="df-t1-label" value="Search Query, Map Request,&#xa;Attraction/Event View Request" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#000000;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="300" y="280" width="180" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- System to Tourist -->
+        <mxCell id="df-t2" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#000000;" edge="1" parent="1" source="p0" target="ee-tourist">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="400" y="380" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="df-t2-label" value="Map Data, Attraction Details,&#xa;Event Info, Gallery Items" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#000000;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="300" y="380" width="180" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Contributor to System -->
+        <mxCell id="df-c1" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#000000;" edge="1" parent="1" source="ee-contributor" target="p0">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="df-c1-label" value="Attraction/Event/Gallery Submissions,&#xa;Barangay Profile Updates" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#000000;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="310" y="490" width="200" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- System to Contributor -->
+        <mxCell id="df-c2" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#000000;" edge="1" parent="1" source="p0" target="ee-contributor">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="df-c2-label" value="Dashboard Data,&#xa;Submission Status" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#000000;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="310" y="560" width="150" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Admin to System -->
+        <mxCell id="df-a1" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#000000;" edge="1" parent="1" source="ee-admin" target="p0">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="df-a1-label" value="Approval/Rejection Decisions,&#xa;User Management Commands" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#000000;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="280" width="180" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- System to Admin -->
+        <mxCell id="df-a2" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#000000;" edge="1" parent="1" source="p0" target="ee-admin">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="df-a2-label" value="Pending Approvals, Analytics,&#xa;System Statistics" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#000000;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="370" width="180" height="40" as="geometry" />
+        </mxCell>
+        
+        <!-- Google to System -->
+        <mxCell id="df-g1" value="" style="endArrow=classic;startArrow=classic;html=1;strokeWidth=2;strokeColor=#000000;" edge="1" parent="1" source="ee-google" target="p0">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="df-g1-label" value="OAuth Token / User Info" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#000000;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="1050" y="500" width="150" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Mapbox to System -->
+        <mxCell id="df-m1" value="" style="endArrow=classic;startArrow=classic;html=1;strokeWidth=2;strokeColor=#000000;" edge="1" parent="1" source="ee-mapbox" target="p0">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="df-m1-label" value="Map Tiles, Geocoding Data" style="text;html=1;align=center;verticalAlign=middle;fontSize=10;fontColor=#000000;fillColor=#ffffff;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="820" y="600" width="160" height="30" as="geometry" />
+        </mxCell>
+        
+        <!-- Legend -->
+        <mxCell id="legend-box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="80" y="80" width="320" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-title" value="Legend" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontStyle=1;fontSize=14;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="180" y="85" width="100" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-ee" value="" style="shape=rectangle;rounded=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="100" y="120" width="40" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-ee-text" value="External Entity" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="150" y="120" width="120" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-process" value="" style="ellipse;fillColor=#fff2cc;strokeColor=#d6b656;" vertex="1" parent="1">
+          <mxGeometry x="100" y="150" width="40" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-process-text" value="Process" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="150" y="150" width="120" height="25" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-df" value="" style="endArrow=classic;html=1;strokeWidth=2;strokeColor=#000000;" edge="1" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="100" y="195" as="sourcePoint" />
+            <mxPoint x="140" y="195" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="legend-df-text" value="Data Flow" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=11;fontColor=#000000;" vertex="1" parent="1">
+          <mxGeometry x="150" y="180" width="120" height="25" as="geometry" />
+        </mxCell>
+        
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

@@ -45,7 +45,9 @@
     <meta property="twitter:image" content="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DJI_0218.jpg">
     {% endblock %}
 
+    <link rel="manifest" href="/manifest.json">
     {% block head %}{% endblock %}
+
 </head>
 
 <body class="bg-gray-50 text-gray-800 flex flex-col {% block body_height %}min-h-screen{% endblock %}">
@@ -404,6 +406,17 @@
             })
         }
     </script>
+    <script>
+        // Register Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(reg => console.log('Service Worker registered:', reg.scope))
+                    .catch(err => console.log('Service Worker registration failed:', err));
+            });
+        }
+    </script>
 </body>
+
 
 </html>

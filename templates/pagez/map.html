@@ -294,9 +294,37 @@
                     <div class="w-8 h-8 rounded bg-emerald-100 border border-emerald-200 group-hover:border-green-500 transition shadow-sm"></div>
                     <span class="text-[9px] font-bold text-gray-500 uppercase">Trail</span>
                 </button>
+                <div class="border-t border-gray-100 my-1"></div>
+                <button id="offline-download-btn" class="p-2 rounded hover:bg-blue-50 transition flex flex-col items-center gap-1 group" title="Download Offline Map">
+                    <div class="w-8 h-8 rounded bg-blue-50 border border-blue-200 group-hover:border-blue-500 transition shadow-sm flex items-center justify-center">
+                        <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                    </div>
+                    <span class="text-[9px] font-bold text-gray-500 uppercase">Offline</span>
+                </button>
             </div>
         </div>
     </div>
+
+    <!-- Offline Download Progress Card -->
+    <div id="download-card" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 bg-white rounded-2xl shadow-2xl p-6 z-[500] border border-gray-100">
+        <h3 class="text-lg font-bold text-gray-900 mb-2">Offline Map</h3>
+        <p class="text-sm text-gray-500 mb-4">Downloading Mangatarem map tiles for offline use. This area is approximately 213 sq km.</p>
+        
+        <div class="w-full bg-gray-100 rounded-full h-2.5 mb-1">
+            <div id="download-progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+        </div>
+        <div class="flex justify-between text-[10px] text-gray-400 font-bold uppercase mb-6">
+            <span id="download-status">Initializing...</span>
+            <span id="download-percentage">0%</span>
+        </div>
+
+        <button id="cancel-download-btn" class="w-full py-2 text-sm font-bold text-gray-500 hover:text-gray-700 transition">
+            Close
+        </button>
+    </div>
+
 
 </div>
 {% endblock %}
