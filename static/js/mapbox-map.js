@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Add navigation controls
-    map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+    map.addControl(new mapboxgl.NavigationControl(), 'top-left');
 
     // Force resize calculation for mobile layout
     map.on('load', () => {
