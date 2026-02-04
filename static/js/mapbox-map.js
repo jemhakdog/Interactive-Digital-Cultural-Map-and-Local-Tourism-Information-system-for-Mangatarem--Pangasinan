@@ -23,6 +23,11 @@ document.addEventListener('DOMContentLoaded', function () {
     // Add navigation controls
     map.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
+    // Force resize calculation for mobile layout
+    map.on('load', () => {
+        setTimeout(() => map.resize(), 500);
+    });
+
     // ========================================
     // 2. CATEGORY ICON CONFIGURATION
     // ========================================

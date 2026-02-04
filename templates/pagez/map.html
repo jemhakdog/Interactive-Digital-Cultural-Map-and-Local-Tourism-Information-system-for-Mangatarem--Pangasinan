@@ -16,6 +16,8 @@
 <meta property="og:description"
     content="Explore Mangatarem's 82 barangays, attractions, and hidden gems on our interactive digital map.">
 
+<!-- Mapbox GL JS CSS (Moved to head for better container sizing) -->
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/map-custom.css') }}">
 {% endblock %}
 
@@ -193,7 +195,7 @@
     </div>
 
     <!-- Map Container with Floating Controls -->
-    <div class="relative flex-1 h-2/3 md:h-full order-1 md:order-2">
+    <div class="relative flex-1 order-1 md:order-2 h-[400px] md:h-full">
         <div id="map" class="w-full h-full z-0"></div>
 
         <!-- Place Details Card (Floating) -->
@@ -331,7 +333,6 @@
 
 {% block scripts %}
 <!-- Mapbox GL JS -->
-<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
 
 <!-- Pass Mapbox Token to JavaScript -->
