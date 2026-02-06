@@ -217,7 +217,7 @@ def get_database_uri() -> str:
     logger.info(f"Configuring database for provider: {provider}")
     
     # Console output for visibility
-    print("\n--- DATABASE CONFIGURATION ---")
+    print("\n🚀 DATABASE CONFIGURATION:")
     print(f"   Provider: {provider.upper()}")
     print(f"   Status: {'READY' if provider != 'sqlite' else 'LOCAL (SQLite)'}")
     print("-" * 30 + "\n")

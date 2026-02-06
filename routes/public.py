@@ -139,7 +139,7 @@ def attraction_detail(id):
     # Fetch related gallery items (if any, matching by barangay since we don't have direct link in GalleryItem)
     # Note: GalleryItem joins with User to check for barangay
     related_gallery = (
-        GalleryItem.query.join(User)
+        GalleryItem.query.join(User, GalleryItem.user_id == User.id)
         .filter(User.barangay == attraction.barangay, GalleryItem.status == "approved")
         .limit(6)
         .all()
@@ -216,7 +216,7 @@ def gallery():
     log_query("public", "gallery", "Fetching unique barangays for gallery")
     barangays = (
         db.session.query(User.barangay)
-        .join(GalleryItem)
+        .join(GalleryItem, User.id == GalleryItem.user_id)
         .filter(GalleryItem.status == "approved", User.barangay is not None)
         .distinct()
         .order_by(User.barangay)
@@ -473,7 +473,7 @@ def barangay_profile(name):
 
     # For gallery, we need to join with User since GalleryItem doesn't have barangay field
     gallery_items = (
-        GalleryItem.query.join(User)
+        GalleryItem.query.join(User, GalleryItem.user_id == User.id)
         .filter(User.barangay == name, GalleryItem.status == "approved")
         .order_by(GalleryItem.uploaded_at.desc())
         .all()

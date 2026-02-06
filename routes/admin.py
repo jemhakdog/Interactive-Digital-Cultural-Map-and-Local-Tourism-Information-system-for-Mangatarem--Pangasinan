@@ -126,7 +126,7 @@ def _get_pending_items() -> Dict[str, any]:
     return {
         "users": User.query.filter_by(is_approved=False, role="contributor").all(),
         "gallery": GalleryItem.query.filter_by(status="pending").all(),
-        "reviews": Review.query.filter_by(status="pending").join(User).join(Attraction).all(),
+        "reviews": Review.query.filter_by(status="pending").join(User, Review.user_id == User.id).join(Attraction, Review.attraction_id == Attraction.id).all(),
     }
 
 
@@ -142,7 +142,7 @@ def _get_top_rated_attractions(limit: int = 5) -> List[Tuple[Attraction, float]]
     """
     return (
         db.session.query(Attraction, func.avg(Review.rating).label("avg_rating"))
-        .join(Review)
+        .join(Review, Attraction.id == Review.attraction_id)
         .group_by(Attraction.id)
         .order_by(func.avg(Review.rating).desc())
         .limit(limit)
