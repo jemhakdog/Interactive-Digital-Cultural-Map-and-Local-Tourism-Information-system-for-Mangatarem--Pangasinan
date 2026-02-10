@@ -64,6 +64,11 @@
             background-position: 200% center;
         }
     }
+
+    .google-btn-wrapper {
+        max-width: 100%;
+        overflow: hidden;
+    }
 </style>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 {% endblock %}
@@ -176,15 +181,43 @@
                 </div>
 
                 <!-- Google Login Component -->
-                <div class="flex justify-center">
+                <div class="flex justify-center google-btn-wrapper" id="google-btn-container">
                     <div id="g_id_onload"
                         data-client_id="794547070676-80dbt1j3a724hacci5684s7b7v93j1fh.apps.googleusercontent.com"
                         data-login_uri="{{ url_for('auth.google_login', _external=True) }}" data-auto_prompt="false">
                     </div>
-                    <div class="g_id_signin" data-type="standard" data-shape="pill" data-theme="filled_black"
-                        data-text="signin_with" data-size="large" data-logo_alignment="left" data-width="384">
+                    <div class="g_id_signin" id="g_id_signin_btn" data-type="standard" data-shape="pill" data-theme="filled_black"
+                        data-text="signin_with" data-size="large" data-logo_alignment="left">
                     </div>
                 </div>
+                <script>
+                    (function() {
+                        function setGoogleBtnWidth() {
+                            var container = document.getElementById('google-btn-container');
+                            var btn = document.getElementById('g_id_signin_btn');
+                            if (container && btn) {
+                                var w = Math.min(384, container.offsetWidth);
+                                btn.setAttribute('data-width', w);
+                            }
+                        }
+                        setGoogleBtnWidth();
+                        window.addEventListener('resize', function() {
+                            setGoogleBtnWidth();
+                            // Re-render the button on resize
+                            if (window.google && window.google.accounts) {
+                                var btn = document.getElementById('g_id_signin_btn');
+                                if (btn) {
+                                    btn.innerHTML = '';
+                                    google.accounts.id.renderButton(btn, {
+                                        type: 'standard', shape: 'pill', theme: 'filled_black',
+                                        text: 'signin_with', size: 'large', logo_alignment: 'left',
+                                        width: Math.min(384, document.getElementById('google-btn-container').offsetWidth)
+                                    });
+                                }
+                            }
+                        });
+                    })();
+                </script>
 
                 <!-- Bottom Links -->
                 <div class="pt-6 text-center">
