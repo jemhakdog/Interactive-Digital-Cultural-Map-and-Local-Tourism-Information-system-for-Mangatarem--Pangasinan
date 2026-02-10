@@ -95,7 +95,7 @@ def _get_supabase_uri() -> str:
     project_id = _extract_supabase_project_id(supabase_url)
     
     # Auto-switch to Transaction Pooler on Vercel
-    if os.getenv("VERCEL") and host and "supabase.com" in host and port == "5432":
+    if os.getenv("VERCEL") and host and "supabase.co" in host and port == "5432":
         logger.info("Auto-switching to Supabase Transaction Pooler (Port 6543) for Vercel")
         port = "6543"
     

@@ -55,7 +55,10 @@ def index():
 
 def record_view(view_type, item_id=None, page_name=None):
     """
-    Helper function to record a page view.
+    Record a page view (non-blocking best-effort).
+    
+    Uses a savepoint so failures don't break the main transaction
+    or delay the response.
     """
     try:
         user_id = current_user.id if current_user.is_authenticated else None
@@ -67,10 +70,8 @@ def record_view(view_type, item_id=None, page_name=None):
             timestamp=datetime.utcnow(),
         )
         db.session.add(view)
-        db.session.commit()
-    except Exception as e:
-        # Silently fail to not disrupt user experience
-        logger.error(f"Error recording view: {e}")
+        db.session.flush()  # Write to DB within current transaction; avoid separate commit overhead
+    except Exception:
         db.session.rollback()
 
 

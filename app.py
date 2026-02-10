@@ -6,11 +6,10 @@ Each function does one thing and returns meaningful values.
 """
 
 import os
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager
 from extensions import limiter
-from flask_migrate import Migrate
 
 from models import db
 from routes import register_blueprints
@@ -22,7 +21,6 @@ load_dotenv()
 
 # Determine if running on Vercel
 IS_VERCEL = "VERCEL" in os.environ
-print("IS_VERCEL: ", IS_VERCEL)
 
 # Determine absolute paths
 if IS_VERCEL:
@@ -32,16 +30,6 @@ else:
 
 template_dir = os.path.join(BASE_DIR, "templates")
 static_dir = os.path.join(BASE_DIR, "static")
-print("template_dir: ", template_dir)
-print("static_dir: ", static_dir)
-print("BASE_DIR: ", BASE_DIR)
-
-# Debug paths
-print(f"BASE_DIR: {BASE_DIR}")
-print(f"template_dir: {template_dir}")
-print(f"template_dir exists: {os.path.exists(template_dir)}")
-if os.path.exists(template_dir):
-    print(f"template_dir contents: {os.listdir(template_dir)}")
 
 app = Flask(__name__, template_folder=template_dir, static_folder=static_dir)
 
@@ -75,9 +63,13 @@ app.config["PREFERRED_URL_SCHEME"] = os.environ.get(
     "PREFERRED_URL_SCHEME", "https" if IS_VERCEL else "http"
 )
 
-# Initialize database and migrations
+# Initialize database
 db.init_app(app)
-migrate = Migrate(app, db)
+
+# Flask-Migrate: only needed for local development
+if not IS_VERCEL:
+    from flask_migrate import Migrate
+    migrate = Migrate(app, db)
 
 # Rate limiter
 limiter.init_app(app)
@@ -89,9 +81,25 @@ login_manager.login_message = "Please log in to access this page."
 login_manager.login_message_category = "error"
 login_manager.init_app(app)
 
-# Supabase client
-supabase = get_supabase_client()
-app.supabase = supabase
+# Supabase client: lazy-loaded on first access to avoid cold start penalty
+_supabase_client = None
+
+
+def _get_lazy_supabase():
+    """Return Supabase client, initializing on first call."""
+    global _supabase_client
+    if _supabase_client is None:
+        _supabase_client = get_supabase_client()
+    return _supabase_client
+
+
+class _LazySupabase:
+    """Descriptor that lazy-loads the Supabase client on first access."""
+    def __get__(self, obj, objtype=None):
+        return _get_lazy_supabase()
+
+
+app.__class__.supabase = _LazySupabase()
 
 
 @login_manager.user_loader
@@ -255,9 +263,8 @@ with app.app_context():
     if not IS_VERCEL:
         db.create_all()
         seed_database()
-    else:
-        # Auto-migrate missing columns on Vercel/Supabase
-        _run_auto_migrations()
+    # Auto-migrations removed from cold start for performance.
+    # Use /admin/run-migrations to run manually when needed.
 
 
 @app.context_processor
@@ -295,9 +302,33 @@ def serve_manifest():
 
 
 @app.after_request
-def add_security_headers(response):
-    """Add security headers to all responses."""
+def add_headers(response):
+    """Add security and caching headers to all responses."""
     response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
+
+    # Smart Cache-Control for Vercel Edge Network
+    if IS_VERCEL and request.method == "GET" and response.status_code == 200:
+        # Skip caching for authenticated/admin/auth routes
+        path = request.path
+        no_cache_prefixes = ("/admin", "/auth", "/user", "/barangay-admin")
+        if any(path.startswith(p) for p in no_cache_prefixes):
+            response.headers["Cache-Control"] = "private, no-store"
+        elif "text/html" in response.content_type:
+            # HTML pages: short browser cache, longer edge cache
+            response.headers["Cache-Control"] = (
+                "public, max-age=60, s-maxage=300, stale-while-revalidate=600"
+            )
+        elif any(path.endswith(ext) for ext in (".js", ".css", ".png", ".jpg", ".webp", ".woff2")):
+            # Static assets: long cache with immutable
+            response.headers["Cache-Control"] = (
+                "public, max-age=31536000, immutable"
+            )
+        else:
+            # API/JSON responses: moderate edge cache
+            response.headers["Cache-Control"] = (
+                "public, max-age=30, s-maxage=120, stale-while-revalidate=300"
+            )
+
     return response
 
 
