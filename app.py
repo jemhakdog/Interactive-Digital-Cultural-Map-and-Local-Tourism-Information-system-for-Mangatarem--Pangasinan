@@ -210,12 +210,54 @@ def seed_database() -> None:
         print("Default contributor created.")
 
 
+def _run_auto_migrations():
+    """
+    Add missing columns to Supabase tables automatically.
+    Uses IF NOT EXISTS-style checks so it's safe to run repeatedly.
+    """
+    from sqlalchemy import text, inspect
+
+    inspector = inspect(db.engine)
+    migrations = {
+        "attraction": [
+            ("reviewed_by", 'ALTER TABLE attraction ADD COLUMN reviewed_by INTEGER REFERENCES "user"(id) ON DELETE SET NULL'),
+            ("reviewed_at", "ALTER TABLE attraction ADD COLUMN reviewed_at TIMESTAMP"),
+        ],
+        "event": [
+            ("reviewed_by", 'ALTER TABLE event ADD COLUMN reviewed_by INTEGER REFERENCES "user"(id) ON DELETE SET NULL'),
+            ("reviewed_at", "ALTER TABLE event ADD COLUMN reviewed_at TIMESTAMP"),
+        ],
+        "gallery_item": [
+            ("reviewed_by", 'ALTER TABLE gallery_item ADD COLUMN reviewed_by INTEGER REFERENCES "user"(id) ON DELETE SET NULL'),
+            ("reviewed_at", "ALTER TABLE gallery_item ADD COLUMN reviewed_at TIMESTAMP"),
+        ],
+        "review": [
+            ("reviewed_by", 'ALTER TABLE review ADD COLUMN reviewed_by INTEGER REFERENCES "user"(id) ON DELETE SET NULL'),
+            ("reviewed_at", "ALTER TABLE review ADD COLUMN reviewed_at TIMESTAMP"),
+        ],
+    }
+
+    for table_name, columns in migrations.items():
+        existing = [col["name"] for col in inspector.get_columns(table_name)]
+        for col_name, alter_sql in columns:
+            if col_name not in existing:
+                try:
+                    db.session.execute(text(alter_sql))
+                    db.session.commit()
+                    print(f"[migrate] Added column {table_name}.{col_name}")
+                except Exception as e:
+                    db.session.rollback()
+                    print(f"[migrate] Skipped {table_name}.{col_name}: {e}")
+
+
 # Database initialization and seeding
 with app.app_context():
     if not IS_VERCEL:
         db.create_all()
         seed_database()
-    # On Vercel, migrations handle this
+    else:
+        # Auto-migrate missing columns on Vercel/Supabase
+        _run_auto_migrations()
 
 
 @app.context_processor

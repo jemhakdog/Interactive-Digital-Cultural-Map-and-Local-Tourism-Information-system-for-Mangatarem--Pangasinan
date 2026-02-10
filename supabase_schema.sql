@@ -30,6 +30,8 @@ CREATE TABLE IF NOT EXISTS attraction (
     image_url VARCHAR(200),
     status VARCHAR(20) DEFAULT 'pending',
     user_id INTEGER REFERENCES "user" (id) ON DELETE SET NULL,
+    reviewed_by INTEGER REFERENCES "user" (id) ON DELETE SET NULL,
+    reviewed_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -57,6 +59,8 @@ CREATE TABLE IF NOT EXISTS event (
     user_id INTEGER REFERENCES "user" (id) ON DELETE SET NULL,
     status VARCHAR(20) DEFAULT 'pending',
     category VARCHAR(50) NOT NULL DEFAULT 'Civic',
+    reviewed_by INTEGER REFERENCES "user" (id) ON DELETE SET NULL,
+    reviewed_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -74,6 +78,8 @@ CREATE TABLE IF NOT EXISTS gallery_item (
     caption VARCHAR(200),
     user_id INTEGER REFERENCES "user" (id) ON DELETE SET NULL,
     status VARCHAR(20) DEFAULT 'pending',
+    reviewed_by INTEGER REFERENCES "user" (id) ON DELETE SET NULL,
+    reviewed_at TIMESTAMP,
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -146,6 +152,8 @@ CREATE TABLE IF NOT EXISTS review (
     ),
     comment TEXT,
     status VARCHAR(20) DEFAULT 'pending',
+    reviewed_by INTEGER REFERENCES "user" (id) ON DELETE SET NULL,
+    reviewed_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
