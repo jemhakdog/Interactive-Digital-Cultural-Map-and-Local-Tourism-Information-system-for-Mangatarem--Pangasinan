@@ -5,7 +5,7 @@ Tests file helpers, logger helpers, and app constants.
 """
 
 import logging
-import pytest
+# import pytest  # Removed unused import
 from unittest.mock import MagicMock, patch
 
 
@@ -146,13 +146,11 @@ class TestAppConstants:
     """Verify named constants replaced magic numbers correctly."""
 
     def test_session_lifetime_is_7_days(self):
-        """SESSION_LIFETIME_SECONDS equals 7 days in seconds."""
-        from app import SESSION_LIFETIME_SECONDS
-
-        assert SESSION_LIFETIME_SECONDS == 86400 * 7
+        """PERMANENT_SESSION_LIFETIME equals 7 days."""
+        from config import Config
+        assert Config.PERMANENT_SESSION_LIFETIME.days == 7
 
     def test_remember_cookie_is_30_days(self):
-        """REMEMBER_COOKIE_SECONDS equals 30 days in seconds."""
-        from app import REMEMBER_COOKIE_SECONDS
-
-        assert REMEMBER_COOKIE_SECONDS == 86400 * 30
+        """REMEMBER_COOKIE_DURATION equals 30 days."""
+        from config import Config
+        assert Config.REMEMBER_COOKIE_DURATION.days == 30
