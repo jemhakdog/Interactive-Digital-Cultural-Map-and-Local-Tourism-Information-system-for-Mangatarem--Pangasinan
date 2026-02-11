@@ -20,6 +20,7 @@ dependencies = [
     "supabase>=2.27.2",
     "psycopg2>=2.9.11",
     "pillow>=12.1.0",
+    "python-docx>=1.2.0",
 ]
 
 [tool.uv]
