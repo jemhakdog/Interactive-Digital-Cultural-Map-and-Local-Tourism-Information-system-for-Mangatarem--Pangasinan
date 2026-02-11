@@ -17,11 +17,9 @@ from models import (
     PageView,
     Review,
     Favorite,
-    EventInterest,
 )
 from extensions import limiter
 from datetime import datetime, timedelta
-from werkzeug.utils import secure_filename
 from sqlalchemy import func
 from utils.logger_helper import (
     log_entry,
@@ -30,8 +28,8 @@ from utils.logger_helper import (
     log_error,
     log_render,
 )
+from utils.file_helpers import save_uploaded_file
 from typing import Dict, List, Tuple
-import os
 import logging
 
 admin_bp = Blueprint("admin", __name__, url_prefix="/admin")
@@ -369,8 +367,6 @@ def edit_attraction(id):
     log_entry("admin", "edit_attraction", id=id, method=request.method)
     logger.info(f"Attraction edit requested for ID {id}")
     
-    from flask import current_app
-    
     log_query("admin", "edit_attraction", f"Fetching attraction ID {id}")
     attraction = Attraction.query.get_or_404(id)
     
@@ -389,11 +385,9 @@ def edit_attraction(id):
         
         # Handle image upload
         if "image" in request.files:
-            file = request.files["image"]
-            if file and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
-                attraction.image_url = url_for("static", filename="uploads/" + filename)
+            uploaded_url = save_uploaded_file(request.files["image"])
+            if uploaded_url:
+                attraction.image_url = uploaded_url
         
         # Fallback to URL
         if request.form.get("image_url"):
@@ -507,8 +501,6 @@ def add_event():
     log_entry("admin", "add_event", user=current_user.username, method=request.method)
     logger.info(f"Add event page accessed by admin {current_user.username}")
     
-    from flask import current_app
-    
     if current_user.role != "admin":
         log_error("admin", "add_event", "Access denied")
         flash("Access denied.")
@@ -519,11 +511,9 @@ def add_event():
         
         # Handle file upload
         if "image" in request.files:
-            file = request.files["image"]
-            if file and file.filename and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
-                image_url = url_for("static", filename="uploads/" + filename)
+            uploaded_url = save_uploaded_file(request.files["image"])
+            if uploaded_url:
+                image_url = uploaded_url
         
         event = Event(
             title=request.form["title"],
@@ -556,8 +546,6 @@ def edit_event(id):
     log_entry("admin", "edit_event", id=id, method=request.method)
     logger.info(f"Event edit requested for ID {id}")
     
-    from flask import current_app
-    
     log_query("admin", "edit_event", f"Fetching event ID {id}")
     event = Event.query.get_or_404(id)
     
@@ -576,11 +564,9 @@ def edit_event(id):
         
         # Handle file upload
         if "image" in request.files:
-            file = request.files["image"]
-            if file and file.filename and allowed_file(file.filename):
-                filename = secure_filename(file.filename)
-                file.save(os.path.join(current_app.config["UPLOAD_FOLDER"], filename))
-                event.image_url = url_for("static", filename="uploads/" + filename)
+            uploaded_url = save_uploaded_file(request.files["image"])
+            if uploaded_url:
+                event.image_url = uploaded_url
         
         # Fallback to URL
         if request.form.get("image_url") and not (
@@ -711,19 +697,4 @@ def reject_review(id):
     return redirect(url_for("admin.admin_dashboard"))
 
 
-# === UTILITY FUNCTIONS ===
 
-def allowed_file(filename: str) -> bool:
-    """
-    Check if file has allowed extension.
-    
-    Args:
-        filename: Name of file to check
-        
-    Returns:
-        True if extension is allowed, False otherwise
-    """
-    from flask import current_app
-    
-    ALLOWED_EXTENSIONS = current_app.config.get("ALLOWED_EXTENSIONS", {"png", "jpg", "jpeg", "gif", "mp4"})
-    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS

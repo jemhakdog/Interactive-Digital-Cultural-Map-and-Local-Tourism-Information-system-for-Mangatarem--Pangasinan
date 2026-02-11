@@ -6,15 +6,22 @@ Each function does one thing and returns meaningful values.
 """
 
 import os
+import logging
+
 from flask import Flask, render_template, request
 from werkzeug.middleware.proxy_fix import ProxyFix
 from flask_login import LoginManager
 from extensions import limiter
-
 from models import db
 from routes import register_blueprints
 from utils.db_manager import get_database_uri, get_db_config, get_supabase_client
 from dotenv import load_dotenv
+
+logger = logging.getLogger(__name__)
+
+# Named constants for session / cookie lifetimes (in seconds)
+SESSION_LIFETIME_SECONDS = 86400 * 7   # 7 days
+REMEMBER_COOKIE_SECONDS = 86400 * 30   # 30 days
 
 # Load environment variables
 load_dotenv()
@@ -48,8 +55,8 @@ get_db_config(app)
 # Server & Session configuration
 app.config["SERVER_NAME"] = None
 app.config["SESSION_COOKIE_HTTPONLY"] = True
-app.config["PERMANENT_SESSION_LIFETIME"] = 86400 * 7  # 7 days
-app.config["REMEMBER_COOKIE_DURATION"] = 86400 * 30  # 30 days
+app.config["PERMANENT_SESSION_LIFETIME"] = SESSION_LIFETIME_SECONDS
+app.config["REMEMBER_COOKIE_DURATION"] = REMEMBER_COOKIE_SECONDS
 
 if IS_VERCEL:
     app.config["SESSION_COOKIE_SECURE"] = True
@@ -209,13 +216,13 @@ def seed_database() -> None:
     
     attractions_count = _seed_attractions_from_json(data_path)
     if attractions_count > 0:
-        print(f"Database seeded with {attractions_count} attractions.")
-    
+        logger.info("Database seeded with %d attractions.", attractions_count)
+
     if _create_default_admin():
-        print("Default admin created.")
-    
+        logger.info("Default admin created.")
+
     if _create_default_contributor():
-        print("Default contributor created.")
+        logger.info("Default contributor created.")
 
 
 def _run_auto_migrations():
@@ -252,10 +259,10 @@ def _run_auto_migrations():
                 try:
                     db.session.execute(text(alter_sql))
                     db.session.commit()
-                    print(f"[migrate] Added column {table_name}.{col_name}")
+                    logger.info("[migrate] Added column %s.%s", table_name, col_name)
                 except Exception as e:
                     db.session.rollback()
-                    print(f"[migrate] Skipped {table_name}.{col_name}: {e}")
+                    logger.warning("[migrate] Skipped %s.%s: %s", table_name, col_name, e)
 
 
 # Database initialization and seeding
@@ -378,8 +385,8 @@ def legal_reasons(e):
 if __name__ == "__main__":
     host = "0.0.0.0"
     port = 5000
-    
+
     if not IS_VERCEL:
-        print(f"Starting in local development mode on http://{host}:{port}")
-    
+        logger.info("Starting in local development mode on http://%s:%d", host, port)
+
     app.run(host=host, port=port, debug=True)

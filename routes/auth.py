@@ -22,13 +22,17 @@ from utils.logger_helper import (
     log_redirect
 )
 import logging
+import os
 from typing import Optional, Tuple
 
 auth_bp = Blueprint("auth", __name__)
 logger = logging.getLogger(__name__)
 
-# Google OAuth Client ID
-GOOGLE_CLIENT_ID = "794547070676-80dbt1j3a724hacci5684s7b7v93j1fh.apps.googleusercontent.com"
+# Google OAuth Client ID – loaded from environment variable
+GOOGLE_CLIENT_ID = os.environ.get(
+    "GOOGLE_CLIENT_ID",
+    "794547070676-80dbt1j3a724hacci5684s7b7v93j1fh.apps.googleusercontent.com",
+)
 
 
 def _authenticate_user(username: str, password: str) -> Optional[User]:
@@ -335,7 +339,7 @@ def register():
             return redirect(url_for("auth.register"))
         
         # Create user
-        user = _create_user_from_form(username, email, password, role, barangay)
+        _create_user_from_form(username, email, password, role, barangay)
         
         if role == "contributor":
             flash("Registration successful! Please wait for admin approval.", "success")
