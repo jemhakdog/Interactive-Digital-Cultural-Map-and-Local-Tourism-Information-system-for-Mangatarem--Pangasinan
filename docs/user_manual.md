@@ -10,6 +10,27 @@ Visit the application URL (e.g., `https://mangatarem-cultural-map.vercel.app`) i
 ### The Homepage
 The homepage provides a quick overview of featured attractions, upcoming events, and a quick link to the main Interactive Map.
 
+### Progressive Web App (PWA) Support
+
+This platform can be installed on your device like a native app:
+
+**On Mobile (Android/iOS)**:
+1. Open the site in your browser
+2. Look for "Add to Home Screen" prompt or tap the browser menu
+3. Select "Add to Home Screen" or "Install App"
+4. The app icon will appear on your home screen
+
+**On Desktop (Chrome/Edge)**:
+1. Look for the install icon (⊕) in the address bar
+2. Click "Install" when prompted
+3. The app will open in its own window
+
+**Benefits of Installing**:
+- Faster loading times (cached resources)
+- Offline access to previously visited pages
+- Full-screen experience without browser UI
+- App-like interface
+
 ## Exploring the Map
 
 1. **Navigate to the Map**: Click on the "Map" or "Explore" link in the navigation bar.
@@ -36,4 +57,10 @@ While much of the platform is public, creating an account allows you to:
 - **Review** and rate attractions you've visited.
 
 ### Submitting Content
-If you have a photo or information about a cultural spot you'd like to share, you can submit it via the "Contribute" section (Account required). Your submission will be reviewed by administrators before going live.
+If you have a photo or information about a cultural spot you'd like to share, refer to the [Contributor Guide](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/contributor_guide.md) for detailed instructions on how to contribute content.
+
+## Additional Resources
+
+- **[Architecture Guide](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/architecture.md)** - Learn about the technical foundation
+- **[Contributor Guide](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/contributor_guide.md)** - For barangay content contributors
+- **[Admin Guide](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/admin_guide.md)** - For system administrators
