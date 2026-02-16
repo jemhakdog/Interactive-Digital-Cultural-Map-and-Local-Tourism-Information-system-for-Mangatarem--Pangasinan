@@ -171,3 +171,12 @@ class Review(db.Model):
     reviewed_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
     reviewed_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+# === Heritage Models (Tourism Forms) ===
+# Import heritage models to register them with SQLAlchemy
+from heritage_models.natural_heritage import NaturalHeritage  # noqa: E402, F401
+from heritage_models.intangible_heritage import IntangibleHeritage  # noqa: E402, F401
+from heritage_models.personality_profile import PersonalityProfile  # noqa: E402, F401
+from heritage_models.cultural_institution import CulturalInstitution  # noqa: E402, F401
+from heritage_models.lgu_culture_program import LGUCultureProgram  # noqa: E402, F401
