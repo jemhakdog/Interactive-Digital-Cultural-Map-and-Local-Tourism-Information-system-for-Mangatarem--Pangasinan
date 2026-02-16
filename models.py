@@ -38,6 +38,47 @@ class Attraction(db.Model):
     reviewed_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
     reviewed_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    
+    # === Heritage Fields (Form 02A & 03A Support) ===
+    
+    # Heritage Type Indicator
+    heritage_type = db.Column(db.String(50), nullable=True)  # 'building', 'archaeological', 'natural', 'standard'
+    
+    # Form 02A - Tangible Immovable (Buildings) Fields
+    building_type = db.Column(db.String(50), nullable=True)  # municipal_hall, church, bridge, etc.
+    year_constructed = db.Column(db.Integer, nullable=True)
+    ownership_type = db.Column(db.String(20), nullable=True)  # public/private
+    declaration_legislation = db.Column(db.Text, nullable=True)
+    physical_description = db.Column(db.Text, nullable=True)
+    history_structure = db.Column(db.Text, nullable=True)
+    occupation_status = db.Column(db.String(20), nullable=True)  # occupied/not_occupied
+    stories_associated = db.Column(db.Text, nullable=True)
+    condition = db.Column(db.String(20), nullable=True)  # excellent/good/fair/deteriorated/ruins
+    condition_remarks = db.Column(db.Text, nullable=True)
+    is_altered = db.Column(db.Boolean, nullable=True)
+    is_original_site = db.Column(db.Boolean, nullable=True)
+    integrity_remarks = db.Column(db.Text, nullable=True)
+    conservation_measures = db.Column(db.Text, nullable=True)
+    movable_heritage_list = db.Column(db.JSON, nullable=True)  # List of objects within premises
+    
+    # Form 03A - Tangible Movable (Archaeological) Fields
+    object_type = db.Column(db.String(50), nullable=True)  # stone_tools, ceramics, metal, etc.
+    place_found = db.Column(db.String(200), nullable=True)
+    date_found = db.Column(db.Date, nullable=True)
+    estimated_age = db.Column(db.String(100), nullable=True)
+    acquisition_type = db.Column(db.String(50), nullable=True)
+    materials = db.Column(db.String(200), nullable=True)
+    dimensions = db.Column(db.String(100), nullable=True)
+    comparative_criteria = db.Column(db.Text, nullable=True)  # Provenance, Rarity, etc.
+    
+    # Common Heritage Fields (applicable to Forms 02A & 03A)
+    significance_types = db.Column(db.JSON, nullable=True)  # Array: ['historical', 'aesthetic', 'spiritual']
+    constraints_threats = db.Column(db.Text, nullable=True)
+    key_informants = db.Column(db.JSON, nullable=True)
+    references = db.Column(db.Text, nullable=True)
+    mapper_name = db.Column(db.String(200), nullable=True)
+    date_profiled = db.Column(db.Date, nullable=True)
+
 
 
 class Event(db.Model):
