@@ -16,7 +16,10 @@ This platform serves as a central digital resource for residents, students, and 
 ## 🛠️ Technical Stack
 ### Backend
 - **Framework**: [Flask 3.1.2](https://flask.palletsprojects.com/)
-- **Database**: SQLite (Local) / PostgreSQL/MySQL compatible via [SQLAlchemy](https://www.sqlalchemy.org/)
+- **Database**: 
+  - **Local Development**: SQLite (stored in `/instance/app.db`)
+  - **Production**: Supabase (PostgreSQL) with connection pooling
+  - **ORM**: [SQLAlchemy](https://www.sqlalchemy.org/)
 - **Authentication**: [Flask-Login](https://flask-login.readthedocs.io/)
 - **Rate Limiting**: [Flask-Limiter](https://flask-limiter.readthedocs.io/)
 
@@ -63,13 +66,15 @@ The application will be available at `http://127.0.0.1:5000`.
 ## 📚 Documentation
 Detailed documentation is available in the [docs/](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/README.md) directory:
 - [Architecture Guide](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/architecture.md)
+- [API Reference](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/api_reference.md)
+- [Deployment Guide](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/deployment_guide.md)
 - [User Manual](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/user_manual.md)
 - [Administrative Guide](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/admin_guide.md)
 
 ## 📂 Project Structure
 - `/app.py`: Main application entry point.
 - `/models.py`: Database schema and models.
-- `/routes/`: Blueprint-based route handling (Admin, Public, Auth).
+- `/routes/`: Blueprint-based route handling (7 blueprints: Admin, Barangay, Public, Auth, API, User, Update).
 - `/templates/`: Jinja2 templates for UI.
 - `/static/`: CSS, JS, and uploaded assets.
 - `/instance/`: Local database storage.

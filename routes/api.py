@@ -27,7 +27,6 @@ def api_attractions():
     Returns:
         JSON: Paginated list of approved attractions with their details.
     """
-    print(f"[PROGRESSIVE LOG] [api] > api_attractions > ENTRY")
     logger.info("API endpoint /api/attractions called")
 
     # Get pagination parameters
@@ -40,9 +39,7 @@ def api_attractions():
     category = request.args.get("category")
     barangay = request.args.get("barangay")
 
-    print(
-        f"[PROGRESSIVE LOG] [api] > api_attractions > QUERY: Fetching attractions with pagination (page={page}, per_page={per_page})"
-    )
+    logger.debug("Fetching attractions page=%d, per_page=%d", page, per_page)
 
     # Build query with filters and only select needed columns
     query = db.session.query(
@@ -94,11 +91,9 @@ def api_attractions():
         },
     }
 
-    print(
-        f"[PROGRESSIVE LOG] [api] > api_attractions > SUCCESS: Returning {len(result)} attractions (page {page}/{paginated_attractions.pages})"
-    )
     logger.info(
-        f"Returning {len(result)} approved attractions (page {page}/{paginated_attractions.pages})"
+        "Returning %d approved attractions (page %d/%d)",
+        len(result), page, paginated_attractions.pages,
     )
 
     # Create response with caching headers

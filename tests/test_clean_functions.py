@@ -1,93 +1,156 @@
 """
-Unit tests for extracted clean functions from refactoring.
+Unit tests for refactored clean code utilities.
 
-Tests all helper functions created during clean function refactoring
-to ensure business logic remains correct after extraction.
+Tests file helpers, logger helpers, and app constants.
 """
 
-import pytest
-from unittest.mock import Mock, patch
-from utils.logger_helper import (
-    log_entry,
-    log_query,
-    log_logic,
-    log_success,
-    log_error,
-    log_render,
-    log_redirect,
-)
+import logging
+# import pytest  # Removed unused import
+from unittest.mock import MagicMock, patch
+
+
+# === Logger Helper Tests ===
 
 
 class TestLoggerHelper:
     """Test centralized logging helper functions."""
 
-    def test_log_entry_with_kwargs(self, capsys):
-        """Test log_entry formats context correctly."""
-        log_entry("auth", "login", method="POST", user="admin")
+    def test_log_entry_with_kwargs(self, caplog):
+        """log_entry formats module/function/kwargs into an INFO message."""
+        from utils.logger_helper import log_entry
+
+        with caplog.at_level(logging.INFO):
+            log_entry("auth", "login", method="POST", user="admin")
+
+        assert "[auth] > login > ENTRY" in caplog.text
+        assert "method=POST" in caplog.text
+        assert "user=admin" in caplog.text
+
+    def test_log_entry_without_kwargs(self, caplog):
+        """log_entry works with no extra context."""
+        from utils.logger_helper import log_entry
+
+        with caplog.at_level(logging.INFO):
+            log_entry("admin", "dashboard")
+
+        assert "[admin] > dashboard > ENTRY" in caplog.text
+
+    def test_log_success(self, caplog):
+        """log_success emits an INFO record."""
+        from utils.logger_helper import log_success
+
+        with caplog.at_level(logging.INFO):
+            log_success("auth", "login", "User 'admin' logged in")
+
+        assert "SUCCESS" in caplog.text
+        assert "User 'admin' logged in" in caplog.text
+
+    def test_log_error(self, caplog):
+        """log_error emits an ERROR record."""
+        from utils.logger_helper import log_error
+
+        with caplog.at_level(logging.ERROR):
+            log_error("auth", "register", "Username already exists")
+
+        assert "ERROR" in caplog.text
+        assert "Username already exists" in caplog.text
+
+    def test_no_print_calls(self, capsys):
+        """Verify print() is no longer called (dual-logging removed)."""
+        from utils.logger_helper import log_entry, log_query, log_success
+
+        log_entry("mod", "fn")
+        log_query("mod", "fn", "desc")
+        log_success("mod", "fn", "ok")
+
         captured = capsys.readouterr()
-        assert "[auth] > login > ENTRY" in captured.out
-        assert "method=POST" in captured.out
-        assert "user=admin" in captured.out
-
-    def test_log_entry_without_kwargs(self, capsys):
-        """Test log_entry works with no context."""
-        log_entry("admin", "dashboard")
-        captured = capsys.readouterr()
-        assert "[admin] > dashboard > ENTRY" in captured.out
-
-    def test_log_query(self, capsys):
-        """Test database query logging."""
-        log_query("auth", "register", "Checking username='testuser'")
-        captured = capsys.readouterr()
-        assert "[auth] > register > QUERY" in captured.out
-        assert "Checking username='testuser'" in captured.out
-
-    def test_log_success(self, capsys):
-        """Test success operation logging."""
-        log_success("auth", "login", "User 'admin' logged in")
-        captured = capsys.readouterr()
-        assert "[auth] > login > SUCCESS" in captured.out
-        assert "User 'admin' logged in" in captured.out
-
-    def test_log_error(self, capsys):
-        """Test error logging."""
-        log_error("auth", "register", "Username already exists")
-        captured = capsys.readouterr()
-        assert "[auth] > register > ERROR" in captured.out
-        assert "Username already exists" in captured.out
+        assert captured.out == "", "logger_helper should not emit print() output"
 
 
-# Placeholder test classes for future refactorings
-class TestAuthHelpers:
-    """Tests for routes/auth.py extracted functions."""
-    
-    # TODO: Add tests after auth refactoring
-    pass
+# === File Helper Tests ===
 
 
-class TestAdminHelpers:
-    """Tests for routes/admin.py extracted functions."""
-    
-    # TODO: Add tests after admin refactoring
-    pass
+class TestFileHelpers:
+    """Test shared file-upload utilities."""
+
+    def test_allowed_file_accepts_valid(self):
+        """allowed_file returns True for allowed extensions."""
+        from utils.file_helpers import allowed_file
+
+        app = MagicMock()
+        app.config = {"ALLOWED_EXTENSIONS": {"png", "jpg", "gif"}}
+
+        with patch("utils.file_helpers.current_app", app):
+            assert allowed_file("photo.png") is True
+            assert allowed_file("image.JPG") is True
+
+    def test_allowed_file_rejects_invalid(self):
+        """allowed_file returns False for disallowed extensions."""
+        from utils.file_helpers import allowed_file
+
+        app = MagicMock()
+        app.config = {"ALLOWED_EXTENSIONS": {"png", "jpg"}}
+
+        with patch("utils.file_helpers.current_app", app):
+            assert allowed_file("script.exe") is False
+            assert allowed_file("noext") is False
+
+    def test_detect_media_type_video(self):
+        """detect_media_type identifies video extensions."""
+        from utils.file_helpers import detect_media_type
+
+        assert detect_media_type("clip.mp4") == "video"
+        assert detect_media_type("recording.mov") == "video"
+
+    def test_detect_media_type_photo(self):
+        """detect_media_type defaults to 'photo' for non-video files."""
+        from utils.file_helpers import detect_media_type
+
+        assert detect_media_type("image.png") == "photo"
+        assert detect_media_type("pic.jpg") == "photo"
+
+    def test_save_uploaded_file_returns_none_on_empty(self):
+        """save_uploaded_file returns None when no file is provided."""
+        from utils.file_helpers import save_uploaded_file
+
+        app = MagicMock()
+        app.config = {
+            "ALLOWED_EXTENSIONS": {"png"},
+            "UPLOAD_FOLDER": "/tmp",
+        }
+
+        with patch("utils.file_helpers.current_app", app):
+            assert save_uploaded_file(None) is None
+
+    def test_save_uploaded_file_returns_none_on_invalid_ext(self):
+        """save_uploaded_file returns None for disallowed file types."""
+        from utils.file_helpers import save_uploaded_file
+
+        app = MagicMock()
+        app.config = {
+            "ALLOWED_EXTENSIONS": {"png"},
+            "UPLOAD_FOLDER": "/tmp",
+        }
+
+        bad_file = MagicMock()
+        bad_file.filename = "virus.exe"
+
+        with patch("utils.file_helpers.current_app", app):
+            assert save_uploaded_file(bad_file) is None
 
 
-class TestDatabaseHelpers:
-    """Tests for utils/db_manager.py extracted functions."""
-    
-    # TODO: Add tests after db_manager refactoring
-    pass
+# === App Constants Tests ===
 
 
-class TestEmailHelpers:
-    """Tests for utils/email_sender.py extracted functions."""
-    
-    # TODO: Add tests after email_sender refactoring
-    pass
+class TestAppConstants:
+    """Verify named constants replaced magic numbers correctly."""
 
+    def test_session_lifetime_is_7_days(self):
+        """PERMANENT_SESSION_LIFETIME equals 7 days."""
+        from config import Config
+        assert Config.PERMANENT_SESSION_LIFETIME.days == 7
 
-class TestAppHelpers:
-    """Tests for app.py extracted functions."""
-    
-    # TODO: Add tests after app.py refactoring
-    pass
+    def test_remember_cookie_is_30_days(self):
+        """REMEMBER_COOKIE_DURATION equals 30 days."""
+        from config import Config
+        assert Config.REMEMBER_COOKIE_DURATION.days == 30
