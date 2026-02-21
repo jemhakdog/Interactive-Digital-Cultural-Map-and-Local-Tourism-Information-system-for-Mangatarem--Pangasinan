@@ -1,0 +1,45 @@
+
+============================================================
+[LINT RUNNER] Unified Linting
+============================================================
+Project: D:\porjects\Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan
+Time: 2026-02-16 22:28:15
+Type: python
+Linters: 2
+------------------------------------------------------------
+
+Running: ruff...
+  [FAIL] ruff
+
+Running: mypy...
+  [FAIL] mypy
+  Error: 'mypy' is not recognized as an internal or external command,
+operable program or batch file.
+
+
+============================================================
+SUMMARY
+============================================================
+[FAIL] ruff
+[FAIL] mypy
+
+{
+  "script": "lint_runner",
+  "project": "D:\\porjects\\Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan",
+  "type": "python",
+  "checks": [
+    {
+      "name": "ruff",
+      "passed": false,
+      "output": "F401 [*] `os` imported but unused\n  --> .agent\\.shared\\ui-ux-pro-max\\scripts\\design_system.py:18:8\n   |\n16 | import csv\n17 | import json\n18 | import os\n   |        ^^\n19 | from datetime import datetime\n20 | from pathlib import Path\n   |\nhelp: Remove unused import: `os`\n\nF541 [*] f-string without any placeholders\n   --> .agent\\.shared\\ui-ux-pro-max\\scripts\\design_system.py:406:18\n    |\n404 |     # Colors section\n405 |     lines.append(\"### Colors\")\n406 |     lines.append(f\"| Role | Hex |\")\n    |                  ^^^^^^^^^^^^^^^^^\n407 |     lines.append(f\"|------|-----|\")\n408 |     lines.append(f\"| Primary | {colors.get('primary', '')} |\")\n    |\nhelp: Remove extraneous `f` prefix\n\nF541 [*] f-string without any placeholders\n   --> .agent\\.shared\\ui-ux-pro-max\\scripts\\design_system.py:407:18\n    |\n405 |     lines.append(\"### Colors\")\n406 |     lines.append(f\"| Role | Hex |\")\n407 |     lines.append(f\"|------|-----|\")\n    |                  ^^^^^^^^^^^^^^^^^\n408 |     lines.append(f\"| Primary | {colors.get('primary', '')} |\")\n409 |     lines.append(f\"| Secondary | {colors.get('secondary', '')} |\")\n    |\nhelp: Remove extraneous `f` prefix\n\nF541 [*] f-string without any placeholders\n   --> .agent\\.shared\\ui-ux-pro-max\\scripts\\design_system.py:428:22\n    |\n426 |         lines.append(f\"- **Google Fonts:** {typography.get('google_fonts_url', '')}\")\n427 |     if typography.get(\"css_import\"):\n428 |         lines.append(f\"- **CSS Import:**\")\n    |                      ^^^^^^^^^^^^^^^^^^^^\n429 |         lines.append(f\"```css\")\n430 |         lines.append(f\"{typography.get('css_import', '')}\")\n    |\nhelp: Remove extraneous `f` prefix\n\nF541 [*] f-string without any placeholders\n   --> .agent\\.shared\\ui-ux-pro-max\\scripts\\design_system.py:429:22\n    |\n427 |     if typography.get(\"css_import\"):\n428 |         lines.append(f\"- **CSS Import:**\")\n429 |         lines.append(f\"```css\")\n    |                      ^^^^^^^^^\n430 |         lines.append(f\"{typography.get('css_import', '')}\")\n431 ",
+      "error": ""
+    },
+    {
+      "name": "mypy",
+      "passed": false,
+      "output": "",
+      "error": "'mypy' is not recognized as an internal or external command,\noperable program or batch file.\n"
+    }
+  ],
+  "passed": false
+}
