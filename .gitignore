@@ -45,3 +45,4 @@ client_secret_*.json
 .idea/
 .DS_Store
 Thumbs.db
+tailwindcss-*

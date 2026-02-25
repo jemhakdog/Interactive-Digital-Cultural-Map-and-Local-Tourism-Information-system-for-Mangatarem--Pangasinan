@@ -1,0 +1,114 @@
+{% extends "admin/dashboard.html" %}
+
+{% block admin_content %}
+<div class="px-6 py-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+        <div>
+            <h1 class="text-4xl font-bold text-white mb-2 heritage-gradient bg-clip-text text-transparent">Heritage Archive</h1>
+            <p class="text-gray-400">Manage Mangatarem's natural and cultural heritage records.</p>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        {% for stat in type_stats %}
+        <div class="glass-card p-6 border-l-4 border-emerald-500 hover:transform hover:translate-y-[-4px] transition-all duration-300">
+            <div class="flex justify-between items-start mb-4">
+                <div>
+                    <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-400 mb-1 block">{{ stat.form }}</span>
+                    <h3 class="text-xl font-bold text-white">{{ stat.label }}</h3>
+                </div>
+                <div class="p-2 bg-emerald-500/10 rounded-lg">
+                    <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        {% if stat.slug == 'natural' %}
+                        <path d="M12 3L2 12h3v8h14v-8h3L12 3z"/>
+                        {% elif stat.slug == 'intangible' %}
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                        {% elif stat.slug == 'personality' %}
+                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                        {% elif stat.slug == 'institution' %}
+                        <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-6h8v6zm-2-2v-2h-4v2h4z"/>
+                        {% else %}
+                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                        {% endif %}
+                    </svg>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-3 gap-2 mb-6">
+                <div class="text-center p-2 bg-white/5 rounded">
+                    <span class="block text-xl font-bold text-white">{{ stat.total }}</span>
+                    <span class="text-[8px] uppercase text-gray-400">Total</span>
+                </div>
+                <div class="text-center p-2 bg-emerald-500/5 rounded border border-emerald-500/20">
+                    <span class="block text-xl font-bold text-emerald-400">{{ stat.approved }}</span>
+                    <span class="text-[8px] uppercase text-emerald-400/70">Approved</span>
+                </div>
+                <div class="text-center p-2 bg-amber-500/5 rounded border border-amber-500/20">
+                    <span class="block text-xl font-bold text-amber-400">{{ stat.pending }}</span>
+                    <span class="text-[8px] uppercase text-amber-400/70">Pending</span>
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <a href="{{ url_for('admin.admin_heritage_list', heritage_type=stat.slug) }}" 
+                   class="flex-1 text-center py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded transition-colors uppercase tracking-wider">
+                    View List
+                </a>
+                <a href="{{ url_for('admin.admin_heritage_add', heritage_type=stat.slug) }}" 
+                   class="p-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded transition-colors">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                    </svg>
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="glass-card p-8">
+        <h3 class="text-xl font-bold text-white mb-6">Master Registry Overview</h3>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="text-gray-400 text-xs uppercase tracking-widest border-b border-white/10">
+                        <th class="pb-4">Registry Type</th>
+                        <th class="pb-4">Form ID</th>
+                        <th class="pb-4">Map Layer</th>
+                        <th class="pb-4">Primary Field</th>
+                        <th class="pb-4 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-300">
+                    {% for slug, config in heritage_types.items() %}
+                    <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
+                        <td class="py-4 font-bold text-white">{{ config.label }}</td>
+                        <td class="py-4"><span class="px-2 py-1 bg-white/5 rounded text-[10px]">{{ config.form }}</span></td>
+                        <td class="py-4">
+                            {% if config.has_coords %}
+                            <span class="flex items-center gap-1 text-emerald-400 text-[10px] uppercase font-bold">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                                Active
+                            </span>
+                            {% else %}
+                            <span class="text-gray-500 text-[10px] uppercase font-bold italic">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-4 text-xs font-mono text-emerald-300/70">{{ config.name_field }}</td>
+                        <td class="py-4 text-right">
+                            <a href="{{ url_for('admin.admin_heritage_list', heritage_type=slug) }}" 
+                               class="text-xs font-bold text-emerald-400 hover:text-emerald-300 transition-colors uppercase tracking-widest">
+                                Manage
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block dashboard_scripts %}{% endblock %}

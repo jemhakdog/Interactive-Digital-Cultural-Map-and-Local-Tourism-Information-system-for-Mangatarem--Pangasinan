@@ -39,7 +39,7 @@ This document provides a comprehensive field reference for all tourism heritage 
 | `constraints_threats` | Text | No | Current threats or issues | |
 | `conservation_measures` | Text | No | Active conservation efforts | |
 | `key_informants` | JSON | No | Array of informant details | `[{"name": "Juan Dela Cruz", "role": "Elder"}]` |
-| `references` | Text | No | References and citations | |
+| `reference_sources` | Text | No | References and citations | |
 | `mapper_name` | String(200) | No | Who profiled this | "Tourism Office Staff" |
 | `date_profiled` | Date | No | When it was profiled | "2024-01-15" |
 | `photo_url` | String(500) | No | Main photo URL | |
@@ -95,7 +95,7 @@ This document provides a comprehensive field reference for all tourism heritage 
 | `significance_types` | JSON | No | Both | `["historical", "aesthetic", "spiritual"]` |
 | `constraints_threats` | Text | No | Both | Threats or issues |
 | `key_informants` | JSON | No | Both | Array of informants |
-| `references` | Text | No | Both | Citations |
+| `reference_sources` | Text | No | Both | Citations |
 | `mapper_name` | String(200) | No | Both | Profiler name |
 | `date_profiled` | Date | No | Both | Profile date |
 

@@ -528,6 +528,131 @@ def barangay_profile(name):
     )
 
 
+
+# === Heritage Public Pages ===
+
+@public_bp.route("/heritage")
+def heritage_index():
+    """
+    Heritage catalog landing page.
+
+    Shows overview of all heritage types with approved item counts,
+    linking to type-specific lists.
+    """
+    from utils.heritage_registry import get_all_types
+
+    log_entry("public", "heritage_index")
+    logger.info("Heritage catalog page accessed")
+    record_view("page", page_name="heritage")
+
+    type_stats = []
+    for slug, config in get_all_types():
+        model = config["model"]
+        count = model.query.filter_by(status="approved").count()
+        # Get a representative photo from the first approved item
+        sample = model.query.filter_by(status="approved").first()
+        photo = None
+        if sample:
+            photo = (
+                getattr(sample, "photo_url", None)
+                or getattr(sample, "facade_photo_url", None)
+                or getattr(sample, "logo_url", None)
+            )
+
+        type_stats.append({
+            "slug": slug,
+            "label": config["label"],
+            "label_plural": config["label_plural"],
+            "form": config["form"],
+            "has_coords": config["has_coords"],
+            "count": count,
+            "photo": photo,
+        })
+
+    log_success("public", "heritage_index", f"Heritage catalog loaded with {len(type_stats)} types")
+    return render_template("pagez/heritage_index.html", type_stats=type_stats)
+
+
+@public_bp.route("/heritage/<heritage_type>")
+def heritage_type_list(heritage_type):
+    """
+    Browse approved heritage items by type.
+
+    Supports pagination and search filtering.
+    """
+    from utils.heritage_registry import get_heritage_config
+
+    config = get_heritage_config(heritage_type)
+    if not config:
+        from flask import abort
+        abort(404)
+
+    log_entry("public", "heritage_type_list", heritage_type=heritage_type)
+    logger.info(f"Heritage list page accessed for type '{heritage_type}'")
+    record_view("page", page_name=f"heritage_{heritage_type}")
+
+    model = config["model"]
+    page = request.args.get("page", 1, type=int)
+    per_page = 12
+    search_term = request.args.get("search", "").strip()
+
+    query = model.query.filter_by(status="approved")
+    if search_term:
+        name_field = config["name_field"]
+        query = query.filter(
+            getattr(model, name_field).ilike(f"%{search_term}%")
+        )
+
+    paginated = query.order_by(model.created_at.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+
+    log_success(
+        "public", "heritage_type_list",
+        f"Loaded {paginated.total} '{config['label']}' items (page {page})"
+    )
+    return render_template(
+        "pagez/heritage_list.html",
+        items=paginated.items,
+        pagination=paginated,
+        heritage_type=heritage_type,
+        config=config,
+        search_term=search_term,
+    )
+
+
+@public_bp.route("/heritage/<heritage_type>/<int:item_id>")
+def heritage_detail(heritage_type, item_id):
+    """Display detailed view of a single approved heritage item."""
+    from utils.heritage_registry import get_heritage_config, get_display_name
+
+    config = get_heritage_config(heritage_type)
+    if not config:
+        from flask import abort
+        abort(404)
+
+    model = config["model"]
+    item = model.query.get_or_404(item_id)
+
+    if item.status != "approved":
+        from flask import abort
+        abort(404)
+
+    display_name = get_display_name(item, heritage_type)
+    log_entry("public", "heritage_detail", heritage_type=heritage_type, id=item_id)
+    logger.info(f"Heritage detail page for '{display_name}' (type: {heritage_type}, id: {item_id})")
+    record_view("heritage", item_id=item_id, page_name=f"heritage_{heritage_type}")
+
+    log_render("public", "heritage_detail", "heritage_detail.html")
+    return render_template(
+        "pagez/heritage_detail.html",
+        item=item,
+        heritage_type=heritage_type,
+        config=config,
+        display_name=display_name,
+    )
+
+
 @public_bp.route("/sitemap.xml")
 def sitemap():
     """

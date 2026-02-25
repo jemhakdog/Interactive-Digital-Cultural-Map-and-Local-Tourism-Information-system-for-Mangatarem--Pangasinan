@@ -46,6 +46,7 @@
     {% endblock %}
 
     <link rel="manifest" href="/manifest.json">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/footer.css') }}">
     {% block head %}{% endblock %}
 
 </head>
@@ -139,19 +140,6 @@
         </div>
     </nav>
     {% endblock %}
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const btn = document.getElementById('mobile-menu-btn');
-            const menu = document.getElementById('mobile-menu');
-
-            if (btn && menu) {
-                btn.addEventListener('click', () => {
-                    menu.classList.toggle('hidden');
-                });
-            }
-        });
-    </script>
 
     <!-- Main Content -->
     <main class="flex-grow">
@@ -328,94 +316,22 @@
             </div>
         </div>
 
-        <style>
-            @keyframes marquee {
-                0% {
-                    transform: translateX(0);
-                }
-
-                100% {
-                    transform: translateX(-50%);
-                }
-            }
-
-            .animate-marquee {
-                display: flex;
-                width: max-content;
-                animation: marquee 60s linear infinite;
-            }
-
-            .pause {
-                animation-play-state: paused;
-            }
-        </style>
     </footer>
     {% endblock %}
 
     {% block scripts %}{% endblock %}
     <script src="{{ url_for('static', filename='vendor/sweetalert2/sweetalert2.all.min.js') }}" defer></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Handle Flask Flash Messages with SweetAlert2
-            {% with messages = get_flashed_messages(with_categories = True) %}
-            {% if messages %}
-            {% for category, message in messages %}
-            {% if category == 'error' %}
-            Swal.fire({
-                icon: 'error',
-                title: 'Error!',
-                text: '{{ message }}',
-                confirmButtonColor: '#d33'
-            });
-            {% elif category == 'warning' %}
-            Swal.fire({
-                icon: 'warning',
-                title: 'Notice',
-                text: '{{ message }}',
-                confirmButtonColor: '#f59e0b'
-            });
-            {% else %}
-            Swal.fire({
-                toast: true,
-                position: 'top-end',
-                icon: 'success', // Default to success for generic messages
-                title: '{{ message }}',
-                showConfirmButton: false,
-                timer: 3000
-            });
-            {% endif %}
-            {% endfor %}
-            {% endif %}
-            {% endwith %}
-        });
+    
+    <!-- Flash Messages Data -->
+    <script type="application/json" id="flash-messages-data">
+        {{ get_flashed_messages(with_categories=True) | tojson | safe }}
+    </script>
 
-        // Global Delete Confirmation
-        function confirmDelete(url) {
-            Swal.fire({
-                title: 'Are you sure?',
-                text: "You won't be able to revert this!",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#d33',
-                cancelButtonColor: '#3085d6',
-                confirmButtonText: 'Yes, delete it!'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.location.href = url;
-                }
-            })
-        }
-    </script>
-    <script>
-        // Register Service Worker for PWA
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(reg => console.log('Service Worker registered:', reg.scope))
-                    .catch(err => console.log('Service Worker registration failed:', err));
-            });
-        }
-    </script>
+    <!-- Component Scripts -->
+    <script src="{{ url_for('static', filename='js/components/mobile-nav.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/components/flash-messages.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/components/delete-confirm.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/components/service-worker-registration.js') }}" defer></script>
 </body>
 
 

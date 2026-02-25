@@ -1,0 +1,49 @@
+@media (prefers-reduced-motion: reduce) {
+    .reveal {
+        opacity: 1;
+        transform: none;
+        transition: none;
+    }
+
+    .aurora-bg::before,
+    .aurora-bg::after {
+        animation: none;
+    }
+
+    .animate-pulse {
+        animation: none;
+    }
+
+    .group-hover\:scale-110 {
+        transform: none !important;
+    }
+
+    .hover-lift:hover {
+        transform: none !important;
+    }
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s ease-out;
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.custom-popup .leaflet-popup-content-wrapper {
+    border-radius: 1rem;
+    padding: 0;
+}

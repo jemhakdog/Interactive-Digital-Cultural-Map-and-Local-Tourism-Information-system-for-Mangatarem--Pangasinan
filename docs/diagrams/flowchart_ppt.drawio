@@ -1,69 +1,67 @@
+<?xml version='1.0' encoding='utf-8'?>
 <mxfile host="65bd71144e">
     <diagram name="Page 1 - Authentication Flow" id="page1">
         <mxGraphModel dx="1206" dy="496" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
             <root>
-                <mxCell id="0"/>
-                <mxCell id="1" parent="0"/>
+                <mxCell id="0" />
+                <mxCell id="1" parent="0" />
                 <mxCell id="title1" value="System Flowchart — Page 1: Authentication &amp; Role Routing" style="text;html=1;fontSize=18;fontStyle=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="200" y="20" width="700" height="40" as="geometry"/>
+                    <mxGeometry x="200" y="20" width="700" height="40" as="geometry" />
                 </mxCell>
                 <mxCell id="p1_start" value="Start / User Visits Website" style="rounded=1;whiteSpace=wrap;arcSize=50;strokeWidth=2;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="100" y="100" width="220" height="40" as="geometry"/>
+                    <mxGeometry x="100" y="100" width="220" height="40" as="geometry" />
                 </mxCell>
                 <mxCell id="p1_landing" value="View Landing Page" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="120" y="190" width="180" height="50" as="geometry"/>
+                    <mxGeometry x="120" y="190" width="180" height="50" as="geometry" />
                 </mxCell>
                 <mxCell id="p1_e1" value="" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;" parent="1" source="p1_start" target="p1_landing" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
                 <mxCell id="p1_logged" value="Is User Logged In?" style="rhombus;strokeWidth=2;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="110" y="300" width="200" height="140" as="geometry"/>
+                    <mxGeometry x="110" y="300" width="200" height="140" as="geometry" />
                 </mxCell>
                 <mxCell id="p1_e2" value="" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;" parent="1" source="p1_landing" target="p1_logged" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
-                <mxCell id="p1_public" value="Go to Public Browsing&#xa;(See Page 4)" style="rounded=1;whiteSpace=wrap;arcSize=30;strokeWidth=2;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=2;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="110" y="550" width="180" height="50" as="geometry"/>
+                <mxCell id="p1_public" value="Go to Public Browsing&#10;(See Page 4)" style="rounded=1;whiteSpace=wrap;arcSize=30;strokeWidth=2;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=2;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="110" y="550" width="180" height="50" as="geometry" />
                 </mxCell>
                 <mxCell id="p1_e3" value="No" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="p1_logged" target="p1_public" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
                 <mxCell id="p1_login" value="Perform Login / Register" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="400" y="200" width="200" height="50" as="geometry"/>
+                    <mxGeometry x="400" y="200" width="200" height="50" as="geometry" />
                 </mxCell>
-                <mxCell id="p1_e4" value="Click Login" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;labelBackgroundColor=#ffffff;" parent="1" source="p1_logged" target="p1_login" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
-                <mxCell id="p1_role" value="Check User Role" style="rhombus;strokeWidth=2;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="420" y="300" width="180" height="140" as="geometry"/>
+                <mxCell id="p1_role" value="Is Admin?" style="rhombus;strokeWidth=2;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="420" y="300" width="180" height="140" as="geometry" />
                 </mxCell>
                 <mxCell id="p1_e5" value="" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;" parent="1" source="p1_login" target="p1_role" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
                 <mxCell id="p1_e5b" value="Yes" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;labelBackgroundColor=#ffffff;" parent="1" source="p1_logged" target="p1_role" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
-                            <mxPoint x="310" y="370"/>
+                            <mxPoint x="310" y="370" />
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="p1_guest" value="Public Browsing&#xa;(See Page 4)" style="rounded=1;whiteSpace=wrap;arcSize=30;strokeWidth=2;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=2;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="320" y="540" width="160" height="50" as="geometry"/>
+                <mxCell id="p1_guest" value="Public Browsing&#10;(See Page 4)" style="rounded=1;whiteSpace=wrap;arcSize=30;strokeWidth=2;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=2;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="320" y="540" width="160" height="50" as="geometry" />
                 </mxCell>
-                <mxCell id="p1_brgy" value="Barangay Rep&#xa;(See Page 2)" style="rounded=1;whiteSpace=wrap;arcSize=30;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=2;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="500" y="540" width="170" height="50" as="geometry"/>
+                <mxCell id="p1_brgy" value="Barangay Rep&#10;(See Page 2)" style="rounded=1;whiteSpace=wrap;arcSize=30;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=2;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="500" y="540" width="170" height="50" as="geometry" />
                 </mxCell>
-                <mxCell id="p1_admin" value="Admin Dashboard&#xa;(See Page 3)" style="rounded=1;whiteSpace=wrap;arcSize=30;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=2;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="720" y="345" width="170" height="50" as="geometry"/>
+                <mxCell id="p1_admin" value="Admin Dashboard&#10;(See Page 3)" style="rounded=1;whiteSpace=wrap;arcSize=30;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=2;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="720" y="345" width="170" height="50" as="geometry" />
                 </mxCell>
-                <mxCell id="p1_e7" value="Barangay Rep" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="p1_role" target="p1_brgy" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                <mxCell id="p1_e7" value="No" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;labelBackgroundColor=#ffffff;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="p1_role" target="p1_brgy" edge="1">
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
-                <mxCell id="p1_e8" value="Admin" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="p1_role" target="p1_admin" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                <mxCell id="p1_e8" value="Yes" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="p1_role" target="p1_admin" edge="1">
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
                 <mxCell id="p1_footer" value="Page 1 of 4" style="text;html=1;fontSize=11;fontStyle=2;align=right;verticalAlign=bottom;whiteSpace=wrap;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="950" y="800" width="120" height="30" as="geometry"/>
+                    <mxGeometry x="950" y="800" width="120" height="30" as="geometry" />
                 </mxCell>
             </root>
         </mxGraphModel>
@@ -71,107 +69,104 @@
     <diagram name="Page 2 - Barangay Representative Flow" id="page2">
         <mxGraphModel dx="844" dy="347" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
             <root>
-                <mxCell id="0"/>
-                <mxCell id="1" parent="0"/>
+                <mxCell id="0" />
+                <mxCell id="1" parent="0" />
                 <mxCell id="title2" value="System Flowchart — Page 2: Barangay Representative Submission Flow" style="text;html=1;fontSize=18;fontStyle=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="150" y="20" width="800" height="40" as="geometry"/>
+                    <mxGeometry x="150" y="20" width="800" height="40" as="geometry" />
                 </mxCell>
-                <mxCell id="p2_entry" value="Logged in as&#xa;Barangay Representative" style="rounded=1;whiteSpace=wrap;arcSize=30;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=2;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="430" y="80" width="240" height="50" as="geometry"/>
+                <mxCell id="p2_entry" value="Logged in as&#10;Barangay Representative" style="rounded=1;whiteSpace=wrap;arcSize=30;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=2;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="430" y="80" width="240" height="50" as="geometry" />
                 </mxCell>
                 <mxCell id="p2_dash" value="Barangay Dashboard" style="whiteSpace=wrap;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="450" y="170" width="200" height="50" as="geometry"/>
+                    <mxGeometry x="450" y="170" width="200" height="50" as="geometry" />
                 </mxCell>
                 <mxCell id="p2_e1" value="" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;" parent="1" source="p2_entry" target="p2_dash" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
-                <mxCell id="p2_create" value="Create New&#xa;Attraction / Event" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="450" y="280" width="200" height="60" as="geometry"/>
-                </mxCell>
-                <mxCell id="p2_e2" value="" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;" parent="1" source="p2_dash" target="p2_create" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                <mxCell id="p2_create" value="Create New&#10;Attraction / Event" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="450" y="530" width="200" height="60" as="geometry" />
                 </mxCell>
                 <mxCell id="p2_submit" value="Submit for Approval" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="450" y="400" width="200" height="50" as="geometry"/>
+                    <mxGeometry x="450" y="650" width="200" height="50" as="geometry" />
                 </mxCell>
                 <mxCell id="p2_e3" value="" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;" parent="1" source="p2_create" target="p2_submit" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
-                <mxCell id="p2_db" value="Save to&#xa;Supabase" style="shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="480" y="520" width="140" height="80" as="geometry"/>
+                <mxCell id="p2_db" value="Save to&#10;Supabase" style="shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="480" y="770" width="140" height="80" as="geometry" />
                 </mxCell>
                 <mxCell id="p2_e4" value="Status: Pending" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;labelBackgroundColor=#ffffff;" parent="1" source="p2_submit" target="p2_db" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
-                <mxCell id="p2_note" value="Goes to Admin Approval Flow&#xa;(See Page 3)" style="shape=note;size=14;strokeWidth=1;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=2;fontSize=11;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="440" y="660" width="220" height="50" as="geometry"/>
+                <mxCell id="p2_note" value="Goes to Admin Approval Flow&#10;(See Page 3)" style="shape=note;size=14;strokeWidth=1;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=2;fontSize=11;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="440" y="910" width="220" height="50" as="geometry" />
                 </mxCell>
                 <mxCell id="p2_e5" value="" style="startArrow=none;endArrow=block;rounded=0;dashed=1;dashPattern=2 3;fontColor=#000000;" parent="1" source="p2_db" target="p2_note" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
                 <mxCell id="p2_footer" value="Page 2 of 4" style="text;html=1;fontSize=11;fontStyle=2;align=right;verticalAlign=bottom;whiteSpace=wrap;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="950" y="800" width="120" height="30" as="geometry"/>
+                    <mxGeometry x="950" y="1050" width="120" height="30" as="geometry" />
                 </mxCell>
-            </root>
+            <mxCell id="manual_collect" value="Manual Field Surveys&lt;br/&gt;(Forms 01A-07)" style="whiteSpace=wrap;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1" vertex="1" parent="1"><mxGeometry x="450" y="280" width="200" height="60" as="geometry" /></mxCell><mxCell id="manual_digitize" value="Manual Encoding&lt;br/&gt;(Word/Excel)" style="whiteSpace=wrap;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=1" vertex="1" parent="1"><mxGeometry x="450" y="380" width="200" height="60" as="geometry" /></mxCell><mxCell id="edge_manual_1" edge="1" parent="1" source="p2_dash" target="manual_collect" style="endArrow=block;rounded=0;entryX=0.5;entryY=0;exitX=0.5;exitY=1;"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="edge_manual_2" edge="1" parent="1" source="manual_collect" target="manual_digitize" style="endArrow=block;rounded=0;entryX=0.5;entryY=0;exitX=0.5;exitY=1;"><mxGeometry relative="1" as="geometry" /></mxCell><mxCell id="edge_manual_3" edge="1" parent="1" source="manual_digitize" target="p2_create" style="endArrow=block;rounded=0;entryX=0.5;entryY=0;exitX=0.5;exitY=1;"><mxGeometry relative="1" as="geometry" /></mxCell></root>
         </mxGraphModel>
     </diagram>
     <diagram name="Page 3 - Admin Approval Flow" id="page3">
         <mxGraphModel dx="804" dy="330" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
             <root>
-                <mxCell id="0"/>
-                <mxCell id="1" parent="0"/>
+                <mxCell id="0" />
+                <mxCell id="1" parent="0" />
                 <mxCell id="title3" value="System Flowchart — Page 3: Admin Approval Flow" style="text;html=1;fontSize=18;fontStyle=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="200" y="20" width="700" height="40" as="geometry"/>
+                    <mxGeometry x="200" y="20" width="700" height="40" as="geometry" />
                 </mxCell>
-                <mxCell id="p3_entry" value="Logged in as&#xa;Admin" style="rounded=1;whiteSpace=wrap;arcSize=30;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=2;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="430" y="80" width="240" height="50" as="geometry"/>
+                <mxCell id="p3_entry" value="Logged in as&#10;Admin" style="rounded=1;whiteSpace=wrap;arcSize=30;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;fontStyle=2;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="430" y="80" width="240" height="50" as="geometry" />
                 </mxCell>
                 <mxCell id="p3_dash" value="Admin Dashboard" style="whiteSpace=wrap;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="450" y="170" width="200" height="50" as="geometry"/>
+                    <mxGeometry x="450" y="170" width="200" height="50" as="geometry" />
                 </mxCell>
                 <mxCell id="p3_e1" value="" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;" parent="1" source="p3_entry" target="p3_dash" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
-                <mxCell id="p3_review" value="Review Pending&#xa;Submissions" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="450" y="270" width="200" height="60" as="geometry"/>
+                <mxCell id="p3_review" value="Review Pending&#10;Submissions" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="450" y="270" width="200" height="60" as="geometry" />
                 </mxCell>
                 <mxCell id="p3_e2" value="" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;" parent="1" source="p3_dash" target="p3_review" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
-                <mxCell id="p3_approve" value="Approve&#xa;Content?" style="rhombus;strokeWidth=2;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="480" y="380" width="140" height="120" as="geometry"/>
+                <mxCell id="p3_approve" value="Approve&#10;Content?" style="rhombus;strokeWidth=2;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="480" y="380" width="140" height="120" as="geometry" />
                 </mxCell>
                 <mxCell id="p3_e3" value="" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;" parent="1" source="p3_review" target="p3_approve" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
                 <mxCell id="p3_reject" value="Reject Submission" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="290" y="560" width="160" height="50" as="geometry"/>
+                    <mxGeometry x="290" y="560" width="160" height="50" as="geometry" />
                 </mxCell>
-                <mxCell id="p3_approved" value="Set Status to&#xa;&#39;Approved&#39;" style="whiteSpace=wrap;strokeWidth=2;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="650" y="560" width="160" height="50" as="geometry"/>
+                <mxCell id="p3_approved" value="Set Status to&#10;'Approved'" style="whiteSpace=wrap;strokeWidth=2;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="650" y="560" width="160" height="50" as="geometry" />
                 </mxCell>
                 <mxCell id="p3_e4" value="No" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;labelBackgroundColor=#ffffff;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="p3_approve" target="p3_reject" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
-                            <mxPoint x="370" y="440"/>
+                            <mxPoint x="370" y="440" />
                         </Array>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="p3_e5" value="Yes" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;labelBackgroundColor=#ffffff;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="p3_approve" target="p3_approved" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
-                            <mxPoint x="730" y="440"/>
+                            <mxPoint x="730" y="440" />
                         </Array>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="p3_db" value="Update Status in&#xa;Supabase" style="shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="660" y="700" width="140" height="80" as="geometry"/>
+                <mxCell id="p3_db" value="Update Status in&#10;Supabase" style="shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="660" y="700" width="140" height="80" as="geometry" />
                 </mxCell>
                 <mxCell id="p3_e7" value="" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;" parent="1" source="p3_approved" target="p3_db" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
                 <mxCell id="p3_footer" value="Page 3 of 4" style="text;html=1;fontSize=11;fontStyle=2;align=right;verticalAlign=bottom;whiteSpace=wrap;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="950" y="800" width="120" height="30" as="geometry"/>
+                    <mxGeometry x="950" y="800" width="120" height="30" as="geometry" />
                 </mxCell>
             </root>
         </mxGraphModel>
@@ -179,46 +174,46 @@
     <diagram name="Page 4 - Public Browsing Flow" id="page4">
         <mxGraphModel dx="888" dy="365" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
             <root>
-                <mxCell id="0"/>
-                <mxCell id="1" parent="0"/>
+                <mxCell id="0" />
+                <mxCell id="1" parent="0" />
                 <mxCell id="title4" value="System Flowchart — Page 4: Public User Browsing Flow" style="text;html=1;fontSize=18;fontStyle=1;align=center;verticalAlign=middle;whiteSpace=wrap;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="200" y="20" width="700" height="40" as="geometry"/>
+                    <mxGeometry x="200" y="20" width="700" height="40" as="geometry" />
                 </mxCell>
-                <mxCell id="p4_entry" value="From Page 1:&#xa;Guest / Not Logged In / User Role" style="rounded=1;whiteSpace=wrap;arcSize=30;strokeWidth=2;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=2;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="80" y="120" width="240" height="50" as="geometry"/>
+                <mxCell id="p4_entry" value="From Page 1:&#10;Guest / Not Logged In / User Role" style="rounded=1;whiteSpace=wrap;arcSize=30;strokeWidth=2;fillColor=#e1d5e7;strokeColor=#9673a6;fontStyle=2;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="120" width="240" height="50" as="geometry" />
                 </mxCell>
-                <mxCell id="p4_browse" value="Browse Interactive Map&#xa;&amp; Events" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="370" y="110" width="240" height="60" as="geometry"/>
+                <mxCell id="p4_browse" value="Browse Interactive Map&#10;&amp; Events" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="370" y="110" width="240" height="60" as="geometry" />
                 </mxCell>
                 <mxCell id="p4_e1" value="" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;" parent="1" source="p4_entry" target="p4_browse" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
                 <mxCell id="p4_filter" value="Filter by Category / Location" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="370" y="240" width="240" height="50" as="geometry"/>
+                    <mxGeometry x="370" y="240" width="240" height="50" as="geometry" />
                 </mxCell>
                 <mxCell id="p4_e2" value="" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;" parent="1" source="p4_browse" target="p4_filter" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
-                <mxCell id="p4_fetch" value="Fetch Approved&#xa;Data" style="shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="410" y="360" width="160" height="80" as="geometry"/>
+                <mxCell id="p4_fetch" value="Fetch Approved&#10;Data" style="shape=cylinder3;boundedLbl=1;backgroundOutline=1;size=10;strokeWidth=2;whiteSpace=wrap;fillColor=#f5f5f5;strokeColor=#666666;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="410" y="360" width="160" height="80" as="geometry" />
                 </mxCell>
                 <mxCell id="p4_e3" value="" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;" parent="1" source="p4_filter" target="p4_fetch" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
                 <mxCell id="p4_details" value="View Attraction Details" style="whiteSpace=wrap;strokeWidth=2;fillColor=#dae8fc;strokeColor=#6c8ebf;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="370" y="510" width="240" height="50" as="geometry"/>
+                    <mxGeometry x="370" y="510" width="240" height="50" as="geometry" />
                 </mxCell>
                 <mxCell id="p4_e4" value="" style="startArrow=none;endArrow=block;rounded=0;fontColor=#000000;" parent="1" source="p4_fetch" target="p4_details" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
-                <mxCell id="p4_note" value="Data comes from approved&#xa;content managed on Page 3" style="shape=note;size=14;strokeWidth=1;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=2;fontSize=11;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="680" y="370" width="220" height="50" as="geometry"/>
+                <mxCell id="p4_note" value="Data comes from approved&#10;content managed on Page 3" style="shape=note;size=14;strokeWidth=1;whiteSpace=wrap;fillColor=#fff2cc;strokeColor=#d6b656;fontStyle=2;fontSize=11;fontColor=#000000;" parent="1" vertex="1">
+                    <mxGeometry x="680" y="370" width="220" height="50" as="geometry" />
                 </mxCell>
                 <mxCell id="p4_e5" value="" style="startArrow=none;endArrow=none;rounded=0;dashed=1;dashPattern=2 3;fontColor=#000000;" parent="1" source="p4_note" target="p4_fetch" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                    <mxGeometry relative="1" as="geometry" />
                 </mxCell>
                 <mxCell id="p4_footer" value="Page 4 of 4" style="text;html=1;fontSize=11;fontStyle=2;align=right;verticalAlign=bottom;whiteSpace=wrap;fontColor=#000000;" parent="1" vertex="1">
-                    <mxGeometry x="950" y="800" width="120" height="30" as="geometry"/>
+                    <mxGeometry x="950" y="800" width="120" height="30" as="geometry" />
                 </mxCell>
             </root>
         </mxGraphModel>

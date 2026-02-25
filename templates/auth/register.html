@@ -3,116 +3,7 @@
 {% block title %}Join the Heritage - GoMangatarem Heritage Portal{% endblock %}
 
 {% block head %}
-<style>
-    .bg-pattern {
-        background-color: #022c22;
-        background-image:
-            radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.1) 0px, transparent 50%),
-            radial-gradient(at 100% 0%, rgba(5, 150, 105, 0.1) 0px, transparent 50%);
-    }
-
-    .topographic-overlay {
-        mask-image: linear-gradient(to bottom, black, transparent);
-        -webkit-mask-image: linear-gradient(to bottom, black, transparent);
-    }
-
-    @keyframes float {
-
-        0%,
-        100% {
-            transform: translateY(0) scale(1);
-        }
-
-        50% {
-            transform: translateY(-20px) scale(1.05);
-        }
-    }
-
-    .animate-float {
-        animation: float 10s ease-in-out infinite;
-    }
-
-    .glass-card {
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(20px);
-        -webkit-backdrop-filter: blur(20px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-    }
-
-    .input-glass {
-        background: rgba(2, 44, 34, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: white;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-
-    .input-glass:focus {
-        background: rgba(2, 44, 34, 0.6);
-        border-color: #10b981;
-        box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
-    }
-
-    .gold-shimmer {
-        background: linear-gradient(45deg, #10b981, #34d399, #10b981);
-        background-size: 200% auto;
-        animation: shimmer 3s linear infinite;
-    }
-
-    @keyframes shimmer {
-        to {
-            background-position: 200% center;
-        }
-    }
-
-    .google-btn-wrapper {
-        max-width: 100%;
-        overflow: hidden;
-    }
-
-    /* Custom Radio Styling for Dark Theme */
-    .role-card input:checked+.role-content {
-        border-color: #10b981;
-        background-color: rgba(16, 185, 129, 0.1);
-        transform: translateY(-4px);
-        box-shadow: 0 15px 30px -5px rgba(16, 185, 129, 0.2);
-    }
-
-    .role-card input:checked+.role-content .role-icon {
-        transform: scale(1.1);
-        filter: drop-shadow(0 0 10px rgba(16, 185, 129, 0.5));
-    }
-
-    .role-card input:checked+.role-content .role-check {
-        opacity: 1;
-    }
-
-    /* Select styling */
-    select.input-glass {
-        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2310b981' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-        background-position: right 1rem center;
-        background-repeat: no-repeat;
-        background-size: 1.5em 1.5em;
-        -webkit-appearance: none;
-        appearance: none;
-    }
-
-    @keyframes fadeInDown {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
-    }
-
-    .animate-fade-in {
-        animation: fadeInDown 0.5s ease-out forwards;
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/auth.css') }}">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 {% endblock %}
 
@@ -303,33 +194,7 @@
                         data-text="signup_with" data-size="large" data-logo_alignment="left">
                     </div>
                 </div>
-                <script>
-                    (function() {
-                        function setGoogleBtnWidth() {
-                            var container = document.getElementById('google-btn-container');
-                            var btn = document.getElementById('g_id_signin_btn');
-                            if (container && btn) {
-                                var w = Math.min(400, container.offsetWidth);
-                                btn.setAttribute('data-width', w);
-                            }
-                        }
-                        setGoogleBtnWidth();
-                        window.addEventListener('resize', function() {
-                            setGoogleBtnWidth();
-                            if (window.google && window.google.accounts) {
-                                var btn = document.getElementById('g_id_signin_btn');
-                                if (btn) {
-                                    btn.innerHTML = '';
-                                    google.accounts.id.renderButton(btn, {
-                                        type: 'standard', shape: 'pill', theme: 'filled_black',
-                                        text: 'signup_with', size: 'large', logo_alignment: 'left',
-                                        width: Math.min(400, document.getElementById('google-btn-container').offsetWidth)
-                                    });
-                                }
-                            }
-                        });
-                    })();
-                </script>
+                <script src="{{ url_for('static', filename='js/pages/auth.js') }}" defer></script>
 
                 <p class="text-center text-sm font-medium text-emerald-100/40 mt-8">
                     Returning to your roots?
@@ -356,19 +221,4 @@
     </div>
 </div>
 
-<script>
-    function toggleBarangay(input) {
-        const section = document.getElementById('barangay-section');
-        const select = document.getElementById('barangay-select');
-        if (input.value === 'contributor') {
-            section.classList.remove('hidden');
-            section.classList.add('animate-fade-in');
-            select.required = true;
-        } else {
-            section.classList.add('hidden');
-            section.classList.remove('animate-fade-in');
-            select.required = false;
-        }
-    }
-</script>
 {% endblock %}

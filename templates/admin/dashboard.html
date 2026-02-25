@@ -5,81 +5,7 @@
 {% endblock %}
 
 {% block head %}
-<style>
-    .glass-card {
-        background: rgba(255, 255, 255, 0.8);
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
-    }
-
-    .heritage-gradient {
-        background: linear-gradient(135deg, #065f46 0%, #064e3b 100%);
-    }
-
-    .bento-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        grid-auto-rows: minmax(160px, auto);
-        gap: 1.5rem;
-    }
-
-    @media (max-width: 1024px) {
-        .bento-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @media (max-width: 640px) {
-        .bento-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    /* Manual Tailwind Overrides for missing build utilities */
-    .col-span-1 {
-        grid-column: span 1 / span 1;
-    }
-
-    .col-span-2 {
-        grid-column: span 2 / span 2;
-    }
-
-    .col-span-3 {
-        grid-column: span 3 / span 3;
-    }
-
-    .col-span-4 {
-        grid-column: span 4 / span 4;
-    }
-
-    @media (min-width: 1024px) {
-        .lg\:col-span-1 {
-            grid-column: span 1 / span 1;
-        }
-
-        .lg\:col-span-2 {
-            grid-column: span 2 / span 2;
-        }
-
-        .lg\:col-span-3 {
-            grid-column: span 3 / span 3;
-        }
-
-        .lg\:col-span-4 {
-            grid-column: span 4 / span 4;
-        }
-    }
-
-    .rounded-3xl {
-        border-radius: 1.5rem;
-    }
-
-    .min-h-\[400px\] {
-        min-height: 400px;
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/admin_dashboard.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -108,6 +34,7 @@
 
     <!-- Main Grid -->
     <div class="container mx-auto px-6 -mt-20">
+        {% block admin_content %}
         <div class="bento-grid">
             <!-- Stats Bento -->
             <div
@@ -366,12 +293,15 @@
                 </div>
             </div>
         </div>
+        {% endblock %}
     </div>
 </div>
 {% endblock %}
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='vendor/chartjs/chart.min.js') }}"></script>
+{% block dashboard_scripts %}
+{% if engagement_data %}
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const ctx = document.getElementById('engagementChart').getContext('2d');
@@ -429,4 +359,6 @@
         });
     });
 </script>
+{% endif %}
+{% endblock %}
 {% endblock %}

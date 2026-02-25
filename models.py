@@ -20,64 +20,56 @@ class User(UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
 
+class HeritageProfile(db.Model):
+    """Base model for all cultural heritage and tourism forms."""
+    __tablename__ = 'heritage_profile'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    asset_type = db.Column(db.String(50), nullable=False) # 'built', 'natural', etc.
+    form_control_number = db.Column(db.String(50), unique=True, nullable=True) # Link to manual form
+    
+    # Shared Fields
+    mapper_name = db.Column(db.String(200), nullable=True)
+    date_profiled = db.Column(db.Date, nullable=True)
+    status = db.Column(db.String(20), default='pending', index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
+    reviewed_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
+    reviewed_at = db.Column(db.DateTime, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # Shared Documentation
+    key_informants = db.Column(db.JSON, nullable=True)
+    reference_sources = db.Column(db.Text, nullable=True)
+    significance = db.Column(db.Text, nullable=True)
+    constraints_threats = db.Column(db.Text, nullable=True)
+    conservation_measures = db.Column(db.Text, nullable=True)
+    common_photo_url = db.Column(db.String(500), nullable=True)
+    
+    # Relationships to detail tables (defined in detail classes)
+    # attraction = db.relationship('Attraction', backref='profile', uselist=False)
+
+
 class Attraction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), nullable=False, index=True)
     description = db.Column(db.Text, nullable=False)
-    category = db.Column(
-        db.String(50), nullable=False, index=True
-    )  # Nature, Historical, Religious, etc.
+    category = db.Column(db.String(50), nullable=False, index=True) 
     barangay = db.Column(db.String(100), nullable=True, index=True)
     lat = db.Column(db.Float, nullable=False)
     lng = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(200), nullable=True)
-    status = db.Column(
-        db.String(20), default="pending", index=True
-    )  # 'pending', 'approved'
+    form_control_number = db.Column(db.String(50), nullable=True) # Link to manual form
+    
+    # Link to heritage documentation
+    heritage_profile_id = db.Column(db.Integer, db.ForeignKey("heritage_profile.id"), nullable=True)
+    profile = db.relationship('HeritageProfile', backref=db.backref('attraction', uselist=False))
+
+    status = db.Column(db.String(20), default="pending", index=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True, index=True)
     reviewed_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
     reviewed_at = db.Column(db.DateTime, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
-    
-    # === Heritage Fields (Form 02A & 03A Support) ===
-    
-    # Heritage Type Indicator
-    heritage_type = db.Column(db.String(50), nullable=True)  # 'building', 'archaeological', 'natural', 'standard'
-    
-    # Form 02A - Tangible Immovable (Buildings) Fields
-    building_type = db.Column(db.String(50), nullable=True)  # municipal_hall, church, bridge, etc.
-    year_constructed = db.Column(db.Integer, nullable=True)
-    ownership_type = db.Column(db.String(20), nullable=True)  # public/private
-    declaration_legislation = db.Column(db.Text, nullable=True)
-    physical_description = db.Column(db.Text, nullable=True)
-    history_structure = db.Column(db.Text, nullable=True)
-    occupation_status = db.Column(db.String(20), nullable=True)  # occupied/not_occupied
-    stories_associated = db.Column(db.Text, nullable=True)
-    condition = db.Column(db.String(20), nullable=True)  # excellent/good/fair/deteriorated/ruins
-    condition_remarks = db.Column(db.Text, nullable=True)
-    is_altered = db.Column(db.Boolean, nullable=True)
-    is_original_site = db.Column(db.Boolean, nullable=True)
-    integrity_remarks = db.Column(db.Text, nullable=True)
-    conservation_measures = db.Column(db.Text, nullable=True)
-    movable_heritage_list = db.Column(db.JSON, nullable=True)  # List of objects within premises
-    
-    # Form 03A - Tangible Movable (Archaeological) Fields
-    object_type = db.Column(db.String(50), nullable=True)  # stone_tools, ceramics, metal, etc.
-    place_found = db.Column(db.String(200), nullable=True)
-    date_found = db.Column(db.Date, nullable=True)
-    estimated_age = db.Column(db.String(100), nullable=True)
-    acquisition_type = db.Column(db.String(50), nullable=True)
-    materials = db.Column(db.String(200), nullable=True)
-    dimensions = db.Column(db.String(100), nullable=True)
-    comparative_criteria = db.Column(db.Text, nullable=True)  # Provenance, Rarity, etc.
-    
-    # Common Heritage Fields (applicable to Forms 02A & 03A)
-    significance_types = db.Column(db.JSON, nullable=True)  # Array: ['historical', 'aesthetic', 'spiritual']
-    constraints_threats = db.Column(db.Text, nullable=True)
-    key_informants = db.Column(db.JSON, nullable=True)
-    references = db.Column(db.Text, nullable=True)
-    mapper_name = db.Column(db.String(200), nullable=True)
-    date_profiled = db.Column(db.Date, nullable=True)
 
 
 
@@ -175,8 +167,11 @@ class Review(db.Model):
 
 # === Heritage Models (Tourism Forms) ===
 # Import heritage models to register them with SQLAlchemy
-from heritage_models.natural_heritage import NaturalHeritage  # noqa: E402, F401
-from heritage_models.intangible_heritage import IntangibleHeritage  # noqa: E402, F401
-from heritage_models.personality_profile import PersonalityProfile  # noqa: E402, F401
-from heritage_models.cultural_institution import CulturalInstitution  # noqa: E402, F401
-from heritage_models.lgu_culture_program import LGUCultureProgram  # noqa: E402, F401
+# === Heritage Models (Tourism Forms - Detail Tables) ===
+from heritage_models.natural_heritage import NaturalHeritage  # Form 01A
+from heritage_models.built_heritage import BuiltHeritage      # Form 02A
+from heritage_models.movable_heritage import MovableHeritage  # Form 03A
+from heritage_models.intangible_heritage import IntangibleHeritage  # Form 04A
+from heritage_models.personality_profile import PersonalityProfile  # Form 05
+from heritage_models.cultural_institution import CulturalInstitution  # Form 06
+from heritage_models.lgu_culture_program import LGUCultureProgram  # Form 07

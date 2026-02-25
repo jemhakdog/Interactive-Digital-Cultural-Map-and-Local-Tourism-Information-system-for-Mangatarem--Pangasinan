@@ -46,7 +46,8 @@ ELEMENTS = {
     # Process Stack Left (1.0, 2.0, 5.0)
     "P1": ("process", "1.0", "User\nAuthentication", COL2_X, 100),
     "P2": ("process", "2.0", "Content\nManagement", COL2_X, 400),
-    "P5": ("process", "5.0", "Admin\nApproval", COL2_X, 700),
+    "P9": ("process", "9.0", "Heritage\nManagement", COL2_X, 700),
+    "P5": ("process", "5.0", "Admin\nApproval", COL2_X, 1000),
 
     # Process Stack Right (3.0, 4.0, 8.0, 6.0, 7.0)
     "P3": ("process", "3.0", "Interactive\nMap Display", COL4_X, 100),
@@ -64,11 +65,19 @@ ELEMENTS = {
     "D1": ("store", "1", "User_db", COL2_X + 10, 220),       # Under P1
     "D2": ("store", "2", "Attraction_db", COL2_X + 10, 520), # Under P2
     "D3": ("store", "3", "Event_db", 720, 350),             # Between COL2 and HUB
-    "D5": ("store", "4", "Barangay_db", 720, 750),          # Between COL2 and HUB
-    "D7": ("store", "5", "Review_db", COL4_X + 10, 620),    # Under P8
-    "D8": ("store", "6", "Favorite_db", COL4_X + 10, 820),  # Under P6
-    "D6": ("store", "7", "PageView_db", 1200, 400),         # Between HUB and COL4
-    "D9": ("store", "8", "Reports_db", 1200, 950),          # Between HUB and COL4
+    "D4": ("store", "4", "Barangay_db", 720, 750),          # Between COL2 and HUB (Fixed ID)
+    "D15": ("store", "15", "Heritage_Profile", 250, 620),   # New Hub store for heritage
+    "D16": ("store", "16", "Built_Heritage", 250, 680),     # Specific detail
+    "D17": ("store", "17", "Movable_Heritage", 250, 740),   # Specific detail
+    "D10": ("store", "10", "Natural_Heritage", 250, 800),   
+    "D11": ("store", "11", "Intangible_Heritage", 250, 860),
+    "D12": ("store", "12", "Cultural_Inst", 250, 920),
+    "D13": ("store", "13", "LGU_Program", 720, 820),        # Right of P9
+    "D14": ("store", "14", "Personality", 720, 880),       
+    "D7":  ("store", "5", "Review_db", COL4_X + 10, 620),    
+    "D8":  ("store", "6", "Favorite_db", COL4_X + 10, 820),  
+    "D6":  ("store", "7", "PageView_db", 1200, 400),         
+    "D9":  ("store", "8", "Reports_db", 1200, 950),          
 }
 
 # ─── Data Flows ───
@@ -78,6 +87,8 @@ FLOWS = [
     ("P1", "E_ADMIN", "Auth Status"),
     ("E_ADMIN", "P2", "Resident Data"), # Mapping Content as Resident
     ("P2", "E_ADMIN", "Status Update"),
+    ("E_ADMIN", "P9", "Heritage Data"),
+    ("P9", "E_ADMIN", "Heritage Status"),
     ("E_ADMIN", "P5", "Review Content"),
     ("P5", "E_ADMIN", "Approval Result"),
     ("E_ADMIN", "P7", "Reports Request"),
@@ -86,6 +97,7 @@ FLOWS = [
     # HUB connections (Spokes)
     ("P1", "HUB", "User Accounts"),
     ("P2", "HUB", "Mangatarem Tourism Record"),
+    ("P9", "HUB", "Heritage Records"),
     ("P5", "HUB", "Approval Log"),
     ("HUB", "P3", "Map Content"),
     ("HUB", "P4", "Discovery Data"),
@@ -113,8 +125,18 @@ FLOWS = [
     ("D2", "P2", "Attraction Record"),
     ("P2", "D3", "Event Content"),
     ("D3", "P2", "Event Details"),
-    ("P2", "D5", "Barangay Data"),
-    ("P5", "D2", "Approval Status"), # Write approval back to Attraction_db
+    ("P2", "D4", "Barangay Data"),
+    ("P9", "D15", "Heritage Profile Entry"),
+    ("D15", "P9", "Profile Record"),
+    ("P9", "D16", "Built Details"),
+    ("P9", "D17", "Movable Details"),
+    ("P9", "D10", "Natural Details"),
+    ("P9", "D11", "Intangible Details"),
+    ("P9", "D12", "Inst Details"),
+    ("P9", "D13", "Program Details"),
+    ("P9", "D14", "Personality Details"),
+    ("P5", "D2", "Approval Status"), 
+    ("P5", "D15", "Profile Approval"),
     ("P8", "D7", "New Review"),
     ("D7", "P8", "Review Feed"),
     ("P6", "D8", "Save Favorite"),
@@ -153,7 +175,7 @@ def build_xml():
         node_ids[name] = nid
 
         if etype == "hub":
-            style = "rounded=0;whiteSpace=wrap;html=1;strokeWidth=3;fontSize=16;fontStyle=1;align=center;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;"
+            style = "rounded=1;whiteSpace=wrap;html=1;strokeWidth=3;fontSize=16;fontStyle=1;align=center;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;"
             node = ET.SubElement(root_cell, "mxCell", id=nid, value=label, style=style, parent="1", vertex="1")
             ET.SubElement(node, "mxGeometry", x=str(x), y=str(y), width=str(HUB_W), height=str(HUB_H)).set("as", "geometry")
 
@@ -170,13 +192,13 @@ def build_xml():
             
             # Header Bar
             header = ET.SubElement(root_cell, "mxCell", id=next_id(), value=id_val,
-                                   style=f"rounded=0;whiteSpace=wrap;html=1;fillColor={COLOR_PROCESS};strokeColor=#000000;fontStyle=1;fontColor=#000000;align=center;verticalAlign=middle;strokeWidth=1.5;",
+                                   style=f"rounded=1;whiteSpace=wrap;html=1;fillColor={COLOR_PROCESS};strokeColor=#000000;fontStyle=1;fontColor=#000000;align=center;verticalAlign=middle;strokeWidth=1.5;",
                                    parent=nid, vertex="1")
             ET.SubElement(header, "mxGeometry", width=str(PROCESS_W), height="30").set("as", "geometry")
             
             # Body Box
             body = ET.SubElement(root_cell, "mxCell", id=next_id(), value=label,
-                                 style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;verticalAlign=middle;fontSize=11;strokeWidth=1.5;",
+                                 style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;align=center;verticalAlign=middle;fontSize=11;strokeWidth=1.5;",
                                  parent=nid, vertex="1")
             ET.SubElement(body, "mxGeometry", y="30", width=str(PROCESS_W), height=str(PROCESS_H-30)).set("as", "geometry")
 
@@ -243,7 +265,7 @@ def main():
     xml_str = ET.tostring(root, encoding="utf-8").decode("utf-8")
     xml_str = xml_str.replace(' as_="geometry"', ' as="geometry"')
     
-    output_path = "docs/diagrams/dfd-level-1-clean.drawio"
+    output_path = "docs/diagrams/dfd-level-1-clean_v1.drawio"
     with open(output_path, "w", encoding="utf-8") as f:
         f.write('<?xml version="1.0" encoding="UTF-8"?>\n')
         f.write(xml_str)

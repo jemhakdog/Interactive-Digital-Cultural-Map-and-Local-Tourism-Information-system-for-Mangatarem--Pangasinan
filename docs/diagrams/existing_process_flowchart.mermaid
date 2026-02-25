@@ -1,0 +1,16 @@
+graph TD
+    A[Start: Data Collection Needs] --> B[Manual Field Surveys<br/>(Forms 01A-07)]
+    B --> C[Manual Encoding<br/>(Word/Excel)]
+    C --> D[Barangay Dashboard Submission]
+    D --> E{Content Approved?}
+    E -- Yes --> F[Database Storage]
+    E -- No --> G[Return to Barangay]
+    F --> H[Public Access<br/>(Interactive Map)]
+
+    style B fill:#f9f,stroke:#333,stroke-width:2px,color:black
+    style C fill:#f9f,stroke:#333,stroke-width:2px,color:black
+    
+    subgraph Bottlenecks
+    B
+    C
+    end

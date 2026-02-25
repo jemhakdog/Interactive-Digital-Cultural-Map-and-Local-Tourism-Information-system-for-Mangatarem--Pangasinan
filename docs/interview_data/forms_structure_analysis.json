@@ -1,15 +1,14 @@
 {
   "Form 01A Natural Resources - Land formation 2019 - Mangatarem Tourism": {
-    "form_name": "Form 01A Natural Resources - Land formation 2019 - Mangatarem Tourism",
     "paragraphs": [
       {
         "index": 0,
-        "text": "Mapping of Significant Natural Resources\nCategory: Natural Geological and Physiographical / Land Formations",
+        "text": "Mapping of Significant Natural Resources Category: Natural Geological and Physiographical / Land Formations",
         "style": "Normal"
       },
       {
         "index": 1,
-        "text": "NAME OF NATURAL HERITAGE:",
+        "text": "NAME OF NATURAL HERITAGE:janjs",
         "style": "Normal"
       },
       {
@@ -96,15 +95,15 @@
         "content": [
           [
             "A. SUB-CATEGORY",
-            "[  ]MOUNTAIN       [  ]VOLCANO               [  ]HILL                                           [  ]SANDBAR"
+            "[ ]MOUNTAIN [ ]VOLCANO [ ]HILL [ ]SANDBAR"
           ],
           [
             "A. SUB-CATEGORY",
-            "[  ]VALLEY               [  ]BASIN                      [  ]MARSHLAND                           [  ]ROCK SHELTER"
+            "[ ]VALLEY [ ]BASIN [ ]MARSHLAND [ ]ROCK SHELTER"
           ],
           [
             "",
-            "[  ]SHORE                [  ]MUD                       [  ]ROCK/STONE FORMATION   [  ]PLAINS                     [  ]PLATEAU            [  ]SINKHOLE              [  ]CAVE                                         [   ]OTHER ________"
+            "[ ]SHORE [ ]MUD [ ]ROCK/STONE FORMATION [ ]PLAINS [ ]PLATEAU [ ]SINKHOLE [ ]CAVE [ ]OTHER ________"
           ]
         ]
       },
@@ -131,8 +130,7 @@
           ]
         ]
       }
-    ],
-    "fields": []
+    ]
   },
   "Form 02A Tangible Immovable - Govt and Commercial Buildings 2019 (1) - Mangatarem Tourism": {
     "form_name": "Form 02A Tangible Immovable - Govt and Commercial Buildings 2019 (1) - Mangatarem Tourism",

@@ -290,8 +290,13 @@ def login():
             logger.info(f"User '{username}' with role '{user.role}' logged in successfully")
             login_user(user, remember=True)
             
-            if user.role == "user":
+            if user.role == "admin":
+                return redirect(url_for("admin.admin_dashboard"))
+            elif user.role == "contributor":
+                return redirect(url_for("barangay.barangay_dashboard"))
+            elif user.role == "user":
                 return redirect(url_for("user.dashboard"))
+            
             return redirect(url_for("public.index"))
         
         log_error("auth", "login", f"Invalid credentials for '{username}'")
@@ -402,6 +407,12 @@ def google_login():
     
     log_success("auth", "google_login", f"Logging in existing user {email} (ID: {user.id})")
     login_user(user, remember=True)
+    
+    if user.role == "admin":
+        return redirect(url_for("admin.admin_dashboard"))
+    elif user.role == "contributor":
+        return redirect(url_for("barangay.barangay_dashboard"))
+    
     return redirect(url_for("user.dashboard"))
 
 

@@ -18,8 +18,18 @@
 
 <!-- Mapbox GL JS CSS (Moved to head for better container sizing) -->
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/map-custom.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/map.css') }}">
 {% endblock %}
+...
+<!-- Mapbox GL JS -->
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+
+<!-- Pass Mapbox Token to JavaScript -->
+<script>
+    window.MAPBOX_TOKEN = "{{ mapbox_token }}";
+</script>
+
+<script src="{{ url_for('static', filename='js/pages/map.js') }}"></script>
 
 {% block content %}
 <div class="relative flex flex-col md:flex-row h-[calc(100vh-64px)] overflow-hidden">

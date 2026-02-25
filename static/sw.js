@@ -57,6 +57,12 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // Exclude sensitive/authenticated routes from caching
+    const sensitiveRoutes = ['/admin', '/auth', '/user', '/barangay-admin', '/barangay'];
+    if (sensitiveRoutes.some(route => url.pathname.startsWith(route))) {
+        return; // Let the browser handle these normally (from network)
+    }
+
     // Default Stale-While-Revalidate for other assets
     event.respondWith(
         caches.match(event.request).then((response) => {

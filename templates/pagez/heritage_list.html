@@ -1,0 +1,75 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<main class="bg-heritage-cream min-h-screen">
+    <!-- Breadcrumbs & Header -->
+    <div class="pt-32 pb-16 container mx-auto px-6">
+        <nav class="flex text-[10px] uppercase tracking-[0.3em] text-emerald-600/60 font-bold mb-6 reveal" data-aos="fade-up">
+            <a href="{{ url_for('public.heritage_index') }}" class="hover:text-emerald-500 transition">Heritage Registry</a>
+            <span class="mx-3 text-emerald-950/20">/</span>
+            <span class="text-emerald-950">{{ config.label_plural }}</span>
+        </nav>
+        
+        <div class="flex flex-col md:flex-row justify-between items-end gap-8 reveal" data-aos="fade-up">
+            <div class="max-w-3xl">
+                <h1 class="text-5xl md:text-7xl font-cultural font-bold text-emerald-950 mb-6 leading-tight">
+                    {{ config.label_plural }}
+                </h1>
+                <p class="text-gray-600 text-lg leading-relaxed">
+                    A curated collection of documentation for {{ config.label_plural|lower }} found across Mangatarem's barangays.
+                </p>
+            </div>
+            <div class="text-[10px] uppercase tracking-widest text-emerald-800/40 font-bold pb-2">
+                {{ items|length }} Elements Recorded
+            </div>
+        </div>
+        
+        <div class="h-px bg-emerald-900/10 w-full mt-12"></div>
+    </div>
+
+    <!-- Collection Grid -->
+    <section class="pb-32 container mx-auto px-6">
+        {% if items %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+            {% for item in items %}
+            <div class="group reveal" data-aos="fade-up" data-aos-delay="{{ loop.index % 3 * 100 }}">
+                <a href="{{ url_for('public.heritage_detail', heritage_type=heritage_type, item_id=item.id) }}">
+                    <div class="aspect-[4/5] overflow-hidden rounded-2xl mb-6 relative">
+                        <img src="{{ item.photo_url or url_for('static', filename='img/placeholder.jpg') }}" 
+                             alt="{{ item.name }}"
+                             class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 grayscale hover:grayscale-0">
+                        <div class="absolute inset-0 bg-emerald-950/20 group-hover:bg-transparent transition-colors duration-700"></div>
+                        
+                        <div class="absolute top-6 left-6">
+                            <span class="glass-stats py-2 px-4 rounded-full text-[10px] font-bold text-white uppercase tracking-widest border border-white/20">
+                                {{ item.barangay or 'Profiled Site' }}
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <h3 class="text-2xl font-bold text-emerald-950 mb-3 group-hover:text-emerald-700 transition">
+                        {{ item.name or item.municipality }}
+                    </h3>
+                    
+                    <p class="text-gray-500 text-sm line-clamp-2 leading-relaxed mb-4">
+                        {{ item.description or item.biography or item.vision_statement or 'No description available for this registry entry.' }}
+                    </p>
+                    
+                    <div class="flex items-center text-[10px] uppercase tracking-widest font-bold text-emerald-600">
+                        View Full Profile
+                        <svg class="ml-2 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                        </svg>
+                    </div>
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="py-32 text-center border-2 border-dashed border-emerald-900/5 rounded-3xl">
+            <p class="text-gray-400 italic font-cultural text-xl">The archive for this category is currently being digitized.</p>
+        </div>
+        {% endif %}
+    </section>
+</main>
+{% endblock %}

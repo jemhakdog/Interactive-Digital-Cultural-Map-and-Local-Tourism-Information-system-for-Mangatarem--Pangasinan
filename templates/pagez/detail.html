@@ -7,43 +7,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet/leaflet.css') }}" />
 <script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js') }}"></script>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const lat = {{ attraction.lat }} 
-        const lng = {{ attraction.lng }}
-
-    const map = L.map('mini-map', {
-        center: [lat, lng],
-        zoom: 15,
-        zoomControl: false,
-        dragging: !L.Browser.mobile,
-        touchZoom: L.Browser.mobile,
-        scrollWheelZoom: false
-    });
-
-    // Add Premium Dark/Emerald Tile Layer
-    L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-        attribution: '&copy; OpenStreetMap contributors'
-    }).addTo(map);
-
-    // Custom Marker
-    const customIcon = L.divIcon({
-        className: 'custom-div-icon',
-        html: `<div class="w-8 h-8 bg-emerald-500 rounded-full border-4 border-white shadow-xl flex items-center justify-center">
-                    <div class="w-2 h-2 bg-white rounded-full animate-ping"></div>
-                   </div>`,
-        iconSize: [32, 32],
-        iconAnchor: [16, 16]
-    });
-
-    L.marker([lat, lng], { icon: customIcon }).addTo(map);
-
-    // Add subtle interaction
-    map.on('click', function () {
-        window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
-    });
-    });
-</script>
+<script src="{{ url_for('static', filename='js/pages/detail.js') }}" defer></script>
 {% endblock %}
 
 {% block meta_description %}
@@ -52,65 +16,7 @@
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/home-heritage.css') }}">
-<style>
-    .editorial-hero {
-        position: relative;
-        height: 80vh;
-        min-height: 600px;
-        background: #022c22;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        overflow: hidden;
-    }
-
-    .aurora-blur {
-        position: absolute;
-        inset: -10%;
-        background: radial-gradient(circle at 60% 40%, rgba(16, 185, 129, 0.3) 0%, transparent 50%),
-            radial-gradient(circle at 40% 60%, rgba(212, 175, 55, 0.2) 0%, transparent 50%);
-        filter: blur(80px);
-        opacity: 0.6;
-        z-index: 1;
-    }
-
-    .hero-image-overlay {
-        position: absolute;
-        inset: 0;
-        z-index: 2;
-        background: linear-gradient(to bottom, rgba(2, 44, 34, 0.2), rgba(2, 44, 34, 0.6), rgba(2, 44, 34, 0.95));
-    }
-
-    .content-card-split {
-        margin-top: -120px;
-        position: relative;
-        z-index: 10;
-    }
-
-    .font-cultural {
-        font-family: 'Playfair Display', serif;
-    }
-
-    .font-body-premium {
-        font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    .glass-stats {
-        background: rgba(255, 255, 255, 0.03);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-
-    #mini-map {
-        height: 300px;
-        border-radius: 2rem;
-        z-index: 1;
-    }
-
-    .text-balance {
-        text-wrap: balance;
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/detail.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -258,7 +164,7 @@
                         Pathfinder
                     </h3>
 
-                    <div id="mini-map" class="mb-8 border border-white/10 shadow-inner"></div>
+                    <div id="mini-map" class="mb-8 border border-white/10 shadow-inner" data-lat="{{ attraction.lat }}" data-lng="{{ attraction.lng }}"></div>
 
                     <div class="space-y-6 relative z-10">
                         <div class="flex items-start gap-4">

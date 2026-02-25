@@ -35,7 +35,7 @@ This platform serves as a central digital resource for residents, students, and 
 ## 🚀 Getting Started
 ### Prerequisites
 - Python 3.8+
-- Node.js & npm (for Tailwind/JS build)
+- internet connection (for Tailwind CLI auto-download)
 
 ### Installation
 1. **Clone the repository**:
@@ -51,10 +51,9 @@ This platform serves as a central digital resource for residents, students, and 
    pip install -r requirements.txt
    ```
 
-3. **Setup Frontend Assets**:
+3. **Build Frontend Assets**:
    ```bash
-   npm install
-   npm run build
+   python build.py
    ```
 
 ### Running Locally

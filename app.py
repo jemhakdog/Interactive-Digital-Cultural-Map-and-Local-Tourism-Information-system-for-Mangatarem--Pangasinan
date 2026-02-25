@@ -17,6 +17,13 @@ from dotenv import load_dotenv
 # Load environment variables early
 load_dotenv()
 
+# Configure root logger so all info/debug messages print to console
+logging.basicConfig(
+    level=logging.DEBUG if os.environ.get("FLASK_ENV") != "production" else logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+
 logger = logging.getLogger(__name__)
 
 def create_app(config_name=None):
@@ -127,13 +134,31 @@ def _register_context_processors(app: Flask) -> None:
 
 def _register_request_hooks(app: Flask) -> None:
     """Register before/after request processing hooks."""
+    request_logger = logging.getLogger("request")
+
     @app.before_request
     def make_session_permanent():
         from flask import session
         session.permanent = True
 
     @app.after_request
-    def add_headers(response):
+    def log_and_add_headers(response):
+        # Log every user action (skip static files to reduce noise)
+        if not request.path.startswith("/static"):
+            from flask_login import current_user
+            user_info = (
+                f"user={current_user.username}(id={current_user.id})"
+                if hasattr(current_user, "username") and current_user.is_authenticated
+                else "user=anonymous"
+            )
+            request_logger.info(
+                "%s %s %s -> %s",
+                request.method,
+                request.path,
+                user_info,
+                response.status_code,
+            )
+
         response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
         
         # Smart Cache-Control logic

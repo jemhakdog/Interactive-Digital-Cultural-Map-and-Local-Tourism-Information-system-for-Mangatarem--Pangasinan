@@ -1,0 +1,24 @@
+/* Admin Documents CSS */
+
+.custom-scrollbar::-webkit-scrollbar {
+    width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(16, 185, 129, 0.2);
+    border-radius: 10px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: rgba(16, 185, 129, 0.4);
+}
+
+#document-canvas {
+    box-shadow: 0 0 50px -12px rgb(0 0 0 / 0.5);
+}
+
+.document-para:empty:before {
+    content: 'Type paragraph content...';
+    color: #9ca3af;
+}

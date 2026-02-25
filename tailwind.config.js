@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    content: ["./templates/**/*.html", "./static/js/**/*.js"],
+    content: ["./templates/**/*.html", "./static/js/**/*.js", "./static/css/**/*.css"],
     theme: {
         extend: {
             colors: {
@@ -26,12 +26,17 @@ module.exports = {
             animation: {
                 'aurora-slow': 'aurora 20s linear infinite',
                 'aurora-fast': 'aurora 10s linear infinite',
+                'fade-in': 'fadeIn 0.5s ease-out forwards',
                 'fade-in-up': 'fadeInUp 0.8s ease-out forwards',
             },
             keyframes: {
                 aurora: {
                     '0%, 100%': { backgroundPosition: '0% 50%' },
                     '50%': { backgroundPosition: '100% 50%' },
+                },
+                fadeIn: {
+                    '0%': { opacity: '0' },
+                    '100%': { opacity: '1' },
                 },
                 fadeInUp: {
                     '0%': { opacity: '0', transform: 'translateY(20px)' },

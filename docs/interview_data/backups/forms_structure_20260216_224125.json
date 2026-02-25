@@ -1,0 +1,1423 @@
+{
+  "Form 01A Natural Resources - Land formation 2019 - Mangatarem Tourism": {
+    "form_name": "Form 01A Natural Resources - Land formation 2019 - Mangatarem Tourism",
+    "paragraphs": [
+      {
+        "index": 0,
+        "text": "Mapping of Significant Natural Resources\nCategory: Natural Geological and Physiographical / Land Formations",
+        "style": "Normal"
+      },
+      {
+        "index": 1,
+        "text": "NAME OF NATURAL HERITAGE:",
+        "style": "Normal"
+      },
+      {
+        "index": 2,
+        "text": "PHOTO:",
+        "style": "Normal"
+      },
+      {
+        "index": 4,
+        "text": "I. BACKGROUND INFORMATION",
+        "style": "Normal"
+      },
+      {
+        "index": 5,
+        "text": "B. LOCATION:",
+        "style": "Normal"
+      },
+      {
+        "index": 6,
+        "text": "C. AREA (in hectares):",
+        "style": "Normal"
+      },
+      {
+        "index": 7,
+        "text": "D. OWNERSHIP/ JURISDICTION:",
+        "style": "Normal"
+      },
+      {
+        "index": 9,
+        "text": "II. DESCRIPTION",
+        "style": "Normal"
+      },
+      {
+        "index": 10,
+        "text": "(Describe the physical features of the land formation)",
+        "style": "Normal"
+      },
+      {
+        "index": 12,
+        "text": "III. STORIES ASSOCIATED WITH THE LAND FORMATION",
+        "style": "Normal"
+      },
+      {
+        "index": 14,
+        "text": "IV. SIGNIFICANCE",
+        "style": "Normal"
+      },
+      {
+        "index": 15,
+        "text": "Indicate type of significance, e.g. historical, aesthetic, scientific, social, socioeconomic, socio-political, spiritual and then explain",
+        "style": "Normal"
+      },
+      {
+        "index": 17,
+        "text": "V. CONSERVATION",
+        "style": "Normal"
+      },
+      {
+        "index": 18,
+        "text": "A. STATUS OF PROTECTION:",
+        "style": "Normal"
+      },
+      {
+        "index": 19,
+        "text": "B. CONSTRAINTS/THREATS/ ISSUES:",
+        "style": "Normal"
+      },
+      {
+        "index": 20,
+        "text": "C. CONSERVATION MEASURES: (Describe the conservation measures taken at the level of the community, provincial and/or national)",
+        "style": "Normal"
+      },
+      {
+        "index": 22,
+        "text": "VI. REFERENCES",
+        "style": "Normal"
+      }
+    ],
+    "tables": [
+      {
+        "table_index": 0,
+        "rows": 3,
+        "columns": 2,
+        "content": [
+          [
+            "A. SUB-CATEGORY",
+            "[  ]MOUNTAIN       [  ]VOLCANO               [  ]HILL                                           [  ]SANDBAR"
+          ],
+          [
+            "A. SUB-CATEGORY",
+            "[  ]VALLEY               [  ]BASIN                      [  ]MARSHLAND                           [  ]ROCK SHELTER"
+          ],
+          [
+            "",
+            "[  ]SHORE                [  ]MUD                       [  ]ROCK/STONE FORMATION   [  ]PLAINS                     [  ]PLATEAU            [  ]SINKHOLE              [  ]CAVE                                         [   ]OTHER ________"
+          ]
+        ]
+      },
+      {
+        "table_index": 1,
+        "rows": 4,
+        "columns": 2,
+        "content": [
+          [
+            "KEY INFORMANT/S:",
+            ""
+          ],
+          [
+            "REFERENCE/S:",
+            ""
+          ],
+          [
+            "NAME OF MAPPER/S:",
+            ""
+          ],
+          [
+            "DATE PROFILED:",
+            ""
+          ]
+        ]
+      }
+    ],
+    "fields": []
+  },
+  "Form 02A Tangible Immovable - Govt and Commercial Buildings 2019 (1) - Mangatarem Tourism": {
+    "form_name": "Form 02A Tangible Immovable - Govt and Commercial Buildings 2019 (1) - Mangatarem Tourism",
+    "paragraphs": [
+      {
+        "index": 0,
+        "text": "Mapping of Significant Tangible Immovable Heritage\nCategory: Government Structures, Private Built Structures and Commercial Establishments",
+        "style": "Normal"
+      },
+      {
+        "index": 2,
+        "text": "NAME OF IMMOVABLE HERITAGE:",
+        "style": "Normal"
+      },
+      {
+        "index": 3,
+        "text": "PHOTO:",
+        "style": "Normal"
+      },
+      {
+        "index": 5,
+        "text": "I. BACKGROUND INFORMATION",
+        "style": "Normal"
+      },
+      {
+        "index": 7,
+        "text": "C. ADDRESS/LOCATION/COORDINATES (Longitude & Latitude):",
+        "style": "Normal"
+      },
+      {
+        "index": 8,
+        "text": "D. AREA:  \t1. Total Land Area:  \t\t\t2. Structure:",
+        "style": "Normal"
+      },
+      {
+        "index": 10,
+        "text": "E.  YEAR CONSTRUCTED/ESTIMATED AGE:",
+        "style": "Normal"
+      },
+      {
+        "index": 11,
+        "text": "F. OWNERSHIP/JURISDICTION:",
+        "style": "Normal"
+      },
+      {
+        "index": 12,
+        "text": "G. DECLARATION/LEGISLATION:",
+        "style": "Normal"
+      },
+      {
+        "index": 13,
+        "text": "II. DESCRIPTION",
+        "style": "Normal"
+      },
+      {
+        "index": 14,
+        "text": "A. Physical Description (Describe the physical features – exterior, interior, landscape surrounding the structure)",
+        "style": "Normal"
+      },
+      {
+        "index": 15,
+        "text": "B. History of the Structure (Write the history of construction, use/function of the building over the years, history of intervention)",
+        "style": "Normal"
+      },
+      {
+        "index": 16,
+        "text": "C. Status: [ ] Occupied\t[ ] Not Occupied",
+        "style": "Normal"
+      },
+      {
+        "index": 18,
+        "text": "III. STORIES ASSOCIATED WITH THE STRUCTURE",
+        "style": "Normal"
+      },
+      {
+        "index": 20,
+        "text": "IV. SIGNIFICANCE",
+        "style": "Normal"
+      },
+      {
+        "index": 21,
+        "text": "Indicate type of significance, e.g. historical, aesthetic, scientific, social, socioeconomic, socio-political, spiritual and then explain",
+        "style": "Normal"
+      },
+      {
+        "index": 23,
+        "text": "V. CONSERVATION",
+        "style": "Normal"
+      },
+      {
+        "index": 24,
+        "text": "A. CONDITION OF STRUCTURE:  (Describe the physical condition of the structure)",
+        "style": "Normal"
+      },
+      {
+        "index": 25,
+        "text": "[  ] Excellent\n[  ] Good\n[  ] Fair \n[  ] Deteriorated\n[  ] Ruins",
+        "style": "Normal"
+      },
+      {
+        "index": 26,
+        "text": "Remarks:",
+        "style": "Normal"
+      },
+      {
+        "index": 28,
+        "text": "B. INTEGRITY OF THE STRUCTURE:",
+        "style": "Normal"
+      },
+      {
+        "index": 29,
+        "text": "1. \t[  ] altered \t\t\t\t2.\t [  ] moved   \n    \t\t[  ] unaltered \t\t\t\t    \t [  ] original site",
+        "style": "Normal"
+      },
+      {
+        "index": 30,
+        "text": "Remarks:",
+        "style": "Normal"
+      },
+      {
+        "index": 32,
+        "text": "C. CONSTRAINTS/THREATS/ISSUES:",
+        "style": "Normal"
+      },
+      {
+        "index": 34,
+        "text": "D. CONSERVATION MEASURES: (Describe the conservation measures taken at the level of the community, provincial and/or national)",
+        "style": "Normal"
+      },
+      {
+        "index": 36,
+        "text": "VI. LIST OF SIGNIFICANT TANGIBLE MOVABLE HERITAGE (within the premises of the built heritage, with the consent of the owner/caretaker):",
+        "style": "Normal"
+      },
+      {
+        "index": 38,
+        "text": "VII. REFERENCES",
+        "style": "Normal"
+      }
+    ],
+    "tables": [
+      {
+        "table_index": 0,
+        "rows": 4,
+        "columns": 4,
+        "content": [
+          [
+            "A. TYPE:",
+            "[ ] ]CAPITOL BUILDING \n[ ] MUNICIPAL/CITY HALL  \n[ ] BARANGAY HALL",
+            "[ ] GOVERNMENT AGENCY BLDG",
+            "[ ] FORTRESS\n[ ] PRISON/CORRECTIONAL FACILITY"
+          ],
+          [
+            "",
+            "[ ] FIRE STATION  \n[ ] POLICE STATION\n[ ] BRIDGE\n[ ] LIBRARY",
+            "[ ] RICE MILL  \n[ ] SUGAR MILL  \n[ ] ICE PLAN                                            \n[ ] DAM/DIKE",
+            "[ ] FACTORY \n[ ] COCKPIT\n[ ] LABORATORY\n[ ] POWER PLANT"
+          ],
+          [
+            "",
+            "[ ] BAKESHOP \n[ ] WINERY\n[ ] MARKETPLACE\n[ ] STORE \n[ ] BANK",
+            "[ ] GYMNASIUM\n[ ] HOTEL\n[ ] TRAIN/BUS STATION \n[ ] AIRPORT\n[ ] SEAPORT",
+            "[ ] RECREATION/SPORTS\n     CENTER\n[ ] MUSEUM\n[ ] OTHER\n_____________________"
+          ],
+          [
+            "B. OWNERSHIP",
+            "[ ] PUBLIC",
+            "[ ] PRIVATE",
+            ""
+          ]
+        ]
+      },
+      {
+        "table_index": 1,
+        "rows": 6,
+        "columns": 3,
+        "content": [
+          [
+            "Name of Object",
+            "Photo",
+            "Year produced or estimated age"
+          ],
+          [
+            "None",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "table_index": 2,
+        "rows": 4,
+        "columns": 2,
+        "content": [
+          [
+            "KEY INFORMANT/S:",
+            ""
+          ],
+          [
+            "REFERENCE/S:",
+            ""
+          ],
+          [
+            "NAME OF MAPPER/S:",
+            ""
+          ],
+          [
+            "DATE PROFILED:",
+            ""
+          ]
+        ]
+      }
+    ],
+    "fields": []
+  },
+  "Form 03A Tangible Movable - Archaeological 2019 - Mangatarem Tourism": {
+    "form_name": "Form 03A Tangible Movable - Archaeological 2019 - Mangatarem Tourism",
+    "paragraphs": [
+      {
+        "index": 0,
+        "text": "Mapping of Significant Tangible Movable Heritage\nCategory: Archaeological Object",
+        "style": "Normal"
+      },
+      {
+        "index": 1,
+        "text": "NAME OF OBJECT:",
+        "style": "Normal"
+      },
+      {
+        "index": 2,
+        "text": "PHOTO OF OBJECT:",
+        "style": "Normal"
+      },
+      {
+        "index": 3,
+        "text": "PHOTO AND/OR OTHER DOCUMENTATION OF PLACE FOUND:",
+        "style": "Normal"
+      },
+      {
+        "index": 5,
+        "text": "I. BACKGROUND INFORMATION",
+        "style": "Normal"
+      },
+      {
+        "index": 7,
+        "text": "B. PLACE FOUND:",
+        "style": "Normal"
+      },
+      {
+        "index": 8,
+        "text": "C. DATE FOUND:",
+        "style": "Normal"
+      },
+      {
+        "index": 9,
+        "text": "D. ESTIMATED AGE:",
+        "style": "Normal"
+      },
+      {
+        "index": 10,
+        "text": "E. NAME OF OWNER:",
+        "style": "Normal"
+      },
+      {
+        "index": 11,
+        "text": "F. TYPE OF ACQUISITION:",
+        "style": "Normal"
+      },
+      {
+        "index": 13,
+        "text": "II. DESCRIPTION OF THE OBJECT",
+        "style": "Normal"
+      },
+      {
+        "index": 14,
+        "text": "(Describe the Material, Dimensions, Color, Markings, Design, Use, etc.)",
+        "style": "Normal"
+      },
+      {
+        "index": 16,
+        "text": "III. STORIES/NARRATIVES/BELIEFS/PRACTICES ASSOCIATED",
+        "style": "Normal"
+      },
+      {
+        "index": 17,
+        "text": "IV. SIGNIFICANCE",
+        "style": "Normal"
+      },
+      {
+        "index": 18,
+        "text": "A. PRIMARY CRITERIA (Indicate type of significance, e.g. historical, aesthetic, scientific, social, socioeconomic, socio-political, spiritual and then explain)",
+        "style": "Normal"
+      },
+      {
+        "index": 19,
+        "text": "B. COMPARATIVE CRITERIA (Indicate Provenance, Representativeness, Rarity, Interpretive Potential)",
+        "style": "Normal"
+      },
+      {
+        "index": 21,
+        "text": "V. CONSERVATION STATUS",
+        "style": "Normal"
+      },
+      {
+        "index": 22,
+        "text": "Remarks:",
+        "style": "Normal"
+      },
+      {
+        "index": 24,
+        "text": "B. CONSTRAINTS/THREATS/ISSUES:",
+        "style": "Normal"
+      },
+      {
+        "index": 25,
+        "text": "C. CONSERVATION MEASURES: (Describe the conservation measures taken at the level of the community, provincial and/or national)",
+        "style": "Normal"
+      },
+      {
+        "index": 27,
+        "text": "VI. REFERENCES",
+        "style": "Normal"
+      }
+    ],
+    "tables": [
+      {
+        "table_index": 0,
+        "rows": 7,
+        "columns": 2,
+        "content": [
+          [
+            "A. TYPE\n\n ARTIFACT",
+            "[  ] STONE TOOLS                        [  ] STONE ORNAMENTS           [  ] METEORITES"
+          ],
+          [
+            "",
+            "[  ] METAL                                     [  ] GLASS                                    [  ] OTHER"
+          ],
+          [
+            "",
+            "[  ] MODIFIED SHELL                   [  ] MODIFIED BONE                       ____________________"
+          ],
+          [
+            "",
+            "[  ] CERAMICS  (Earthenware, Stoneware, Porcelain)"
+          ],
+          [
+            "",
+            ""
+          ],
+          [
+            "ECOFACT",
+            "[  ] SHELLS                                     [  ]  BONES                                  [  ] OTHER"
+          ],
+          [
+            "",
+            "[  ] FOSSILS                                    [  ]  PLANT REMAINS                      ____________________"
+          ]
+        ]
+      },
+      {
+        "table_index": 1,
+        "rows": 3,
+        "columns": 4,
+        "content": [
+          [
+            "A. PHYSICAL CONDITION:",
+            "[ ] YELLOWING  \n[ ] STAINS",
+            "[ ]FADING  \n[ ] FOXING (BROWN SPOTS)",
+            "[ ] ACCRETIONS\n[ ] HOLES"
+          ],
+          [
+            "",
+            "[ ] FINGERPRINTS \n[ ] TEARS/BREAK  \n[ ] LOSSES",
+            "[ ] CREASES\n[ ] BRITTLE  \n[ ] ABRASION",
+            "[ ] MISSING PART ___________________"
+          ],
+          [
+            "",
+            "[ ] FOLDS  \n[ ] WRINKLES",
+            "[ ] MOLDS  \n[ ] INSECT INFESTATION",
+            "[  ] OTHER\n___________________"
+          ]
+        ]
+      },
+      {
+        "table_index": 2,
+        "rows": 4,
+        "columns": 2,
+        "content": [
+          [
+            "KEY INFORMANT/S:",
+            ""
+          ],
+          [
+            "REFERENCE/S:",
+            ""
+          ],
+          [
+            "NAME OF MAPPER/S:",
+            ""
+          ],
+          [
+            "DATE PROFILED:",
+            ""
+          ]
+        ]
+      }
+    ],
+    "fields": []
+  },
+  "Form 04A Intangible Heritage - Oral Tradition and expressions 2019 - Mangatarem Tourism": {
+    "form_name": "Form 04A Intangible Heritage - Oral Tradition and expressions 2019 - Mangatarem Tourism",
+    "paragraphs": [
+      {
+        "index": 0,
+        "text": "Mapping of Significant Intangible Cultural Heritage\nCategory: Oral Traditions and Expressions, including Language",
+        "style": "Normal"
+      },
+      {
+        "index": 1,
+        "text": "NAME OF THE ELEMENT:",
+        "style": "Normal"
+      },
+      {
+        "index": 2,
+        "text": "I. BACKGROUND INFORMATION",
+        "style": "Normal"
+      },
+      {
+        "index": 4,
+        "text": "PHOTO/REFERENCE IMAGE: (if applicable)",
+        "style": "Normal"
+      },
+      {
+        "index": 5,
+        "text": "GEOGRAPHICAL LOCATION AND RANGE OF THE ELEMENT: \n(Describe the place where intangible heritage is practiced, even including the extent of the practice in neighboring areas or places)",
+        "style": "Normal"
+      },
+      {
+        "index": 6,
+        "text": "RELATED DOMAINS OF THE INTANGIBLE CULTURAL HERITAGE: (Tick appropriate box/es.)",
+        "style": "Normal"
+      },
+      {
+        "index": 7,
+        "text": "[  ] Performing arts",
+        "style": "Normal"
+      },
+      {
+        "index": 8,
+        "text": "[  ] Social practices, rituals and festive events",
+        "style": "Normal"
+      },
+      {
+        "index": 9,
+        "text": "[  ] Knowledge and practices concerning nature and the universe",
+        "style": "Normal"
+      },
+      {
+        "index": 10,
+        "text": "[  ] Traditional craftsmanship",
+        "style": "Normal"
+      },
+      {
+        "index": 12,
+        "text": "II. DESCRIPTION OF INTANGIBLE CULTURAL HERITAGE",
+        "style": "Normal"
+      },
+      {
+        "index": 13,
+        "text": "Summary of the element (Description of the history of the practice, occasion/season, processes involved, procedures, beliefs associated, settings, aims, social functions, cultural meaning, and other pertinent data)",
+        "style": "Normal"
+      },
+      {
+        "index": 15,
+        "text": "Culture-bearer/s and practitioner/s of the element (Description of person/s or people practicing the intangible heritage)",
+        "style": "Normal"
+      },
+      {
+        "index": 18,
+        "text": "Mode of transmission (Describe how the knowledge and skills related to the element is passed on)",
+        "style": "Normal"
+      },
+      {
+        "index": 21,
+        "text": "D. LIST OF SIGNIFICANT TANGIBLE MOVABLE HERITAGE USED/ASSOCIATED WITH THE ELEMENT:",
+        "style": "Normal"
+      },
+      {
+        "index": 23,
+        "text": "E. LIST OF SIGNIFICANT FLORA/FAUNA USED/ASSOCIATED WITH THE ELEMENT:",
+        "style": "Normal"
+      },
+      {
+        "index": 25,
+        "text": "III. STORIES/NARRATIVES ASSOCIATED WITH THE ELEMENT",
+        "style": "Normal"
+      },
+      {
+        "index": 27,
+        "text": "IV. SIGNIFICANCE",
+        "style": "Normal"
+      },
+      {
+        "index": 28,
+        "text": "(Indicate type of significance, e.g. historical, aesthetic, scientific, social, socioeconomic, socio-political, spiritual and then explain)",
+        "style": "Normal"
+      },
+      {
+        "index": 30,
+        "text": "V. ASSESSMENT OF THE PRACTICE",
+        "style": "Normal"
+      },
+      {
+        "index": 31,
+        "text": "A. CONDITION/STATUS OF THE PRACTICE",
+        "style": "Normal"
+      },
+      {
+        "index": 32,
+        "text": "B. CONSTRAINTS/ THREATS/ ISSUES/ CHALLENGES: (Reasons for the condition/status)",
+        "style": "Normal"
+      },
+      {
+        "index": 33,
+        "text": "C. MEASURES AND DESCRIPTION OF SAFEGUARDING MEASURES TAKEN:",
+        "style": "Normal"
+      },
+      {
+        "index": 34,
+        "text": "Tick one or more boxes to identify the safeguarding measures that have been and are currently being taken at the level of the community, provincial and/or national with regard to the element",
+        "style": "Normal"
+      },
+      {
+        "index": 35,
+        "text": "[  ] transmission, particularly through formal education",
+        "style": "Normal"
+      },
+      {
+        "index": 36,
+        "text": "[  ] transmission, particularly through non-formal education",
+        "style": "Normal"
+      },
+      {
+        "index": 37,
+        "text": "[  ] identification, documentation, research",
+        "style": "Normal"
+      },
+      {
+        "index": 38,
+        "text": "[  ] preservation, protection",
+        "style": "Normal"
+      },
+      {
+        "index": 39,
+        "text": "[  ] promotion, enhancement",
+        "style": "Normal"
+      },
+      {
+        "index": 40,
+        "text": "[  ] revitalization",
+        "style": "Normal"
+      },
+      {
+        "index": 42,
+        "text": "Description of Safeguarding Measures Taken:",
+        "style": "Normal"
+      },
+      {
+        "index": 44,
+        "text": "VI. REFERENCES",
+        "style": "Normal"
+      },
+      {
+        "index": 45,
+        "text": "SUPPORTING DOCUMENTATION: (Tick appropriate box/es)",
+        "style": "Normal"
+      },
+      {
+        "index": 46,
+        "text": "[  ] Audio/video recording",
+        "style": "Normal"
+      },
+      {
+        "index": 47,
+        "text": "[  ] Photographs and sketches",
+        "style": "Normal"
+      },
+      {
+        "index": 48,
+        "text": "[  ] Others (e.g. Music notations etc.) __________________________",
+        "style": "Normal"
+      }
+    ],
+    "tables": [
+      {
+        "table_index": 0,
+        "rows": 1,
+        "columns": 4,
+        "content": [
+          [
+            "TYPE:",
+            "[  ] Proverbs  \n[  ] Riddles\n[  ] Tales\n[  ] Nursery rhymes\n[  ] Dramatic performance",
+            "[  ] Legends\n[  ] Myths\n[  ] Epic\n[  ] Song\n[  ] Other _______________",
+            "[  ] Poems\n[  ] Charm\n[  ] Prayer\n[  ] Chant"
+          ]
+        ]
+      },
+      {
+        "table_index": 1,
+        "rows": 4,
+        "columns": 4,
+        "content": [
+          [
+            "Name of Object",
+            "Photo",
+            "Year produced\nor estimated age",
+            "Use of the object in the practice"
+          ],
+          [
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "table_index": 2,
+        "rows": 4,
+        "columns": 3,
+        "content": [
+          [
+            "Name of Flora/Fauna",
+            "Photo",
+            "Use of the flora/fauna in the practice"
+          ],
+          [
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            ""
+          ],
+          [
+            "",
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "table_index": 3,
+        "rows": 4,
+        "columns": 1,
+        "content": [
+          [
+            "KEY INFORMANT/S: \n(Include basic information on the informant’s background)"
+          ],
+          [
+            "REFERENCE/S AND OTHER RESOURCES:"
+          ],
+          [
+            "NAME OF MAPPER/S:"
+          ],
+          [
+            "DATE PROFILED:"
+          ]
+        ]
+      }
+    ],
+    "fields": []
+  },
+  "Form 05 Personalities 2017 - Mangatarem Tourism": {
+    "form_name": "Form 05 Personalities 2017 - Mangatarem Tourism",
+    "paragraphs": [
+      {
+        "index": 0,
+        "text": "Mapping of Significant Personalities",
+        "style": "Normal"
+      },
+      {
+        "index": 1,
+        "text": "NAME:",
+        "style": "Normal"
+      },
+      {
+        "index": 2,
+        "text": "PHOTO:",
+        "style": "Normal"
+      },
+      {
+        "index": 3,
+        "text": "I. BACKGROUND INFORMATION",
+        "style": "Normal"
+      },
+      {
+        "index": 4,
+        "text": "DATE OF BIRTH:",
+        "style": "Normal"
+      },
+      {
+        "index": 5,
+        "text": "DATE OF DEATH: (If applicable)",
+        "style": "Normal"
+      },
+      {
+        "index": 6,
+        "text": "PROMINENCE: (Indicate the field – whether Arts, Crafts, Sports, Science, Politics, Religion, History and others)",
+        "style": "Normal"
+      },
+      {
+        "index": 7,
+        "text": "BIRTH PLACE:",
+        "style": "Normal"
+      },
+      {
+        "index": 8,
+        "text": "PRESENT ADDRESS: (If living)",
+        "style": "Normal"
+      },
+      {
+        "index": 9,
+        "text": "AGE:",
+        "style": "Normal"
+      },
+      {
+        "index": 10,
+        "text": "II. BIOGRAPHY",
+        "style": "Normal"
+      },
+      {
+        "index": 11,
+        "text": "(Include life story, awards received, contributions to the community, citation with specific years)",
+        "style": "Normal"
+      },
+      {
+        "index": 12,
+        "text": "III. SIGNIFICANCE",
+        "style": "Normal"
+      },
+      {
+        "index": 14,
+        "text": "(Indicate type of significance, e.g. historical, aesthetic, scientific, social, socioeconomic, socio-political, spiritual and then explain)",
+        "style": "Normal"
+      },
+      {
+        "index": 15,
+        "text": "IV. REFERENCES",
+        "style": "Normal"
+      },
+      {
+        "index": 17,
+        "text": "ATTACHMENTS:",
+        "style": "Normal"
+      },
+      {
+        "index": 18,
+        "text": "1. List of works and achievements",
+        "style": "Normal"
+      },
+      {
+        "index": 19,
+        "text": "2. References and other resources",
+        "style": "Normal"
+      }
+    ],
+    "tables": [
+      {
+        "table_index": 0,
+        "rows": 4,
+        "columns": 2,
+        "content": [
+          [
+            "KEY INFORMANT/S:",
+            ""
+          ],
+          [
+            "REFERENCE/S AND OTHER RESOURCES:",
+            ""
+          ],
+          [
+            "NAME OF MAPPER/S:",
+            ""
+          ],
+          [
+            "DATE PROFILED:",
+            ""
+          ]
+        ]
+      }
+    ],
+    "fields": []
+  },
+  "Form 06 Cultural Institutions 2019 - Mangatarem Tourism": {
+    "form_name": "Form 06 Cultural Institutions 2019 - Mangatarem Tourism",
+    "paragraphs": [
+      {
+        "index": 0,
+        "text": "Mapping of Significant Cultural Institutions",
+        "style": "Normal"
+      },
+      {
+        "index": 1,
+        "text": "NAME OF INSTITUTION:",
+        "style": "Normal"
+      },
+      {
+        "index": 2,
+        "text": "I. BACKGROUND INFORMATION",
+        "style": "Normal"
+      },
+      {
+        "index": 3,
+        "text": "MUNICIPALITY/CITY:",
+        "style": "Normal"
+      },
+      {
+        "index": 4,
+        "text": "PROVINCE:",
+        "style": "Normal"
+      },
+      {
+        "index": 5,
+        "text": "LOCATION/ADDRESS:",
+        "style": "Normal"
+      },
+      {
+        "index": 6,
+        "text": "PHOTO(S):",
+        "style": "Normal"
+      },
+      {
+        "index": 7,
+        "text": "(Facade of the structure where the cultural institution holds office)",
+        "style": "Normal"
+      },
+      {
+        "index": 8,
+        "text": "(Logo of the institution with description of the symbols and meanings)",
+        "style": "Normal"
+      },
+      {
+        "index": 9,
+        "text": "TYPE OF CULTURAL INSTITUTION: (Indicate if it is a library, museum, formal education, alternative learning system, gallery and/or others)",
+        "style": "Normal"
+      },
+      {
+        "index": 11,
+        "text": "II. NARRATIVE DESCRIPTION",
+        "style": "Normal"
+      },
+      {
+        "index": 12,
+        "text": "(Include the mandate, history, officials, contact details and other pertinent data)",
+        "style": "Normal"
+      },
+      {
+        "index": 14,
+        "text": "DESCRIPTION OF SIGNIFICANT MILESTONES:",
+        "style": "Normal"
+      },
+      {
+        "index": 16,
+        "text": "III. STORIES AND NARRATIVES",
+        "style": "Normal"
+      },
+      {
+        "index": 18,
+        "text": "IV. SIGNIFICANCE",
+        "style": "Normal"
+      },
+      {
+        "index": 19,
+        "text": "(Indicate type of significance, e.g. historical, aesthetic, scientific, social, socioeconomic, socio-political, spiritual and then explain)",
+        "style": "Normal"
+      },
+      {
+        "index": 21,
+        "text": "V. ASSESSMENT OF THE INSTITUTION",
+        "style": "Normal"
+      },
+      {
+        "index": 22,
+        "text": "A. CONDITION/STATUS OF THE INSTITUTION",
+        "style": "Normal"
+      },
+      {
+        "index": 23,
+        "text": "B. CONSTRAINTS/ THREATS/ ISSUES/ CHALLENGES: (Reasons for the condition/status)",
+        "style": "Normal"
+      },
+      {
+        "index": 24,
+        "text": "C. MEASURES AND DESCRIPTION OF SAFEGUARDING MEASURES TAKEN:",
+        "style": "Normal"
+      },
+      {
+        "index": 26,
+        "text": "VI. REFERENCES",
+        "style": "Normal"
+      },
+      {
+        "index": 27,
+        "text": "SUPPORTING DOCUMENTATION: (Tick appropriate box/es)",
+        "style": "Normal"
+      },
+      {
+        "index": 28,
+        "text": "[  ] Print, write-ups",
+        "style": "Normal"
+      },
+      {
+        "index": 29,
+        "text": "[  ] Audio/video recording",
+        "style": "Normal"
+      },
+      {
+        "index": 30,
+        "text": "[  ] Photographs and sketches",
+        "style": "Normal"
+      },
+      {
+        "index": 31,
+        "text": "[  ] Others __________________________",
+        "style": "Normal"
+      }
+    ],
+    "tables": [
+      {
+        "table_index": 0,
+        "rows": 4,
+        "columns": 2,
+        "content": [
+          [
+            "KEY INFORMANT/S:",
+            ""
+          ],
+          [
+            "REFERENCE/S AND OTHER RESOURCES:",
+            ""
+          ],
+          [
+            "NAME OF MAPPER/S:",
+            ""
+          ],
+          [
+            "DATE PROFILED:",
+            ""
+          ]
+        ]
+      }
+    ],
+    "fields": []
+  },
+  "Form 07 LGU Programs projects for culture 2019 - Mangatarem Tourism": {
+    "form_name": "Form 07 LGU Programs projects for culture 2019 - Mangatarem Tourism",
+    "paragraphs": [
+      {
+        "index": 0,
+        "text": "Matrix of Local Government Unit Programs, Policies and Projects geared towards the Development of Culture and the Arts and the Conservation of Cultural Heritage",
+        "style": "Normal"
+      },
+      {
+        "index": 1,
+        "text": "MUNICIPALITY/CITY:",
+        "style": "Normal"
+      },
+      {
+        "index": 2,
+        "text": "PROVINCE:",
+        "style": "Normal"
+      },
+      {
+        "index": 4,
+        "text": "A. CORE DEVELOPMENT PRINCIPLES (Note: Mention the date of adoption)",
+        "style": "Normal"
+      },
+      {
+        "index": 5,
+        "text": "LGU Vision Statement",
+        "style": "Normal"
+      },
+      {
+        "index": 6,
+        "text": "LGU Mission Statement",
+        "style": "Normal"
+      },
+      {
+        "index": 7,
+        "text": "LGU Goal Statements",
+        "style": "Normal"
+      },
+      {
+        "index": 9,
+        "text": "B. BRIEF HISTORY OF THE LGU (Attach a brief history of the LGU)",
+        "style": "Normal"
+      },
+      {
+        "index": 11,
+        "text": "C. LGU LOGO/EMBLEM (Attach photo of the Emblem, indicate date of Legislation and the explanation of the Emblem / Logo)",
+        "style": "Normal"
+      },
+      {
+        "index": 13,
+        "text": "D. THE LOCAL CHIEF EXECUTIVES (Attach the names of Chief Executives and the corresponding term of office)",
+        "style": "Normal"
+      },
+      {
+        "index": 15,
+        "text": "E. LGU POLICIES AND ACTION AGENDA",
+        "style": "Normal"
+      },
+      {
+        "index": 16,
+        "text": "Attach a list of the following:",
+        "style": "Normal"
+      },
+      {
+        "index": 17,
+        "text": "Nature / Number of resolutions on Culture, Arts and Heritage passed in the last five years",
+        "style": "Normal"
+      },
+      {
+        "index": 18,
+        "text": "Nature / Number of Ordinances on Culture, Arts and Heritage passed in the last five years",
+        "style": "Normal"
+      },
+      {
+        "index": 19,
+        "text": "Nature / Number of Items / Action Agenda on Culture, Arts and Heritage adopted in the LGU-ELA during the last five years",
+        "style": "Normal"
+      },
+      {
+        "index": 23,
+        "text": "G. LGU PROGRAMS ON CULTURE, ARTS, AND HERITAGE",
+        "style": "Normal"
+      },
+      {
+        "index": 24,
+        "text": "(Attach a summary of the Strategies for the Development of Culture and Arts and  Safeguarding and Conservation of Cultural Heritage as adopted in the CDP or other LGU Strategic Plan (Office in charge of implementing Culture and Arts)",
+        "style": "Normal"
+      },
+      {
+        "index": 30,
+        "text": "K. COMMUNITY CULTURE ENTERPRISES",
+        "style": "Normal"
+      },
+      {
+        "index": 31,
+        "text": "(Attach a List of Culture Enterprises including the nature of enterprise and date of establishment)",
+        "style": "Normal"
+      },
+      {
+        "index": 33,
+        "text": "L. PEOPLE’S STORIES RELATED TO LGU CULTURE-AND-DEVELOPMENT PROGRAM",
+        "style": "Normal"
+      },
+      {
+        "index": 34,
+        "text": "(Attach a narration of the peoples' stories related to LGU Culture-and-Development Program)",
+        "style": "Normal"
+      },
+      {
+        "index": 36,
+        "text": "M. REFERENCES",
+        "style": "Normal"
+      }
+    ],
+    "tables": [
+      {
+        "table_index": 0,
+        "rows": 5,
+        "columns": 2,
+        "content": [
+          [
+            "F. MAJOR POLICIES ON CULTURE",
+            "(Fill in the chart)"
+          ],
+          [
+            "Date adopted",
+            "Title / Summary of Policies adopted by the LGU"
+          ],
+          [
+            "",
+            ""
+          ],
+          [
+            "",
+            ""
+          ],
+          [
+            "",
+            ""
+          ]
+        ]
+      },
+      {
+        "table_index": 1,
+        "rows": 7,
+        "columns": 2,
+        "content": [
+          [
+            "H. ANNUAL INVESTMENT PLAN",
+            "(Fill in the chart of the LGU annual investment plan for the last 5 years)"
+          ],
+          [
+            "Culture and Heritage Programs",
+            "Title of Programs & Amount of Budget Allocated"
+          ],
+          [
+            "Calendar Year 2012",
+            ""
+          ],
+          [
+            "Calendar Year 2013",
+            ""
+          ],
+          [
+            "Calendar Year 2014",
+            ""
+          ],
+          [
+            "Calendar Year 2015",
+            ""
+          ],
+          [
+            "Calendar Year 2016",
+            ""
+          ]
+        ]
+      },
+      {
+        "table_index": 2,
+        "rows": 6,
+        "columns": 2,
+        "content": [
+          [
+            "Culture and Heritage Projects",
+            "Title of Implemented Projects & Amount"
+          ],
+          [
+            "Calendar Year 2012",
+            ""
+          ],
+          [
+            "Calendar Year 2013",
+            ""
+          ],
+          [
+            "Calendar Year 2014",
+            ""
+          ],
+          [
+            "Calendar Year 2015",
+            ""
+          ],
+          [
+            "Calendar Year 2016",
+            ""
+          ]
+        ]
+      },
+      {
+        "table_index": 3,
+        "rows": 9,
+        "columns": 2,
+        "content": [
+          [
+            "I. LOCAL ARTS AND CULTURE COUNCIL",
+            "NARRATIVE SUMMARY"
+          ],
+          [
+            "Date of Creation:",
+            ""
+          ],
+          [
+            "Legal Basis:",
+            ""
+          ],
+          [
+            "Functions:",
+            ""
+          ],
+          [
+            "Composition:",
+            ""
+          ],
+          [
+            "List of Current Officers:",
+            ""
+          ],
+          [
+            "List of Major Programs:",
+            ""
+          ],
+          [
+            "List of Significant Activities implemented during the last three (3) years:",
+            ""
+          ],
+          [
+            "Other significant Information on the Council",
+            ""
+          ]
+        ]
+      },
+      {
+        "table_index": 4,
+        "rows": 3,
+        "columns": 2,
+        "content": [
+          [
+            "J. CULTURE-FOCUSED ALTERNATIVE LIVELIHOOD (Fill in the chart with the needed information)",
+            "J. CULTURE-FOCUSED ALTERNATIVE LIVELIHOOD (Fill in the chart with the needed information)"
+          ],
+          [
+            "List of Culture-focused Alternative Livelihood",
+            ""
+          ],
+          [
+            "Nature of LGU Support",
+            ""
+          ]
+        ]
+      },
+      {
+        "table_index": 5,
+        "rows": 4,
+        "columns": 2,
+        "content": [
+          [
+            "KEY INFORMANT/S:",
+            ""
+          ],
+          [
+            "REFERENCE AND OTHER RESOURCES:",
+            ""
+          ],
+          [
+            "NAME OF MAPPER/S:",
+            ""
+          ],
+          [
+            "DATE PROFILED:",
+            ""
+          ]
+        ]
+      }
+    ],
+    "fields": []
+  }
+}
