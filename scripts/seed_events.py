@@ -18,7 +18,7 @@ def seed_events():
                 location="St. Raymond's Church",
                 barangay="Poblacion",
                 status="approved",
-                image_url="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DSC_0054.jpg",
+                image_url="https://images.unsplash.com/photo-1548625361-ec853f0cf786?q=80&w=2070&auto=format&fit=crop",
             ),
             Event(
                 title="Battle of the Bands",
@@ -27,7 +27,7 @@ def seed_events():
                 location="Public Plaza",
                 barangay="Poblacion",
                 status="approved",
-                image_url="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DSC_0098.jpg",
+                image_url="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop",
             ),
             Event(
                 title="Civic Parade",
@@ -36,7 +36,7 @@ def seed_events():
                 location="Mangatarem Streets",
                 barangay="Poblacion",
                 status="approved",
-                image_url="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DSC_0123.jpg",
+                image_url="https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2070&auto=format&fit=crop",
             ),
         ]
 

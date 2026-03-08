@@ -40,21 +40,45 @@
 </div>
 
 <div class="container mx-auto px-6 py-24">
-    {% if events %}
-    <div>
+    <div class="w-full">
         <span class="section-label">Upcoming</span>
         <h2 class="section-title">The Calendar.</h2>
 
+        <!-- Calendar Widget -->
+        <div class="calendar-container mb-16">
+            <div class="calendar-header">
+                <button id="prevMonth" class="cal-nav-btn">&lt;</button>
+                <h3 id="currentMonthYear" class="cal-month-title"></h3>
+                <button id="nextMonth" class="cal-nav-btn">&gt;</button>
+            </div>
+            <div class="calendar-grid-header">
+                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+            </div>
+            <div id="calendarDays" class="calendar-days">
+                <!-- Days will be inserted via JS -->
+            </div>
+        </div>
+
+    {% if events %}
         <div class="event-grid" id="eventsGrid">
             {% for event in events %}
-            <article class="event-item" data-category="{{ event.category|lower }}"
-                style="animation-delay: {{ loop.index0 * 0.1 }}s">
-                <main class="event-card-inner">
-                    <div class="event-visual">
-                        <img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2070&auto=format&fit=crop"
-                            alt="{{ event.title }}">
-                    </div>
-                    <div class="event-meta">
+                <article class="event-item" data-category="{{ event.category|lower }}" data-date="{{ event.date.strftime('%Y-%m-%d') }}"
+                    style="animation-delay: {{ loop.index0 * 0.1 }}s">
+                    <main class="event-card-inner">
+                        <div class="event-visual">
+                            {% if event.image_url %}
+                                <img src="{{ event.image_url }}" alt="{{ event.title }}">
+                            {% else %}
+                                {% if event.category == 'Religious' %}
+                                    <img src="https://images.unsplash.com/photo-1548625361-ec853f0cf786?q=80&w=2070&auto=format&fit=crop" alt="{{ event.title }}">
+                                {% elif event.category == 'Entertainment' %}
+                                    <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop" alt="{{ event.title }}">
+                                {% else %}
+                                    <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2070&auto=format&fit=crop" alt="{{ event.title }}">
+                                {% endif %}
+                            {% endif %}
+                        </div>
+                        <div class="event-meta">
                         <span class="event-date-editorial">{{ event.date.strftime('%b %d') }}</span>
                         <span class="event-tag">{{ event.category }}</span>
                     </div>
@@ -88,8 +112,14 @@
             </article>
             {% endfor %}
         </div>
-    </div>
     {% else %}
+        <div class="text-center py-12 glass-card border-dashed border-2 border-emerald-900/10 mb-24">
+            <p class="text-gray-500 italic text-lg">No upcoming events are currently scheduled. Check out our annual highlights below.</p>
+        </div>
+    {% endif %}
+    </div>
+</div>
+    
     <!-- Annual Traditions Section -->
     <section class="highlights-section text-center">
         <div class="container mx-auto px-6">
@@ -100,7 +130,7 @@
                 <!-- Card 1 -->
                 <div class="highlight-card">
                     <div class="highlight-image">
-                        <img src="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DSC_0054.jpg" alt="Town Fiesta">
+                        <img src="https://images.unsplash.com/photo-1548625361-ec853f0cf786?q=80&w=2070&auto=format&fit=crop" alt="Town Fiesta">
                     </div>
                     <div class="highlight-content text-left">
                         <span class="highlight-month">January</span>
@@ -114,7 +144,7 @@
                 <!-- Card 2 -->
                 <div class="highlight-card">
                     <div class="highlight-image">
-                        <img src="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DSC_0098.jpg"
+                        <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop"
                             alt="Pindang Festival">
                     </div>
                     <div class="highlight-content text-left">
@@ -129,7 +159,7 @@
                 <!-- Card 3 -->
                 <div class="highlight-card">
                     <div class="highlight-image">
-                        <img src="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DSC_0123.jpg" alt="Holy Week">
+                        <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2070&auto=format&fit=crop" alt="Holy Week">
                     </div>
                     <div class="highlight-content text-left">
                         <span class="highlight-month">March / April</span>
@@ -142,7 +172,6 @@
             </div>
         </div>
     </section>
-    {% endif %}
 
     <!-- Gallery Link -->
     <div class="mt-40 text-center py-32 border-t border-gray-100">
