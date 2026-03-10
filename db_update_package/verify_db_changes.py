@@ -1,6 +1,6 @@
 import os
 from app import app, db
-from models import Attraction, Event, GalleryItem, Review
+from models import Attraction, Event, GalleryItem, AttractionReview
 from sqlalchemy import inspect
 
 def verify_schema():

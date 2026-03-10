@@ -86,7 +86,8 @@ class BarangayInfo(db.Model):
     )
 
 
-class PageView(db.Model):
+class AnalyticsPageView(db.Model):
+    __tablename__ = 'analytics_page_view'
     id = db.Column(db.Integer, primary_key=True)
     view_type = db.Column(
         db.String(50), nullable=False
@@ -101,7 +102,7 @@ class PageView(db.Model):
     user_id = db.Column(db.Integer, nullable=True)  # Optional, if logged in
 
 
-class Favorite(db.Model):
+class UserFavoriteAttraction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     attraction_id = db.Column(
@@ -110,7 +111,7 @@ class Favorite(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
-class EventInterest(db.Model):
+class UserEventInterest(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey("event.id"), nullable=False)
@@ -118,7 +119,7 @@ class EventInterest(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
-class Review(db.Model):
+class AttractionReview(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     attraction_id = db.Column(

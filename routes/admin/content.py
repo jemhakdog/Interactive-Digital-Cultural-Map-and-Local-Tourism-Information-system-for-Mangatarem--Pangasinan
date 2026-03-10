@@ -2,7 +2,7 @@ import logging
 from flask import redirect, url_for, flash
 from flask_login import login_required, current_user
 from extensions import db, limiter
-from models import GalleryItem, Review
+from models import GalleryItem, AttractionReview
 from utils.logger_helper import log_entry, log_success, log_error
 from . import admin_bp
 
@@ -66,12 +66,12 @@ def approve_review(id):
         flash("Access denied.")
         return redirect(url_for("public.index"))
     
-    review = Review.query.get_or_404(id)
+    review = AttractionReview.query.get_or_404(id)
     review.status = "approved"
     db.session.commit()
     
-    log_success("admin", "approve_review", f"Review ID {id} approved")
-    flash("Review approved!")
+    log_success("admin", "approve_review", f"AttractionReview ID {id} approved")
+    flash("AttractionReview approved!")
     return redirect(url_for("admin.admin_dashboard"))
 
 
@@ -87,10 +87,10 @@ def reject_review(id):
         flash("Access denied.")
         return redirect(url_for("public.index"))
     
-    review = Review.query.get_or_404(id)
+    review = AttractionReview.query.get_or_404(id)
     db.session.delete(review)
     db.session.commit()
     
-    log_success("admin", "reject_review", f"Review ID {id} rejected")
-    flash("Review rejected and removed.")
+    log_success("admin", "reject_review", f"AttractionReview ID {id} rejected")
+    flash("AttractionReview rejected and removed.")
     return redirect(url_for("admin.admin_dashboard"))

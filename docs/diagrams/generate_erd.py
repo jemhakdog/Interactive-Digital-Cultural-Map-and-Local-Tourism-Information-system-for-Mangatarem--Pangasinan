@@ -259,7 +259,7 @@ LAYOUT_ROWS = [
     ["HERITAGE_PROFILES", "ATTRACTIONS", "EVENTS", "GALLERY_ITEMS", "BARANGAY_INFOS"],
     ["BUILT_HERITAGE_DETAILS", "NATURAL_HERITAGE_DETAILS", "INTANGIBLE_HERITAGE_DETAILS", "MOVABLE_HERITAGE_DETAILS"],
     ["PERSONALITY_DETAILS", "INSTITUTION_DETAILS", "LGU_PROGRAM_DETAILS"],
-    ["REVIEWS", "FAVORITES", "EVENT_INTERESTS", "PAGE_VIEWS"],
+    ["REVIEWS", "FAVORITES", "EVENT_INTERESTS", "ANALYTICS_PAGE_VIEW"],
 ]
 
 POSITIONS = {}
@@ -288,8 +288,8 @@ RELATIONSHIPS = [
     ("USERS", "REVIEWS",                "writes",   "ERmandOne", "ERzeroToMany"),
     ("ATTRACTIONS", "FAVORITES",        "receives", "ERmandOne", "ERzeroToMany"),
     ("ATTRACTIONS", "REVIEWS",          "receives", "ERmandOne", "ERzeroToMany"),
-    ("ATTRACTIONS", "PAGE_VIEWS",       "tracks",   "ERmandOne", "ERzeroToMany"),
-    ("EVENTS", "PAGE_VIEWS",            "tracks",   "ERmandOne", "ERzeroToMany"),
+    ("ATTRACTIONS", "ANALYTICS_PAGE_VIEW",       "tracks",   "ERmandOne", "ERzeroToMany"),
+    ("EVENTS", "ANALYTICS_PAGE_VIEW",            "tracks",   "ERmandOne", "ERzeroToMany"),
     ("EVENTS", "EVENT_INTERESTS",       "receives", "ERmandOne", "ERzeroToMany"),
     ("USERS", "HERITAGE_PROFILES",      "profiles", "ERmandOne", "ERzeroToMany"),
     ("ATTRACTIONS", "HERITAGE_PROFILES", "linked",   "ERmandOne", "ERmandOne"),

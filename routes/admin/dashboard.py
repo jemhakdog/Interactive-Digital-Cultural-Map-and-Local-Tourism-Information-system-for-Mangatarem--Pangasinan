@@ -5,7 +5,7 @@ from sqlalchemy import func
 from datetime import datetime, timedelta
 from typing import Dict, List, Tuple
 
-from models import db, User, Attraction, Event, GalleryItem, Review, Favorite, PageView
+from models import db, User, Attraction, Event, GalleryItem, AttractionReview, UserFavoriteAttraction, AnalyticsPageView
 from utils.logger_helper import log_entry, log_success, log_error
 from . import admin_bp
 
@@ -19,20 +19,20 @@ def _get_content_stats() -> Dict[str, int]:
         "attractions": Attraction.query.count(),
         "events": Event.query.count(),
         "gallery": GalleryItem.query.count(),
-        "reviews": Review.query.count(),
-        "pending_reviews": Review.query.filter_by(status="pending").count(),
-        "favorites": Favorite.query.count(),
+        "reviews": AttractionReview.query.count(),
+        "pending_reviews": AttractionReview.query.filter_by(status="pending").count(),
+        "favorites": UserFavoriteAttraction.query.count(),
     }
 
 
 def _get_top_attractions(limit: int = 5) -> List[Dict[str, any]]:
     """Fetch most viewed attractions."""
     top_query = (
-        db.session.query(Attraction.name, func.count(PageView.id).label("view_count"))
-        .join(PageView, PageView.item_id == Attraction.id)
-        .filter(PageView.view_type == "attraction")
+        db.session.query(Attraction.name, func.count(AnalyticsPageView.id).label("view_count"))
+        .join(AnalyticsPageView, AnalyticsPageView.item_id == Attraction.id)
+        .filter(AnalyticsPageView.view_type == "attraction")
         .group_by(Attraction.id)
-        .order_by(func.count(PageView.id).desc())
+        .order_by(func.count(AnalyticsPageView.id).desc())
         .limit(limit)
         .all()
     )
@@ -44,11 +44,11 @@ def _get_engagement_data(days: int = 7) -> Dict[str, List]:
     cutoff_date = datetime.utcnow() - timedelta(days=days)
     daily_views_query = (
         db.session.query(
-            func.date(PageView.timestamp).label("date"),
-            func.count(PageView.id).label("count"),
+            func.date(AnalyticsPageView.timestamp).label("date"),
+            func.count(AnalyticsPageView.id).label("count"),
         )
-        .filter(PageView.timestamp >= cutoff_date)
-        .group_by(func.date(PageView.timestamp))
+        .filter(AnalyticsPageView.timestamp >= cutoff_date)
+        .group_by(func.date(AnalyticsPageView.timestamp))
         .all()
     )
     daily_views_dict = {str(d): c for d, c in daily_views_query}
@@ -68,25 +68,25 @@ def _get_pending_items() -> Dict[str, any]:
     return {
         "users": User.query.filter_by(is_approved=False, role="contributor").all(),
         "gallery": GalleryItem.query.filter_by(status="pending").all(),
-        "reviews": Review.query.filter_by(status="pending").join(User, Review.user_id == User.id).join(Attraction, Review.attraction_id == Attraction.id).all(),
+        "reviews": AttractionReview.query.filter_by(status="pending").join(User, AttractionReview.user_id == User.id).join(Attraction, AttractionReview.attraction_id == Attraction.id).all(),
     }
 
 
 def _get_top_rated_attractions(limit: int = 5) -> List[Tuple[Attraction, float]]:
     """Fetch top-rated attractions based on average review rating."""
     return (
-        db.session.query(Attraction, func.avg(Review.rating).label("avg_rating"))
-        .join(Review, Attraction.id == Review.attraction_id)
+        db.session.query(Attraction, func.avg(AttractionReview.rating).label("avg_rating"))
+        .join(AttractionReview, Attraction.id == AttractionReview.attraction_id)
         .group_by(Attraction.id)
-        .order_by(func.avg(Review.rating).desc())
+        .order_by(func.avg(AttractionReview.rating).desc())
         .limit(limit)
         .all()
     )
 
 
-def _get_recent_reviews(limit: int = 5) -> List[Review]:
+def _get_recent_reviews(limit: int = 5) -> List[AttractionReview]:
     """Fetch most recent reviews for dashboard feed."""
-    return Review.query.order_by(Review.created_at.desc()).limit(limit).all()
+    return AttractionReview.query.order_by(AttractionReview.created_at.desc()).limit(limit).all()
 
 
 # === ROUTE HANDLERS ===

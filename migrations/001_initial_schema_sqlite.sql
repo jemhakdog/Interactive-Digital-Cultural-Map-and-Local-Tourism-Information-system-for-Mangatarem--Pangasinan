@@ -121,7 +121,7 @@ CREATE TABLE IF NOT EXISTS barangay_info (
 -- ============================================================
 
 -- Page view tracking for analytics
-CREATE TABLE IF NOT EXISTS page_view (
+CREATE TABLE IF NOT EXISTS analytics_page_view (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     view_type VARCHAR(50) NOT NULL,
     item_id INTEGER,
@@ -132,7 +132,7 @@ CREATE TABLE IF NOT EXISTS page_view (
 );
 
 -- User favorite attractions
-CREATE TABLE IF NOT EXISTS favorite (
+CREATE TABLE IF NOT EXISTS user_favorite_attraction (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     attraction_id INTEGER NOT NULL,
@@ -143,7 +143,7 @@ CREATE TABLE IF NOT EXISTS favorite (
 );
 
 -- User interest in events
-CREATE TABLE IF NOT EXISTS event_interest (
+CREATE TABLE IF NOT EXISTS user_event_interest (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     event_id INTEGER NOT NULL,
@@ -155,7 +155,7 @@ CREATE TABLE IF NOT EXISTS event_interest (
 );
 
 -- User reviews and ratings for attractions
-CREATE TABLE IF NOT EXISTS review (
+CREATE TABLE IF NOT EXISTS attraction_review (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER NOT NULL,
     attraction_id INTEGER NOT NULL,
@@ -312,12 +312,12 @@ CREATE INDEX IF NOT EXISTS idx_heritage_profile_asset_type ON heritage_profile(a
 CREATE INDEX IF NOT EXISTS idx_heritage_profile_created_at ON heritage_profile(created_at);
 
 -- Page view indexes
-CREATE INDEX IF NOT EXISTS idx_page_view_timestamp ON page_view(timestamp);
-CREATE INDEX IF NOT EXISTS idx_page_view_type ON page_view(view_type);
+CREATE INDEX IF NOT EXISTS idx_analytics_page_view_timestamp ON analytics_page_view(timestamp);
+CREATE INDEX IF NOT EXISTS idx_analytics_page_view_type ON analytics_page_view(view_type);
 
 -- Review indexes
-CREATE INDEX IF NOT EXISTS idx_review_attraction_id ON review(attraction_id);
-CREATE INDEX IF NOT EXISTS idx_review_status ON review(status);
+CREATE INDEX IF NOT EXISTS idx_attraction_review_attraction_id ON attraction_review(attraction_id);
+CREATE INDEX IF NOT EXISTS idx_attraction_review_status ON attraction_review(status);
 
 -- Gallery item indexes
 CREATE INDEX IF NOT EXISTS idx_gallery_item_status ON gallery_item(status);

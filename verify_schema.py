@@ -56,13 +56,13 @@ EXPECTED_TABLES = {
         'id', 'barangay_name', 'history', 'cultural_assets', 'traditions',
         'local_practices', 'unique_features', 'user_id', 'updated_at'
     ],
-    'page_view': [
+    'analytics_page_view': [
         'id', 'view_type', 'item_id', 'page_name', 'timestamp', 'user_id'
     ],
     'favorite': [
         'id', 'user_id', 'attraction_id', 'created_at'
     ],
-    'event_interest': [
+    'user_event_interest': [
         'id', 'user_id', 'event_id', 'status', 'created_at'
     ],
     'review': [

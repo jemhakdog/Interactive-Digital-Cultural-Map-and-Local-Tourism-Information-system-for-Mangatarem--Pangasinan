@@ -108,17 +108,18 @@ CREATE TABLE IF NOT EXISTS barangay_info (
 -- ============================================================
 
 -- Page view tracking for analytics
-CREATE TABLE IF NOT EXISTS page_view (
+CREATE TABLE IF NOT EXISTS analytics_page_view (
     id SERIAL PRIMARY KEY,
     view_type VARCHAR(50) NOT NULL,
     item_id INTEGER,
     page_name VARCHAR(100),
     timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    user_id INTEGER REFERENCES "user"(id) ON DELETE SET NULL
+    user_id INTEGER,
+    FOREIGN KEY (user_id) REFERENCES "user"(id) ON DELETE SET NULL
 );
 
 -- User favorite attractions
-CREATE TABLE IF NOT EXISTS favorite (
+CREATE TABLE IF NOT EXISTS user_favorite_attraction (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
     attraction_id INTEGER NOT NULL REFERENCES attraction(id) ON DELETE CASCADE,
@@ -127,7 +128,7 @@ CREATE TABLE IF NOT EXISTS favorite (
 );
 
 -- User interest in events
-CREATE TABLE IF NOT EXISTS event_interest (
+CREATE TABLE IF NOT EXISTS user_event_interest (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
     event_id INTEGER NOT NULL REFERENCES event(id) ON DELETE CASCADE,
@@ -137,7 +138,7 @@ CREATE TABLE IF NOT EXISTS event_interest (
 );
 
 -- User reviews and ratings for attractions
-CREATE TABLE IF NOT EXISTS review (
+CREATE TABLE IF NOT EXISTS attraction_review (
     id SERIAL PRIMARY KEY,
     user_id INTEGER NOT NULL REFERENCES "user"(id) ON DELETE CASCADE,
     attraction_id INTEGER NOT NULL REFERENCES attraction(id) ON DELETE CASCADE,
@@ -285,25 +286,25 @@ CREATE INDEX IF NOT EXISTS idx_heritage_profile_asset_type ON heritage_profile(a
 CREATE INDEX IF NOT EXISTS idx_heritage_profile_created_at ON heritage_profile(created_at);
 
 -- Page view indexes
-CREATE INDEX IF NOT EXISTS idx_page_view_timestamp ON page_view(timestamp);
-CREATE INDEX IF NOT EXISTS idx_page_view_type ON page_view(view_type);
+CREATE INDEX IF NOT EXISTS idx_analytics_page_view_timestamp ON analytics_page_view(timestamp);
+CREATE INDEX IF NOT EXISTS idx_analytics_page_view_type ON analytics_page_view(view_type);
 
 -- Review indexes
-CREATE INDEX IF NOT EXISTS idx_review_attraction_id ON review(attraction_id);
-CREATE INDEX IF NOT EXISTS idx_review_status ON review(status);
-CREATE INDEX IF NOT EXISTS idx_review_user_id ON review(user_id);
+CREATE INDEX IF NOT EXISTS idx_attraction_review_attraction_id ON attraction_review(attraction_id);
+CREATE INDEX IF NOT EXISTS idx_attraction_review_status ON attraction_review(status);
+CREATE INDEX IF NOT EXISTS idx_attraction_review_user_id ON attraction_review(user_id);
 
 -- Gallery item indexes
 CREATE INDEX IF NOT EXISTS idx_gallery_item_status ON gallery_item(status);
 CREATE INDEX IF NOT EXISTS idx_gallery_item_type ON gallery_item(type);
 
 -- Favorite indexes
-CREATE INDEX IF NOT EXISTS idx_favorite_user_id ON favorite(user_id);
-CREATE INDEX IF NOT EXISTS idx_favorite_attraction_id ON favorite(attraction_id);
+CREATE INDEX IF NOT EXISTS idx_user_favorite_attraction_user_id ON user_favorite_attraction(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_favorite_attraction_attraction_id ON user_favorite_attraction(attraction_id);
 
 -- Event interest indexes
-CREATE INDEX IF NOT EXISTS idx_event_interest_user_id ON event_interest(user_id);
-CREATE INDEX IF NOT EXISTS idx_event_interest_event_id ON event_interest(event_id);
+CREATE INDEX IF NOT EXISTS idx_user_event_interest_user_id ON user_event_interest(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_event_interest_event_id ON user_event_interest(event_id);
 
 -- Barangay info index
 CREATE INDEX IF NOT EXISTS idx_barangay_info_name ON barangay_info(barangay_name);
@@ -329,10 +330,10 @@ ALTER TABLE attraction ENABLE ROW LEVEL SECURITY;
 ALTER TABLE event ENABLE ROW LEVEL SECURITY;
 ALTER TABLE gallery_item ENABLE ROW LEVEL SECURITY;
 ALTER TABLE barangay_info ENABLE ROW LEVEL SECURITY;
-ALTER TABLE page_view ENABLE ROW LEVEL SECURITY;
-ALTER TABLE favorite ENABLE ROW LEVEL SECURITY;
-ALTER TABLE event_interest ENABLE ROW LEVEL SECURITY;
-ALTER TABLE review ENABLE ROW LEVEL SECURITY;
+ALTER TABLE analytics_page_view ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_favorite_attraction ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_event_interest ENABLE ROW LEVEL SECURITY;
+ALTER TABLE attraction_review ENABLE ROW LEVEL SECURITY;
 ALTER TABLE natural_heritage_details ENABLE ROW LEVEL SECURITY;
 ALTER TABLE built_heritage_details ENABLE ROW LEVEL SECURITY;
 ALTER TABLE movable_heritage_details ENABLE ROW LEVEL SECURITY;
@@ -347,9 +348,9 @@ DROP POLICY IF EXISTS "Public Read Approved Attractions" ON attraction;
 DROP POLICY IF EXISTS "Public Read Approved Events" ON event;
 DROP POLICY IF EXISTS "Public Read Approved Gallery" ON gallery_item;
 DROP POLICY IF EXISTS "Public Read Barangay Info" ON barangay_info;
-DROP POLICY IF EXISTS "Public Read Approved Reviews" ON review;
-DROP POLICY IF EXISTS "Users can view own favorites" ON favorite;
-DROP POLICY IF EXISTS "Users can view own event interests" ON event_interest;
+DROP POLICY IF EXISTS "Public Read Approved Reviews" ON attraction_review;
+DROP POLICY IF EXISTS "Users can view own favorites" ON user_favorite_attraction;
+DROP POLICY IF EXISTS "Users can view own event interests" ON user_event_interest;
 
 -- Public read policies for approved content
 CREATE POLICY "Public Read Approved Profiles" ON heritage_profile
@@ -367,14 +368,14 @@ CREATE POLICY "Public Read Approved Gallery" ON gallery_item
 CREATE POLICY "Public Read Barangay Info" ON barangay_info
     FOR SELECT USING (true); -- Barangay info is always public
 
-CREATE POLICY "Public Read Approved Reviews" ON review
+CREATE POLICY "Public Read Approved Reviews" ON attraction_review
     FOR SELECT USING (status = 'approved');
 
 -- Users can view their own favorites and event interests
-CREATE POLICY "Users can view own favorites" ON favorite
+CREATE POLICY "Users can view own favorites" ON user_favorite_attraction
     FOR SELECT USING (auth.uid()::text = user_id::text OR true); -- Allow public read for now
 
-CREATE POLICY "Users can view own event interests" ON event_interest
+CREATE POLICY "Users can view own event interests" ON user_event_interest
     FOR SELECT USING (auth.uid()::text = user_id::text OR true); -- Allow public read for now
 
 -- Detail tables: inherit approval status from heritage_profile

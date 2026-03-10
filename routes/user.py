@@ -4,9 +4,9 @@ from models import (
     db,
     Attraction,
     Event,
-    Favorite,
-    EventInterest,
-    Review,
+    UserFavoriteAttraction,
+    UserEventInterest,
+    AttractionReview,
     GalleryItem,
 )
 from functools import wraps
@@ -29,20 +29,20 @@ def user_required(f):
 @login_required
 @user_required
 def dashboard():
-    favorite_count = Favorite.query.filter_by(user_id=current_user.id).count()
-    event_interest_count = EventInterest.query.filter_by(
+    favorite_count = UserFavoriteAttraction.query.filter_by(user_id=current_user.id).count()
+    event_interest_count = UserEventInterest.query.filter_by(
         user_id=current_user.id
     ).count()
     contribution_count = (
-        Review.query.filter_by(user_id=current_user.id).count()
+        AttractionReview.query.filter_by(user_id=current_user.id).count()
         + GalleryItem.query.filter_by(user_id=current_user.id).count()
     )
 
     recent_favorites = (
         db.session.query(Attraction)
-        .join(Favorite)
-        .filter(Favorite.user_id == current_user.id)
-        .order_by(Favorite.created_at.desc())
+        .join(UserFavoriteAttraction)
+        .filter(UserFavoriteAttraction.user_id == current_user.id)
+        .order_by(UserFavoriteAttraction.created_at.desc())
         .limit(5)
         .all()
     )
@@ -79,8 +79,8 @@ def profile():
 def favorites():
     favorites = (
         db.session.query(Attraction)
-        .join(Favorite)
-        .filter(Favorite.user_id == current_user.id)
+        .join(UserFavoriteAttraction)
+        .filter(UserFavoriteAttraction.user_id == current_user.id)
         .all()
     )
     return render_template("user/favorites.html", favorites=favorites)
@@ -92,8 +92,8 @@ def favorites():
 def my_events():
     events = (
         db.session.query(Event)
-        .join(EventInterest)
-        .filter(EventInterest.user_id == current_user.id)
+        .join(UserEventInterest)
+        .filter(UserEventInterest.user_id == current_user.id)
         .all()
     )
     return render_template("user/my_events.html", events=events)
@@ -103,7 +103,7 @@ def my_events():
 @login_required
 @user_required
 def contributions():
-    reviews = Review.query.filter_by(user_id=current_user.id).all()
+    reviews = AttractionReview.query.filter_by(user_id=current_user.id).all()
     gallery_items = GalleryItem.query.filter_by(user_id=current_user.id).all()
     return render_template(
         "user/contributions.html", reviews=reviews, gallery_items=gallery_items
