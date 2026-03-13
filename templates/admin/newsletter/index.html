@@ -1,0 +1,99 @@
+{% extends 'admin/dashboard.html' %}
+
+{% block title %}Newsletter Management - GoMangatarem{% endblock %}
+
+{% block admin_content %}
+<div class="grid grid-cols-1 gap-8">
+    <!-- Stats Row -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="glass-card p-6 rounded-3xl flex flex-col justify-between">
+            <div class="p-3 bg-emerald-100 rounded-2xl text-emerald-700 w-fit">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 01-9-3.812M13.712 11.288a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0z" />
+                </svg>
+            </div>
+            <div>
+                <p class="text-4xl font-black text-emerald-950 mt-4 tracking-tighter">{{ active_count }}</p>
+                <h3 class="text-emerald-900/60 font-bold uppercase tracking-wider text-xs mt-1">Active Subscribers</h3>
+            </div>
+        </div>
+        
+        <div class="glass-card p-6 rounded-3xl flex items-center justify-center">
+            <div class="flex gap-4">
+                <a href="{{ url_for('newsletter_admin.compose') }}" class="px-8 py-4 bg-emerald-600 text-white rounded-2xl font-bold hover:bg-emerald-700 transition shadow-lg shadow-emerald-200 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                    Compose Newsletter
+                </a>
+                <a href="{{ url_for('newsletter_admin.export_subscribers') }}" class="px-8 py-4 bg-white border border-emerald-900/10 text-emerald-950 rounded-2xl font-bold hover:bg-emerald-50 transition flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                    Export CSV
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscriber List -->
+    <div class="glass-card rounded-3xl overflow-hidden">
+        <div class="bg-emerald-900/5 px-8 py-6 border-b border-emerald-900/10 flex justify-between items-center">
+            <h4 class="font-black text-white text-xl flex items-center gap-3">
+                <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                Subscriber Directory
+            </h4>
+        </div>
+
+        <div class="overflow-x-auto">
+            <table class="w-full text-left">
+                <thead>
+                    <tr class="bg-emerald-50/50">
+                        <th class="px-8 py-4 text-xs font-black text-emerald-900/40 uppercase tracking-widest">Subscriber</th>
+                        <th class="px-8 py-4 text-xs font-black text-emerald-900/40 uppercase tracking-widest">Status</th>
+                        <th class="px-8 py-4 text-xs font-black text-emerald-900/40 uppercase tracking-widest">Joined Date</th>
+                        <th class="px-8 py-4 text-xs font-black text-emerald-900/40 uppercase tracking-widest text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-emerald-900/5">
+                    {% for sub in subscribers %}
+                    <tr class="hover:bg-emerald-50/30 transition-colors">
+                        <td class="px-8 py-5">
+                            <p class="font-bold text-emerald-950">{{ sub.email }}</p>
+                        </td>
+                        <td class="px-8 py-5">
+                            {% if sub.is_active %}
+                            <span class="bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase px-2 py-1 rounded-full">Active</span>
+                            {% else %}
+                            <span class="bg-gray-100 text-gray-500 text-[10px] font-black uppercase px-2 py-1 rounded-full">Inactive</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-8 py-5 text-emerald-900/60 text-sm font-medium">
+                            {{ sub.created_at.strftime('%B %d, %Y') }}
+                        </td>
+                        <td class="px-8 py-5 text-right">
+                            <form action="{{ url_for('newsletter_admin.delete_subscriber', id=sub.id) }}" method="POST" onsubmit="return confirm('Are you sure you want to remove this subscriber?')">
+                                <button type="submit" class="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not subscribers %}
+                    <tr>
+                        <td colspan="4" class="px-8 py-12 text-center text-emerald-900/40 font-medium">
+                            No subscribers found yet.
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

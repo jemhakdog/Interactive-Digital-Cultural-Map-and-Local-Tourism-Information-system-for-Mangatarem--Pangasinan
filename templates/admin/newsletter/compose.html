@@ -1,0 +1,47 @@
+{% extends 'admin/dashboard.html' %}
+
+{% block title %}Compose Newsletter - GoMangatarem{% endblock %}
+
+{% block admin_content %}
+<div class="max-w-4xl mx-auto">
+    <div class="glass-card rounded-3xl overflow-hidden">
+        <div class="bg-emerald-900/5 px-8 py-6 border-b border-emerald-900/10 flex items-center justify-between">
+            <h4 class="font-black text-white text-xl flex items-center gap-3">
+                <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+                Draft New Newsletter
+            </h4>
+            <a href="{{ url_for('newsletter_admin.index') }}" class="text-sm font-bold text-emerald-100 hover:text-white transition-colors">Back to List</a>
+        </div>
+
+        
+        <form action="{{ url_for('newsletter_admin.compose') }}" method="POST" class="p-8 space-y-6">
+            <div class="space-y-2">
+                <label for="subject" class="text-xs font-black text-emerald-900/40 uppercase tracking-widest ml-1">Email Subject</label>
+                <input type="text" name="subject" id="subject" required
+                    class="w-full px-6 py-4 bg-emerald-50/50 border border-emerald-900/10 rounded-2xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-bold text-emerald-950 placeholder-emerald-900/20"
+                    placeholder="e.g. Highlights of the Month in Mangatarem">
+            </div>
+
+            <div class="space-y-2">
+                <label for="content" class="text-xs font-black text-emerald-900/40 uppercase tracking-widest ml-1">Email Content (HTML supported)</label>
+                <textarea name="content" id="content" rows="12" required
+                    class="w-full px-6 py-4 bg-emerald-50/50 border border-emerald-900/10 rounded-2xl focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all font-medium text-emerald-950 placeholder-emerald-900/20"
+                    placeholder="Write your newsletter content here..."></textarea>
+                <p class="text-[10px] text-emerald-900/40 font-medium px-1">Tip: You can use HTML tags like &lt;b&gt;, &lt;i&gt;, and &lt;a&gt; for formatting.</p>
+            </div>
+
+            <div class="pt-4">
+                <button type="submit" 
+                    class="w-full py-5 bg-emerald-600 text-white rounded-2xl font-black text-lg hover:bg-emerald-700 transition shadow-xl shadow-emerald-200 flex items-center justify-center gap-3 group">
+                    <svg class="w-6 h-6 transform group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                    Send to All Active Subscribers
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -6,10 +6,11 @@ Print statements replaced with logging helpers.
 Complex route handlers decomposed into focused functions.
 """
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from flask_login import login_user, logout_user, login_required, current_user
-from models import db, User
+from models import db, User, PasswordResetToken
 from extensions import limiter
+from utils.email_sender import send_password_reset_email
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from utils.logger_helper import (
@@ -429,6 +430,103 @@ def logout():
     logout_user()
     log_redirect("auth", "logout", "home")
     return redirect(url_for("public.index"))
+
+
+@auth_bp.route("/forgot-password", methods=["GET", "POST"])
+@limiter.limit("5 per minute")
+def forgot_password():
+    """
+    Handle forgot password request.
+
+    GET:  Display the email input form.
+    POST: Generate a reset token and send a reset email.
+          Always shows the same success message to prevent user enumeration.
+    """
+    log_entry("auth", "forgot_password", method=request.method)
+
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+        user = User.query.filter_by(email=email).first()
+
+        if user:
+            expiry = current_app.config.get("PASSWORD_RESET_EXPIRY_MINUTES", 30)
+            reset_token = PasswordResetToken.create_for_user(user, expiry_minutes=expiry)
+            # Use request.url_root to ensure the link matches the current host and protocol
+            # (e.g., http://localhost:5001 or https://gomangatarem.vercel.app)
+            relative_url = url_for(
+                "auth.reset_password",
+                token=reset_token.token
+            )
+            reset_url = f"{request.url_root.rstrip('/')}{relative_url}"
+            sent = send_password_reset_email(user.email, reset_url)
+            if sent:
+                log_success("auth", "forgot_password", f"Reset email sent to '{email}'")
+            else:
+                log_error("auth", "forgot_password", f"Failed to send reset email to '{email}'")
+
+        # Always show success to prevent user enumeration
+        flash(
+            "If that email is registered, a password reset link has been sent. Check your inbox.",
+            "success",
+        )
+        return redirect(url_for("auth.forgot_password"))
+
+    return render_template("auth/forgot_password.html")
+
+
+def _validate_reset_token(token_str: str) -> "PasswordResetToken | None":
+    """
+    Validate a password reset token.
+
+    Args:
+        token_str: Raw token string from URL
+
+    Returns:
+        PasswordResetToken if valid, None if invalid/expired/used
+    """
+    record = PasswordResetToken.query.filter_by(token=token_str).first()
+    if record and record.is_valid:
+        return record
+    return None
+
+
+@auth_bp.route("/reset-password/<token>", methods=["GET", "POST"])
+def reset_password(token: str):
+    """
+    Handle password reset via token.
+
+    GET:  Validate token and display the new password form.
+    POST: Validate token, update password, mark token used.
+    """
+    log_entry("auth", "reset_password", method=request.method)
+
+    reset_record = _validate_reset_token(token)
+    if not reset_record:
+        log_error("auth", "reset_password", "Invalid or expired token")
+        flash("Reset link is invalid or has expired. Please request a new one.", "error")
+        return redirect(url_for("auth.forgot_password"))
+
+    if request.method == "POST":
+        new_password = request.form.get("password", "")
+        confirm_password = request.form.get("confirm_password", "")
+
+        if len(new_password) < 8:
+            flash("Password must be at least 8 characters.", "error")
+            return render_template("auth/reset_password.html", token=token)
+
+        if new_password != confirm_password:
+            flash("Passwords do not match.", "error")
+            return render_template("auth/reset_password.html", token=token)
+
+        reset_record.user.set_password(new_password)
+        reset_record.used = True
+        db.session.commit()
+
+        log_success("auth", "reset_password", f"Password reset for user id={reset_record.user_id}")
+        flash("Your password has been reset. You can now log in.", "success")
+        return redirect(url_for("auth.login"))
+
+    return render_template("auth/reset_password.html", token=token)
 
 
 @auth_bp.route("/pending-approval")

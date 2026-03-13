@@ -28,12 +28,16 @@ class Config:
     REMEMBER_COOKIE_DURATION = timedelta(days=30)
     
     # Misc
-    PREFERRED_URL_SCHEME = os.environ.get("PREFERRED_URL_SCHEME", "https")
+    PASSWORD_RESET_EXPIRY_MINUTES = 30
+    # Use request host by default, don't force SERVER_NAME in base config
+    # unless explicitly needed for background tasks.
+    PREFERRED_URL_SCHEME = "https"
 
 class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True
     SESSION_COOKIE_SECURE = False
+    PREFERRED_URL_SCHEME = "http"
 
 class ProductionConfig(Config):
     """Production configuration."""

@@ -1,8 +1,8 @@
-from flask import Blueprint, render_template, request
-from models import db, User, Attraction, Event, GalleryItem, BarangayInfo, PageView
+from models import db, User, Attraction, Event, GalleryItem, BarangayInfo, PageView, NewsletterSubscriber
 from flask_login import current_user
 from extensions import limiter
 from datetime import datetime
+from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
 from utils.logger_helper import (
     log_entry,
     log_query,
@@ -663,8 +663,9 @@ def sitemap():
     Returns:
         XML response containing the sitemap.
     """
-    from flask import make_response, url_for
+    from flask import make_response
     from datetime import datetime
+
     # host_url = "/".join(host_components[:3])  # e.g., http://localhost:5000
 
     pages = []
@@ -790,15 +791,54 @@ def verify_site():
     return render_template("google364b8336ce52ae86.html")
 
 
-@public_bp.route("/robots.txt")
-def robots():
-    """
-    Generate robots.txt configuration.
 
-    Returns:
-        Text response with robots.txt content.
+@public_bp.route("/subscribe", methods=["POST"])
+def subscribe():
     """
-    from flask import make_response, url_for
+    Handle newsletter subscription requests.
+    """
+    email = request.form.get("email")
+    if not email:
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"status": "error", "message": "Email is required"}), 400
+        flash("Email is required", "error")
+        return redirect(url_for("public.index"))
+
+    # Check if already subscribed
+    existing = NewsletterSubscriber.query.filter_by(email=email).first()
+    if existing:
+        if not existing.is_active:
+            existing.is_active = True
+            db.session.commit()
+            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+                return jsonify({"status": "success", "message": "Welcome back! You've been resubscribed."})
+            flash("Welcome back! You've been resubscribed.", "success")
+            return redirect(url_for("public.index"))
+        
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"status": "info", "message": "You are already subscribed!"})
+        flash("You are already subscribed!", "info")
+        return redirect(url_for("public.index"))
+
+    # Create new subscriber
+    try:
+        new_subscriber = NewsletterSubscriber(email=email)
+        db.session.add(new_subscriber)
+        db.session.commit()
+        
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"status": "success", "message": "Thank you for subscribing to our newsletter!"})
+        flash("Thank you for subscribing to our newsletter!", "success")
+        return redirect(url_for("public.index"))
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Subscription error: {e}")
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"status": "error", "message": "An error occurred. Please try again later."}), 500
+        flash("An error occurred. Please try again later.", "error")
+        return redirect(url_for("public.index"))
+
+    from flask import make_response
 
     sitemap_url = url_for("public.sitemap", _external=True)
 

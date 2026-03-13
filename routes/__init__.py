@@ -8,6 +8,8 @@ def register_blueprints(app):
     from .user import user_bp
     from .update import update_bp
 
+    from .admin.newsletter import newsletter_admin_bp
+
     app.register_blueprint(public_bp)
     app.register_blueprint(api_bp)
     app.register_blueprint(auth_bp)
@@ -15,3 +17,5 @@ def register_blueprints(app):
     app.register_blueprint(barangay_bp)
     app.register_blueprint(user_bp)
     app.register_blueprint(update_bp)
+    app.register_blueprint(newsletter_admin_bp)
+

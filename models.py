@@ -1,7 +1,8 @@
 from extensions import db
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime
+from datetime import datetime, timedelta
+import secrets
 
 
 class User(UserMixin, db.Model):
@@ -18,6 +19,38 @@ class User(UserMixin, db.Model):
 
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
+
+
+
+class PasswordResetToken(db.Model):
+    """Single-use, time-limited tokens for password reset."""
+    __tablename__ = "password_reset_token"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    token = db.Column(db.String(128), unique=True, nullable=False)
+    expires_at = db.Column(db.DateTime, nullable=False)
+    used = db.Column(db.Boolean, default=False, nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship("User", backref=db.backref("reset_tokens", lazy=True))
+
+    @classmethod
+    def create_for_user(cls, user, expiry_minutes: int = 30) -> "PasswordResetToken":
+        """Generate a new token for the given user."""
+        token = cls(
+            user_id=user.id,
+            token=secrets.token_hex(32),
+            expires_at=datetime.utcnow() + timedelta(minutes=expiry_minutes),
+        )
+        db.session.add(token)
+        db.session.commit()
+        return token
+
+    @property
+    def is_valid(self) -> bool:
+        """True if token is unused and not expired."""
+        return not self.used and datetime.utcnow() < self.expires_at
 
 
 class HeritageProfile(db.Model):
@@ -165,7 +198,21 @@ class AttractionReview(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
+
+class NewsletterSubscriber(db.Model):
+    __tablename__ = 'newsletter_subscriber'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    email = db.Column(db.String(120), unique=True, nullable=False, index=True)
+    is_active = db.Column(db.Boolean, default=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    def __repr__(self):
+        return f'<NewsletterSubscriber {self.email}>'
+
+
 # === Heritage Models (Tourism Forms) ===
+
 # Import heritage models to register them with SQLAlchemy
 # === Heritage Models (Tourism Forms - Detail Tables) ===
 from heritage_models.natural_heritage import NaturalHeritage  # Form 01A
