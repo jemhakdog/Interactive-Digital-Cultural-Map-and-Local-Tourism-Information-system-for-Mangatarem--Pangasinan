@@ -1,33 +1,65 @@
-# Documentation Directory
+# Documentation Index
 
-This directory contains all project documentation, reports, and planning documents.
+> **Interactive Digital Cultural Map & Local Tourism Information System**
+> Mangatarem, Pangasinan
 
-## Contents
+This folder contains all project documentation. Below is a map of every sub-directory.
 
-### Planning & Organization
-- **[ORGANIZATION_PLAN.md](./ORGANIZATION_PLAN.md)** - Long-term organizational structure planning
-- **[design.md](./design.md)** - Design guidelines and specifications
-- **[todo.md](./todo.md)** - Project tasks and to-do items
-- **[planning/](./planning/)** - Detailed planning documents (PLAN-*.md files)
+---
 
-### Technical Documentation
-- **[architecture.md](./architecture.md)** - System architecture and technical stack
-- **[api_reference.md](./api_reference.md)** - API endpoint documentation
-- **[deployment_guide.md](./deployment_guide.md)** - Vercel deployment instructions
-- **[database_migration.md](./database_migration.md)** - Database migration workflows
-- **[user_manual.md](./user_manual.md)** - Visitor and user guide
-- **[admin_guide.md](./admin_guide.md)** - Guide for LGU administrators
-- **[contributor_guide.md](./contributor_guide.md)** - Guide for barangay contributors
-- **[optimization.md](./optimization.md)** - Performance optimization notes and strategies
-- **[sql_files.md](./sql_files.md)** - SQL-related code documentation and queries
+## 📂 Folder Structure
 
-### Reports & Investigations
-- **[duplicate_imports_report.md](./duplicate_imports_report.md)** - Analysis of duplicate imports
+```
+docs/
+├── capstone/               Academic capstone deliverables
+│   ├── chapters/           Chapter 1–3 (markdown + consolidated docx)
+│   ├── defense/            Defense prep guides, flashcards, scripts, diagrams
+│   └── guide/              BCC BSIT capstone guide PDF/reference
+│
+├── design/                 UI/UX design specs and search design notes
+│
+├── diagrams/               All draw.io files, PNGs, and diagram generation scripts
+│   ├── final/              Finalized diagram exports
+│   └── images/             Diagram image exports
+│
+├── planning/               All PLAN-*.md files (feature/task planning docs)
+│
+├── reports/                Audit, migration, lint, security, and sync reports
+│
+├── context/                Project context files (PRD, source, ERD notes)
+│
+├── project/                Root project overview files
+│   ├── PROJECT_DESCRIPTION.md
+│   ├── CHANGES.md
+│   └── QWEN.md
+│
+├── interview_data/         Raw interview data from stakeholders
+├── reference/              Reference snapshots and file lists
+│
+├── admin_guide.md          Admin panel documentation
+├── api_reference.md        API endpoint reference
+├── architecture.md         System architecture overview
+├── contributor_guide.md    How to contribute to the project
+├── core.md                 Core module documentation
+├── database_migration.md   Migration instructions and history
+├── deployment_guide.md     How to deploy the application
+└── optimization.md         Performance optimization notes
+```
 
-## Contributing
+---
 
-When adding new documentation:
-- Use descriptive filenames
-- Follow markdown best practices
-- Keep documentation up-to-date with code changes
-- Add new documents to this README
+## Quick Links
+
+| Document | Description |
+|---|---|
+| [architecture.md](architecture.md) | System overview and tech stack |
+| [api_reference.md](api_reference.md) | All API routes and responses |
+| [database_migration.md](database_migration.md) | Running and writing migrations |
+| [deployment_guide.md](deployment_guide.md) | Production deployment steps |
+| [admin_guide.md](admin_guide.md) | Admin panel usage |
+| [contributor_guide.md](contributor_guide.md) | Development guidelines |
+| [capstone/chapters/](capstone/chapters/) | Chapters 1–3 academic write-up |
+| [capstone/defense/](capstone/defense/) | Defense scripts and guides |
+| [diagrams/](diagrams/) | All system diagrams |
+| [planning/](planning/) | Feature planning files |
+| [reports/](reports/) | Audit and migration reports |
