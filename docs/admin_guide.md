@@ -126,7 +126,7 @@ Submission → Pending Review → Admin Review → Approved/Rejected → Publish
 2. Verify with barangay captain or LGU tourism office
 3. Click **"Approve User"**
 4. System sets `is_approved = True`
-5. Contributor receives email with login instructions
+5. Contributor receives email with login instructions, and is no longer redirected to the pending approval page when signing in.
 
 ---
 

@@ -283,8 +283,8 @@ def login():
         
         if user:
             if not _check_approval_status(user):
-                flash("Your account is pending approval by the admin.", "warning")
-                return redirect(url_for("auth.login"))
+                log_logic("auth", "login", f"Redirecting unapproved contributor '{username}' to pending page")
+                return redirect(url_for("auth.pending_approval"))
             
             log_success("auth", "login", f"User '{username}' logged in")
             logger.info(f"User '{username}' with role '{user.role}' logged in successfully")
@@ -347,11 +347,10 @@ def register():
         _create_user_from_form(username, email, password, role, barangay)
         
         if role == "contributor":
-            flash("Registration successful! Please wait for admin approval.", "success")
+            return redirect(url_for("auth.pending_approval"))
         else:
             flash("Registration successful! You can now log in.", "success")
-        
-        return redirect(url_for("auth.login"))
+            return redirect(url_for("auth.login"))
     
     log_render("auth", "register", "register.html")
     return render_template("auth/register.html")
@@ -430,3 +429,12 @@ def logout():
     logout_user()
     log_redirect("auth", "logout", "home")
     return redirect(url_for("public.index"))
+
+
+@auth_bp.route("/pending-approval")
+def pending_approval():
+    """
+    Display the pending approval page for newly registered contributors.
+    """
+    log_entry("auth", "pending_approval")
+    return render_template("auth/pending_approval.html")

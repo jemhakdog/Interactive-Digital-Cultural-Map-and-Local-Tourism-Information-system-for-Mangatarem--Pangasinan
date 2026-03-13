@@ -63,21 +63,44 @@ self.addEventListener('fetch', (event) => {
         return; // Let the browser handle these normally (from network)
     }
 
-    // Default Stale-While-Revalidate for other assets
-    event.respondWith(
-        caches.match(event.request).then((response) => {
-            return response || fetch(event.request).then((networkResponse) => {
-                // Optionally cache other successful GET requests
-                if (networkResponse.ok && event.request.method === 'GET' && !url.pathname.startsWith('/api/')) {
-                    const responseToCache = networkResponse.clone();
+    // Stale-While-Revalidate for static assets
+    const staleWhileRevalidate = () => {
+        return caches.match(event.request).then((cacheResponse) => {
+            const fetchPromise = fetch(event.request).then((networkResponse) => {
+                if (networkResponse.ok && event.request.method === 'GET') {
                     caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, responseToCache);
+                        cache.put(event.request, networkResponse.clone());
                     });
                 }
                 return networkResponse;
+            }).catch(() => {
+                // ignore fetch errors
             });
-        })
-    );
+            return cacheResponse || fetchPromise;
+        });
+    };
+
+    // Network-First for dynamic routes
+    const networkFirst = () => {
+        return fetch(event.request).then((networkResponse) => {
+            if (networkResponse.ok && event.request.method === 'GET') {
+                caches.open(CACHE_NAME).then((cache) => {
+                    cache.put(event.request, networkResponse.clone());
+                });
+            }
+            return networkResponse;
+        }).catch(() => {
+            return caches.match(event.request);
+        });
+    };
+
+    const isStaticObject = url.pathname.startsWith('/static/') || url.pathname.match(/\.(css|js|png|jpg|jpeg|gif|svg|webp|woff|woff2|ico)$/i);
+
+    if (isStaticObject) {
+        event.respondWith(staleWhileRevalidate());
+    } else {
+        event.respondWith(networkFirst());
+    }
 });
 
 // Message Event: Handle batch pre-fetching

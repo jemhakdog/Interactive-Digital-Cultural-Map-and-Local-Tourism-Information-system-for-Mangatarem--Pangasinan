@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request
-from models import db, User, Attraction, Event, GalleryItem, BarangayInfo, AnalyticsPageView
+from models import db, User, Attraction, Event, GalleryItem, BarangayInfo, PageView
 from flask_login import current_user
 from extensions import limiter
 from datetime import datetime
@@ -62,7 +62,7 @@ def record_view(view_type, item_id=None, page_name=None):
     """
     try:
         user_id = current_user.id if current_user.is_authenticated else None
-        view = AnalyticsPageView(
+        view = PageView(
             view_type=view_type,
             item_id=item_id,
             page_name=page_name,

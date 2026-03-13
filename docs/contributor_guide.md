@@ -61,9 +61,10 @@ As a **Contributor**, you play a vital role in showcasing your barangay's cultur
 
 After registration:
 - Your account will be in **pending** status
+- If you attempt to log in before approval, you will be redirected to a dedicated "Account Pending Review" page explaining the verification process (typically 24-48 hours).
 - An LGU admin will review your application
 - You'll receive email notification once approved
-- Login credentials will work after approval
+- Login credentials will work and redirect you to your dashboard after approval
 
 ### 3. First Login
 
