@@ -1,0 +1,118 @@
+<mxfile host="65bd71144e">
+    <diagram name="User Login Flow" id="user_login_flow">
+        <mxGraphModel dx="1833" dy="1173" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="start" value="Start" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;strokeWidth=2;fillColor=#1ba1e2;strokeColor=#006eaf;fontColor=#ffffff;fontStyle=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="360" y="40" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="login_page" value="GET /login" style="whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;fontStyle=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="360" y="120" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="submit" value="POST /login" style="whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;fontStyle=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="360" y="200" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="auth_check" value="Authenticate&lt;br/&gt;Credentials?" style="rhombus;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;fontStyle=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="345" y="280" width="150" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="invalid_cred" value="Show Error" style="whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#f8cecc;strokeColor=#b85450;fontColor=#000000;fontStyle=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="130" y="310" width="100" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="admin_check" value="Is Admin?" style="rhombus;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+                    <mxGeometry x="345" y="440" width="150" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="contrib_check" value="Is Contributor?" style="rhombus;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;fontStyle=1;fontSize=12;" vertex="1" parent="1">
+                    <mxGeometry x="345" y="580" width="150" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="approval_check" value="Is Approved?" style="rhombus;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;fontStyle=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="355" y="740" width="130" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="pending_page" value="Redirect&lt;br/&gt;/pending-approval" style="whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#fff2cc;strokeColor=#d6b656;fontColor=#000000;fontStyle=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="165" y="760" width="130" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="admin_dash" value="Admin Dashboard" style="whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;fontStyle=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="580" y="460" width="140" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="user_dash" value="User Dashboard" style="whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;fontStyle=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="580" y="600" width="140" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="contributor_dash" value="Contributor Dashboard" style="whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#d5e8d4;strokeColor=#82b366;fontColor=#000000;fontStyle=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="580" y="760" width="140" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="google_start" value="Google Sign-In" style="rounded=1;whiteSpace=wrap;html=1;arcSize=50;strokeWidth=2;fillColor=#1ba1e2;strokeColor=#006eaf;fontColor=#ffffff;fontStyle=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="840" y="40" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="verify_jwt" value="Verify JWT" style="rhombus;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;fontStyle=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="825" y="120" width="150" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="email_exists" value="Email Exists?" style="rhombus;whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;fontStyle=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="825" y="290" width="150" height="80" as="geometry"/>
+                </mxCell>
+                <mxCell id="create_google" value="Create User" style="whiteSpace=wrap;html=1;strokeWidth=2;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;fontStyle=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="1060" y="310" width="100" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="e1" style="endArrow=block;rounded=0;" parent="1" source="start" target="login_page" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e2" style="endArrow=block;rounded=0;" parent="1" source="login_page" target="submit" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e3" style="endArrow=block;rounded=0;" parent="1" source="submit" target="auth_check" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e4" value="No" style="endArrow=block;rounded=0;exitX=0;exitY=0.5;entryX=1;entryY=0.5;labelBackgroundColor=#ffffff;fontStyle=1;fontSize=11;fontColor=#000000;" parent="1" source="auth_check" target="invalid_cred" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="-10" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e5" style="endArrow=block;rounded=0;curved=1;" parent="1" source="invalid_cred" target="login_page" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="230" y="140"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e6" value="Yes" style="endArrow=block;rounded=0;labelBackgroundColor=#ffffff;fontStyle=1;fontSize=11;fontColor=#000000;" parent="1" source="auth_check" target="admin_check" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_admin_yes" value="Yes" style="endArrow=block;rounded=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;labelBackgroundColor=#ffffff;fontStyle=1;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="admin_check" target="admin_dash">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_admin_no" value="No" style="endArrow=block;rounded=0;labelBackgroundColor=#ffffff;fontStyle=1;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="admin_check" target="contrib_check">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_contrib_yes" value="Yes" style="endArrow=block;rounded=0;labelBackgroundColor=#ffffff;fontStyle=1;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="contrib_check" target="approval_check">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e_contrib_no" value="No" style="endArrow=block;rounded=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;labelBackgroundColor=#ffffff;fontStyle=1;fontSize=11;fontColor=#000000;" edge="1" parent="1" source="contrib_check">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="580" y="620" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="e9" value="No" style="endArrow=block;rounded=0;exitX=0;exitY=0.5;entryX=1;entryY=0.5;labelBackgroundColor=#ffffff;fontStyle=1;fontSize=11;fontColor=#000000;" parent="1" source="approval_check" target="pending_page" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="e10" value="Yes" style="endArrow=block;rounded=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;labelBackgroundColor=#ffffff;fontStyle=1;fontSize=11;fontColor=#000000;entryDx=0;entryDy=0;" parent="1" source="approval_check" target="contributor_dash" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="580" y="740" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="ge1" style="endArrow=block;rounded=0;" parent="1" source="google_start" target="verify_jwt" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="ge2" value="Valid" style="endArrow=block;rounded=0;labelBackgroundColor=#ffffff;fontStyle=1;fontSize=11;fontColor=#000000;" parent="1" source="verify_jwt" target="email_exists" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="ge3" value="No" style="endArrow=block;rounded=0;exitX=1;exitY=0.5;entryX=0;entryY=0.5;labelBackgroundColor=#ffffff;fontStyle=1;fontSize=11;fontColor=#000000;" parent="1" source="email_exists" target="create_google" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="ge4" value="Yes" style="endArrow=block;rounded=0;exitX=0.5;exitY=1;entryX=1;entryY=0.5;labelBackgroundColor=#ffffff;fontStyle=1;fontSize=11;fontColor=#000000;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;" parent="1" source="email_exists" target="user_dash" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="900" y="540" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
