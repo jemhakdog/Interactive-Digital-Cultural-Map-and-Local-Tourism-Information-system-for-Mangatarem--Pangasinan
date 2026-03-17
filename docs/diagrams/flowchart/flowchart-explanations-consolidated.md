@@ -16,7 +16,18 @@ This document provides a comprehensive overview of all system flowcharts and the
 
 ---
 
-## 2. User Registration and Validation
+## 2. Existing Tourism Flowchart (Manual Navigation)
+**Goal**: Highlight the physical dependency and navigation risks of the pre-digital era.
+
+### Process Breakdown:
+1.  **Physical Visit**: Requirement to stop at the Municipal Tourism Office.
+2.  **Brochure Dependency**: Information limited to printed media or verbal directions.
+3.  **Manual Navigation (Bottleneck)**: High risk of getting lost or using inefficient routes without GPS.
+4.  **Information Lag**: No real-time status updates for attractions (risk of finding sites closed).
+
+---
+
+## 3. User Registration and Validation
 **Goal**: Maintain data integrity and representative accountability during onboarding.
 
 ### Critical Decisions:
@@ -29,7 +40,7 @@ This document provides a comprehensive overview of all system flowcharts and the
 
 ---
 
-## 3. User Login and Authentication
+## 4. User Login and Authentication
 **Goal**: Multi-layered security accommodating different user types.
 
 ### Interaction Flows:
@@ -41,7 +52,7 @@ This document provides a comprehensive overview of all system flowcharts and the
 
 ---
 
-## 4. Map Exploration
+## 5. Map Exploration
 **Goal**: Interactive spatial navigation and tourism discovery.
 
 ### Workflow:
@@ -53,7 +64,7 @@ This document provides a comprehensive overview of all system flowcharts and the
 
 ---
 
-## 5. Cultural Content Navigation
+## 6. Cultural Content Navigation
 **Goal**: Path-based access to curated cultural repositories.
 
 ### Navigation Streams:
