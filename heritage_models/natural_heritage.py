@@ -8,17 +8,17 @@ from extensions import db
 class NaturalHeritage(db.Model):
     """Detail model for natural heritage sites (Form 01A)."""
     
-    __tablename__ = 'natural_heritage_details'
+    __tablename__ = 'NATURAL_HERITAGE_DETAIL'
     
     # Linked to HeritageProfile
-    profile_id = db.Column(db.Integer, db.ForeignKey('heritage_profile.id'), primary_key=True)
+    heritage_profile_id = db.Column(db.Integer, db.ForeignKey('HERITAGE_PROFILE.id'), primary_key=True)
     profile = db.relationship('HeritageProfile', backref=db.backref('natural_details', uselist=False))
     
-    # Unique Fields (Section I & V)
-    subcategory = db.Column(db.String(50), nullable=True)  # mountain, cave, etc.
-    area_hectares = db.Column(db.Float, nullable=True)
-    ownership = db.Column(db.String(200), nullable=True)
-    protection_status = db.Column(db.String(100), nullable=True)
+    # ERD Fields
+    type_of_natural_heritage = db.Column(db.String(100), nullable=True)
+    area_size = db.Column(db.String(100), nullable=True)
+    primary_features = db.Column(db.Text, nullable=True)
+    biodiversity_significance = db.Column(db.Text, nullable=True)
     
     def __repr__(self):
-        return f'<NaturalHeritage Detail for Profile {self.profile_id}>'
+        return f'<NaturalHeritage Detail for Profile {self.heritage_profile_id}>'

@@ -241,7 +241,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     </svg>
-                                    {{ "%.4f"|format(attraction.lat) }}, {{ "%.4f"|format(attraction.lng) }}
+                                    {{ "%.4f"|format(attraction.latitude) }}, {{ "%.4f"|format(attraction.longitude) }}
                                 </div>
                             </td>
                             <td class="px-6 py-5">
@@ -255,7 +255,7 @@
                                 <p class="text-xs font-bold text-emerald-950">{{ attraction.user.username if
                                     attraction.user else 'System' }}</p>
                                 <p class="text-[10px] text-emerald-900/40 font-black uppercase tracking-tighter">Brgy.
-                                    {{ attraction.user.barangay if attraction.user else 'Global' }}</p>
+                                    {{ (attraction.barangay.name if attraction.barangay else (attraction.user.barangay.name if attraction.user and attraction.user.barangay else 'Global')) }}</p>
                             </td>
                             <td class="px-8 py-5 text-right">
                                 <div class="flex justify-end gap-2">

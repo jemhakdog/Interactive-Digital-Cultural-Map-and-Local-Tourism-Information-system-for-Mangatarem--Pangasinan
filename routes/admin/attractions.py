@@ -31,6 +31,46 @@ def admin_attractions():
     )
 
 
+@admin_bp.route("/attractions/add", methods=["GET", "POST"])
+@login_required
+@limiter.limit("10 per minute")
+def add_attraction():
+    """Add new attraction (admin only)."""
+    log_entry("admin", "add_attraction", method=request.method)
+    
+    if current_user.role != "admin":
+        log_error("admin", "add_attraction", "Access denied")
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+    
+    if request.method == "POST":
+        image_url = request.form.get("image_url")
+        if "image" in request.files:
+            uploaded_url = save_uploaded_file(request.files["image"])
+            if uploaded_url:
+                image_url = uploaded_url
+        
+        attraction = Attraction(
+            name=request.form.get("name"),
+            category=request.form.get("category"),
+            description=request.form.get("description"),
+            latitude=float(request.form.get("latitude")),
+            longitude=float(request.form.get("longitude")),
+            image_url=image_url,
+            user_id=current_user.id,
+            barangay_id=1, # Admin submissions default to global/center
+            status="approved",
+        )
+        db.session.add(attraction)
+        db.session.commit()
+        
+        log_success("admin", "add_attraction", f"New attraction '{attraction.name}' added")
+        flash("Attraction added successfully!")
+        return redirect(url_for("admin.admin_attractions"))
+    
+    return render_template("admin/add_attraction.html")
+
+
 @admin_bp.route("/attractions/approve/<int:id>")
 @login_required
 @limiter.limit("10 per minute")
@@ -91,8 +131,8 @@ def edit_attraction(id):
         attraction.name = request.form.get("name")
         attraction.category = request.form.get("category")
         attraction.description = request.form.get("description")
-        attraction.lat = float(request.form.get("lat"))
-        attraction.lng = float(request.form.get("lng"))
+        attraction.latitude = float(request.form.get("latitude"))
+        attraction.longitude = float(request.form.get("longitude"))
         
         # Handle image upload
         if "image" in request.files:

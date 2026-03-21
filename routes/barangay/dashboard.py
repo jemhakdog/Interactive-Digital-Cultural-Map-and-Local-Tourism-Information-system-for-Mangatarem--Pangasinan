@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 @login_required
 def barangay_dashboard():
     """Display the barangay contributor dashboard with content statistics."""
-    logger.info("Barangay dashboard accessed by %s (%s)", current_user.username, current_user.barangay)
+    logger.info("Barangay dashboard accessed by %s (%s)", current_user.username, current_user.barangay_id)
 
     if current_user.role != "contributor":
         flash("Access denied.")

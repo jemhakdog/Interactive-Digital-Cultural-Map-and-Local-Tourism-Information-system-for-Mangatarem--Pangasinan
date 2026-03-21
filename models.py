@@ -6,28 +6,31 @@ import secrets
 
 
 class User(UserMixin, db.Model):
+    __tablename__ = 'USER'
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password_hash = db.Column(db.String(128))
+    password = db.Column(db.String(255), nullable=False) # Renamed from password_hash to match ERD
     role = db.Column(db.String(20), default="user")  # 'admin', 'contributor', or 'user'
-    barangay = db.Column(db.String(100), nullable=True)
+    barangay_id = db.Column(db.Integer, db.ForeignKey('BARANGAY_INFO.id'), nullable=True) # Renamed from barangay to match ERD
     is_approved = db.Column(db.Boolean, default=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    barangay = db.relationship('BarangayInfo', backref='users')
 
     def set_password(self, password):
-        self.password_hash = generate_password_hash(password)
+        self.password = generate_password_hash(password)
 
     def check_password(self, password):
-        return check_password_hash(self.password_hash, password)
-
+        return check_password_hash(self.password, password)
 
 
 class PasswordResetToken(db.Model):
     """Single-use, time-limited tokens for password reset."""
-    __tablename__ = "password_reset_token"
+    __tablename__ = "PASSWORD_RESET_TOKEN"
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False, index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=False, index=True)
     token = db.Column(db.String(128), unique=True, nullable=False)
     expires_at = db.Column(db.DateTime, nullable=False)
     used = db.Column(db.Boolean, default=False, nullable=False)
@@ -55,153 +58,140 @@ class PasswordResetToken(db.Model):
 
 class HeritageProfile(db.Model):
     """Base model for all cultural heritage and tourism forms."""
-    __tablename__ = 'heritage_profile'
+    __tablename__ = 'HERITAGE_PROFILE'
     
     id = db.Column(db.Integer, primary_key=True)
     asset_type = db.Column(db.String(50), nullable=False) # 'built', 'natural', etc.
-    form_control_number = db.Column(db.String(50), unique=True, nullable=True) # Link to manual form
+    form_control_number = db.Column(db.String(100), unique=True, nullable=True) # Link to manual form
     
-    # Shared Fields
+    # ERD Fields
+    name_of_asset = db.Column(db.String(200), nullable=True)
+    common_name = db.Column(db.String(200), nullable=True)
+    barangay_id = db.Column(db.Integer, db.ForeignKey('BARANGAY_INFO.id'), nullable=True)
+    location_details = db.Column(db.Text, nullable=True)
+    contact_person = db.Column(db.String(200), nullable=True)
+    contact_number = db.Column(db.String(50), nullable=True)
+    ownership_type = db.Column(db.String(50), nullable=True)
+    owner_administrator = db.Column(db.String(200), nullable=True)
+    usage_status = db.Column(db.String(50), nullable=True)
+    latitude = db.Column(db.Float, nullable=True)
+    longitude = db.Column(db.Float, nullable=True)
+    
+    # Shared Documentation
+    significance = db.Column(db.Text, nullable=True)
+    conservation_status = db.Column(db.Text, nullable=True)
+    
+    # Meta
     mapper_name = db.Column(db.String(200), nullable=True)
     date_profiled = db.Column(db.Date, nullable=True)
     status = db.Column(db.String(20), default='pending', index=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
-    reviewed_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
-    reviewed_at = db.Column(db.DateTime, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-    # Shared Documentation
-    key_informants = db.Column(db.JSON, nullable=True)
-    reference_sources = db.Column(db.Text, nullable=True)
-    significance = db.Column(db.Text, nullable=True)
-    constraints_threats = db.Column(db.Text, nullable=True)
-    conservation_measures = db.Column(db.Text, nullable=True)
-    common_photo_url = db.Column(db.String(500), nullable=True)
-    
-    # Relationships to detail tables (defined in detail classes)
-    # attraction = db.relationship('Attraction', backref='profile', uselist=False)
+    # Relationships
+    barangay = db.relationship('BarangayInfo', backref='profiles')
+    user = db.relationship('User', foreign_keys=[user_id], backref='profiles')
 
 
 class Attraction(db.Model):
+    __tablename__ = 'ATTRACTION'
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), nullable=False, index=True)
+    name = db.Column(db.String(200), nullable=False, index=True)
     description = db.Column(db.Text, nullable=False)
     category = db.Column(db.String(50), nullable=False, index=True) 
-    barangay = db.Column(db.String(100), nullable=True, index=True)
-    lat = db.Column(db.Float, nullable=False)
-    lng = db.Column(db.Float, nullable=False)
-    image_url = db.Column(db.String(200), nullable=True)
-    form_control_number = db.Column(db.String(50), nullable=True) # Link to manual form
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    image_url = db.Column(db.String(500), nullable=True)
     
-    # Link to heritage documentation
-    heritage_profile_id = db.Column(db.Integer, db.ForeignKey("heritage_profile.id"), nullable=True)
-    profile = db.relationship('HeritageProfile', backref=db.backref('attraction', uselist=False))
-
+    barangay_id = db.Column(db.Integer, db.ForeignKey('BARANGAY_INFO.id'), nullable=True)
+    heritage_profile_id = db.Column(db.Integer, db.ForeignKey("HERITAGE_PROFILE.id"), nullable=True)
+    
+    barangay = db.relationship('BarangayInfo', backref='attractions')
+    
     status = db.Column(db.String(20), default="pending", index=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True, index=True)
-    reviewed_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
-    reviewed_at = db.Column(db.DateTime, nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=True, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
 
 
-
 class Event(db.Model):
+    __tablename__ = 'EVENT'
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(100), nullable=False)
+    name = db.Column(db.String(200), nullable=False) # Renamed from title to match ERD
     description = db.Column(db.Text, nullable=False)
     date = db.Column(db.DateTime, nullable=False)
-    location = db.Column(db.String(100), nullable=False)
-    barangay = db.Column(db.String(100), nullable=True)
-    image_url = db.Column(db.String(200), nullable=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
-    status = db.Column(db.String(20), default="pending")  # 'pending', 'approved'
-    category = db.Column(
-        db.String(50), nullable=False, default="Civic"
-    )  # 'Religious', 'Civic', 'Entertainment'
-    reviewed_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
-    reviewed_at = db.Column(db.DateTime, nullable=True)
+    location = db.Column(db.String(255), nullable=False)
+    barangay_id = db.Column(db.Integer, db.ForeignKey('BARANGAY_INFO.id'), nullable=True)
+    image_url = db.Column(db.String(500), nullable=True)
+    
+    barangay = db.relationship('BarangayInfo', backref='events')
+    
+    category = db.Column(db.String(50), nullable=False, default="Civic")
+    status = db.Column(db.String(20), default="pending")
+    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 class GalleryItem(db.Model):
+    __tablename__ = 'GALLERY_ITEM'
     id = db.Column(db.Integer, primary_key=True)
     type = db.Column(db.String(20), nullable=False)  # 'photo' or 'video'
-    url = db.Column(db.String(200), nullable=False)
-    caption = db.Column(db.String(200), nullable=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
-    status = db.Column(db.String(20), default="pending")  # 'pending', 'approved'
-    reviewed_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
-    reviewed_at = db.Column(db.DateTime, nullable=True)
-    uploaded_at = db.Column(db.DateTime, default=datetime.utcnow)
+    url = db.Column(db.String(500), nullable=False)
+    caption = db.Column(db.Text, nullable=True) # Changed from String(200) to Text
+    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=True)
+    status = db.Column(db.String(20), default="pending")
+    created_at = db.Column(db.DateTime, default=datetime.utcnow) # Renamed from uploaded_at
 
 
 class BarangayInfo(db.Model):
+    __tablename__ = 'BARANGAY_INFO'
     id = db.Column(db.Integer, primary_key=True)
-    barangay_name = db.Column(db.String(100), unique=True, nullable=False)
-    history = db.Column(db.Text, nullable=True)
-    cultural_assets = db.Column(db.Text, nullable=True)
-    traditions = db.Column(db.Text, nullable=True)
-    local_practices = db.Column(db.Text, nullable=True)
-    unique_features = db.Column(db.Text, nullable=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
-    updated_at = db.Column(
-        db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
-    )
+    name = db.Column(db.String(100), unique=True, nullable=False) # Renamed from barangay_name
+    map_geo_json = db.Column(db.JSON, nullable=True) # Renamed from cultural_assets/etc to match ERD
+    location_data = db.Column(db.JSON, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
-class PageView(db.Model):
+class AnalyticsPageView(db.Model):
+    __tablename__ = 'ANALYTICS_PAGE_VIEW'
     id = db.Column(db.Integer, primary_key=True)
-    view_type = db.Column(
-        db.String(50), nullable=False
-    )  # 'attraction', 'event', 'page'
-    item_id = db.Column(
-        db.Integer, nullable=True
-    )  # ID of the attraction or event, if applicable
-    page_name = db.Column(
-        db.String(100), nullable=True
-    )  # Name of the page (e.g., 'home', 'map', 'events')
+    page_url = db.Column(db.String(500), nullable=False) # Renamed from view_type/page_name combo
+    user_id = db.Column(db.Integer, nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
-    user_id = db.Column(db.Integer, nullable=True)  # Optional, if logged in
+    session_id = db.Column(db.String(100), nullable=True)
+    ip_address = db.Column(db.String(45), nullable=True)
+    device_info = db.Column(db.Text, nullable=True)
 
 
 class UserFavoriteAttraction(db.Model):
+    __tablename__ = 'USER_FAVORITE_ATTRACTION'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    attraction_id = db.Column(
-        db.Integer, db.ForeignKey("attraction.id"), nullable=False
-    )
+    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=False)
+    attraction_id = db.Column(db.Integer, db.ForeignKey("ATTRACTION.id"), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 class UserEventInterest(db.Model):
+    __tablename__ = 'USER_EVENT_INTEREST'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    event_id = db.Column(db.Integer, db.ForeignKey("event.id"), nullable=False)
-    status = db.Column(db.String(20), default="interested")  # 'interested', 'going'
+    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=False)
+    event_id = db.Column(db.Integer, db.ForeignKey("EVENT.id"), nullable=False)
+    status = db.Column(db.String(20), default="interested")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 class AttractionReview(db.Model):
+    __tablename__ = 'ATTRACTION_REVIEW'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
-    attraction_id = db.Column(
-        db.Integer, db.ForeignKey("attraction.id"), nullable=False
-    )
+    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=False)
+    attraction_id = db.Column(db.Integer, db.ForeignKey("ATTRACTION.id"), nullable=False)
     rating = db.Column(db.Integer, nullable=False)
     comment = db.Column(db.Text, nullable=True)
-    status = db.Column(
-        db.String(20), default="pending"
-    )  # 'pending', 'approved', 'rejected'
-    reviewed_by = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=True)
-    reviewed_at = db.Column(db.DateTime, nullable=True)
+    status = db.Column(db.String(20), default="pending")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
-
 class NewsletterSubscriber(db.Model):
-    __tablename__ = 'newsletter_subscriber'
-    
+    __tablename__ = 'NEWSLETTER_SUBSCRIBER'
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     is_active = db.Column(db.Boolean, default=True)

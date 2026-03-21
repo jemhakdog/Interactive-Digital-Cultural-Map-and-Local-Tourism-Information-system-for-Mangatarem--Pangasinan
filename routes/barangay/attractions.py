@@ -46,10 +46,10 @@ def barangay_add_attraction():
             name=request.form["name"],
             category=request.form["category"],
             description=request.form["description"],
-            lat=float(request.form["lat"]),
-            lng=float(request.form["lng"]),
+            latitude=float(request.form["latitude"]),
+            longitude=float(request.form["longitude"]),
             image_url=image_url,
-            barangay=current_user.barangay,
+            barangay_id=current_user.barangay_id,
             user_id=current_user.id,
             status="pending",
         )
@@ -78,8 +78,8 @@ def barangay_edit_attraction(id):
         attraction.name = request.form["name"]
         attraction.category = request.form["category"]
         attraction.description = request.form["description"]
-        attraction.lat = float(request.form["lat"])
-        attraction.lng = float(request.form["lng"])
+        attraction.latitude = float(request.form["latitude"])
+        attraction.longitude = float(request.form["longitude"])
 
         if "image" in request.files:
             uploaded_url = save_uploaded_file(request.files["image"])

@@ -30,79 +30,87 @@ logger = logging.getLogger(__name__)
 
 # Expected schema based on models.py
 EXPECTED_TABLES = {
-    'user': [
-        'id', 'username', 'email', 'password_hash', 'role', 'barangay', 'is_approved'
+    'USER': [
+        'id', 'username', 'email', 'password', 'role', 'barangay_id', 'is_approved'
     ],
-    'heritage_profile': [
+    'HERITAGE_PROFILE': [
         'id', 'asset_type', 'form_control_number', 'mapper_name', 'date_profiled',
         'status', 'user_id', 'reviewed_by', 'reviewed_at', 'created_at', 'updated_at',
         'key_informants', 'reference_sources', 'significance', 'constraints_threats',
-        'conservation_measures', 'common_photo_url'
+        'conservation_measures', 'photo_url'
     ],
-    'attraction': [
-        'id', 'name', 'description', 'category', 'barangay', 'lat', 'lng',
+    'ATTRACTION': [
+        'id', 'name', 'description', 'category', 'barangay_id', 'latitude', 'longitude',
         'image_url', 'form_control_number', 'heritage_profile_id', 'status',
         'user_id', 'reviewed_by', 'reviewed_at', 'created_at'
     ],
-    'event': [
-        'id', 'title', 'description', 'date', 'location', 'barangay', 'image_url',
+    'EVENT': [
+        'id', 'title', 'description', 'date', 'location', 'barangay_id', 'image_url',
         'user_id', 'status', 'category', 'reviewed_by', 'reviewed_at', 'created_at'
     ],
-    'gallery_item': [
+    'GALLERY_ITEM': [
         'id', 'type', 'url', 'caption', 'user_id', 'status', 'reviewed_by',
         'reviewed_at', 'uploaded_at'
     ],
-    'barangay_info': [
-        'id', 'barangay_name', 'history', 'cultural_assets', 'traditions',
+    'BARANGAY_INFO': [
+        'id', 'name', 'history', 'cultural_property', 'traditions',
         'local_practices', 'unique_features', 'user_id', 'updated_at'
     ],
-    'analytics_page_view': [
+    'ANALYTICS_PAGE_VIEW': [
         'id', 'view_type', 'item_id', 'page_name', 'timestamp', 'user_id'
     ],
-    'favorite': [
+    'USER_FAVORITE_ATTRACTION': [
         'id', 'user_id', 'attraction_id', 'created_at'
     ],
-    'user_event_interest': [
+    'USER_EVENT_INTEREST': [
         'id', 'user_id', 'event_id', 'status', 'created_at'
     ],
-    'review': [
+    'ATTRACTION_REVIEW': [
         'id', 'user_id', 'attraction_id', 'rating', 'comment', 'status',
         'reviewed_by', 'reviewed_at', 'created_at'
     ],
     # Heritage detail tables
-    'natural_heritage_details': [
-        'profile_id', 'subcategory', 'area_hectares', 'ownership', 'protection_status'
+    'BUILT_HERITAGE_DETAIL': [
+        'heritage_profile_id', 'form_control_number', 'name', 'category', 'address',
+        'dates', 'ownership', 'latitude', 'longitude', 'description', 'stories',
+        'significance', 'protection_status', 'constraints_threats', 'conservation_measures',
+        'key_informants', 'reference_sources', 'mapper_name', 'date_profiled'
     ],
-    'built_heritage_details': [
-        'profile_id', 'building_type', 'year_constructed', 'ownership_type',
-        'declaration_legislation', 'physical_description', 'history_structure',
-        'occupation_status', 'is_altered', 'is_original_site', 'integrity_remarks',
-        'movable_heritage_list'
+    'NATURAL_HERITAGE_DETAIL': [
+        'heritage_profile_id', 'form_control_number', 'name', 'category', 'location',
+        'area_hectares', 'ownership', 'latitude', 'longitude', 'description', 'stories',
+        'significance', 'protection_status', 'constraints_threats', 'conservation_measures',
+        'key_informants', 'reference_sources', 'mapper_name', 'date_profiled'
     ],
-    'movable_heritage_details': [
-        'profile_id', 'object_type', 'place_found', 'date_found', 'estimated_age',
-        'acquisition_type', 'materials', 'dimensions', 'comparative_criteria'
+    'MOVABLE_HERITAGE_DETAIL': [
+        'heritage_profile_id', 'form_control_number', 'name', 'type_of_object', 'category',
+        'location', 'ownership', 'latitude', 'longitude', 'description', 'date_produced',
+        'medium_material', 'dimension', 'stories', 'significance', 'status_condition',
+        'constraints_threats', 'conservation_measures', 'key_informants', 'reference_sources',
+        'mapper_name', 'date_profiled'
     ],
-    'intangible_heritage_details': [
-        'profile_id', 'heritage_type', 'geographical_range', 'related_domains',
-        'culture_bearers', 'culture_bearer_photos', 'transmission_mode',
-        'objects_used', 'flora_fauna_used', 'safeguarding_measures', 'supporting_docs'
+    'INTANGIBLE_HERITAGE_DETAIL': [
+        'heritage_profile_id', 'form_control_number', 'name', 'category', 'geographical_range',
+        'related_domains', 'description', 'culture_bearers', 'transmission_mode', 'objects_used',
+        'stories', 'significance', 'practice_status', 'constraints_threats',
+        'safeguarding_measures', 'safeguarding_description', 'key_informants', 'reference_sources',
+        'mapper_name', 'date_profiled'
     ],
-    'personality_details': [
-        'profile_id', 'date_of_birth', 'date_of_death', 'birth_place',
-        'present_address', 'age', 'prominence_field', 'biography', 'works_achievements'
+    'PERSONALITY_DETAIL': [
+        'heritage_profile_id', 'form_control_number', 'name', 'dates_of_birth_death',
+        'address', 'prominence_field', 'biography', 'achievements', 'significance',
+        'key_informants', 'reference_sources', 'mapper_name', 'date_profiled'
     ],
-    'institution_details': [
-        'profile_id', 'municipality', 'province', 'institution_type',
-        'mandate_description', 'milestones', 'condition_status', 'supporting_docs'
+    'INSTITUTION_DETAIL': [
+        'heritage_profile_id', 'form_control_number', 'name', 'address', 'latitude',
+        'longitude', 'type_of_institution', 'mandate', 'history', 'stories',
+        'significance', 'condition', 'constraints_threats', 'safeguarding_measures',
+        'key_informants', 'reference_sources', 'mapper_name', 'date_profiled'
     ],
-    'lgu_program_details': [
-        'profile_id', 'vision_statement', 'mission_statement', 'goal_statements',
-        'adoption_date', 'brief_history', 'logo_url', 'logo_legislation_date',
-        'logo_explanation', 'chief_executives', 'resolutions', 'ordinances',
-        'ela_action_items', 'major_policies', 'program_strategies',
-        'annual_investments', 'culture_projects', 'arts_council',
-        'alternative_livelihoods', 'community_enterprises', 'peoples_stories'
+    'LGU_PROGRAM_DETAIL': [
+        'heritage_profile_id', 'form_control_number', 'program_name', 'lgu_name', 'vision',
+        'mission', 'goals', 'date_created', 'history', 'chief_executives', 'policies',
+        'strategies', 'budget', 'key_informants', 'reference_sources', 'mapper_name', 'date_profiled'
     ],
 }
 

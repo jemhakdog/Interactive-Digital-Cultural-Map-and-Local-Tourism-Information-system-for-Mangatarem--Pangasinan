@@ -5,7 +5,7 @@ from sqlalchemy import func
 from datetime import datetime, timedelta
 from typing import Dict, List, Tuple
 
-from models import db, User, Attraction, Event, GalleryItem, AttractionReview, UserFavoriteAttraction, PageView
+from models import db, User, Attraction, Event, GalleryItem, AttractionReview, UserFavoriteAttraction, AnalyticsPageView
 from utils.logger_helper import log_entry, log_success, log_error
 from . import admin_bp
 
@@ -28,11 +28,11 @@ def _get_content_stats() -> Dict[str, int]:
 def _get_top_attractions(limit: int = 5) -> List[Dict[str, any]]:
     """Fetch most viewed attractions."""
     top_query = (
-        db.session.query(Attraction.name, func.count(PageView.id).label("view_count"))
-        .join(PageView, PageView.item_id == Attraction.id)
-        .filter(PageView.view_type == "attraction")
+        db.session.query(Attraction.name, func.count(AnalyticsPageView.id).label("view_count"))
+        .join(AnalyticsPageView, AnalyticsPageView.item_id == Attraction.id)
+        .filter(AnalyticsPageView.view_type == "attraction")
         .group_by(Attraction.id)
-        .order_by(func.count(PageView.id).desc())
+        .order_by(func.count(AnalyticsPageView.id).desc())
         .limit(limit)
         .all()
     )
@@ -44,11 +44,11 @@ def _get_engagement_data(days: int = 7) -> Dict[str, List]:
     cutoff_date = datetime.utcnow() - timedelta(days=days)
     daily_views_query = (
         db.session.query(
-            func.date(PageView.timestamp).label("date"),
-            func.count(PageView.id).label("count"),
+            func.date(AnalyticsPageView.timestamp).label("date"),
+            func.count(AnalyticsPageView.id).label("count"),
         )
-        .filter(PageView.timestamp >= cutoff_date)
-        .group_by(func.date(PageView.timestamp))
+        .filter(AnalyticsPageView.timestamp >= cutoff_date)
+        .group_by(func.date(AnalyticsPageView.timestamp))
         .all()
     )
     daily_views_dict = {str(d): c for d, c in daily_views_query}

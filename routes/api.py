@@ -48,8 +48,8 @@ def api_attractions():
         Attraction.category,
         Attraction.barangay,
         Attraction.description,
-        Attraction.lat,
-        Attraction.lng,
+        Attraction.latitude,
+        Attraction.longitude,
         Attraction.image_url,
     ).filter(Attraction.status == "approved")
 
@@ -72,8 +72,8 @@ def api_attractions():
                 "category": a[2],  # category
                 "barangay": a[3],  # barangay
                 "description": a[4],  # description
-                "lat": a[5],  # lat
-                "lng": a[6],  # lng
+                "latitude": a[5],  # latitude
+                "longitude": a[6],  # longitude
                 "image": a[7],  # image_url
                 "rating": 4.5,  # Placeholder rating until we implement reviews
             }
@@ -157,8 +157,8 @@ def api_heritage_list(heritage_type):
         }
         # Add coordinates for mappable types
         if config.get("has_coords"):
-            item_dict["lat"] = getattr(item, "lat", None)
-            item_dict["lng"] = getattr(item, "lng", None)
+            item_dict["latitude"] = getattr(item, "latitude", None)
+            item_dict["longitude"] = getattr(item, "longitude", None)
         # Add photo if available
         photo = getattr(item, "photo_url", None) or getattr(item, "facade_photo_url", None)
         if photo:

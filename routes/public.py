@@ -1,4 +1,4 @@
-from models import db, User, Attraction, Event, GalleryItem, BarangayInfo, PageView, NewsletterSubscriber
+from models import db, User, Attraction, Event, GalleryItem, BarangayInfo, AnalyticsPageView, NewsletterSubscriber
 from flask_login import current_user
 from extensions import limiter
 from datetime import datetime
@@ -62,7 +62,7 @@ def record_view(view_type, item_id=None, page_name=None):
     """
     try:
         user_id = current_user.id if current_user.is_authenticated else None
-        view = PageView(
+        view = AnalyticsPageView(
             view_type=view_type,
             item_id=item_id,
             page_name=page_name,
@@ -141,7 +141,7 @@ def attraction_detail(id):
     # Note: GalleryItem joins with User to check for barangay
     related_gallery = (
         GalleryItem.query.join(User, GalleryItem.user_id == User.id)
-        .filter(User.barangay == attraction.barangay, GalleryItem.status == "approved")
+        .filter(User.barangay_id == attraction.barangay, GalleryItem.status == "approved")
         .limit(6)
         .all()
     )
@@ -216,11 +216,11 @@ def gallery():
     # Get list of unique barangays from approved gallery items for the filter
     log_query("public", "gallery", "Fetching unique barangays for gallery")
     barangays = (
-        db.session.query(User.barangay)
+        db.session.query(User.barangay_id)
         .join(GalleryItem, User.id == GalleryItem.user_id)
-        .filter(GalleryItem.status == "approved", User.barangay is not None)
+        .filter(GalleryItem.status == "approved", User.barangay_id.is_not(None))
         .distinct()
-        .order_by(User.barangay)
+        .order_by(User.barangay_id)
         .all()
     )
 
@@ -277,9 +277,9 @@ def search():
             | (Event.category.ilike(search_terms))
         )
         barangays_info_query = barangays_info_query.filter(
-            (BarangayInfo.barangay_name.ilike(search_terms))
+            (BarangayInfo.name.ilike(search_terms))
             | (BarangayInfo.history.ilike(search_terms))
-            | (BarangayInfo.cultural_assets.ilike(search_terms))
+            | (BarangayInfo.cultural_property.ilike(search_terms))
         )
 
     # Apply Category Filter (only for attractions and events)
@@ -301,7 +301,7 @@ def search():
         )
         events_query = events_query.filter(Event.barangay == barangay_filter)
         barangays_info_query = barangays_info_query.filter(
-            BarangayInfo.barangay_name == barangay_filter
+            BarangayInfo.name == barangay_filter
         )
 
     # Execute queries
@@ -379,9 +379,9 @@ def barangays():
 
     # Get list of barangays that have active contributors
     barangay_names_query = (
-        db.session.query(User.barangay)
+        db.session.query(User.barangay_id)
         .filter(
-            User.role == "contributor", User.is_approved, User.barangay.is_not(None)
+            User.role == "contributor", User.is_approved, User.barangay_id.is_not(None)
         )
         .distinct()
         .all()
@@ -411,10 +411,10 @@ def barangays():
         image_url = next((a.image_url for a in attractions if a.image_url), None)
 
         # Calculate center coordinates (centroid)
-        lat, lng = 15.9949, 120.4869  # Default
+        latitude, longitude = 15.9949, 120.4869  # Default
         if attractions:
-            lat = sum(a.lat for a in attractions) / len(attractions)
-            lng = sum(a.lng for a in attractions) / len(attractions)
+            latitude = sum(a.latitude for a in attractions) / len(attractions)
+            longitude = sum(a.longitude for a in attractions) / len(attractions)
 
         # Collect unique categories as tags
         tags = list(set(a.category for a in attractions))
@@ -423,8 +423,8 @@ def barangays():
             {
                 "name": name,
                 "image_url": image_url,
-                "lat": lat,
-                "lng": lng,
+                "latitude": latitude,
+                "longitude": longitude,
                 "tags": tags,
                 "attraction_count": len(attractions),
             }
@@ -475,19 +475,19 @@ def barangay_profile(name):
     # For gallery, we need to join with User since GalleryItem doesn't have barangay field
     gallery_items = (
         GalleryItem.query.join(User, GalleryItem.user_id == User.id)
-        .filter(User.barangay == name, GalleryItem.status == "approved")
+        .filter(User.barangay_id == name, GalleryItem.status == "approved")
         .order_by(GalleryItem.uploaded_at.desc())
         .all()
     )
 
     # Get barangay info (cultural assets, traditions, etc.)
-    barangay_info = BarangayInfo.query.filter_by(barangay_name=name).first()
+    barangay_info = BarangayInfo.query.filter_by(name=name).first()
 
     # Calculate center coordinates for map (average of all attraction coordinates)
-    center_lat, center_lng = 15.9949, 120.4869  # Default: Mangatarem coordinates
+    center_latitude, center_longitude = 15.9949, 120.4869  # Default: Mangatarem coordinates
     if attractions:
-        center_lat = sum(a.lat for a in attractions) / len(attractions)
-        center_lng = sum(a.lng for a in attractions) / len(attractions)
+        center_latitude = sum(a.latitude for a in attractions) / len(attractions)
+        center_longitude = sum(a.longitude for a in attractions) / len(attractions)
 
     # Convert attractions to dictionaries for JSON serialization
     attractions_json = []
@@ -499,8 +499,8 @@ def barangay_profile(name):
                 "category": a.category,
                 "barangay": a.barangay,
                 "description": a.description,
-                "lat": a.lat,
-                "lng": a.lng,
+                "latitude": a.latitude,
+                "longitude": a.longitude,
                 "image_url": a.image_url,
             }
         )
@@ -523,8 +523,8 @@ def barangay_profile(name):
         events=events,
         gallery_items=gallery_items,
         barangay_info=barangay_info,
-        center_lat=center_lat,
-        center_lng=center_lng,
+        center_latitude=center_latitude,
+        center_longitude=center_longitude,
     )
 
 
@@ -746,9 +746,9 @@ def sitemap():
     # Dynamic pages: Barangays
     # Get unique barangays from users/attractions
     barangay_names = (
-        db.session.query(User.barangay)
+        db.session.query(User.barangay_id)
         .filter(
-            User.role == "contributor", User.is_approved, User.barangay.is_not(None)
+            User.role == "contributor", User.is_approved, User.barangay_id.is_not(None)
         )
         .distinct()
         .all()

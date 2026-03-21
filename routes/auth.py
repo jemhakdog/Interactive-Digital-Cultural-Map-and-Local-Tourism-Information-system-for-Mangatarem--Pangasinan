@@ -107,12 +107,12 @@ def _validate_email_available(email: str) -> bool:
     return True
 
 
-def _validate_barangay_representative(barangay: str, role: str) -> bool:
+def _validate_barangay_representative(barangay_id: str, role: str) -> bool:
     """
     Check if barangay already has an approved representative.
     
     Args:
-        barangay: Barangay name
+        barangay_id: Barangay ID
         role: User role (check only if 'contributor')
         
     Returns:
@@ -121,19 +121,19 @@ def _validate_barangay_representative(barangay: str, role: str) -> bool:
     if role != "contributor":
         return True
     
-    log_query("auth", "register", f"Checking existing representative for '{barangay}'")
+    log_query("auth", "register", f"Checking existing representative for ID '{barangay_id}'")
     existing_rep = User.query.filter_by(
-        barangay=barangay, role="contributor", is_approved=True
+        barangay_id=barangay_id, role="contributor", is_approved=True
     ).first()
     
     if existing_rep:
-        log_error("auth", "register", f"Representative already exists for '{barangay}'")
+        log_error("auth", "register", f"Representative already exists for ID '{barangay_id}'")
         return False
     
     return True
 
 
-def _create_user_from_form(username: str, email: str, password: str, role: str, barangay: Optional[str]) -> User:
+def _create_user_from_form(username: str, email: str, password: str, role: str, barangay_id: Optional[str]) -> User:
     """
     Create new user from registration form data.
     
@@ -142,7 +142,7 @@ def _create_user_from_form(username: str, email: str, password: str, role: str, 
         email: Email address
         password: Plain text password
         role: User role
-        barangay: Barangay name (for contributors)
+        barangay_id: Barangay ID (for contributors)
         
     Returns:
         Created and committed User object
@@ -153,15 +153,15 @@ def _create_user_from_form(username: str, email: str, password: str, role: str, 
         username=username,
         email=email,
         role=role,
-        barangay=barangay if role == "contributor" else None,
+        barangay_id=barangay_id if role == "contributor" else None,
         is_approved=(role == "user"),
     )
     user.set_password(password)
     db.session.add(user)
     db.session.commit()
     
-    log_success("auth", "register", f"New user '{username}' registered for barangay '{barangay}'")
-    logger.info(f"New contributor user '{username}' registered for barangay '{barangay}', awaiting approval")
+    log_success("auth", "register", f"New user '{username}' registered for barangay ID '{barangay_id}'")
+    logger.info(f"New contributor user '{username}' registered for barangay ID '{barangay_id}', awaiting approval")
     
     return user
 
@@ -327,7 +327,7 @@ def register():
         email = request.form.get("email")
         password = request.form.get("password")
         role = request.form.get("role", "user")
-        barangay = request.form.get("barangay")
+        barangay_id = request.form.get("barangay")
         
         log_query("auth", "register", f"Checking existence for username='{username}', email='{email}'")
         
@@ -340,12 +340,12 @@ def register():
             flash("Email already exists.", "error")
             return redirect(url_for("auth.register"))
         
-        if not _validate_barangay_representative(barangay, role):
+        if not _validate_barangay_representative(barangay_id, role):
             flash("This Barangay already has a registered representative.", "error")
             return redirect(url_for("auth.register"))
         
         # Create user
-        _create_user_from_form(username, email, password, role, barangay)
+        _create_user_from_form(username, email, password, role, barangay_id)
         
         if role == "contributor":
             return redirect(url_for("auth.pending_approval"))

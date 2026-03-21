@@ -201,7 +201,7 @@ def admin_heritage_add(heritage_type):
         db.session.flush() # To get the profile.id
         
         # Create detail model
-        detail = model(profile_id=profile.id)
+        detail = model(heritage_profile_id=profile.id)
         _populate_item_from_form(profile, detail, config, request.form)
         
         db.session.add(detail)

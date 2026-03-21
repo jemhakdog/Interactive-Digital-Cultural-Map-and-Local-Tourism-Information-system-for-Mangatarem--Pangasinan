@@ -115,13 +115,13 @@ Edit Attraction - {% if current_user.role == 'admin' %}Admin{% else %}Barangay{%
                                 <div>
                                     <label
                                         class="block text-xs font-bold text-emerald-900/40 uppercase tracking-widest mb-2">Latitude</label>
-                                    <input type="number" step="any" name="lat" value="{{ attraction.lat }}" required
+                                    <input type="number" step="any" name="latitude" value="{{ attraction.latitude }}" required
                                         class="w-full bg-white/50 border border-emerald-900/10 rounded-2xl px-5 py-4 text-emerald-950 font-bold input-focus outline-none">
                                 </div>
                                 <div>
                                     <label
                                         class="block text-xs font-bold text-emerald-900/40 uppercase tracking-widest mb-2">Longitude</label>
-                                    <input type="number" step="any" name="lng" value="{{ attraction.lng }}" required
+                                    <input type="number" step="any" name="longitude" value="{{ attraction.longitude }}" required
                                         class="w-full bg-white/50 border border-emerald-900/10 rounded-2xl px-5 py-4 text-emerald-950 font-bold input-focus outline-none">
                                 </div>
                             </div>

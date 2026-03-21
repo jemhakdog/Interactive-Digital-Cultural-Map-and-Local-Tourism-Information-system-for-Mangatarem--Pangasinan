@@ -46,8 +46,8 @@ def approve_event(id):
     event.status = "approved"
     db.session.commit()
     
-    log_success("admin", "approve_event", f"Event '{event.title}' approved")
-    flash(f'Event "{event.title}" approved!')
+    log_success("admin", "approve_event", f"Event '{event.name}' approved")
+    flash(f'Event "{event.name}" approved!')
     return redirect(url_for("admin.admin_events"))
 
 
@@ -64,7 +64,7 @@ def reject_event(id):
         return redirect(url_for("public.index"))
     
     event = Event.query.get_or_404(id)
-    title = event.title
+    title = event.name
     db.session.delete(event)
     db.session.commit()
     
@@ -93,20 +93,20 @@ def add_event():
                 image_url = uploaded_url
         
         event = Event(
-            title=request.form["title"],
+            name=request.form["name"],
             date=datetime.strptime(request.form["date"], "%Y-%m-%d"),
             location=request.form["location"],
             category=request.form["category"],
             description=request.form["description"],
             image_url=image_url,
-            barangay=request.form.get("barangay", "Mangatarem"),
+            barangay_id=int(request.form.get("barangay_id", 1)), # Default to ID 1 if not provided
             user_id=current_user.id,
             status="approved",
         )
         db.session.add(event)
         db.session.commit()
         
-        log_success("admin", "add_event", f"New event '{event.title}' added")
+        log_success("admin", "add_event", f"New event '{event.name}' added")
         flash("Event added successfully!")
         return redirect(url_for("admin.admin_events"))
     
@@ -127,12 +127,12 @@ def edit_event(id):
         return redirect(url_for("public.index"))
     
     if request.method == "POST":
-        event.title = request.form["title"]
+        event.name = request.form["name"]
         event.date = datetime.strptime(request.form["date"], "%Y-%m-%d")
         event.location = request.form["location"]
         event.category = request.form["category"]
         event.description = request.form["description"]
-        event.barangay = request.form.get("barangay", event.barangay)
+        event.barangay_id = int(request.form.get("barangay_id", event.barangay_id))
         
         if "image" in request.files:
             uploaded_url = save_uploaded_file(request.files["image"])
@@ -143,7 +143,7 @@ def edit_event(id):
             event.image_url = request.form.get("image_url")
         
         db.session.commit()
-        log_success("admin", "edit_event", f"Event '{event.title}' updated")
+        log_success("admin", "edit_event", f"Event '{event.name}' updated")
         flash("Event updated successfully!")
         return redirect(url_for("admin.admin_events"))
     
@@ -163,7 +163,7 @@ def delete_event(id):
         return redirect(url_for("public.index"))
     
     event = Event.query.get_or_404(id)
-    title = event.title
+    title = event.name
     db.session.delete(event)
     db.session.commit()
     

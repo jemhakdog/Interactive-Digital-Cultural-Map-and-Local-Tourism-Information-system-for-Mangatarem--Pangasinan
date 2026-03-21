@@ -48,7 +48,7 @@ def barangay_add_event():
             category=request.form["category"],
             description=request.form["description"],
             image_url=image_url,
-            barangay=current_user.barangay,
+            barangay_id=current_user.barangay_id,
             user_id=current_user.id,
             status="pending",
         )

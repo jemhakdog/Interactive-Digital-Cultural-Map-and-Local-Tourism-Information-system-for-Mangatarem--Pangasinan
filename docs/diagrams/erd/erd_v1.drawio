@@ -1159,7 +1159,7 @@
                         <mxRectangle width="210" height="34" as="alternateBounds"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="erd_1266" value="PAGE_VIEW" style="shape=table;startSize=25;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=1;fontStyle=1;align=center;resizeLast=1;fontSize=18;" parent="1" vertex="1">
+                <mxCell id="erd_1266" value="ANALYTICS_PAGE_VIEW" style="shape=table;startSize=25;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=1;fontStyle=1;align=center;resizeLast=1;fontSize=18;" parent="1" vertex="1">
                     <mxGeometry x="2150" y="870" width="560" height="233" as="geometry"/>
                 </mxCell>
                 <mxCell id="erd_1267" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;" parent="erd_1266" vertex="1">
@@ -1300,7 +1300,7 @@
                         <mxRectangle width="210" height="34" as="alternateBounds"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="erd_1297" value="FAVORITE" style="shape=table;startSize=25;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=1;fontStyle=1;align=center;resizeLast=1;fontSize=18;" parent="1" vertex="1">
+                <mxCell id="erd_1297" value="USER_FAVORITE_ATTRACTION" style="shape=table;startSize=25;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=1;fontStyle=1;align=center;resizeLast=1;fontSize=18;" parent="1" vertex="1">
                     <mxGeometry x="2090" y="40" width="560" height="165" as="geometry"/>
                 </mxCell>
                 <mxCell id="erd_1298" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;" parent="erd_1297" vertex="1">
@@ -1395,7 +1395,7 @@
                         <mxRectangle width="210" height="34" as="alternateBounds"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="erd_1318" value="EVENT_INTEREST" style="shape=table;startSize=25;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=1;fontStyle=1;align=center;resizeLast=1;fontSize=18;" parent="1" vertex="1">
+                <mxCell id="erd_1318" value="USER_EVENT_INTEREST" style="shape=table;startSize=25;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=1;fontStyle=1;align=center;resizeLast=1;fontSize=18;" parent="1" vertex="1">
                     <mxGeometry x="2150" y="1163" width="560" height="199" as="geometry"/>
                 </mxCell>
                 <mxCell id="erd_1319" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;" parent="erd_1318" vertex="1">
@@ -1513,7 +1513,7 @@
                         <mxRectangle width="210" height="34" as="alternateBounds"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="erd_1344" value="REVIEW" style="shape=table;startSize=25;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=1;fontStyle=1;align=center;resizeLast=1;fontSize=18;" parent="1" vertex="1">
+                <mxCell id="erd_1344" value="ATTRACTION_REVIEW" style="shape=table;startSize=25;container=1;collapsible=0;childLayout=tableLayout;fixedRows=1;rowLines=1;fontStyle=1;align=center;resizeLast=1;fontSize=18;" parent="1" vertex="1">
                     <mxGeometry x="2090" y="265" width="560" height="335" as="geometry"/>
                 </mxCell>
                 <mxCell id="erd_1345" style="shape=tableRow;horizontal=0;startSize=0;swimlaneHead=0;swimlaneBody=0;fillColor=none;collapsible=0;dropTarget=0;points=[[0,0.5],[1,0.5]];portConstraint=eastwest;top=0;left=0;right=0;bottom=0;" parent="erd_1344" vertex="1">
