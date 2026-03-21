@@ -19,8 +19,8 @@
 <section class="editorial-hero">
     <div class="aurora-layer"></div>
     <div class="hero-content">
-        <h1 class="hero-title">Heritage In <br>Motion.</h1>
-        <p class="hero-subtitle">Chronicles of community, culture, and celebration in Mangatarem. <br>Our traditions,
+        <h1 class="hero-title" data-aos="fade-right" data-aos-duration="1200">Heritage In <br><span class="pl-20 md:pl-40 block" data-aos="fade-left" data-aos-delay="400" data-aos-duration="1200">Motion.</span></h1>
+        <p class="hero-subtitle" data-aos="fade-up" data-aos-delay="800">Chronicles of community, culture, and celebration in Mangatarem. <br>Our traditions,
             reborn.</p>
     </div>
     <div class="scroll-hint">
@@ -40,27 +40,8 @@
 </div>
 
 <div class="container mx-auto px-6 py-24">
-    <div class="w-full">
-        <span class="section-label">Upcoming</span>
-        <h2 class="section-title">The Calendar.</h2>
-
-        <!-- Calendar Widget -->
-        <div class="calendar-container mb-16">
-            <div class="calendar-header">
-                <button id="prevMonth" class="cal-nav-btn">&lt;</button>
-                <h3 id="currentMonthYear" class="cal-month-title"></h3>
-                <button id="nextMonth" class="cal-nav-btn">&gt;</button>
-            </div>
-            <div class="calendar-grid-header">
-                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-            </div>
-            <div id="calendarDays" class="calendar-days">
-                <!-- Days will be inserted via JS -->
-            </div>
-        </div>
-
-    {% if events %}
-        <div class="event-grid" id="eventsGrid">
+    <div id="eventsGrid" class="event-grid">
+        {% if events %}
             {% for event in events %}
                 <article class="event-item" data-category="{{ event.category|lower }}" data-date="{{ event.date.strftime('%Y-%m-%d') }}"
                     style="animation-delay: {{ loop.index0 * 0.1 }}s">
@@ -71,7 +52,7 @@
                             {% else %}
                                 {% if event.category == 'Religious' %}
                                     <img src="https://images.unsplash.com/photo-1548625361-ec853f0cf786?q=80&w=2070&auto=format&fit=crop" alt="{{ event.title }}">
-                                {% elif event.category == 'Entertainment' %}
+                                % elif event.category == 'Entertainment' %}
                                     <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop" alt="{{ event.title }}">
                                 {% else %}
                                     <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2070&auto=format&fit=crop" alt="{{ event.title }}">
@@ -111,12 +92,36 @@
                 </main>
             </article>
             {% endfor %}
+        {% else %}
+            <div class="event-item" style="grid-column: span 12; width: 100%;">
+                <div class="text-center py-16 glass-card border-dashed border-2 border-emerald-900/10 mb-24" style="border-radius: 2.5rem;">
+                    <p class="text-gray-500 italic text-xl">No upcoming events are currently scheduled.</p>
+                    <p class="text-gray-400 mt-2">Check out our annual highlights below.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="mt-32 pt-24 border-t border-gray-100 flex flex-col items-center">
+        <div class="text-center mb-16">
+            <span class="section-label">Schedule</span>
+            <h2 class="section-title">The Calendar.</h2>
         </div>
-    {% else %}
-        <div class="text-center py-12 glass-card border-dashed border-2 border-emerald-900/10 mb-24">
-            <p class="text-gray-500 italic text-lg">No upcoming events are currently scheduled. Check out our annual highlights below.</p>
+        <!-- Calendar Widget -->
+        <div class="calendar-container w-full shrink-0 mb-16 shimmer" style="margin-top: 2rem;" id="calendarSection" data-aos="fade-up">
+            <div class="calendar-header">
+                <button id="prevMonth" class="cal-nav-btn">&lt;</button>
+                <h3 id="currentMonthYear" class="cal-month-title"></h3>
+                <button id="nextMonth" class="cal-nav-btn">&gt;</button>
+            </div>
+            <div class="calendar-grid-header">
+                <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+            </div>
+            <div id="calendarDays" class="calendar-days">
+                <!-- Days will be inserted via JS -->
+            </div>
         </div>
-    {% endif %}
+    </div>
     </div>
 </div>
     
@@ -128,7 +133,7 @@
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-16 mt-20">
                 <!-- Card 1 -->
-                <div class="highlight-card">
+                <div class="highlight-card" data-aos="fade-right" data-aos-delay="100">
                     <div class="highlight-image">
                         <img src="https://images.unsplash.com/photo-1548625361-ec853f0cf786?q=80&w=2070&auto=format&fit=crop" alt="Town Fiesta">
                     </div>
@@ -142,7 +147,7 @@
                 </div>
 
                 <!-- Card 2 -->
-                <div class="highlight-card">
+                <div class="highlight-card" data-aos="fade-up" data-aos-delay="200">
                     <div class="highlight-image">
                         <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop"
                             alt="Pindang Festival">
@@ -157,7 +162,7 @@
                 </div>
 
                 <!-- Card 3 -->
-                <div class="highlight-card">
+                <div class="highlight-card" data-aos="fade-left" data-aos-delay="300">
                     <div class="highlight-image">
                         <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2070&auto=format&fit=crop" alt="Holy Week">
                     </div>
@@ -174,7 +179,7 @@
     </section>
 
     <!-- Gallery Link -->
-    <div class="mt-40 text-center py-32 border-t border-gray-100">
+    <div class="mt-40 text-center py-32 border-t border-gray-100" data-aos="zoom-in">
         <span class="section-label">Archives</span>
         <h2 class="section-title mb-10">Past Moments.</h2>
         <p class="max-w-2xl mx-auto mb-16 text-gray-500 italic text-xl">"Photography is the only language that can be
@@ -191,7 +196,7 @@
     <div class="aurora-layer"></div>
     <div class="container mx-auto px-6 relative z-10">
         <span class="section-label text-white/50">Registry</span>
-        <h2 class="subscription-title">Stay Enrolled.</h2>
+        <h2 class="subscription-title" data-aos="fade-up">Keep the Tradition Alive.</h2>
         <p class="mb-20 text-white/70 max-w-2xl mx-auto text-xl leading-relaxed">Be the first to receive invitationals
             for our cultural gatherings, heritage festivals, and community celebrations.</p>
 

@@ -308,39 +308,76 @@
 
     .highlight-card {
         background: var(--heritage-sand);
-        border-radius: 3rem;
+        border-radius: 2rem; /* Softened radius */
         overflow: hidden;
-        transition: all 0.5s ease;
+        transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+        border: 1px solid rgba(0, 0, 0, 0.03);
+        display: flex;
+        flex-direction: column;
     }
 
     .highlight-card:hover {
-        transform: translateY(-15px);
-        box-shadow: 0 50px 100px rgba(0, 0, 0, 0.12);
+        transform: translateY(-12px) scale(1.02);
+        box-shadow: 0 40px 80px rgba(6, 78, 59, 0.1);
+        border-color: var(--heritage-gold);
     }
 
     .highlight-image {
-        aspect-ratio: 16/11;
+        width: 100%;
+        height: 300px; /* Increased height from aspect-ratio based */
         overflow: hidden;
+        position: relative;
+    }
+
+    .highlight-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 1.2s ease;
+    }
+
+    .highlight-card:hover .highlight-image img {
+        transform: scale(1.1);
+    }
+
+    /* Skeleton Shimmer */
+    .shimmer {
+        background: linear-gradient(90deg, #f3f1e7 25%, #ece9d8 50%, #f3f1e7 75%);
+        background-size: 200% 100%;
+        animation: shimmer-load 1.5s infinite;
+    }
+
+    @keyframes shimmer-load {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
     }
 
     .highlight-content {
-        padding: 3rem;
+        padding: 2rem; /* Reduced from 3rem to help with "forehead" */
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
     .highlight-month {
-        font-family: 'Noto Serif TC', serif;
+        font-family: 'Playfair Display', serif;
         font-style: italic;
         color: var(--heritage-gold);
-        font-size: 1.75rem;
+        font-size: 1.25rem;
         margin-bottom: 0.5rem;
         display: block;
+        opacity: 0.8;
     }
 
     .highlight-title {
-        font-family: 'Noto Serif TC', serif;
-        font-size: 2.25rem;
-        font-weight: 700;
-        margin-bottom: 1.25rem;
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem; /* Increased size */
+        font-weight: 800;
+        margin-bottom: 1rem;
+        color: var(--heritage-emerald);
+        line-height: 1.05;
+        letter-spacing: -0.04em;
     }
 
     /* Newsletter - Immersive Glass */

@@ -79,15 +79,15 @@
 
     <!-- Hero Glass Card -->
     <div class="container mx-auto px-6 relative z-10">
-        <div class="max-w-4xl mx-auto glass-aura p-12 md:p-20 rounded-[2.5rem] text-center reveal">
+        <div class="max-w-4xl mx-auto glass-aura p-12 md:p-20 rounded-[2.5rem] text-center" data-aos="zoom-in" data-aos-duration="1500">
             <span
-                class="inline-block px-4 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-[0.2em] mb-8 border border-emerald-500/30">
+                class="inline-block px-4 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-[0.2em] mb-8 border border-emerald-500/30" data-aos="fade-down" data-aos-delay="400">
                 Pangasinan's Hidden Sanctuary
             </span>
-            <h1 class="hero-title text-white !mb-6 !transform-none !opacity-100">
+            <h1 class="hero-title text-white !mb-6 !transform-none !opacity-100" data-aos="fade-up" data-aos-delay="600">
                 Mangatarem
             </h1>
-            <p class="text-xl md:text-2xl mb-12 text-emerald-50 font-light leading-relaxed max-w-2xl mx-auto">
+            <p class="text-xl md:text-2xl mb-12 text-emerald-50 font-light leading-relaxed max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="800">
                 Discover the 82 barangays of a town where history breathes and nature thrives in every corner.
             </p>
 
@@ -152,15 +152,15 @@
 <!-- Bento Spotlight - Premium Heritage Collection -->
 <section id="featured" class="py-24 bg-heritage-cream paper-texture overflow-hidden">
     <div class="container mx-auto px-6">
-        <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8 reveal">
-            <div class="max-w-2xl">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
+            <div class="max-w-2xl" data-aos="fade-right">
                 <span class="caption-serif">Curated Masterpieces</span>
                 <h2 class="text-5xl md:text-6xl font-bold text-emerald-950 mt-4 leading-tight">Heritage Spotlight</h2>
                 <p class="text-gray-600 text-lg mt-6 leading-relaxed">
                     A collection of the most significant cultural and natural landmarks that define our town's identity.
                 </p>
             </div>
-            <a href="{{ url_for('public.barangays') }}" class="btn-heritage-outline !rounded-full group">
+            <a href="{{ url_for('public.barangays') }}" class="btn-heritage-outline !rounded-full group" data-aos="fade-left">
                 Browse All Places
                 <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
@@ -174,8 +174,8 @@
         <div class="bento-grid min-h-[600px]">
             {% for attraction in featured[:5] %}
             <div
-                class="bento-item spotlight-card reveal group 
-                {% if loop.index == 1 %}col-span-2 row-span-2{% elif loop.index == 2 %}col-span-2 row-span-1{% elif loop.index == 3 %}col-span-1 row-span-1{% elif loop.index == 4 %}col-span-1 row-span-1{% elif loop.index == 5 %}col-span-2 row-span-1{% endif %}">
+                class="bento-item spotlight-card group {% if loop.index == 1 %}col-span-2 row-span-2{% elif loop.index == 2 %}col-span-2 row-span-1{% elif loop.index == 3 %}col-span-1 row-span-1{% elif loop.index == 4 %}col-span-1 row-span-1{% elif loop.index == 5 %}col-span-2 row-span-1{% endif %}"
+                data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
                 <img src="{{ attraction.image_url }}" alt="{{ attraction.name }}"
                     class="w-full h-full object-cover spotlight-img">
                 <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/95 via-emerald-950/40 to-transparent">
@@ -228,7 +228,7 @@
 
         <div class="bento-grid">
             <!-- Experience 1: Heritage Walk -->
-            <div class="bento-item col-span-2 row-span-2 reveal group">
+            <div class="bento-item col-span-2 row-span-2 group" data-aos="fade-right">
                 <img src="{{ url_for('static', filename='img/st_raymund_church.webp') }}" alt="Heritage Walk"
                     class="w-full h-full object-cover spotlight-img">
                 <div
@@ -246,7 +246,7 @@
             </div>
 
             <!-- Experience 2: Eco-Trail -->
-            <div class="bento-item col-span-2 row-span-2 reveal group">
+            <div class="bento-item col-span-2 row-span-2 group" data-aos="fade-left">
                 <img src="{{ url_for('static', filename='img/manleluag_spring.webp') }}" alt="Eco-Trail"
                     class="w-full h-full object-cover spotlight-img">
                 <div
@@ -352,7 +352,7 @@
 <!-- Newsletter Section - Premium Glassmorphism -->
 <section class="py-32 bg-emerald-950 relative overflow-hidden">
     <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/felt.png')]"></div>
-    <div class="container mx-auto px-6 text-center relative z-10 reveal">
+    <div class="container mx-auto px-6 text-center relative z-10" data-aos="zoom-in">
         <div class="max-w-3xl mx-auto glass-aura p-16 rounded-[3rem] border-white/5 shadow-inner">
             <span class="caption-serif !text-emerald-400 mb-6">Stay Connected</span>
             <h2 class="text-4xl md:text-5xl font-bold text-white mb-8">Join the Digital Archive</h2>
