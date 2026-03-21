@@ -5,6 +5,9 @@ Stores municipal-level cultural development policies and programs.
 from extensions import db
 
 
+__all__ = ['LGUCultureProgram', 'LGU_PROGRAM_DETAIL']
+
+
 class LGUCultureProgram(db.Model):
     """Detail model for LGU culture programs (Form 07)."""
     

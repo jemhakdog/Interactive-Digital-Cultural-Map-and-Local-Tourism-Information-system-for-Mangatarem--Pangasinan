@@ -5,6 +5,9 @@ Stores information about libraries, museums, schools, and other cultural organiz
 from extensions import db
 
 
+__all__ = ['CulturalInstitution', 'INSTITUTION_DETAIL']
+
+
 class CulturalInstitution(db.Model):
     """Detail model for cultural institutions (Form 06)."""
     

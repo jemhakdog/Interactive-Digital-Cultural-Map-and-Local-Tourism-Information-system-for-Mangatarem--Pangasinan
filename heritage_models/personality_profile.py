@@ -5,6 +5,9 @@ Stores information about notable individuals in arts, science, politics, etc.
 from extensions import db
 
 
+__all__ = ['PersonalityProfile', 'PERSONALITY_DETAIL']
+
+
 class PersonalityProfile(db.Model):
     """Detail model for significant personalities (Form 05)."""
     

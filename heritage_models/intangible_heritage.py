@@ -5,6 +5,9 @@ Stores cultural practices, performances, and traditional knowledge.
 from extensions import db
 
 
+__all__ = ['IntangibleHeritage', 'INTANGIBLE_HERITAGE_DETAIL']
+
+
 class IntangibleHeritage(db.Model):
     """Detail model for intangible cultural heritage (Form 04A)."""
     

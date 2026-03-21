@@ -1,5 +1,7 @@
 from extensions import db
 
+__all__ = ['BuiltHeritage', 'BUILT_HERITAGE_DETAIL']
+
 class BuiltHeritage(db.Model):
     """Detail model for tangible immovable (built) heritage (Form 02A)."""
     

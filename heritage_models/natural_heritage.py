@@ -5,6 +5,9 @@ Stores geological and physiographical heritage sites.
 from extensions import db
 
 
+__all__ = ['NaturalHeritage', 'NATURAL_HERITAGE_DETAIL']
+
+
 class NaturalHeritage(db.Model):
     """Detail model for natural heritage sites (Form 01A)."""
     
