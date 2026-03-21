@@ -446,9 +446,11 @@ def forgot_password():
 
     if request.method == "POST":
         email = request.form.get("email", "").strip().lower()
+        log_logic("auth", "forgot_password", f"Received password reset request for email: '{email}'")
         user = User.query.filter_by(email=email).first()
 
         if user:
+            log_logic("auth", "forgot_password", f"User found matching email: '{email}'")
             expiry = current_app.config.get("PASSWORD_RESET_EXPIRY_MINUTES", 30)
             reset_token = PasswordResetToken.create_for_user(user, expiry_minutes=expiry)
             # Use request.url_root to ensure the link matches the current host and protocol
@@ -461,14 +463,14 @@ def forgot_password():
             sent = send_password_reset_email(user.email, reset_url)
             if sent:
                 log_success("auth", "forgot_password", f"Reset email sent to '{email}'")
+                flash("A password reset link has been sent. Check your inbox.", "success")
             else:
                 log_error("auth", "forgot_password", f"Failed to send reset email to '{email}'")
+                flash("Failed to send reset email. Please try again later.", "error")
+        else:
+            log_error("auth", "forgot_password", f"No user found matching email: '{email}'")
+            flash("No user found with that email address. Please check your spelling.", "error")
 
-        # Always show success to prevent user enumeration
-        flash(
-            "If that email is registered, a password reset link has been sent. Check your inbox.",
-            "success",
-        )
         return redirect(url_for("auth.forgot_password"))
 
     return render_template("auth/forgot_password.html")

@@ -100,19 +100,22 @@ def _send_via_smtp(msg: MIMEMultipart, config: EmailConfig) -> bool:
     Returns:
         True if sent successfully, False otherwise
     """
+    logger.info(f"Attempting to connect to SMTP server {config.smtp_server}:{config.smtp_port}")
     try:
         server = smtplib.SMTP(config.smtp_server, config.smtp_port)
         server.ehlo()
         server.starttls()
         server.ehlo()
+        logger.info(f"Authenticating with SMTP email: {config.sender_email}")
         server.login(config.sender_email, config.sender_password)
+        logger.info(f"Sending email to: {msg['To']}")
         server.sendmail(config.sender_email, msg['To'], msg.as_string())
         server.close()
         
         logger.info(f"Email sent successfully to {msg['To']}")
         return True
     except Exception as e:
-        logger.error(f"Failed to send email: {e}")
+        logger.error(f"Failed to send email to {msg['To']}. Error details: {e}", exc_info=True)
         return False
 
 
@@ -136,11 +139,14 @@ def send_email(
     Returns:
         True if email sent successfully, False otherwise
     """
+    logger.info(f"Preparing to send email to: {recipient} with subject: '{subject}'")
+    
     if config is None:
+        logger.info("No explicit config provided. Loading from environment variables...")
         config = EmailConfig.from_env()
     
     if config is None:
-        logger.error("SMTP credentials not provided")
+        logger.error("SMTP credentials not provided via environment variables (SMTP_EMAIL and SMTP_PASSWORD).")
         return False
     
     msg = _build_email_message(subject, recipient, body, html_body, config.sender_email)
