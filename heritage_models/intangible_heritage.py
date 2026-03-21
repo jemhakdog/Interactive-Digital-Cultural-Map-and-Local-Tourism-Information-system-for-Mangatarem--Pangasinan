@@ -22,3 +22,7 @@ class IntangibleHeritage(db.Model):
     
     def __repr__(self):
         return f'<IntangibleHeritage Detail for Profile {self.heritage_profile_id}>'
+
+
+# Alias for registry imports
+INTANGIBLE_HERITAGE_DETAIL = IntangibleHeritage

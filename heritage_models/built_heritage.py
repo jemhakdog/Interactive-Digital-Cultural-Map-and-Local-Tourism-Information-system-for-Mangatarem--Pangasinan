@@ -19,3 +19,7 @@ class BuiltHeritage(db.Model):
     
     def __repr__(self):
         return f'<BuiltHeritage Detail for Profile {self.heritage_profile_id}>'
+
+
+# Alias for registry imports
+BUILT_HERITAGE_DETAIL = BuiltHeritage

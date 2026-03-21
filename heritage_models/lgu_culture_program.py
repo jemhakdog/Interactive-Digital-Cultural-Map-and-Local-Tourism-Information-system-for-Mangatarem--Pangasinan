@@ -22,3 +22,7 @@ class LGUCultureProgram(db.Model):
     
     def __repr__(self):
         return f'<LGUCultureProgram Detail for Profile {self.heritage_profile_id}>'
+
+
+# Alias for registry imports
+LGU_PROGRAM_DETAIL = LGUCultureProgram

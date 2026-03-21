@@ -22,3 +22,7 @@ class PersonalityProfile(db.Model):
     
     def __repr__(self):
         return f'<PersonalityProfile Detail for Profile {self.heritage_profile_id}>'
+
+
+# Alias for registry imports
+PERSONALITY_DETAIL = PersonalityProfile

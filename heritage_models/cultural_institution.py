@@ -22,3 +22,7 @@ class CulturalInstitution(db.Model):
     
     def __repr__(self):
         return f'<CulturalInstitution Detail for Profile {self.heritage_profile_id}>'
+
+
+# Alias for registry imports
+INSTITUTION_DETAIL = CulturalInstitution

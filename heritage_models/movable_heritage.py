@@ -18,3 +18,7 @@ class MovableHeritage(db.Model):
     
     def __repr__(self):
         return f'<MovableHeritage Detail for Profile {self.heritage_profile_id}>'
+
+
+# Alias for registry imports
+MOVABLE_HERITAGE_DETAIL = MovableHeritage

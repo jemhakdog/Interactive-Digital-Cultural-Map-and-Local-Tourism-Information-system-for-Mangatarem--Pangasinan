@@ -22,3 +22,7 @@ class NaturalHeritage(db.Model):
     
     def __repr__(self):
         return f'<NaturalHeritage Detail for Profile {self.heritage_profile_id}>'
+
+
+# Alias for registry imports
+NATURAL_HERITAGE_DETAIL = NaturalHeritage
