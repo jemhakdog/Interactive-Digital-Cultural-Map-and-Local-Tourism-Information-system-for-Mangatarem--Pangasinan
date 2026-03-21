@@ -1,0 +1,12 @@
+
+--- DATABASE CONFIGURATION ---
+   Provider: SUPABASE
+   Status: READY
+------------------------------
+
+Connecting to host...
+TABLE USER: ['id', 'is_approved', 'email', 'role', 'barangay', 'password_hash', 'username']
+TABLE ATTRACTION: ['movable_heritage_list', 'reviewed_at', 'lat', 'date_found', 'lng', 'year_constructed', 'user_id', 'is_altered', 'is_original_site', 'significance_types', 'id', 'key_informants', 'created_at', 'reviewed_by', 'date_profiled', 'heritage_profile_id', 'condition_remarks', 'integrity_remarks', 'conservation_measures', 'object_type', 'place_found', 'estimated_age', 'acquisition_type', 'materials', 'dimensions', 'comparative_criteria', 'reference_sources', 'mapper_name', 'constraints_threats', 'name', 'description', 'category', 'barangay', 'image_url', 'status', 'heritage_type', 'building_type', 'ownership_type', 'declaration_legislation', 'physical_description', 'history_structure', 'occupation_status', 'stories_associated', 'condition']
+TABLE EVENT: ['id', 'date', 'user_id', 'created_at', 'reviewed_by', 'reviewed_at', 'image_url', 'category', 'title', 'description', 'status', 'location', 'barangay']
+TABLE BARANGAY_INFO: ['id', 'user_id', 'updated_at', 'cultural_assets', 'traditions', 'local_practices', 'unique_features', 'barangay_name', 'history']
+TABLE HERITAGE_PROFILE: ['id', 'date_profiled', 'user_id', 'reviewed_by', 'reviewed_at', 'created_at', 'updated_at', 'key_informants', 'constraints_threats', 'asset_type', 'mapper_name', 'conservation_measures', 'status', 'common_photo_url', 'reference_sources', 'significance']

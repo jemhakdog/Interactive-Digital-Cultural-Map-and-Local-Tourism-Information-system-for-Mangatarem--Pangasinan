@@ -1,0 +1,39 @@
+
+--- DATABASE CONFIGURATION ---
+   Provider: SUPABASE
+   Status: READY
+------------------------------
+
+Tables in 'public' schema:
+'user'
+'barangay_info'
+'event_interest'
+'favorite'
+'gallery_item'
+'page_view'
+'review'
+'natural_heritage_detail'
+'intangible_heritage_detail'
+'personality_detail'
+'institution_detail'
+'lgu_program_detail'
+'event'
+'attraction'
+'_migrations'
+'newsletter_subscriber'
+'USER'
+'password_reset_token'
+'analytics_page_view'
+'user_favorite_attraction'
+'user_event_interest'
+'attraction_review'
+'institution_details'
+'lgu_program_details'
+'heritage_profile'
+'built_heritage_details'
+'movable_heritage_details'
+'natural_heritage_details'
+'intangible_heritage_details'
+'personality_details'
+'built_heritage_detail'
+'movable_heritage_detail'

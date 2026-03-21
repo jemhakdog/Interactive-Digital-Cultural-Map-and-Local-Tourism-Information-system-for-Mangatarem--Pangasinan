@@ -1,0 +1,27 @@
+2026-03-21 20:21:40,390 - INFO - ============================================================
+2026-03-21 20:21:40,390 - INFO - Mangatarem Cultural Heritage - Schema Verification
+2026-03-21 20:21:40,390 - INFO - ============================================================
+2026-03-21 20:21:40,391 - INFO - Database type: postgresql
+2026-03-21 20:21:40,391 - INFO - Expected tables: 19
+2026-03-21 20:21:40,391 - INFO - Skipped tables: 2 (attractions, events)
+2026-03-21 20:21:40,391 - INFO - ============================================================
+2026-03-21 20:21:43,147 - INFO - \u2713 _migrations table exists
+2026-03-21 20:21:43,194 - INFO - Applied migrations: 0
+2026-03-21 20:21:43,349 - ERROR - \u2717 Table PASSWORD_RESET_TOKEN missing columns: {'expires_at', 'used'}
+2026-03-21 20:21:43,399 - ERROR - \u2717 Table HERITAGE_PROFILE missing columns: {'date_profiled', 'mapper_name', 'significance', 'user_id'}
+2026-03-21 20:21:43,450 - ERROR - \u2717 Table ATTRACTION missing columns: {'heritage_profile_id', 'status', 'user_id'}
+2026-03-21 20:21:43,496 - ERROR - \u2717 Table EVENT missing columns: {'user_id', 'status', 'category', 'location', 'image_url'}
+2026-03-21 20:21:43,496 - ERROR - \u2717 Missing table: GALLERY_ITEM
+2026-03-21 20:21:43,551 - ERROR - \u2717 Missing table: ANALYTICS_PAGE_VIEW
+2026-03-21 20:21:43,551 - ERROR - \u2717 Missing table: USER_FAVORITE_ATTRACTION
+2026-03-21 20:21:43,552 - ERROR - \u2717 Missing table: USER_EVENT_INTEREST
+2026-03-21 20:21:43,552 - ERROR - \u2717 Missing table: ATTRACTION_REVIEW
+2026-03-21 20:21:43,652 - ERROR - \u2717 Missing table: NATURAL_HERITAGE
+2026-03-21 20:21:43,900 - INFO - ============================================================
+2026-03-21 20:21:43,900 - ERROR - \u2717 Schema verification FAILED
+2026-03-21 20:21:43,900 - ERROR -   Missing tables: ['GALLERY_ITEM', 'ANALYTICS_PAGE_VIEW', 'USER_FAVORITE_ATTRACTION', 'USER_EVENT_INTEREST', 'ATTRACTION_REVIEW', 'NATURAL_HERITAGE']
+2026-03-21 20:21:43,900 - ERROR -   Table PASSWORD_RESET_TOKEN missing columns: ['expires_at', 'used']
+2026-03-21 20:21:43,900 - ERROR -   Table HERITAGE_PROFILE missing columns: ['date_profiled', 'mapper_name', 'significance', 'user_id']
+2026-03-21 20:21:43,900 - ERROR -   Table ATTRACTION missing columns: ['heritage_profile_id', 'status', 'user_id']
+2026-03-21 20:21:43,900 - ERROR -   Table EVENT missing columns: ['user_id', 'status', 'category', 'location', 'image_url']
+2026-03-21 20:21:43,900 - INFO - ============================================================

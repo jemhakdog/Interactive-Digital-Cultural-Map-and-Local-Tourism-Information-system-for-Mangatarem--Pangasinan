@@ -195,7 +195,7 @@ def _register_utility_routes(app: Flask) -> None:
 
 def _seed_database(app):
     """Seed initial data if needed."""
-    from models import Attraction, User
+    from models import Attraction, User, BarangayInfo
     import json
     
     if Attraction.query.first() is not None:
@@ -206,10 +206,21 @@ def _seed_database(app):
         with open(data_path, "r") as f:
             data = json.load(f)
             for item in data:
+                # Handle barangay relationship
+                barangay_name = item.get("barangay")
+                brgy = None
+                if barangay_name:
+                    brgy = BarangayInfo.query.filter_by(name=barangay_name).first()
+                    if not brgy:
+                        brgy = BarangayInfo(name=barangay_name)
+                        db.session.add(brgy)
+                        db.session.flush()
+
                 db.session.add(Attraction(
                     name=item["name"], category=item["category"],
-                    barangay=item.get("barangay"), description=item["description"],
-                    lat=item["lat"], lng=item["lng"], image_url=item["image"],
+                    barangay=brgy, description=item["description"],
+                    latitude=item["lat"], longitude=item["lng"], 
+                    image_url=item["image"],
                     status="approved"
                 ))
         db.session.commit()

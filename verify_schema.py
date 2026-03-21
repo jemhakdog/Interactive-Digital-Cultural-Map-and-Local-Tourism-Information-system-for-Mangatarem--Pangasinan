@@ -31,33 +31,35 @@ logger = logging.getLogger(__name__)
 # Expected schema based on models.py
 EXPECTED_TABLES = {
     'USER': [
-        'id', 'username', 'email', 'password', 'role', 'barangay_id', 'is_approved'
+        'id', 'username', 'email', 'password', 'role', 'barangay_id', 'is_approved', 'created_at'
+    ],
+    'PASSWORD_RESET_TOKEN': [
+        'id', 'user_id', 'token', 'expires_at', 'used', 'created_at'
     ],
     'HERITAGE_PROFILE': [
-        'id', 'asset_type', 'form_control_number', 'mapper_name', 'date_profiled',
-        'status', 'user_id', 'reviewed_by', 'reviewed_at', 'created_at', 'updated_at',
-        'key_informants', 'reference_sources', 'significance', 'constraints_threats',
-        'conservation_measures', 'photo_url'
+        'id', 'asset_type', 'form_control_number', 'name_of_asset', 'common_name',
+        'barangay_id', 'location_details', 'contact_person', 'contact_number',
+        'ownership_type', 'owner_administrator', 'usage_status', 'latitude',
+        'longitude', 'significance', 'conservation_status', 'mapper_name',
+        'date_profiled', 'status', 'user_id', 'created_at'
     ],
     'ATTRACTION': [
-        'id', 'name', 'description', 'category', 'barangay_id', 'latitude', 'longitude',
-        'image_url', 'form_control_number', 'heritage_profile_id', 'status',
-        'user_id', 'reviewed_by', 'reviewed_at', 'created_at'
+        'id', 'name', 'description', 'category', 'latitude', 'longitude',
+        'image_url', 'barangay_id', 'heritage_profile_id', 'status',
+        'user_id', 'created_at'
     ],
     'EVENT': [
-        'id', 'title', 'description', 'date', 'location', 'barangay_id', 'image_url',
-        'user_id', 'status', 'category', 'reviewed_by', 'reviewed_at', 'created_at'
+        'id', 'name', 'description', 'date', 'location', 'barangay_id',
+        'image_url', 'category', 'status', 'user_id', 'created_at'
     ],
     'GALLERY_ITEM': [
-        'id', 'type', 'url', 'caption', 'user_id', 'status', 'reviewed_by',
-        'reviewed_at', 'uploaded_at'
+        'id', 'type', 'url', 'caption', 'user_id', 'status', 'created_at'
     ],
     'BARANGAY_INFO': [
-        'id', 'name', 'history', 'cultural_property', 'traditions',
-        'local_practices', 'unique_features', 'user_id', 'updated_at'
+        'id', 'name', 'map_geo_json', 'location_data', 'created_at'
     ],
     'ANALYTICS_PAGE_VIEW': [
-        'id', 'view_type', 'item_id', 'page_name', 'timestamp', 'user_id'
+        'id', 'page_url', 'user_id', 'timestamp', 'session_id', 'ip_address', 'device_info'
     ],
     'USER_FAVORITE_ATTRACTION': [
         'id', 'user_id', 'attraction_id', 'created_at'
@@ -66,52 +68,39 @@ EXPECTED_TABLES = {
         'id', 'user_id', 'event_id', 'status', 'created_at'
     ],
     'ATTRACTION_REVIEW': [
-        'id', 'user_id', 'attraction_id', 'rating', 'comment', 'status',
-        'reviewed_by', 'reviewed_at', 'created_at'
+        'id', 'user_id', 'attraction_id', 'rating', 'comment', 'status', 'created_at'
     ],
-    # Heritage detail tables
+    'NEWSLETTER_SUBSCRIBER': [
+        'id', 'email', 'is_active', 'created_at'
+    ],
     'BUILT_HERITAGE_DETAIL': [
-        'heritage_profile_id', 'form_control_number', 'name', 'category', 'address',
-        'dates', 'ownership', 'latitude', 'longitude', 'description', 'stories',
-        'significance', 'protection_status', 'constraints_threats', 'conservation_measures',
-        'key_informants', 'reference_sources', 'mapper_name', 'date_profiled'
+        'heritage_profile_id', 'kind_of_structure', 'historical_significance',
+        'architectural_description', 'estimated_date_of_construction'
     ],
-    'NATURAL_HERITAGE_DETAIL': [
-        'heritage_profile_id', 'form_control_number', 'name', 'category', 'location',
-        'area_hectares', 'ownership', 'latitude', 'longitude', 'description', 'stories',
-        'significance', 'protection_status', 'constraints_threats', 'conservation_measures',
-        'key_informants', 'reference_sources', 'mapper_name', 'date_profiled'
+    'NATURAL_HERITAGE': [
+        'heritage_profile_id', 'scientific_name', 'common_name',
+        'conservation_status', 'description'
     ],
     'MOVABLE_HERITAGE_DETAIL': [
-        'heritage_profile_id', 'form_control_number', 'name', 'type_of_object', 'category',
-        'location', 'ownership', 'latitude', 'longitude', 'description', 'date_produced',
-        'medium_material', 'dimension', 'stories', 'significance', 'status_condition',
-        'constraints_threats', 'conservation_measures', 'key_informants', 'reference_sources',
-        'mapper_name', 'date_profiled'
+        'heritage_profile_id', 'type_of_object', 'material', 'dimensions',
+        'current_location', 'state_of_conservation'
     ],
     'INTANGIBLE_HERITAGE_DETAIL': [
-        'heritage_profile_id', 'form_control_number', 'name', 'category', 'geographical_range',
-        'related_domains', 'description', 'culture_bearers', 'transmission_mode', 'objects_used',
-        'stories', 'significance', 'practice_status', 'constraints_threats',
-        'safeguarding_measures', 'safeguarding_description', 'key_informants', 'reference_sources',
-        'mapper_name', 'date_profiled'
+        'heritage_profile_id', 'category', 'description', 'practitioners',
+        'transmission_mode'
     ],
     'PERSONALITY_DETAIL': [
-        'heritage_profile_id', 'form_control_number', 'name', 'dates_of_birth_death',
-        'address', 'prominence_field', 'biography', 'achievements', 'significance',
-        'key_informants', 'reference_sources', 'mapper_name', 'date_profiled'
+        'heritage_profile_id', 'full_name', 'dates_of_birth_death',
+        'place_of_birth', 'major_achievements'
     ],
     'INSTITUTION_DETAIL': [
-        'heritage_profile_id', 'form_control_number', 'name', 'address', 'latitude',
-        'longitude', 'type_of_institution', 'mandate', 'history', 'stories',
-        'significance', 'condition', 'constraints_threats', 'safeguarding_measures',
-        'key_informants', 'reference_sources', 'mapper_name', 'date_profiled'
+        'heritage_profile_id', 'type_of_institution', 'year_established',
+        'head_of_institution', 'activities_services'
     ],
     'LGU_PROGRAM_DETAIL': [
-        'heritage_profile_id', 'form_control_number', 'program_name', 'lgu_name', 'vision',
-        'mission', 'goals', 'date_created', 'history', 'chief_executives', 'policies',
-        'strategies', 'budget', 'key_informants', 'reference_sources', 'mapper_name', 'date_profiled'
-    ],
+        'heritage_profile_id', 'program_name', 'starting_year',
+        'description', 'culture_projects'
+    ]
 }
 
 # Tables that should NOT exist (old/unused schemas)
