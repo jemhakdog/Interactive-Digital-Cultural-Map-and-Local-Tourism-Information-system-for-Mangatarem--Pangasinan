@@ -91,7 +91,7 @@ def map_view():
     # Get list of unique barangays from approved attractions for the filter
     barangays = (
         db.session.query(Attraction.barangay)
-        .filter(Attraction.status == "approved", Attraction.barangay.is_not(None))
+        .filter(Attraction.status == "approved", Attraction.barangay_id.is_not(None))
         .distinct()
         .order_by(Attraction.barangay)
         .all()
@@ -209,7 +209,7 @@ def gallery():
     log_query("public", "gallery", "Fetching approved gallery items")
     items = (
         GalleryItem.query.filter_by(status="approved")
-        .order_by(GalleryItem.uploaded_at.desc())
+        .order_by(GalleryItem.created_at.desc())
         .all()
     )
 
@@ -335,7 +335,7 @@ def search():
 
     available_barangays = (
         db.session.query(Attraction.barangay)
-        .filter(Attraction.status == "approved", Attraction.barangay.is_not(None))
+        .filter(Attraction.status == "approved", Attraction.barangay_id.is_not(None))
         .distinct()
         .all()
     )
@@ -476,7 +476,7 @@ def barangay_profile(name):
     gallery_items = (
         GalleryItem.query.join(User, GalleryItem.user_id == User.id)
         .filter(User.barangay_id == name, GalleryItem.status == "approved")
-        .order_by(GalleryItem.uploaded_at.desc())
+        .order_by(GalleryItem.created_at.desc())
         .all()
     )
 
