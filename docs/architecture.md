@@ -16,7 +16,7 @@ This document describes the technical architecture of the Interactive Digital Cu
 
 ### Frontend
 - **Templating**: Jinja2
-- **Styling**: Tailwind CSS (v3.4)
+- **Styling**: Vanilla CSS with Tailwind CSS (v4.0)
 - **Interactive Maps**: Leaflet.js
 - **Assets Build**: PostCSS and Terser
 
@@ -25,167 +25,90 @@ This document describes the technical architecture of the Interactive Digital Cu
 The application follows a modular blueprint-based structure:
 
 - `app.py`: Application factory implementation with Vercel optimizations.
-- `models.py`: SQLAlchemy database schema with 9 core models.
-- `routes/`: Blueprint-based modular structure (7 blueprints):
+- `models.py`: SQLAlchemy database schema with 20+ core models including Heritage Registry.
+- `routes/`: Blueprint-based modular structure:
   - `auth.py`: Authentication (login, logout, registration, password reset).
   - `public.py`: Public visitor pages (Home, Map, Attractions, Events).
-  - `admin/`: **Package** - LGU administrative dashboard (5 submodules):
+  - `admin/`: **Package** - Administrative dashboard (7 submodules):
     - `dashboard.py`: Admin overview and analytics.
-    - `attractions.py`: Manage and review attraction submissions.
-    - `events.py`: Manage and review event submissions.
-    - `content.py`: Review gallery items and other content.
+    - `attractions.py`: Manage attraction submissions.
+    - `events.py`: Manage event submissions.
+    - `heritage.py`: Review Cultural Heritage Registry (Forms 01-07).
+    - `documents.py`: Manage administrative documents and reports.
+    - `newsletter.py`: Manage newsletter subscribers and campaigns.
     - `users.py`: User management and role assignment.
-  - `barangay/`: **Package** - Barangay-level content management (5 submodules):
-    - `dashboard.py`: Barangay contributor dashboard.
-    - `attractions.py`: Submit and manage barangay attractions.
-    - `events.py`: Submit and manage barangay events.
-    - `gallery.py`: Upload and manage gallery items.
-    - `profile.py`: Manage barangay information and profile.
-  - `api.py`: Public JSON API endpoints for map data and analytics.
-  - `user.py`: User profile, favorites, and reviews.
-  - `update.py`: System update operations and maintenance.
-- `utils/`: Six utility modules providing core functionality:
-  - `db_manager.py`: Multi-database support (SQLite/Supabase) with connection pooling.
-  - `email_sender.py`: Email notifications and communication.
-  - `file_helpers.py`: File upload validation and management.
-  - `logger_helper.py`: Centralized logging configuration.
-  - `session_helper.py`: Session management utilities.
-  - `__init__.py`: Module initialization.
+  - `barangay/`: **Package** - Barangay-level content management.
+  - `api.py`: Public JSON API endpoints and Heritage Registry API.
+  - `user.py`: User profile and favorites.
+  - `update.py`: System update operations.
+- `utils/`: Core utility modules:
+    - `heritage_registry.py`: Registry configuration and model mapping.
+    - `db_manager.py`: Multi-database support (SQLite/Supabase).
+    - `email_sender.py`: Notification system.
+    - `file_helpers.py`: File validation.
+    - `logger_helper.py`: Logging.
 
 ## Database Schema
 
-The core entities in the system are:
+The system implements a comprehensive schema aligned with the Cultural Heritage Registry (Forms 01-07):
 
-- **User**: Authentication and authorization (Roles: `admin`, `contributor`, `user`). Includes approval workflow for contributors.
-- **Attraction**: Cultural and tourism spots with geo-coordinates (lat/lng). Includes status field (pending/approved) and review tracking.
-- **Event**: Local festivals and community activities with categorization (Religious/Civic/Entertainment). Includes status and review workflow.
-- **BarangayInfo**: Detailed historical and cultural background for each barangay (history, traditions, cultural assets, local practices).
-- **GalleryItem**: Photos and videos with content moderation (pending/approved status).
-- **PageView**: Internal analytics for tracking page views and attraction popularity.
-- **Favorite**: User's saved attractions for quick access.
-- **EventInterest**: Tracks user interest in events (statuses: 'interested', 'going').
-- **Review**: User ratings and comments for attractions with moderation (pending/approved/rejected).
+- **User**: Authentication (Roles: `admin`, `contributor`, `user`).
+- **HeritageProfile**: Base model for all cultural registry entries. Links to specialized detail tables.
+- **Specialized Heritage Details**:
+    - `NATURAL_HERITAGE_DETAIL` (Form 01A)
+    - `BUILT_HERITAGE_DETAIL` (Form 02A)
+    - `MOVABLE_HERITAGE_DETAIL` (Form 03A)
+    - `INTANGIBLE_HERITAGE_DETAIL` (Form 04A)
+    - `PERSONALITY_PROFILE_DETAIL` (Form 05)
+    - `CULTURAL_INSTITUTION_DETAIL` (Form 06)
+    - `LGU_CULTURE_PROGRAM_DETAIL` (Form 07)
+- **Attraction**: Tourism spots with `latitude` and `longitude`. Optional link to `HeritageProfile`.
+- **Event**: Local festivals and community activities.
+- **BarangayInfo**: Historical and cultural background for each barangay.
+- **GalleryItem**: Photos and videos with content moderation.
+- **AnalyticsPageView**: Page view tracking and engagement.
+- **PasswordResetToken**: Secure, time-limited tokens for account recovery.
+- **NewsletterSubscriber**: Opt-in mailing list management.
+
+---
 
 ## Utility Modules
 
-The `utils/` directory contains six core utility modules:
+The `utils/` directory contains core functionality:
+
+### Heritage Registry (`heritage_registry.py`)
+- **Purpose**: Central configuration for the 7 heritage form types.
+- **Features**: Model mapping, field labels, and UI generation metadata.
 
 ### Database Manager (`db_manager.py`)
 - **Purpose**: Intelligent database URI selection and Supabase client management.
-- **Features**:
-  - Automatic environment detection (local vs production).
-  - SQLite for local development (`instance/app.db`).
-  - Supabase connection pooling for production (via `DATABASE_URL`).
-  - Lazy Supabase client initialization.
-- **Key Functions**: `get_database_uri()`, `get_supabase_client()`.
+- **Features**: Automatic environment detection, SQLite for local, Supabase for production.
 
 ### Email Sender (`email_sender.py`)
-- **Purpose**: Email notifications for user actions.
-- **Use Cases**: Account verification, password reset, content approval notifications.
-
-### File Helpers (`file_helpers.py`)
-- **Purpose**: File upload validation and management.
-- **Features**:
-  - Allowed extensions validation (`png`, `jpg`, `jpeg`, `gif`, `mp4`).
-  - Secure filename generation.
-  - Upload directory management.
-
-### Logger Helper (`logger_helper.py`)
-- **Purpose**: Centralized logging configuration.
-- **Features**: Configurable log levels, structured logging output.
-
-### Session Helper (`session_helper.py`)
-- **Purpose**: Session management utilities.
-- **Features**: Session persistence, secure cookie configuration.
+- **Purpose**: Email notifications for account verification and password resets.
 
 ---
 
 ## Advanced Features
 
+### Cultural Heritage Registry (Forms 01-07)
+The system fully implements the structured cultural heritage documentation required by national tourism standards. Each profile includes significant history, conservation status, and mapping coordinates.
+
 ### Lazy-Loaded Supabase Client
-
-The application uses a descriptor pattern to initialize the Supabase client only when first accessed:
-
-```python
-class LazySupabase:
-    def __get__(self, obj, objtype=None):
-        if _supabase_client is None:
-            _supabase_client = get_supabase_client()
-        return _supabase_client
-```
-
-**Benefits**:
-- Reduces cold start time on Vercel (300-500ms faster).
-- Client initialized only when Supabase-specific features are used.
-- Prevents unnecessary connection overhead.
+Cold start optimization on Vercel by initializing the Supabase client only when first accessed.
 
 ### Smart Cache Headers
-
-Automatic edge caching based on path and content type:
-
-| Path Type | Cache-Control | Use Case |
-|-----------|---------------|----------|
-| Admin/Auth routes (`/admin`, `/auth`) | `private, no-store` | Never cached, always fresh |
-| HTML pages (public) | `public, max-age=60, s-maxage=300, stale-while-revalidate=600` | Edge cached for 5 min, stale served up to 10 min |
-| Static assets (`.js`, `.css`, images) | `public, max-age=31536000, immutable` | Cached for 1 year (versioned files) |
-| API responses | `public, max-age=30, s-maxage=120, stale-while-revalidate=300` | Edge cached for 2 min |
-
-**Implementation**: See `_apply_cache_headers()` in `app.py:147-157`.
-
-### Custom Error Handlers
-
-Custom error pages for improved user experience:
-
-**Supported Error Codes**: `400`, `401`, `403`, `404`, `408`, `429`, `451`, `500`.
-
-**Template Location**: `templates/errors/{code}.html`.
-
-**Implementation**: All error codes route through a unified handler that renders appropriate error templates.
-
-### PWA Support
-
-Progressive Web App capabilities:
-
-- **Service Worker**: `/sw.js` - Enables offline functionality and caching.
-- **Web App Manifest**: `/manifest.json` - Defines app metadata for installation.
-- **Benefits**:
-  - Install to home screen on mobile devices.
-  - Offline content access.
-  - Native app-like experience.
-
-### Error Handling ⚠️
-The application provides user-friendly error pages for 8 HTTP status codes:
-
-| Code | Type | Description |
-|------|------|-------------|
-| **400** | Bad Request | Invalid request parameters or malformed data |
-| **401** | Unauthorized | Authentication required but not provided |
-| **403** | Forbidden | Authenticated but lacking required permissions |
-| **404** | Not Found | Requested resource does not exist |
-| **408** | Request Timeout | Server timeout waiting for request |
-| **429** | Too Many Requests | Rate limit exceeded |
-| **451** | Unavailable For Legal Reasons | Content blocked for legal reasons |
-| **500** | Internal Server Error | Unexpected server-side error |
-
-**Implementation**: Error templates located in `templates/errors/{code}.html`, registered via `_register_error_handlers()` in `app.py`.
+Automatic edge caching based on path and content type (HTML: 5-10 min, Static: 1 year, API: 2 min).
 
 ### ProxyFix Middleware
-
-Handles Vercel's reverse proxy headers correctly:
-
-```python
-if "VERCEL" in os.environ:
-    app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
-```
-
-**Purpose**: Ensures correct client IP, protocol, and host detection behind Vercel's proxy.
+Handles Vercel's reverse proxy headers to ensure correct IP and protocol detection.
 
 ---
 
 ## Integration Details
 
-- **Supabase**: Production database via Python SDK with connection pooling (port 6543). Lazy-loaded client for optimal cold start performance.
-- **Leaflet.js**: Interactive maps with Mapbox tiles. Displays attraction markers with clustering and barangay boundaries.
-- **Vercel**: Serverless deployment with edge caching, ProxyFix middleware, and optimized cold start times.
-- **Flask-Login**: Session-based authentication with "Remember Me" functionality (30-day cookie duration).
-- **Flask-Limiter**: Rate limiting for API endpoints (20 requests/minute default).
+- **Supabase**: Production PostgreSQL database via connection pooling (port 6543).
+- **Leaflet.js**: Interactive maps with marker clustering and barangay boundaries.
+- **Vercel**: Serverless deployment with edge caching and optimized performance.
+- **Flask-Login**: Session-based authentication (30-day "Remember Me").
+- **Flask-Limiter**: Rate limiting (20 requests/minute API default).

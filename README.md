@@ -6,11 +6,12 @@ An interactive, web-based platform showcasing the cultural identity, community h
 This platform serves as a central digital resource for residents, students, and visitors to explore the rich cultural heritage and tourism spots of Mangatarem. It emphasizes interactive storytelling through maps and multimedia, promoting local pride and supporting educational use.
 
 ## ✨ Key Features
-- **Interactive Cultural Map**: Explorer barangay-level highlights using an interactive Leaflet-based map.
+- **Interactive Cultural Map**: Explore barangay-level highlights using an interactive Leaflet-based map with marker clustering.
+- **Cultural Heritage Registry**: Full implementation of standardized Heritage Forms 01-07 for deep historical archival.
 - **Tourism Information Portal**: Detailed profiles of local attractions, traditions, and eateries.
 - **Events & Festival Directory**: Stay updated with local festivities and community celebrations.
 - **Multimedia Gallery**: High-quality photo and video collections of local traditions.
-- **Admin & Contributor Dashboard**: Secure management for LGU and barangay representatives to update content.
+- **Admin & Contributor Dashboard**: Secure management for LGU and barangay representatives to review and update content.
 - **Analytics Dashboard**: Insights into popular locations and user engagement levels.
 
 ## 🛠️ Technical Stack
@@ -18,24 +19,24 @@ This platform serves as a central digital resource for residents, students, and 
 - **Framework**: [Flask 3.1.2](https://flask.palletsprojects.com/)
 - **Database**: 
   - **Local Development**: SQLite (stored in `/instance/app.db`)
-  - **Production**: Supabase (PostgreSQL) with connection pooling
+  - **Production**: Supabase (PostgreSQL) with connection pooling (Port 6543)
   - **ORM**: [SQLAlchemy](https://www.sqlalchemy.org/)
 - **Authentication**: [Flask-Login](https://flask-login.readthedocs.io/)
 - **Rate Limiting**: [Flask-Limiter](https://flask-limiter.readthedocs.io/)
 
 ### Frontend
-- **Styling**: [Tailwind CSS 3.4](https://tailwindcss.com/)
+- **Styling**: [Tailwind CSS 4.0](https://tailwindcss.com/) (Vanilla CSS engine)
 - **Interactive Maps**: [Leaflet.js](https://leafletjs.com/)
-- **Build Tools**: Terser for JS minification, PostCSS for Tailwind.
+- **Build Tools**: PostCSS and Terser for optimized production assets.
 
 ### Deployment
-- **Platform**: Optimized for [Vercel](https://vercel.com/) (includes `/tmp` SQLite handling).
-- **Environment**: Python 3.x
+- **Platform**: Optimized for [Vercel](https://vercel.com/) with Edge Caching and ProxyFix support.
+- **Environment**: Python 3.12+
 
 ## 🚀 Getting Started
 ### Prerequisites
-- Python 3.8+
-- internet connection (for Tailwind CLI auto-download)
+- Python 3.12+
+- Internet connection (for initial library installs)
 
 ### Installation
 1. **Clone the repository**:
@@ -63,23 +64,26 @@ python app.py
 The application will be available at `http://127.0.0.1:5000`.
 
 ## 📚 Documentation
-Detailed documentation is available in the [docs/](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/README.md) directory:
-- [Architecture Guide](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/architecture.md)
-- [API Reference](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/api_reference.md)
-- [Deployment Guide](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/deployment_guide.md)
-- [User Manual](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/user_manual.md)
-- [Administrative Guide](file:///d:/porjects/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/docs/admin_guide.md)
+Detailed documentation is available in the [docs/](docs/README.md) directory:
+- [Architecture Guide](docs/architecture.md)
+- [Database Migration](docs/database_migration.md)
+- [API Reference](docs/api_reference.md)
+- [User Manual](docs/user_manual.md)
+- [Administrative Guide](docs/admin_guide.md)
+- [Contributor Guide](docs/contributor_guide.md)
+- [Performance Optimization](docs/optimization.md)
 
 ## 📂 Project Structure
-- `/app.py`: Main application entry point.
-- `/models.py`: Database schema and models.
-- `/routes/`: Blueprint-based route handling (7 blueprints: Admin, Barangay, Public, Auth, API, User, Update).
+- `/app.py`: Main application entry point and factory.
+- `/models.py`: Database schema (20+ models including Heritage Registry).
+- `/routes/`: Blueprint-based route handling (Admin, Barangay, Public, Auth, API, User, Update).
+- `/heritage_models/`: Specialized models for Forms 01-07.
 - `/templates/`: Jinja2 templates for UI.
 - `/static/`: CSS, JS, and uploaded assets.
-- `/instance/`: Local database storage.
+- `/utils/`: Core utility modules (Registry, DB Manager, Email Sender).
 
 ## 👤 Stakeholders
-- **LGU Mangatarem**: Primary beneficiary for tourism promotion.
+- **LGU Mangatarem**: Primary beneficiary for tourism promotion and cultural archival.
 - **Barangay Representatives**: Local content contributors.
 - **Students & Researchers**: For educational and historical reference.
 - **Visitors**: Digital guide for tourism.

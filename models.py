@@ -53,7 +53,14 @@ class PasswordResetToken(db.Model):
     @property
     def is_valid(self) -> bool:
         """True if token is unused and not expired."""
-        return not self.used and datetime.utcnow() < self.expires_at
+        from datetime import timezone
+        
+        expires = self.expires_at
+        if expires.tzinfo is not None:
+            # Normalize aware database datetime to naive UTC for comparison
+            expires = expires.astimezone(timezone.utc).replace(tzinfo=None)
+            
+        return not self.used and datetime.utcnow() < expires
 
 
 class HeritageProfile(db.Model):

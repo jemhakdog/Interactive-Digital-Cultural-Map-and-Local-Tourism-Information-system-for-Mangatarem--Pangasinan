@@ -1,65 +1,23 @@
-# Documentation Index
+# Documentation Overview
 
-> **Interactive Digital Cultural Map & Local Tourism Information System**
-> Mangatarem, Pangasinan
+Welcome to the technical documentation for the **Interactive Digital Cultural Map of Mangatarem**.
 
-This folder contains all project documentation. Below is a map of every sub-directory.
+## Document Index
 
----
+| Document | Purpose | Audience |
+|----------|---------|----------|
+| [**Architecture**](architecture.md) | High-level system design and data flow. | Developers |
+| [**Database Migration**](database_migration.md) | Schema details and migration workflows. | DevOps / DBAs |
+| [**API Reference**](api_reference.md) | Endpoint details and JSON structures. | Developers |
+| [**Admin Guide**](admin_guide.md) | Content moderation and user management. | LGU Admins |
+| [**Contributor Guide**](contributor_guide.md) | asset submission and documentation rules. | Barangay Level |
+| [**User Manual**](user_manual.md) | How to explore the map and registry. | Visitors |
+| [**Optimization**](optimization.md) | Performance metrics and edge strategies. | Developers |
+| [**Deployment Guide**](deployment_guide.md) | Vercel and Supabase cloud setup. | DevOps |
+| [**Core System**](core.md) | Project vision, goals, and core features. | All Roles |
 
-## 📂 Folder Structure
+## General Guidelines
 
-```
-docs/
-├── capstone/               Academic capstone deliverables
-│   ├── chapters/           Chapter 1–3 (markdown + consolidated docx)
-│   ├── defense/            Defense prep guides, flashcards, scripts, diagrams
-│   └── guide/              BCC BSIT capstone guide PDF/reference
-│
-├── design/                 UI/UX design specs and search design notes
-│
-├── diagrams/               All draw.io files, PNGs, and diagram generation scripts
-│   ├── final/              Finalized diagram exports
-│   └── images/             Diagram image exports
-│
-├── planning/               All PLAN-*.md files (feature/task planning docs)
-│
-├── reports/                Audit, migration, lint, security, and sync reports
-│
-├── context/                Project context files (PRD, source, ERD notes)
-│
-├── project/                Root project overview files
-│   ├── PROJECT_DESCRIPTION.md
-│   ├── CHANGES.md
-│   └── QWEN.md
-│
-├── interview_data/         Raw interview data from stakeholders
-├── reference/              Reference snapshots and file lists
-│
-├── admin_guide.md          Admin panel documentation
-├── api_reference.md        API endpoint reference
-├── architecture.md         System architecture overview
-├── contributor_guide.md    How to contribute to the project
-├── core.md                 Core module documentation
-├── database_migration.md   Migration instructions and history
-├── deployment_guide.md     How to deploy the application
-└── optimization.md         Performance optimization notes
-```
-
----
-
-## Quick Links
-
-| Document | Description |
-|---|---|
-| [architecture.md](architecture.md) | System overview and tech stack |
-| [api_reference.md](api_reference.md) | All API routes and responses |
-| [database_migration.md](database_migration.md) | Running and writing migrations |
-| [deployment_guide.md](deployment_guide.md) | Production deployment steps |
-| [admin_guide.md](admin_guide.md) | Admin panel usage |
-| [contributor_guide.md](contributor_guide.md) | Development guidelines |
-| [capstone/chapters/](capstone/chapters/) | Chapters 1–3 academic write-up |
-| [capstone/defense/](capstone/defense/) | Defense scripts and guides |
-| [diagrams/](diagrams/) | All system diagrams |
-| [planning/](planning/) | Feature planning files |
-| [reports/](reports/) | Audit and migration reports |
+- **Standardization**: All cultural heritage data must align with the Heritage Registry (Forms 01-07).
+- **Security**: Never commit `SECRET_KEY` or `DATABASE_URL` to version control.
+- **Formatting**: All documentation uses GitHub Flavored Markdown.
