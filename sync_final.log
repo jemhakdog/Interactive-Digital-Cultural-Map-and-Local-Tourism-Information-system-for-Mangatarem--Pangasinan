@@ -1,4 +1,0 @@
-Traceback (most recent call last):
-  File "D:\porjects\Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan\run_final_sync.py", line 2, in <module>
-    import psycopg2
-ModuleNotFoundError: No module named 'psycopg2'

@@ -46,3 +46,9 @@ client_secret_*.json
 .DS_Store
 Thumbs.db
 tailwindcss-*
+
+# Execution Logs & Dumps
+*.log
+*output.txt
+*debug.txt
+*audit.txt
