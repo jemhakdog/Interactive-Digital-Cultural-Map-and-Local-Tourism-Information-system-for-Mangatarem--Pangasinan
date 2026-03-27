@@ -161,7 +161,10 @@ class BarangayInfo(db.Model):
 class AnalyticsPageView(db.Model):
     __tablename__ = 'ANALYTICS_PAGE_VIEW'
     id = db.Column(db.Integer, primary_key=True)
-    page_url = db.Column(db.String(500), nullable=False) # Renamed from view_type/page_name combo
+    page_url = db.Column(db.String(500), nullable=True) # Kept for compatibility
+    view_type = db.Column(db.String(50), nullable=True)  # 'attraction', 'event', 'page'
+    item_id = db.Column(db.Integer, nullable=True)       # ID of the attraction or event, if applicable
+    page_name = db.Column(db.String(100), nullable=True) # Name of the page (e.g., 'home', 'map', 'events')
     user_id = db.Column(db.Integer, nullable=True)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     session_id = db.Column(db.String(100), nullable=True)

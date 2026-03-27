@@ -6,6 +6,7 @@ and clarify dependency management.
 """
 
 import os
+import sys
 import logging
 from flask import Flask, render_template, request, send_from_directory
 from werkzeug.middleware.proxy_fix import ProxyFix
@@ -41,7 +42,12 @@ def create_app(config_name=None):
     
     # Determine absolute paths for template/static folders
     is_vercel = "VERCEL" in os.environ
-    base_dir = "/var/task" if is_vercel else os.path.abspath(os.path.dirname(__file__))
+    if is_vercel:
+        base_dir = "/var/task"
+    elif getattr(sys, 'frozen', False):
+        base_dir = sys._MEIPASS
+    else:
+        base_dir = os.path.abspath(os.path.dirname(__file__))
     
     app = Flask(
         __name__,

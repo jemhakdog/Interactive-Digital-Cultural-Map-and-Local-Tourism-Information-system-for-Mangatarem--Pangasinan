@@ -1,4 +1,5 @@
 import os
+import sys
 from datetime import timedelta
 from utils.db_manager import get_database_uri
 
@@ -7,7 +8,12 @@ class Config:
     SECRET_KEY = os.environ.get("SECRET_KEY", "your-secret-key-here")
     
     # Static and upload folders
-    BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+    # Handle PyInstaller paths
+    if getattr(sys, 'frozen', False):
+        BASE_DIR = sys._MEIPASS
+    else:
+        BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+        
     STATIC_FOLDER = os.path.join(BASE_DIR, "static")
     TEMPLATE_FOLDER = os.path.join(BASE_DIR, "templates")
     UPLOAD_FOLDER = os.path.join(STATIC_FOLDER, "uploads")

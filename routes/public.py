@@ -89,11 +89,13 @@ def map_view():
     record_view("page", page_name="map")
 
     # Get list of unique barangays from approved attractions for the filter
+    # Get unique barangays that have approved attractions
     barangays = (
-        db.session.query(Attraction.barangay)
-        .filter(Attraction.status == "approved", Attraction.barangay_id.is_not(None))
+        db.session.query(BarangayInfo.name)
+        .join(Attraction, Attraction.barangay_id == BarangayInfo.id)
+        .filter(Attraction.status == "approved")
         .distinct()
-        .order_by(Attraction.barangay)
+        .order_by(BarangayInfo.name)
         .all()
     )
 
