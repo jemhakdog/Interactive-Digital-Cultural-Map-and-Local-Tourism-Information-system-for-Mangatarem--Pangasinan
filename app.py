@@ -240,9 +240,70 @@ def _seed_database(app):
         db.session.commit()
         logger.info("Default admin user created.")
 
+    # Seed establishments
+    from models import Establishment, EstablishmentRoom, EstablishmentMenuItem
+    if Establishment.query.first() is None:
+        # Create a demo business owner
+        biz_user = User.query.filter_by(username="business_demo").first()
+        if not biz_user:
+            biz_user = User(
+                username="business_demo",
+                email="business@example.com",
+                role="business_owner",
+                is_approved=True,
+            )
+            biz_user.set_password("business123")
+            db.session.add(biz_user)
+            db.session.flush()
+
+        est_path = os.path.join(app.root_path, "data", "establishments.json")
+        if os.path.exists(est_path):
+            with open(est_path, "r", encoding="utf-8") as f:
+                est_data = json.load(f)
+            for item in est_data:
+                est = Establishment(
+                    owner_id=biz_user.id,
+                    name=item["name"],
+                    type=item["type"],
+                    description=item.get("description", ""),
+                    address=item.get("address", ""),
+                    latitude=item.get("latitude", 0),
+                    longitude=item.get("longitude", 0),
+                    contact_number=item.get("contact_number"),
+                    price_range=item.get("price_range"),
+                    amenities=item.get("amenities", []),
+                    operating_hours=item.get("operating_hours", {}),
+                    status="approved",
+                )
+                db.session.add(est)
+                db.session.flush()
+
+                for room in item.get("rooms", []):
+                    db.session.add(EstablishmentRoom(
+                        establishment_id=est.id,
+                        name=room["name"],
+                        description=room.get("description", ""),
+                        price_per_night=room.get("price_per_night"),
+                        capacity=room.get("capacity", 2),
+                        amenities=room.get("amenities", []),
+                    ))
+
+                for mi in item.get("menu_items", []):
+                    db.session.add(EstablishmentMenuItem(
+                        establishment_id=est.id,
+                        name=mi["name"],
+                        description=mi.get("description", ""),
+                        price=mi.get("price"),
+                        category=mi.get("category", "main"),
+                        is_bestseller=mi.get("is_bestseller", False),
+                    ))
+
+            db.session.commit()
+            logger.info("Database seeded with sample establishments.")
+
 
 # Entry point for Vercel and local running
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5001, debug=True)
+    app.run(host="0.0.0.0", port=5002, debug=True)

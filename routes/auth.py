@@ -295,6 +295,8 @@ def login():
                 return redirect(url_for("admin.admin_dashboard"))
             elif user.role == "contributor":
                 return redirect(url_for("barangay.barangay_dashboard"))
+            elif user.role == "business_owner":
+                return redirect(url_for("business.dashboard"))
             elif user.role == "user":
                 return redirect(url_for("user.dashboard"))
             
@@ -355,6 +357,52 @@ def register():
     
     log_render("auth", "register", "register.html")
     return render_template("auth/register.html")
+
+
+@auth_bp.route("/register/business", methods=["GET", "POST"])
+@limiter.limit("5 per minute")
+def register_business():
+    """
+    Handle business owner registration.
+    
+    Creates business_owner accounts requiring admin approval.
+    """
+    log_entry("auth", "register_business", method=request.method)
+    logger.info("Business registration page accessed")
+    
+    if request.method == "POST":
+        username = request.form.get("username")
+        email = request.form.get("email")
+        password = request.form.get("password")
+        business_name = request.form.get("business_name")
+        business_type = request.form.get("business_type")
+        
+        # Validation
+        if not _validate_username_available(username):
+            flash("Username already exists.", "error")
+            return redirect(url_for("auth.register_business"))
+        
+        if not _validate_email_available(email):
+            flash("Email already exists.", "error")
+            return redirect(url_for("auth.register_business"))
+        
+        # Create business owner user
+        user = User(
+            username=username,
+            email=email,
+            role="business_owner",
+            is_approved=False,
+        )
+        user.set_password(password)
+        db.session.add(user)
+        db.session.commit()
+        
+        log_success("auth", "register_business", f"Business owner '{username}' registered for '{business_name}'")
+        logger.info(f"New business owner '{username}' registered, awaiting approval")
+        
+        return redirect(url_for("auth.pending_approval"))
+    
+    return render_template("auth/register_business.html")
 
 
 @auth_bp.route("/google-login", methods=["POST"])

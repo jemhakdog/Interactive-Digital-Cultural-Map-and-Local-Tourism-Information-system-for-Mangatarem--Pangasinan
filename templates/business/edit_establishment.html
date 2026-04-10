@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block title %}{{ 'Edit' if establishment else 'Create' }} Establishment — GoMangatarem{% endblock %}
+{% block content %}
+<section class="min-h-screen bg-heritage-gradient bg-gradient-to-br from-emerald-950 via-gray-900 to-emerald-950 pt-8 pb-16 px-4">
+    <div class="container mx-auto max-w-3xl">
+        <div class="mb-8">
+            <a href="{{ url_for('business.dashboard') }}" class="text-emerald-400 hover:text-emerald-300 text-sm font-medium inline-flex items-center gap-1 mb-4">
+                ← Back to Dashboard
+            </a>
+            <h1 class="text-3xl font-bold text-white font-heading tracking-tight">
+                {{ 'Edit Your Establishment' if establishment else 'Create Your Listing' }}
+            </h1>
+        </div>
+
+        <form method="POST" action="{{ url_for('business.edit_establishment') if establishment else url_for('business.create_establishment') }}"
+            class="bg-emerald-900/20 border border-white/10 rounded-3xl p-8 backdrop-blur-md space-y-8">
+
+            <!-- Basic Info -->
+            <div class="space-y-5">
+                <h2 class="text-lg font-bold text-emerald-300 uppercase tracking-wider">Basic Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-bold text-emerald-300/80 mb-2">Establishment Name *</label>
+                        <input type="text" name="name" required value="{{ establishment.name if establishment else '' }}"
+                            class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-emerald-300/80 mb-2">Type *</label>
+                        <select name="type" required
+                            class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                            <option value="inn" {{ 'selected' if establishment and establishment.type == 'inn' }}>🏨 Inn / Lodge</option>
+                            <option value="restaurant" {{ 'selected' if establishment and establishment.type == 'restaurant' }}>🍽️ Restaurant</option>
+                            <option value="cafe" {{ 'selected' if establishment and establishment.type == 'cafe' }}>☕ Café</option>
+                            <option value="fastfood" {{ 'selected' if establishment and establishment.type == 'fastfood' }}>🍔 Fast Food</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-emerald-300/80 mb-2">Description</label>
+                    <textarea name="description" rows="4"
+                        class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">{{ establishment.description if establishment else '' }}</textarea>
+                </div>
+            </div>
+
+            <!-- Location -->
+            <div class="space-y-5">
+                <h2 class="text-lg font-bold text-emerald-300 uppercase tracking-wider">Location</h2>
+                <div>
+                    <label class="block text-sm font-bold text-emerald-300/80 mb-2">Address</label>
+                    <input type="text" name="address" value="{{ establishment.address if establishment else '' }}"
+                        class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div>
+                        <label class="block text-sm font-bold text-emerald-300/80 mb-2">Barangay</label>
+                        <select name="barangay"
+                            class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                            <option value="">Select...</option>
+                            {% for b in barangays %}
+                            <option value="{{ b.name }}" {{ 'selected' if establishment and establishment.barangay and establishment.barangay.name == b.name }}>{{ b.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-emerald-300/80 mb-2">Latitude *</label>
+                        <input type="number" step="any" name="latitude" required value="{{ establishment.latitude if establishment else '15.9949' }}"
+                            class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-emerald-300/80 mb-2">Longitude *</label>
+                        <input type="number" step="any" name="longitude" required value="{{ establishment.longitude if establishment else '120.4869' }}"
+                            class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact -->
+            <div class="space-y-5">
+                <h2 class="text-lg font-bold text-emerald-300 uppercase tracking-wider">Contact & Links</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div>
+                        <label class="block text-sm font-bold text-emerald-300/80 mb-2">Phone</label>
+                        <input type="text" name="contact_number" value="{{ establishment.contact_number if establishment else '' }}"
+                            class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-emerald-300/80 mb-2">Email</label>
+                        <input type="email" name="email" value="{{ establishment.email if establishment else '' }}"
+                            class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-emerald-300/80 mb-2">Website</label>
+                        <input type="url" name="website" value="{{ establishment.website if establishment else '' }}"
+                            class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pricing & Amenities -->
+            <div class="space-y-5">
+                <h2 class="text-lg font-bold text-emerald-300 uppercase tracking-wider">Details</h2>
+                <div>
+                    <label class="block text-sm font-bold text-emerald-300/80 mb-2">Price Range</label>
+                    <select name="price_range"
+                        class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                        <option value="">Select...</option>
+                        <option value="budget" {{ 'selected' if establishment and establishment.price_range == 'budget' }}>💚 Budget (₱)</option>
+                        <option value="moderate" {{ 'selected' if establishment and establishment.price_range == 'moderate' }}>💛 Moderate (₱₱)</option>
+                        <option value="premium" {{ 'selected' if establishment and establishment.price_range == 'premium' }}>🧡 Premium (₱₱₱)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-emerald-300/80 mb-3">Amenities</label>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+                        {% set amenity_options = ['wifi', 'parking', 'aircon', 'pool', 'tv', 'kitchen', 'pet_friendly', 'wheelchair'] %}
+                        {% set amenity_labels = {'wifi': '📶 WiFi', 'parking': '🅿️ Parking', 'aircon': '❄️ Aircon', 'pool': '🏊 Pool', 'tv': '📺 TV', 'kitchen': '🍳 Kitchen', 'pet_friendly': '🐕 Pet Friendly', 'wheelchair': '♿ Wheelchair'} %}
+                        {% for amenity in amenity_options %}
+                        <label class="flex items-center gap-2 text-emerald-100/70 text-sm cursor-pointer bg-emerald-900/20 border border-white/5 rounded-lg px-3 py-2.5 hover:bg-emerald-800/30 transition-all">
+                            <input type="checkbox" name="amenities" value="{{ amenity }}"
+                                {{ 'checked' if establishment and establishment.amenities and amenity in establishment.amenities }}
+                                class="rounded border-emerald-600 text-emerald-500 focus:ring-emerald-500">
+                            {{ amenity_labels[amenity] }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Images -->
+            <div class="space-y-5">
+                <h2 class="text-lg font-bold text-emerald-300 uppercase tracking-wider">Images</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div>
+                        <label class="block text-sm font-bold text-emerald-300/80 mb-2">Cover Image URL</label>
+                        <input type="url" name="cover_image_url" value="{{ establishment.cover_image_url if establishment else '' }}" placeholder="https://..."
+                            class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-emerald-300/80 mb-2">Logo URL</label>
+                        <input type="url" name="logo_url" value="{{ establishment.logo_url if establishment else '' }}" placeholder="https://..."
+                            class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operating Hours -->
+            <div class="space-y-5">
+                <h2 class="text-lg font-bold text-emerald-300 uppercase tracking-wider">Operating Hours</h2>
+                <div class="space-y-3">
+                    {% set days = [('mon', 'Monday'), ('tue', 'Tuesday'), ('wed', 'Wednesday'), ('thu', 'Thursday'), ('fri', 'Friday'), ('sat', 'Saturday'), ('sun', 'Sunday')] %}
+                    {% for day_key, day_name in days %}
+                    {% set hours = '' %}
+                    {% if establishment and establishment.operating_hours and day_key in establishment.operating_hours %}
+                        {% set hours = establishment.operating_hours[day_key] %}
+                    {% endif %}
+                    <div class="flex items-center gap-4">
+                        <span class="text-emerald-100/60 text-sm w-24 font-medium">{{ day_name }}</span>
+                        <input type="time" name="hours_{{ day_key }}_open" value="{{ hours.split('-')[0] if hours else '' }}"
+                            class="bg-emerald-900/30 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                        <span class="text-emerald-100/40">to</span>
+                        <input type="time" name="hours_{{ day_key }}_close" value="{{ hours.split('-')[1] if hours and '-' in hours else '' }}"
+                            class="bg-emerald-900/30 border border-white/10 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <button type="submit"
+                class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-6 rounded-xl transition-all duration-300 shadow-lg shadow-emerald-900/30 hover:shadow-emerald-500/20 hover:scale-[1.01] active:scale-[0.99]">
+                {{ 'Update Establishment' if establishment else 'Submit for Approval' }}
+            </button>
+        </form>
+    </div>
+</section>
+{% endblock %}

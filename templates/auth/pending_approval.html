@@ -43,7 +43,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="relative min-h-[calc(100vh-80px)] bg-pattern flex items-center justify-center overflow-hidden py-16 px-4">
+<div class="relative min-h-[calc(100vh-80px)] bg-heritage-dark bg-pattern flex items-center justify-center overflow-hidden py-16 px-4">
 
     <!-- Topographic Background Layer -->
     <div class="absolute inset-0 opacity-[0.07] topographic-overlay pointer-events-none" aria-hidden="true">
@@ -82,10 +82,10 @@
                 </h1>
                 
                 <div class="bg-emerald-900/30 border border-emerald-500/20 rounded-2xl p-6 mb-6 backdrop-blur-sm">
-                    <p class="text-emerald-100/80 font-body text-base md:text-lg leading-relaxed mb-4">
+                    <p class="text-contrast-muted font-body text-base md:text-lg leading-relaxed mb-4">
                         Thank you for registering as a Barangay Contributor. Your account is currently under review by our administrators.
                     </p>
-                    <p class="text-emerald-200/60 text-sm">
+                    <p class="text-contrast-dim text-sm">
                         To maintain the quality and authenticity of our cultural heritage platform, all contributor accounts require manual verification. This process typically takes <strong>24-48 hours</strong>.
                     </p>
                 </div>
@@ -98,7 +98,7 @@
                     </div>
                     <div>
                         <h3 class="text-emerald-100 font-bold mb-1">What happens next?</h3>
-                        <p class="text-emerald-100/60 text-xs leading-relaxed">
+                        <p class="text-contrast-dim text-xs leading-relaxed">
                             You will receive an email notification as soon as your account is approved. Once approved, you can log in and start adding attractions, events, and gallery items for your barangay.
                         </p>
                     </div>
@@ -113,7 +113,7 @@
                 </a>
                 
                 <a href="{{ url_for('auth.login') }}"
-                    class="inline-block py-2 px-4 rounded-xl border border-white/10 text-emerald-100/60 hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
+                    class="inline-block py-2 px-4 rounded-xl border border-white/10 text-contrast-muted hover:text-white hover:bg-white/5 transition-all text-sm font-medium">
                     Try Logging In Again
                 </a>
             </div>

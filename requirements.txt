@@ -1591,3 +1591,4 @@ yarl==1.22.0 \
     #   storage3
     #   supabase
     #   supabase-functions
+upstash-redis==1.0.0 

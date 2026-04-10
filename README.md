@@ -6,7 +6,8 @@ An interactive, web-based platform showcasing the cultural identity, community h
 This platform serves as a central digital resource for residents, students, and visitors to explore the rich cultural heritage and tourism spots of Mangatarem. It emphasizes interactive storytelling through maps and multimedia, promoting local pride and supporting educational use.
 
 ## ✨ Key Features
-- **Interactive Cultural Map**: Explore barangay-level highlights using an interactive Leaflet-based map with marker clustering.
+- **Interactive Cultural Map**: Explore barangay-level highlights using Mapbox GL JS with vector tile rendering for high-performance display.
+- **High-Concurrency Map Architecture**: Mapbox Vector Tiles (MVT) generated via PostGIS ST_AsMVT with Vercel Edge Caching and Redis caching layers.
 - **Cultural Heritage Registry**: Full implementation of standardized Heritage Forms 01-07 for deep historical archival.
 - **Tourism Information Portal**: Detailed profiles of local attractions, traditions, and eateries.
 - **Events & Festival Directory**: Stay updated with local festivities and community celebrations.
@@ -26,7 +27,7 @@ This platform serves as a central digital resource for residents, students, and 
 
 ### Frontend
 - **Styling**: [Tailwind CSS 4.0](https://tailwindcss.com/) (Vanilla CSS engine)
-- **Interactive Maps**: [Leaflet.js](https://leafletjs.com/)
+- **Interactive Maps**: [Mapbox GL JS](https://docs.mapbox.com/mapbox-gl-js) with Vector Tile (MVT) support
 - **Build Tools**: PostCSS and Terser for optimized production assets.
 
 ### Deployment

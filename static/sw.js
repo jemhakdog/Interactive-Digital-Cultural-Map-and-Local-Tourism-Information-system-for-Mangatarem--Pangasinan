@@ -4,8 +4,8 @@ const STATIC_ASSETS = [
     '/map',
     '/static/css/main.css',
     '/static/css/style.css',
-    '/static/css/map-custom.css',
-    '/static/js/mapbox-map.js',
+    '/static/css/pages/map.css',
+    '/static/js/pages/map.js',
     '/static/manifest.json'
 ];
 

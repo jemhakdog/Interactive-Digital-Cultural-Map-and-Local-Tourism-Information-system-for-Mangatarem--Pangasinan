@@ -35,9 +35,9 @@
     }
 
     .input-glass {
-        background: rgba(2, 44, 34, 0.4);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        color: white;
+        background: rgba(2, 44, 34, 0.8) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        color: white !important;
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 

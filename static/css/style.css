@@ -84,6 +84,7 @@ h6,
     border: none !important;
     box-shadow: none !important;
     padding: 0 !important;
+    z-index: 1000 !important;
 }
 
 /* Custom Scrollbar */
@@ -203,3 +204,156 @@ h6,
     break-inside: avoid;
     margin-bottom: 1.5rem;
 }
+
+/* --- Fallback Utilities for Missing Tailwind Classes --- */
+.bg-heritage-dark {
+    background-color: #022c22 !important; /* emerald-950 fallback */
+}
+
+.bg-heritage-gradient {
+    background: #022c22 !important;
+    background: linear-gradient(135deg, #022c22, #111827, #022c22) !important;
+}
+
+.text-contrast-muted {
+    color: rgba(209, 250, 229, 0.85) !important; /* emerald-100/85 */
+}
+
+.text-contrast-dim {
+    color: rgba(209, 250, 229, 0.7) !important; /* emerald-100/70 */
+}
+
+.border-white-10 {
+    border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+.glass-panel {
+    background: rgba(255, 255, 255, 0.03) !important;
+    backdrop-filter: blur(20px) !important;
+    -webkit-backdrop-filter: blur(20px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+.input-heritage {
+    background-color: rgba(2, 44, 34, 0.8) !important;
+    color: white !important;
+    border: 1px solid rgba(52, 211, 153, 0.2) !important;
+}
+
+.input-heritage::placeholder {
+    color: rgba(16, 185, 129, 0.5) !important;
+}
+
+.input-heritage option {
+    background-color: #022c22 !important;
+    color: white !important;
+}
+
+
+/* Force dark inputs on heritage backgrounds to fix white-on-white issues */
+.bg-heritage-gradient input, 
+.bg-heritage-gradient select,
+.bg-heritage-gradient textarea,
+.bg-heritage-dark input,
+.bg-heritage-dark select,
+.bg-heritage-dark textarea {
+    background-color: #022c22 !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.bg-heritage-gradient input::placeholder,
+.bg-heritage-dark input::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.bg-heritage-gradient option,
+.bg-heritage-dark option {
+    background-color: #022c22 !important;
+    color: white !important;
+}
+
+
+/* Force dark inputs inside glass panels */
+.glass-panel input, 
+.glass-panel select,
+.glass-panel textarea {
+    background-color: #022c22 !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.glass-panel input::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+.glass-panel option {
+    background-color: #022c22 !important;
+    color: white !important;
+}
+
+
+/* Additional robustness for all search/filter forms */
+form input[type='text'], 
+form input[type='email'], 
+form input[type='password'], 
+form select {
+    background-color: rgba(2, 44, 34, 0.85) !important;
+    color: white !important;
+    border: 1px solid rgba(16, 185, 129, 0.2) !important;
+}
+
+form input::placeholder {
+    color: rgba(255, 255, 255, 0.4) !important;
+}
+
+form select option {
+    background-color: #022c22 !important;
+    color: white !important;
+}
+
+
+/* Business Dashboard Specific Robustness */
+.bg-emerald-900\/20, 
+.bg-emerald-900\/30,
+.bg-emerald-800\/50 {
+    background-color: rgba(2, 44, 34, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Ensure headings and primary text in business portal stay white */
+.font-heading, h1, h2, h3, .text-white {
+    color: #ffffff !important;
+}
+
+/* Fallback for emerald text shades */
+.text-emerald-100\/70,
+.text-emerald-100\/60,
+.text-emerald-100\/50,
+.text-emerald-100\/40 {
+    color: rgba(209, 250, 229, 0.85) !important;
+}
+
+.text-emerald-400,
+.text-emerald-300 {
+    color: #34d399 !important;
+}
+
+
+/* Establishment Detail Page Overrides */
+.lg\:col-span-2 > div.bg-emerald-900\/20,
+.lg\:col-span-2 > div.bg-emerald-900\/30,
+.space-y-6 > div.bg-emerald-900\/20,
+.space-y-6 > div.bg-emerald-900\/30 {
+    background-color: rgba(2, 44, 34, 0.6) !important;
+    backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Fix for specifically illegible headings in detail subcards */
+.bg-emerald-900\/20 h2, 
+.bg-emerald-900\/20 h3,
+.bg-emerald-900\/20 .text-white {
+    color: #ffffff !important;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+

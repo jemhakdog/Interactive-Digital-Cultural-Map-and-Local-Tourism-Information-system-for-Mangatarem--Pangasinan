@@ -1,0 +1,190 @@
+{% extends "base.html" %}
+{% block title %}Business Dashboard — GoMangatarem{% endblock %}
+{% block content %}
+<section class="min-h-screen bg-heritage-gradient bg-gradient-to-br from-emerald-950 via-gray-900 to-emerald-950 pt-8 pb-16 px-4">
+    <div class="container mx-auto max-w-6xl">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-white font-heading tracking-tight">Business Dashboard</h1>
+                <p class="text-emerald-100/60 mt-1">Manage your establishment listing</p>
+            </div>
+            {% if not establishment %}
+            <a href="{{ url_for('business.create_establishment') }}"
+                class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg inline-flex items-center gap-2 hover:scale-[1.02]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Create Listing
+            </a>
+            {% endif %}
+        </div>
+
+        {% if establishment %}
+        <!-- Status Banner -->
+        {% if establishment.status == 'pending' %}
+        <div class="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 mb-8 flex items-center gap-3">
+            <svg class="w-6 h-6 text-amber-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            <p class="text-amber-200 text-sm">Your listing is <strong>pending approval</strong>. It will be visible to tourists once an admin approves it.</p>
+        </div>
+        {% elif establishment.status == 'rejected' %}
+        <div class="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 mb-8 flex items-center gap-3">
+            <svg class="w-6 h-6 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+            <p class="text-red-200 text-sm">Your listing was <strong>rejected</strong>. Please update your information and contact admin.</p>
+        </div>
+        {% endif %}
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+            <div class="bg-emerald-900/30 border border-white/10 rounded-2xl p-5 backdrop-blur-md">
+                <p class="text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">Status</p>
+                <p class="text-2xl font-bold text-white capitalize">{{ establishment.status }}</p>
+            </div>
+            <div class="bg-emerald-900/30 border border-white/10 rounded-2xl p-5 backdrop-blur-md">
+                <p class="text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">Rating</p>
+                <p class="text-2xl font-bold text-white">
+                    {% if establishment.rating_avg > 0 %}
+                    {{ "%.1f"|format(establishment.rating_avg) }} ⭐
+                    {% else %}
+                    No reviews
+                    {% endif %}
+                </p>
+            </div>
+            <div class="bg-emerald-900/30 border border-white/10 rounded-2xl p-5 backdrop-blur-md">
+                <p class="text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">
+                    {% if establishment.type == 'inn' %}Rooms{% else %}Menu Items{% endif %}
+                </p>
+                <p class="text-2xl font-bold text-white">
+                    {% if establishment.type == 'inn' %}{{ stats.room_count }}{% else %}{{ stats.menu_count }}{% endif %}
+                </p>
+            </div>
+            <div class="bg-emerald-900/30 border border-white/10 rounded-2xl p-5 backdrop-blur-md">
+                <p class="text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">Reviews</p>
+                <p class="text-2xl font-bold text-white">{{ stats.total_reviews }}</p>
+            </div>
+        </div>
+
+        <!-- Establishment Info Card -->
+        <div class="bg-emerald-900/20 border border-white/10 rounded-3xl overflow-hidden mb-8 backdrop-blur-md">
+            {% if establishment.cover_image_url %}
+            <div class="h-48 bg-cover bg-center" style="background-image: url('{{ establishment.cover_image_url }}')">
+                <div class="h-full bg-gradient-to-t from-emerald-950/80 to-transparent"></div>
+            </div>
+            {% endif %}
+            <div class="p-8">
+                <div class="flex items-start justify-between gap-4 flex-wrap">
+                    <div>
+                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">
+                            {% if establishment.type == 'inn' %}🏨 Inn / Lodge{% elif establishment.type == 'restaurant' %}🍽️ Restaurant{% elif establishment.type == 'cafe' %}☕ Café{% elif establishment.type == 'fastfood' %}🍔 Fast Food{% endif %}
+                        </span>
+                        <h2 class="text-2xl font-bold text-white mt-2 font-heading">{{ establishment.name }}</h2>
+                        {% if establishment.address %}
+                        <p class="text-emerald-100/50 text-sm mt-1">📍 {{ establishment.address }}</p>
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('business.edit_establishment') }}"
+                        class="bg-emerald-700/50 hover:bg-emerald-600 text-emerald-100 text-sm font-bold py-2 px-5 rounded-xl transition-all duration-300 inline-flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                        Edit Details
+                    </a>
+                </div>
+                {% if establishment.description %}
+                <p class="text-emerald-100/60 mt-4 leading-relaxed">{{ establishment.description[:200] }}{% if establishment.description|length > 200 %}...{% endif %}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {% if establishment.type == 'inn' %}
+            <a href="{{ url_for('business.manage_rooms') }}"
+                class="bg-emerald-900/30 border border-white/10 rounded-2xl p-6 hover:bg-emerald-800/30 transition-all group backdrop-blur-md">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-800/50 flex items-center justify-center group-hover:bg-emerald-700/50 transition-colors">
+                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-bold">Manage Rooms</h3>
+                        <p class="text-emerald-100/50 text-sm">{{ stats.room_count }} rooms listed</p>
+                    </div>
+                </div>
+            </a>
+            {% else %}
+            <a href="{{ url_for('business.manage_menu') }}"
+                class="bg-emerald-900/30 border border-white/10 rounded-2xl p-6 hover:bg-emerald-800/30 transition-all group backdrop-blur-md">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-800/50 flex items-center justify-center group-hover:bg-emerald-700/50 transition-colors">
+                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-bold">Manage Menu</h3>
+                        <p class="text-emerald-100/50 text-sm">{{ stats.menu_count }} items listed</p>
+                    </div>
+                </div>
+            </a>
+            {% endif %}
+
+            <a href="{{ url_for('business.view_reviews') }}"
+                class="bg-emerald-900/30 border border-white/10 rounded-2xl p-6 hover:bg-emerald-800/30 transition-all group backdrop-blur-md">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-800/50 flex items-center justify-center group-hover:bg-emerald-700/50 transition-colors">
+                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-bold">Reviews</h3>
+                        <p class="text-emerald-100/50 text-sm">{{ stats.total_reviews }} reviews</p>
+                    </div>
+                </div>
+            </a>
+
+            <a href="{{ url_for('business.edit_establishment') }}"
+                class="bg-emerald-900/30 border border-white/10 rounded-2xl p-6 hover:bg-emerald-800/30 transition-all group backdrop-blur-md">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-xl bg-emerald-800/50 flex items-center justify-center group-hover:bg-emerald-700/50 transition-colors">
+                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                    </div>
+                    <div>
+                        <h3 class="text-white font-bold">Settings</h3>
+                        <p class="text-emerald-100/50 text-sm">Edit details & hours</p>
+                    </div>
+                </div>
+            </a>
+        </div>
+
+        {% else %}
+        <!-- Empty State -->
+        <div class="text-center py-20">
+            <div class="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-emerald-800/30 border border-emerald-700/30 mb-6">
+                <svg class="w-12 h-12 text-emerald-500/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                </svg>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-3">No Establishment Yet</h2>
+            <p class="text-emerald-100/50 max-w-md mx-auto mb-8">Create your business listing to showcase your rooms, menu, and services to tourists visiting Mangatarem.</p>
+            <a href="{{ url_for('business.create_establishment') }}"
+                class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-8 rounded-xl transition-all duration-300 shadow-lg inline-flex items-center gap-2 hover:scale-[1.02]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                Create Your Listing
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

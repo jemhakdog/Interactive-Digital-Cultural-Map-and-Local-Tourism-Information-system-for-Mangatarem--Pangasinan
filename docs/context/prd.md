@@ -31,10 +31,11 @@
 
 #### **4.1 Interactive Cultural Map**
 
-* **Map Interface:** Base map rendered using **Leaflet.js** centered on Mangatarem.  
-* **Pins and Markers:** Color-coded icons for categories (Nature, Historical, Religious, Food).  
-* **Pop-up Cards:** Clicking a pin opens a card with the attraction name, description, and link to details.  
-* **Navigation:** Zoom/Pan controls; "Fly To" animation when selecting a spot from the sidebar.
+* **Map Interface:** Base map rendered using **Mapbox GL JS** with Vector Tiles (MVT) centered on Mangatarem.
+* **Pins and Markers:** Category-based styling with circle markers (Nature=Green, Historical=Amber, Religious=Purple, Food=Red).
+* **Pop-up Cards:** Clicking a marker opens a popup with attraction name and category; clicking flys to location with smooth animation.
+* **Navigation:** Zoom/Pan controls, 3D terrain view, 3D buildings at high zoom; "Fly To" animation when selecting a spot from the sidebar.
+* **Performance:** Sub-200ms tile loading via Vercel Edge Cache and Redis caching layers.
 
 #### **4.2 Cultural and Tourism Information Portal**
 
@@ -97,9 +98,10 @@ This section now reflects the actual implementation found in the repository.
   * **Templating:** **Jinja2** (Server-side rendering).  
   * **Styling:** **Tailwind CSS** (Utility-first CSS framework) \+ Custom CSS.  
   * **Interactivity:** **Vanilla JavaScript** (No heavy frontend frameworks like React/Vue required).  
-* **Mapping API:** **Leaflet.js** (Open-source)  
-  * *Tiles:* OpenStreetMap or CartoDB Voyager.  
-  * *Plugins:* Leaflet.markercluster for grouping pins.  
+* **Mapping API:** **Mapbox GL JS** with Vector Tiles
+  * *Tiles:* Mapbox Streets v12 (vector tiles).
+  * *Features:* 3D terrain, 3D buildings, smooth zoom/pan, category-based styling.
+  * *Performance:* MVT tiles generated via PostGIS ST_AsMVT with Vercel Edge Cache.
 * **Authentication:** **Flask-Login** for session management and user auth.  
 * **Hosting Environment:** Any Python-capable host (e.g., PythonAnywhere, Heroku, or a VPS with Gunicorn/Nginx).
 

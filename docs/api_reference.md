@@ -14,32 +14,159 @@ Administrative and contributor endpoints require authentication. Use the session
 Returns a list of all approved attractions with their basic information and coordinates.
 
 **Parameters:**
+- `page` (optional): Page number for pagination (default: 1).
+- `per_page` (optional): Items per page (default: 20, max: 100).
 - `category` (optional): Filter by attraction category (e.g., "Natural", "Religious").
 - `barangay` (optional): Filter by barangay name.
 
 **Response:**
 ```json
-[
-  {
-    "id": 1,
-    "name": "Manleluag Spring",
-    "latitude": 15.7894,
-    "longitude": 120.2831,
-    "category": "Natural",
-    "barangay": "Malabobo",
-    "image_url": "/static/uploads/spring.jpg"
+{
+  "attractions": [
+    {
+      "id": 1,
+      "name": "Manleluag Spring",
+      "latitude": 15.7894,
+      "longitude": 120.2831,
+      "category": "Natural",
+      "barangay": "Malabobo",
+      "image": "/static/uploads/spring.jpg",
+      "description": "Beautiful natural spring",
+      "rating": 4.5
+    }
+  ],
+  "pagination": {
+    "page": 1,
+    "per_page": 20,
+    "total": 50,
+    "pages": 3,
+    "has_next": true,
+    "has_prev": false
   }
-]
+}
 ```
 
-### 2. Search Events
-`GET /api/events`
+**Cache Headers:**
+- `Cache-Control: public, max-age=300` (5 minutes)
 
-Returns a list of upcoming community events.
+---
 
-**Parameters:**
-- `status` (optional): Defaults to "approved".
-- `type` (optional): Filter by event type.
+## Mapbox Vector Tiles (MVT) API
+
+High-performance vector tile endpoints for map rendering. Tiles are generated using PostGIS `ST_AsMVT` and cached via Vercel Edge Cache and Redis.
+
+### 6. Single Layer Tile
+`GET /api/tiles/<z>/<x>/<y>.pbf`
+
+Returns a Mapbox Vector Tile for the specified coordinates and layer.
+
+**URL Parameters:**
+- `z` (required): Zoom level (0-20).
+- `x` (required): Tile X coordinate.
+- `y` (required): Tile Y coordinate.
+
+**Query Parameters:**
+- `layer` (optional): Layer name (default: `attractions`).
+  - Available layers: `attractions`, `natural_heritage`, `built_heritage`, `events`
+
+**Response:**
+- Content-Type: `application/x-protobuf`
+- Binary MVT tile data
+
+**Cache Headers:**
+- `Cache-Control: public, s-maxage=3600, stale-while-revalidate=86400`
+- `X-Cache: HIT|MISS` (Redis cache status)
+- `ETag: "<md5-hash>"` (for conditional requests)
+
+**Example:**
+```bash
+GET /api/tiles/12/500/500.pbf?layer=attractions
+```
+
+**Frontend Usage (Mapbox GL JS):**
+```javascript
+map.addSource('mvt-tiles', {
+    type: 'vector',
+    tiles: ['/api/tiles/{z}/{x}/{y}.pbf?layer=attractions'],
+    minzoom: 0,
+    maxzoom: 20
+});
+```
+
+### 7. Combined Multi-Layer Tile
+`GET /api/tiles/combined/<z>/<x>/<y>.pbf`
+
+Returns a single MVT tile containing multiple named layers.
+
+**URL Parameters:**
+- `z` (required): Zoom level (0-20).
+- `x` (required): Tile X coordinate.
+- `y` (required): Tile Y coordinate.
+
+**Query Parameters:**
+- `layers` (optional): Comma-separated list of layer names.
+  - Default: all available layers
+  - Example: `layers=attractions,natural_heritage`
+
+**Response:**
+- Content-Type: `application/x-protobuf`
+- Binary MVT tile with multiple layers
+
+**Example:**
+```bash
+GET /api/tiles/combined/12/500/500.pbf?layers=attractions,built_heritage
+```
+
+### 8. List Available Layers
+`GET /api/tiles/layers`
+
+Returns metadata for all available tile layers.
+
+**Response:**
+```json
+{
+  "layers": [
+    {
+      "name": "attractions",
+      "table": "ATTRACTION",
+      "id_column": "id",
+      "name_column": "name",
+      "category_column": "category"
+    },
+    {
+      "name": "natural_heritage",
+      "table": "NATURAL_HERITAGE",
+      "id_column": "id",
+      "name_column": "name_of_asset",
+      "category_column": "asset_sub_type"
+    }
+  ]
+}
+```
+
+### 9. Invalidate Tile Cache
+`POST /api/tiles/cache/invalidate`
+
+Invalidates cached tiles for a specific layer. Called automatically when data is updated.
+
+**Request Body (JSON):**
+```json
+{
+  "layer": "attractions",
+  "z": 12,        // optional: specific zoom level
+  "x": 500,       // optional: specific tile X
+  "y": 500        // optional: specific tile Y
+}
+```
+
+**Response:**
+```json
+{
+  "status": "success",
+  "message": "Invalidated 125 cached tiles",
+  "layer": "attractions"
+}
+```
 
 ---
 

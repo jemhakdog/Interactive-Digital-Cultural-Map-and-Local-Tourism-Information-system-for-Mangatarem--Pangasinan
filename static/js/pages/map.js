@@ -1,6 +1,12 @@
 /**
  * Mapbox GL JS Map Implementation for GoMangatarem
- * Replaces Leaflet.js with Mapbox GL JS
+ * High-Performance MVT (Mapbox Vector Tile) Implementation
+ * 
+ * Architecture:
+ * - Consumes MVT tiles from /api/tiles/{z}/{x}/{y}.pbf endpoint
+ * - Multi-layer support for attractions, heritage, events
+ * - Client-side filtering and styling
+ * - Optimized for high-concurrency with Vercel Edge Cache
  */
 
 document.addEventListener('DOMContentLoaded', function () {
@@ -13,7 +19,7 @@ document.addEventListener('DOMContentLoaded', function () {
         container: 'map',
         style: 'mapbox://styles/mapbox/streets-v12',
         center: [120.2986, 15.7889], // Mangatarem coordinates [lng, lat]
-        zoom: 15.5,
+        zoom: 13.5,
         pitch: 65,      // Tilted view for 3D effect
         bearing: -15,   // Rotated view
         attributionControl: true,
@@ -39,39 +45,201 @@ document.addEventListener('DOMContentLoaded', function () {
         default: { color: '#6b7280', emoji: '📍' }      // Gray
     };
 
-    function createMarkerElement(category) {
-        const config = iconConfig[category] || iconConfig.default;
-        const el = document.createElement('div');
-        el.className = 'mapbox-marker';
-        el.innerHTML = `
-            <svg width="32" height="40" viewBox="0 0 32 40" xmlns="http://www.w3.org/2000/svg">
-                <path d="M16 0C7.163 0 0 7.163 0 16c0 12 16 24 16 24s16-12 16-24c0-8.837-7.163-16-16-16z" 
-                      fill="${config.color}" stroke="#fff" stroke-width="2"/>
-                <text x="16" y="20" text-anchor="middle" font-size="14" fill="#fff">${config.emoji}</text>
-            </svg>
-        `;
-        el.style.cursor = 'pointer';
-        return el;
-    }
-
     // ========================================
-    // 3. DATA & MARKER MANAGEMENT
+    // 3. MVT TILE SOURCE SETUP
     // ========================================
     let attractionsData = [];
-    let markers = [];
-    const markerMap = {};
-
-    // Filter state
     let currentCategory = 'all';
     let currentBarangay = 'all';
     let currentSearchTerm = '';
-
-    // Pagination state
+    
+    // Pagination state (for sidebar list, not map tiles)
     let currentPage = 1;
     let totalPages = 1;
     let isLoading = false;
     let hasMorePages = true;
     const loadingIndicator = document.getElementById('loading-indicator');
+
+    // Add MVT tile source when map loads
+    map.on('load', () => {
+        setupMVTSource();
+        setupMVTLayers();
+        init3DLayers();
+        fetchAttractions(1, true); // Fetch for sidebar list
+    });
+
+    // Re-add layers when style changes
+    map.on('style.load', () => {
+        // Remove layers first (they depend on the source)
+        if (map.getLayer('mvt-points')) {
+            map.removeLayer('mvt-points');
+        }
+        if (map.getLayer('mvt-labels')) {
+            map.removeLayer('mvt-labels');
+        }
+        
+        // Then remove source
+        if (map.getSource('mvt-tiles')) {
+            map.removeSource('mvt-tiles');
+        }
+        
+        // Re-add everything
+        setupMVTSource();
+        setupMVTLayers();
+        init3DLayers();
+    });
+
+    function setupMVTSource() {
+        // Add vector tile source
+        map.addSource('mvt-tiles', {
+            type: 'vector',
+            tiles: [
+                '/api/tiles/{z}/{x}/{y}.pbf?layer=attractions'
+            ],
+            minzoom: 0,
+            maxzoom: 20,
+            scheme: 'xyz',
+            promoteId: 'id' // Enable feature state for hover effects
+        });
+    }
+
+    function setupMVTLayers() {
+        // Get layer order from existing style
+        const layers = map.getStyle().layers;
+        const labelLayerId = layers?.find(
+            (layer) => layer.type === 'symbol' && layer.layout?.['text-field']
+        )?.id;
+
+        // Add circle layer for points (styled by category)
+        if (!map.getLayer('mvt-points')) {
+            map.addLayer({
+                id: 'mvt-points',
+                type: 'circle',
+                source: 'mvt-tiles',
+                'source-layer': 'layer',
+                minzoom: 10,
+                paint: {
+                    'circle-radius': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        10, 4,
+                        14, 8,
+                        16, 12
+                    ],
+                    'circle-color': [
+                        'match',
+                        ['get', 'category'],
+                        'Nature', '#10b981',
+                        'Historical', '#f59e0b',
+                        'Religious', '#8b5cf6',
+                        'Food', '#ef4444',
+                        '#6b7280' // default
+                    ],
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#ffffff',
+                    'circle-opacity': 0.9
+                }
+            }, labelLayerId);
+        }
+
+        // Add icon layer (using text as emoji placeholder)
+        if (!map.getLayer('mvt-labels')) {
+            map.addLayer({
+                id: 'mvt-labels',
+                type: 'symbol',
+                source: 'mvt-tiles',
+                'source-layer': 'layer',
+                minzoom: 14,
+                layout: {
+                    'text-field': ['get', 'name'],
+                    'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Regular'],
+                    'text-size': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        14, 10,
+                        16, 12
+                    ],
+                    'text-offset': [0, 1.2],
+                    'text-anchor': 'top',
+                    'text-allow-overlap': false,
+                    'text-ignore-placement': false
+                },
+                paint: {
+                    'text-color': '#333333',
+                    'text-halo-color': '#ffffff',
+                    'text-halo-width': 1.5
+                }
+            }, labelLayerId);
+        }
+
+        // Add hover effect using feature-state
+        map.on('mouseenter', 'mvt-points', () => {
+            map.getCanvas().style.cursor = 'pointer';
+        });
+
+        map.on('mouseleave', 'mvt-points', () => {
+            map.getCanvas().style.cursor = '';
+        });
+
+        // Click handler for points
+        map.on('click', 'mvt-points', (e) => {
+            const feature = e.features[0];
+            if (!feature) return;
+
+            const attraction = {
+                id: feature.properties.id,
+                name: feature.properties.name,
+                category: feature.properties.category,
+                barangay: feature.properties.barangay_id,
+                description: feature.properties.description || '',
+                image: feature.properties.image_url || '',
+                lat: e.lngLat.lat,
+                lng: e.lngLat.lng
+            };
+
+            // Fly to location
+            map.flyTo({
+                center: [feature.geometry.coordinates[0], feature.geometry.coordinates[1]],
+                zoom: 16,
+                duration: 1500
+            });
+
+            // Update card
+            setTimeout(() => {
+                updateCard(attraction);
+            }, 1600);
+        });
+
+        // Hover popup
+        let popup = null;
+        map.on('mousemove', 'mvt-points', (e) => {
+            const feature = e.features[0];
+            if (!feature) return;
+
+            if (popup) {
+                popup.remove();
+            }
+
+            popup = new mapboxgl.Popup({ offset: 10, closeButton: false })
+                .setLngLat(e.lngLat)
+                .setHTML(`
+                    <div class="text-sm">
+                        <strong class="text-green-800">${feature.properties.name}</strong>
+                        <div class="text-xs text-gray-600">${feature.properties.category}</div>
+                    </div>
+                `)
+                .addTo(map);
+        });
+
+        map.on('mouseleave', 'mvt-points', () => {
+            if (popup) {
+                popup.remove();
+                popup = null;
+            }
+        });
+    }
 
     // ========================================
     // 4. TAB SYSTEM
@@ -138,7 +306,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ========================================
-    // 6. FETCH & RENDER ATTRACTIONS
+    // 6. FETCH & RENDER ATTRACTIONS (for sidebar list)
     // ========================================
     async function fetchAttractions(page = 1, reset = false) {
         if (isLoading) return;
@@ -154,7 +322,6 @@ document.addEventListener('DOMContentLoaded', function () {
             hasMorePages = cachedData.pagination.has_next;
 
             renderAttractions(attractionsData);
-            addMarkers(attractionsData);
             isLoading = false;
             return;
         }
@@ -189,7 +356,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 hasMorePages = result.pagination.has_next;
 
                 renderAttractions(attractionsData);
-                addMarkers(attractionsData);
 
                 if (page === 1) {
                     setCachedData(cacheKey, result);
@@ -213,6 +379,9 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // ========================================
+    // 7. 3D LAYERS (Terrain, Buildings, Sky)
+    // ========================================
     function init3DLayers() {
         // 1. ADD 3D TERRAIN
         if (!map.getSource('mapbox-dem')) {
@@ -241,64 +410,47 @@ document.addEventListener('DOMContentLoaded', function () {
         // 3. ADD 3D BUILDINGS
         if (!map.getLayer('add-3d-buildings')) {
             const layers = map.getStyle().layers;
-            const labelLayerId = layers.find(
-                (layer) => layer.type === 'symbol' && layer.layout['text-field']
-            ).id;
+            const labelLayerId = layers?.find(
+                (layer) => layer.type === 'symbol' && layer.layout?.['text-field']
+            )?.id;
 
-            map.addLayer(
-                {
-                    'id': 'add-3d-buildings',
-                    'source': 'composite',
-                    'source-layer': 'building',
-                    'filter': ['==', 'extrude', 'true'],
-                    'type': 'fill-extrusion',
-                    'minzoom': 15,
-                    'paint': {
-                        'fill-extrusion-color': '#aaa',
-                        'fill-extrusion-height': [
-                            'interpolate',
-                            ['linear'],
-                            ['zoom'],
-                            15,
-                            0,
-                            15.05,
-                            ['get', 'height']
-                        ],
-                        'fill-extrusion-base': [
-                            'interpolate',
-                            ['linear'],
-                            ['zoom'],
-                            15,
-                            0,
-                            15.05,
-                            ['get', 'min_height']
-                        ],
-                        'fill-extrusion-opacity': 0.6
-                    }
-                },
-                labelLayerId
-            );
-        }
-
-        // 4. RESTORE ATTRACTIONS SOURCE & LAYERS (if they were wiped)
-        if (!map.getSource('attractions')) {
-            setupClusterSource();
-            if (attractionsData.length > 0) {
-                updateClusterSource(attractionsData);
+            if (labelLayerId) {
+                map.addLayer(
+                    {
+                        'id': 'add-3d-buildings',
+                        'source': 'composite',
+                        'source-layer': 'building',
+                        'filter': ['==', 'extrude', 'true'],
+                        'type': 'fill-extrusion',
+                        'minzoom': 15,
+                        'paint': {
+                            'fill-extrusion-color': '#aaa',
+                            'fill-extrusion-height': [
+                                'interpolate',
+                                ['linear'],
+                                ['zoom'],
+                                15,
+                                0,
+                                15.05,
+                                ['get', 'height']
+                            ],
+                            'fill-extrusion-base': [
+                                'interpolate',
+                                ['linear'],
+                                ['zoom'],
+                                15,
+                                0,
+                                15.05,
+                                ['get', 'min_height']
+                            ],
+                            'fill-extrusion-opacity': 0.6
+                        }
+                    },
+                    labelLayerId
+                );
             }
         }
     }
-
-    // Initial fetch
-    map.on('load', () => {
-        fetchAttractions(1, true);
-        init3DLayers();
-    });
-
-    // Re-add layers when style changes
-    map.on('style.load', () => {
-        init3DLayers();
-    });
 
     // Style Switcher Logic
     window.changeMapStyle = function(styleId) {
@@ -315,147 +467,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // ========================================
-    // 7. MARKER CLUSTERING WITH GEOJSON
-    // ========================================
-    function setupClusterSource() {
-        // Add empty source - will be populated when data loads
-        map.addSource('attractions', {
-            type: 'geojson',
-            data: {
-                type: 'FeatureCollection',
-                features: []
-            },
-            cluster: true,
-            clusterMaxZoom: 14,
-            clusterRadius: 50
-        });
-
-        // Cluster circles
-        map.addLayer({
-            id: 'clusters',
-            type: 'circle',
-            source: 'attractions',
-            filter: ['has', 'point_count'],
-            paint: {
-                'circle-color': [
-                    'step',
-                    ['get', 'point_count'],
-                    '#10b981',
-                    10, '#f59e0b',
-                    30, '#ef4444'
-                ],
-                'circle-radius': [
-                    'step',
-                    ['get', 'point_count'],
-                    20,
-                    10, 25,
-                    30, 30
-                ],
-                'circle-stroke-width': 2,
-                'circle-stroke-color': '#fff'
-            }
-        });
-
-        // Cluster count labels
-        map.addLayer({
-            id: 'cluster-count',
-            type: 'symbol',
-            source: 'attractions',
-            filter: ['has', 'point_count'],
-            layout: {
-                'text-field': ['get', 'point_count_abbreviated'],
-                'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-                'text-size': 12
-            },
-            paint: {
-                'text-color': '#ffffff'
-            }
-        });
-
-        // Click on cluster to zoom
-        map.on('click', 'clusters', (e) => {
-            const features = map.queryRenderedFeatures(e.point, { layers: ['clusters'] });
-            const clusterId = features[0].properties.cluster_id;
-            map.getSource('attractions').getClusterExpansionZoom(clusterId, (err, zoom) => {
-                if (err) return;
-                map.easeTo({
-                    center: features[0].geometry.coordinates,
-                    zoom: zoom
-                });
-            });
-        });
-
-        map.on('mouseenter', 'clusters', () => {
-            map.getCanvas().style.cursor = 'pointer';
-        });
-
-        map.on('mouseleave', 'clusters', () => {
-            map.getCanvas().style.cursor = '';
-        });
-    }
-
-    function updateClusterSource(attractions) {
-        const geojson = {
-            type: 'FeatureCollection',
-            features: attractions.map(a => ({
-                type: 'Feature',
-                geometry: {
-                    type: 'Point',
-                    coordinates: [a.lng, a.lat]
-                },
-                properties: {
-                    id: a.id,
-                    name: a.name,
-                    category: a.category,
-                    description: a.description,
-                    barangay: a.barangay,
-                    image: a.image
-                }
-            }))
-        };
-
-        const source = map.getSource('attractions');
-        if (source) {
-            source.setData(geojson);
-        }
-    }
-
-    // ========================================
-    // 8. INDIVIDUAL MARKERS (Alternative to clustering)
-    // ========================================
-    function addMarkers(attractions) {
-        // Clear existing markers
-        markers.forEach(m => m.remove());
-        markers = [];
-
-        // Update cluster source
-        updateClusterSource(attractions);
-
-        // Add individual markers for unclustered points
-        attractions.forEach(attraction => {
-            const el = createMarkerElement(attraction.category);
-
-            const marker = new mapboxgl.Marker(el)
-                .setLngLat([attraction.lng, attraction.lat])
-                .addTo(map);
-
-            // Click handler
-            el.addEventListener('click', () => {
-                updateCard(attraction);
-                map.flyTo({
-                    center: [attraction.lng, attraction.lat],
-                    zoom: 16,
-                    duration: 1500
-                });
-            });
-
-            markers.push(marker);
-            markerMap[attraction.id] = marker;
-        });
-    }
-
-    // ========================================
-    // 9. PLACE CARD MANAGEMENT
+    // 8. PLACE CARD MANAGEMENT
     // ========================================
     const placeCard = document.getElementById('place-card');
     const cardTitle = document.getElementById('card-title');
@@ -485,7 +497,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ========================================
-    // 10. FLYTO ANIMATION
+    // 9. FLYTO ANIMATION
     // ========================================
     function flyToLocation(id, lat, lng) {
         map.flyTo({
@@ -525,7 +537,7 @@ document.addEventListener('DOMContentLoaded', function () {
             card.className = 'group bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer overflow-hidden flex flex-row h-32';
             card.innerHTML = `
                 <div class="w-1/3 h-full bg-gray-200 relative">
-                    <img src="${attraction.image}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="${attraction.name}">
+                    <img src="${attraction.image}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="${attraction.name}" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
                     <div class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold" style="color: ${categoryConfig.color}">${categoryLabel}</div>
                 </div>
                 <div class="w-2/3 p-3 flex flex-col justify-between">
@@ -546,7 +558,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ========================================
-    // 11. FILTERING & SEARCH
+    // 10. FILTERING & SEARCH
     // ========================================
     const searchInput = document.getElementById('search-input');
     const filterBtns = document.querySelectorAll('.filter-btn');
@@ -600,7 +612,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ========================================
-    // 12. INFINITE SCROLL
+    // 11. INFINITE SCROLL
     // ========================================
     const contentArea = document.getElementById('content-area');
     let scrollTimeout;
@@ -617,7 +629,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ========================================
-    // 13. GEOLOCATION "NEAR ME"
+    // 12. GEOLOCATION "NEAR ME"
     // ========================================
     const locateBtn = document.getElementById('locate-me');
     let userLocationMarker = null;
@@ -679,7 +691,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ========================================
-    // 14. ROUTES TOGGLE
+    // 13. ROUTES TOGGLE
     // ========================================
     const routesToggle = document.getElementById('routes-toggle');
     if (routesToggle) {
@@ -687,7 +699,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ========================================
-    // 15. MOBILE BOTTOM SHEET
+    // 14. MOBILE BOTTOM SHEET
     // ========================================
     const sidebar = document.getElementById('attractions-sidebar');
     const dragHandle = document.getElementById('drag-handle');
@@ -763,7 +775,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ========================================
-    // 16. SUGGESTED ROUTES (POLYLINES)
+    // 15. SUGGESTED ROUTES (POLYLINES)
     // ========================================
     const routeData = {
         nature: [
@@ -855,7 +867,7 @@ document.addEventListener('DOMContentLoaded', function () {
     };
 
     // ========================================
-    // 17. OFFLINE MAP DOWNLOAD LOGIC
+    // 16. OFFLINE MAP DOWNLOAD LOGIC
     // ========================================
     const offlineDownloadBtn = document.getElementById('offline-download-btn');
     const downloadCard = document.getElementById('download-card');
@@ -904,7 +916,7 @@ document.addEventListener('DOMContentLoaded', function () {
         offlineDownloadBtn.addEventListener('click', () => {
             downloadCard.classList.remove('hidden');
             downloadStatus.textContent = 'Calculating tiles...';
-            
+
             const tileUrls = calculateTileUrls(MANGATAREM_BBOX, 13, 16);
             const totalTiles = tileUrls.length;
             let downloadedCount = 0;
@@ -924,7 +936,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         const percent = Math.round((downloadedCount / totalTiles) * 100);
                         downloadProgressBar.style.width = `${percent}%`;
                         downloadPercentage.textContent = `${percent}%`;
-                        
+
                         if (downloadedCount >= totalTiles) {
                             downloadStatus.textContent = 'Download Complete!';
                             navigator.serviceWorker.removeEventListener('message', progressHandler);
@@ -949,4 +961,3 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
 });
-

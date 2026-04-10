@@ -91,6 +91,8 @@
                     {% include 'includes/admin_nav.html' %}
                     {% elif current_user.role == 'contributor' %}
                     {% include 'includes/barangay_nav.html' %}
+                    {% elif current_user.role == 'business_owner' %}
+                    {% include 'includes/business_nav.html' %}
                     {% else %}
                     {% include 'includes/user_nav.html' %}
                     {% endif %}
@@ -130,6 +132,8 @@
                 {% include 'includes/admin_nav.html' %}
                 {% elif current_user.role == 'contributor' %}
                 {% include 'includes/barangay_nav.html' %}
+                {% elif current_user.role == 'business_owner' %}
+                {% include 'includes/business_nav.html' %}
                 {% else %}
                 {% include 'includes/user_nav.html' %}
                 {% endif %}

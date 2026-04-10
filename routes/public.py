@@ -1,4 +1,4 @@
-from models import db, User, Attraction, Event, GalleryItem, BarangayInfo, AnalyticsPageView, NewsletterSubscriber
+from models import db, User, Attraction, Event, GalleryItem, BarangayInfo, AnalyticsPageView, NewsletterSubscriber, Establishment, EstablishmentRoom, EstablishmentMenuItem, EstablishmentReview
 from flask_login import current_user
 from extensions import limiter
 from datetime import datetime
@@ -155,12 +155,36 @@ def attraction_detail(id):
     )
     logger.info(f"Showing attraction '{attraction.name}' (ID: {id})")
 
+    # Fetch nearby establishments (within ~5km radius)
+    nearby_stay = []
+    nearby_eat = []
+    if attraction.latitude and attraction.longitude:
+        from utils.geo import haversine_distance
+        all_establishments = Establishment.query.filter_by(status="approved").all()
+        for est in all_establishments:
+            dist = haversine_distance(
+                attraction.latitude, attraction.longitude,
+                est.latitude, est.longitude
+            )
+            if dist <= 5.0:  # 5km radius
+                est._distance = round(dist, 1)
+                if est.type == "inn":
+                    nearby_stay.append(est)
+                else:
+                    nearby_eat.append(est)
+        nearby_stay.sort(key=lambda x: x._distance)
+        nearby_eat.sort(key=lambda x: x._distance)
+        nearby_stay = nearby_stay[:3]
+        nearby_eat = nearby_eat[:3]
+
     log_render("public", "attraction_detail", "detail.html")
     return render_template(
         "pagez/detail.html",
         attraction=attraction,
         nearby=nearby,
         related_gallery=related_gallery,
+        nearby_stay=nearby_stay,
+        nearby_eat=nearby_eat,
     )
 
 
@@ -857,3 +881,97 @@ Sitemap: {sitemap_url}
     response = make_response(robots_txt)
     response.headers["Content-Type"] = "text/plain"
     return response
+
+
+# === Establishment Routes ===
+
+@public_bp.route("/establishments")
+def establishments():
+    """Public establishment directory with filters."""
+    log_entry("public", "establishments", method=request.method)
+    logger.info("Establishments directory accessed")
+
+    query = Establishment.query.filter_by(status="approved")
+
+    # Filters
+    type_filter = request.args.get("type")
+    if type_filter:
+        query = query.filter_by(type=type_filter)
+
+    price_filter = request.args.get("price_range")
+    if price_filter:
+        query = query.filter_by(price_range=price_filter)
+
+    barangay_filter = request.args.get("barangay")
+    if barangay_filter:
+        query = query.join(BarangayInfo).filter(BarangayInfo.name == barangay_filter)
+
+    search = request.args.get("q")
+    if search:
+        query = query.filter(Establishment.name.ilike(f"%{search}%"))
+
+    establishments_list = query.order_by(Establishment.is_featured.desc(), Establishment.rating_avg.desc()).all()
+    barangays = BarangayInfo.query.order_by(BarangayInfo.name).all()
+
+    return render_template(
+        "pagez/establishments.html",
+        establishments=establishments_list,
+        barangays=barangays,
+    )
+
+
+@public_bp.route("/establishment/<int:id>")
+def establishment_detail(id):
+    """Public establishment detail page."""
+    establishment = Establishment.query.get_or_404(id)
+
+    if establishment.status != "approved":
+        flash("This establishment is not yet published.", "warning")
+        return redirect(url_for("public.establishments"))
+
+    rooms = []
+    menu_items = []
+
+    if establishment.type == "inn":
+        rooms = EstablishmentRoom.query.filter_by(
+            establishment_id=establishment.id, is_available=True
+        ).all()
+    else:
+        menu_items = EstablishmentMenuItem.query.filter_by(
+            establishment_id=establishment.id, is_available=True
+        ).order_by(EstablishmentMenuItem.category, EstablishmentMenuItem.name).all()
+
+    reviews = EstablishmentReview.query.filter_by(
+        establishment_id=establishment.id, status="approved"
+    ).order_by(EstablishmentReview.created_at.desc()).all()
+
+    return render_template(
+        "pagez/establishment_detail.html",
+        establishment=establishment,
+        rooms=rooms,
+        menu_items=menu_items,
+        reviews=reviews,
+    )
+
+
+@public_bp.route("/establishment/<int:id>/review", methods=["POST"])
+def submit_establishment_review(id):
+    """Submit a review for an establishment."""
+    if not current_user.is_authenticated:
+        flash("Please login to leave a review.", "warning")
+        return redirect(url_for("auth.login"))
+
+    establishment = Establishment.query.get_or_404(id)
+
+    review = EstablishmentReview(
+        user_id=current_user.id,
+        establishment_id=establishment.id,
+        rating=int(request.form.get("rating", 5)),
+        comment=request.form.get("comment"),
+        status="pending",
+    )
+    db.session.add(review)
+    db.session.commit()
+
+    flash("Your review has been submitted and is pending approval.", "success")
+    return redirect(url_for("public.establishment_detail", id=id))

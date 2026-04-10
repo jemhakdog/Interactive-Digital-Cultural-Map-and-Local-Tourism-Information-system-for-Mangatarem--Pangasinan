@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}Manage Establishments — Admin{% endblock %}
+{% block content %}
+<section class="min-h-screen bg-gradient-to-br from-emerald-950 via-gray-900 to-emerald-950 pt-8 pb-16 px-4">
+    <div class="container mx-auto max-w-6xl">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-white font-heading tracking-tight">Establishments</h1>
+                <p class="text-emerald-100/60 mt-1">
+                    {% if pending_count > 0 %}
+                    <span class="text-amber-400 font-bold">{{ pending_count }}</span> pending approval
+                    {% else %}
+                    All caught up ✓
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Status Tabs -->
+        <div class="flex gap-3 mb-8">
+            {% set statuses = [('all', 'All'), ('pending', '⏳ Pending'), ('approved', '✅ Approved'), ('rejected', '❌ Rejected')] %}
+            {% for val, label in statuses %}
+            <a href="{{ url_for('admin.manage_establishments', status=val) }}"
+                class="px-5 py-2 rounded-full text-sm font-bold transition-all {{ 'bg-emerald-600 text-white' if current_status == val else 'bg-emerald-900/30 text-emerald-300 border border-white/10 hover:bg-emerald-800/30' }}">
+                {{ label }}
+            </a>
+            {% endfor %}
+        </div>
+
+        {% if establishments %}
+        <div class="space-y-4">
+            {% for est in establishments %}
+            <div class="bg-emerald-900/20 border border-white/10 rounded-2xl p-6 backdrop-blur-md">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex items-center gap-4">
+                        {% if est.cover_image_url %}
+                        <img src="{{ est.cover_image_url }}" alt="{{ est.name }}" class="w-16 h-16 rounded-xl object-cover flex-shrink-0">
+                        {% else %}
+                        <div class="w-16 h-16 rounded-xl bg-emerald-800/30 flex items-center justify-center flex-shrink-0">
+                            {% if est.type == 'inn' %}🏨{% elif est.type == 'restaurant' %}🍽️{% elif est.type == 'cafe' %}☕{% elif est.type == 'fastfood' %}🍔{% endif %}
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h3 class="text-white font-bold text-lg">{{ est.name }}</h3>
+                            <div class="flex items-center gap-3 text-sm text-emerald-100/50">
+                                <span>{% if est.type == 'inn' %}Inn{% elif est.type == 'restaurant' %}Restaurant{% elif est.type == 'cafe' %}Café{% elif est.type == 'fastfood' %}Fast Food{% endif %}</span>
+                                {% if est.barangay %}
+                                <span>📍 {{ est.barangay.name }}</span>
+                                {% endif %}
+                                <span>👤 {{ est.owner.username }}</span>
+                                <span>📅 {{ est.created_at.strftime('%b %d, %Y') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3 flex-shrink-0">
+                        <span class="text-xs font-bold px-3 py-1.5 rounded-full
+                            {{ 'bg-amber-500/20 text-amber-300' if est.status == 'pending' else
+                               'bg-emerald-500/20 text-emerald-300' if est.status == 'approved' else
+                               'bg-red-500/20 text-red-300' }}">
+                            {{ est.status|title }}
+                        </span>
+                        {% if est.status == 'pending' %}
+                        <form method="POST" action="{{ url_for('admin.approve_establishment', id=est.id) }}" class="inline">
+                            <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold py-2 px-4 rounded-xl transition-all">Approve</button>
+                        </form>
+                        <form method="POST" action="{{ url_for('admin.reject_establishment', id=est.id) }}" class="inline">
+                            <button type="submit" class="bg-red-600/80 hover:bg-red-500 text-white text-sm font-bold py-2 px-4 rounded-xl transition-all">Reject</button>
+                        </form>
+                        {% endif %}
+                        <form method="POST" action="{{ url_for('admin.delete_establishment', id=est.id) }}" class="inline" onsubmit="return confirm('Delete this establishment?')">
+                            <button type="submit" class="text-red-400 hover:text-red-300 text-sm font-medium transition-colors">🗑️</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12 text-emerald-100/40">
+            <p>No establishments to show for this filter.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

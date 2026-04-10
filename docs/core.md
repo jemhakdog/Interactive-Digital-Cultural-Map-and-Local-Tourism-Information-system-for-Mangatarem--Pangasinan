@@ -18,7 +18,7 @@ The **Interactive Digital Cultural Map and Local Tourism Information System for 
   - **Development**: SQLite (`instance/app.db`)
   - **Production**: Supabase PostgreSQL (Managed)
 - **Frontend**: Jinja2 / Tailwind CSS 4.0 / Vanilla JS
-- **Mapping**: Leaflet.js
+- **Mapping**: Mapbox GL JS with Vector Tiles (MVT)
 - **Deployment**: Vercel (Edge Optimized)
 
 ---
@@ -51,7 +51,7 @@ The system utilizes 19+ core database models:
 ## Key Features
 
 ### Interactive GIS Cultural Map
-A real-time mapping interface built on Leaflet.js that identifies attractions, heritage sites, and events with marker clustering and custom barangay boundaries.
+A high-performance mapping interface using Mapbox GL JS and Vector Tiles (MVT) that displays attractions, heritage sites, and events with 3D buildings, terrain, and smooth interactions.
 
 ### Cultural Heritage Registry (Forms 01-07)
 A first-of-its-kind digital implementation of the standardized heritage forms, allowing for complex data entry and structured archival of local history.

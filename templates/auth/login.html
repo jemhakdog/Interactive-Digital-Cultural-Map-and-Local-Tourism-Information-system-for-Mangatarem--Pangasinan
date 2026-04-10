@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block content %}
-<div class="relative min-h-[calc(100vh-80px)] bg-pattern flex items-center justify-center overflow-hidden py-16 px-4">
+<div class="relative min-h-[calc(100vh-80px)] bg-heritage-dark bg-pattern flex items-center justify-center overflow-hidden py-16 px-4">
 
     <!-- Topographic Background Layer -->
     <div class="absolute inset-0 opacity-[0.07] topographic-overlay pointer-events-none" aria-hidden="true">
@@ -40,7 +40,7 @@
                 <h1 class="font-heading text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight">
                     Welcome <span class="text-emerald-400">Back</span>
                 </h1>
-                <p class="text-emerald-100/60 font-body text-lg">Enter your credentials to access the heritage
+                <p class="text-contrast-muted font-body text-lg">Enter your credentials to access the heritage
                     sanctuary.</p>
             </div>
 
@@ -81,7 +81,7 @@
                             </svg>
                         </div>
                         <input id="password" name="password" type="password" required
-                            class="input-glass block w-full pl-11 pr-4 py-4 rounded-2xl text-base focus:outline-none"
+                            class="input-glass input-heritage block w-full pl-11 pr-4 py-4 rounded-2xl text-base focus:outline-none"
                             placeholder="••••••••">
                     </div>
                 </div>
@@ -128,7 +128,7 @@
 
                 <!-- Bottom Links -->
                 <div class="pt-6 text-center">
-                    <p class="text-sm text-emerald-100/40">
+                    <p class="text-sm text-contrast-dim">
                         Not an explorer yet?
                         <a href="{{ url_for('auth.register') }}"
                             class="text-emerald-400 font-bold hover:text-emerald-300 transition-colors">Join the

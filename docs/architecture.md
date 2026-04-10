@@ -17,8 +17,19 @@ This document describes the technical architecture of the Interactive Digital Cu
 ### Frontend
 - **Templating**: Jinja2
 - **Styling**: Vanilla CSS with Tailwind CSS (v4.0)
-- **Interactive Maps**: Leaflet.js
+- **Interactive Maps**: Mapbox GL JS with Mapbox Vector Tiles (MVT)
 - **Assets Build**: PostCSS and Terser
+
+## High-Concurrency Map Architecture
+
+The map system uses a high-performance architecture optimized for Vercel's serverless free tier:
+
+- **Vector Tile Generation**: PostGIS `ST_AsMVT` functions generate Mapbox Vector Tiles (.pbf) directly in the database.
+- **Tile Endpoint**: Flask route `/tiles/<z>/<x>/<y>.pbf` serves binary MVT data with `application/x-protobuf` content type.
+- **Caching Layers**:
+  - **Primary**: Vercel Edge Cache with `Cache-Control: public, s-maxage=3600` headers.
+  - **Secondary**: Upstash Redis for dynamic hot-data caching (< 50ms response time).
+- **Frontend**: Mapbox GL JS consumes vector tiles instead of GeoJSON, enabling instant map loads and smooth interactions.
 
 ## Application Structure
 
@@ -108,7 +119,7 @@ Handles Vercel's reverse proxy headers to ensure correct IP and protocol detecti
 ## Integration Details
 
 - **Supabase**: Production PostgreSQL database via connection pooling (port 6543).
-- **Leaflet.js**: Interactive maps with marker clustering and barangay boundaries.
+- **Mapbox GL JS**: Interactive maps with vector tile rendering and 3D buildings.
 - **Vercel**: Serverless deployment with edge caching and optimized performance.
 - **Flask-Login**: Session-based authentication (30-day "Remember Me").
 - **Flask-Limiter**: Rate limiting (20 requests/minute API default).

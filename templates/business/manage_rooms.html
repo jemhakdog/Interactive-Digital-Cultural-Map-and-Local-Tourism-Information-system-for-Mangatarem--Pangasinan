@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Manage Rooms — {{ establishment.name }}{% endblock %}
+{% block content %}
+<section class="min-h-screen bg-heritage-gradient bg-gradient-to-br from-emerald-950 via-gray-900 to-emerald-950 pt-8 pb-16 px-4">
+    <div class="container mx-auto max-w-5xl">
+        <div class="mb-8">
+            <a href="{{ url_for('business.dashboard') }}" class="text-emerald-400 hover:text-emerald-300 text-sm font-medium inline-flex items-center gap-1 mb-4">← Back to Dashboard</a>
+            <h1 class="text-3xl font-bold text-white font-heading tracking-tight">Manage Rooms</h1>
+            <p class="text-emerald-100/60 mt-1">{{ establishment.name }} — {{ rooms|length }} rooms listed</p>
+        </div>
+
+        <!-- Add Room Form -->
+        <div class="bg-emerald-900/20 border border-white/10 rounded-3xl p-8 backdrop-blur-md mb-8">
+            <h2 class="text-lg font-bold text-emerald-300 mb-5">Add New Room</h2>
+            <form method="POST" action="{{ url_for('business.add_room') }}" class="space-y-5">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    <div>
+                        <label class="block text-sm font-bold text-emerald-300/80 mb-2">Room Name *</label>
+                        <input type="text" name="name" required placeholder="e.g., Deluxe Twin Room"
+                            class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-emerald-300/80 mb-2">Price per Night (₱)</label>
+                        <input type="number" step="0.01" name="price_per_night" placeholder="500.00"
+                            class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-bold text-emerald-300/80 mb-2">Capacity (guests)</label>
+                        <input type="number" name="capacity" value="2" min="1"
+                            class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-emerald-300/80 mb-2">Description</label>
+                    <textarea name="description" rows="2" placeholder="Brief description of the room..."
+                        class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-emerald-300/80 mb-2">Image URLs (comma-separated)</label>
+                    <input type="text" name="image_urls" placeholder="https://img1.jpg, https://img2.jpg"
+                        class="w-full bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-emerald-500/40 focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                </div>
+                <div>
+                    <label class="block text-sm font-bold text-emerald-300/80 mb-3">Room Amenities</label>
+                    <div class="flex flex-wrap gap-3">
+                        {% for amenity in ['wifi', 'aircon', 'tv', 'hot_water', 'mini_bar', 'balcony', 'bathroom'] %}
+                        <label class="flex items-center gap-2 text-emerald-100/70 text-sm cursor-pointer bg-emerald-900/20 border border-white/5 rounded-lg px-3 py-2 hover:bg-emerald-800/30 transition-all">
+                            <input type="checkbox" name="room_amenities" value="{{ amenity }}" class="rounded border-emerald-600 text-emerald-500">
+                            {{ amenity|replace('_', ' ')|title }}
+                        </label>
+                        {% endfor %}
+                    </div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <label class="flex items-center gap-2 text-emerald-100/70 text-sm cursor-pointer">
+                        <input type="checkbox" name="is_available" checked class="rounded border-emerald-600 text-emerald-500">
+                        Available for booking
+                    </label>
+                </div>
+                <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg">
+                    Add Room
+                </button>
+            </form>
+        </div>
+
+        <!-- Room List -->
+        {% if rooms %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {% for room in rooms %}
+            <div class="bg-emerald-900/20 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-md group">
+                {% if room.image_urls and room.image_urls|length > 0 %}
+                <div class="h-40 bg-cover bg-center" style="background-image: url('{{ room.image_urls[0] }}')">
+                    <div class="h-full bg-gradient-to-t from-emerald-950/60 to-transparent"></div>
+                </div>
+                {% endif %}
+                <div class="p-6">
+                    <div class="flex items-start justify-between mb-3">
+                        <div>
+                            <h3 class="text-lg font-bold text-white">{{ room.name }}</h3>
+                            <div class="flex items-center gap-3 mt-1">
+                                {% if room.price_per_night %}
+                                <span class="text-emerald-400 font-bold">₱{{ "%.0f"|format(room.price_per_night) }}/night</span>
+                                {% endif %}
+                                <span class="text-emerald-100/40 text-sm">👤 {{ room.capacity }} guests</span>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ 'bg-emerald-500/20 text-emerald-300' if room.is_available else 'bg-red-500/20 text-red-300' }}">
+                            {{ 'Available' if room.is_available else 'Unavailable' }}
+                        </span>
+                    </div>
+                    {% if room.description %}
+                    <p class="text-emerald-100/50 text-sm mb-3">{{ room.description }}</p>
+                    {% endif %}
+                    {% if room.amenities %}
+                    <div class="flex flex-wrap gap-1 mb-4">
+                        {% for a in room.amenities %}
+                        <span class="text-xs bg-emerald-800/30 text-emerald-300/70 px-2 py-1 rounded-md">{{ a|replace('_', ' ')|title }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    <div class="flex items-center gap-2">
+                        <form method="POST" action="{{ url_for('business.delete_room', room_id=room.id) }}" class="inline" onsubmit="return confirm('Delete this room?')">
+                            <button type="submit" class="text-red-400 hover:text-red-300 text-sm font-medium transition-colors">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-12 text-emerald-100/40">
+            <p>No rooms added yet. Add your first room above!</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
