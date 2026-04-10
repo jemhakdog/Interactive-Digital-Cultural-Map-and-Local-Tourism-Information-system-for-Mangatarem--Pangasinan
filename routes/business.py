@@ -391,3 +391,38 @@ def view_reviews():
         establishment=establishment,
         reviews=reviews,
     )
+
+@business_bp.route("/browse")
+@login_required
+@business_owner_required
+def browse_peers():
+    """Browse other approved establishments of the same type."""
+    establishment = _get_owner_establishment()
+    if not establishment:
+        flash("Please create your establishment profile first to browse peers.", "info")
+        return redirect(url_for("business.create_establishment"))
+
+    # Mapping for friendly labels
+    type_labels = {
+        "inn": "Inns & Lodges",
+        "restaurant": "Restaurants",
+        "cafe": "Cafés",
+        "fastfood": "Fast Food Establishments"
+    }
+    type_label = type_labels.get(establishment.type, establishment.type.title() + "s")
+
+    # Get approved establishments of the same type, excluding own
+    peers = Establishment.query.filter_by(
+        type=establishment.type,
+        status="approved"
+    ).filter(Establishment.id != (establishment.id if establishment else 0)).order_by(
+        Establishment.is_featured.desc(), 
+        Establishment.rating_avg.desc()
+    ).all()
+
+    return render_template(
+        "business/browse_peers.html",
+        establishment=establishment,
+        peers=peers,
+        type_label=type_label
+    )

@@ -204,33 +204,34 @@ def _seed_database(app):
     from models import Attraction, User, BarangayInfo
     import json
     
-    if Attraction.query.first() is not None:
-        return
+    # We no longer early-return if Attractions exist. 
+    # Instead, each seeding block checks its own table.
 
-    data_path = os.path.join(app.root_path, "data", "attractions.json")
-    if os.path.exists(data_path):
-        with open(data_path, "r") as f:
-            data = json.load(f)
-            for item in data:
-                # Handle barangay relationship
-                barangay_name = item.get("barangay")
-                brgy = None
-                if barangay_name:
-                    brgy = BarangayInfo.query.filter_by(name=barangay_name).first()
-                    if not brgy:
-                        brgy = BarangayInfo(name=barangay_name)
-                        db.session.add(brgy)
-                        db.session.flush()
+    if Attraction.query.first() is None:
+        data_path = os.path.join(app.root_path, "data", "attractions.json")
+        if os.path.exists(data_path):
+            with open(data_path, "r") as f:
+                data = json.load(f)
+                for item in data:
+                    # Handle barangay relationship
+                    barangay_name = item.get("barangay")
+                    brgy = None
+                    if barangay_name:
+                        brgy = BarangayInfo.query.filter_by(name=barangay_name).first()
+                        if not brgy:
+                            brgy = BarangayInfo(name=barangay_name)
+                            db.session.add(brgy)
+                            db.session.flush()
 
-                db.session.add(Attraction(
-                    name=item["name"], category=item["category"],
-                    barangay=brgy, description=item["description"],
-                    latitude=item["lat"], longitude=item["lng"], 
-                    image_url=item["image"],
-                    status="approved"
-                ))
-        db.session.commit()
-        logger.info("Database seeded with sample attractions.")
+                    db.session.add(Attraction(
+                        name=item["name"], category=item["category"],
+                        barangay=brgy, description=item["description"],
+                        latitude=item["lat"], longitude=item["lng"], 
+                        image_url=item["image"],
+                        status="approved"
+                    ))
+            db.session.commit()
+            logger.info("Database seeded with sample attractions.")
 
     # Create default admin
     if not User.query.filter_by(username="admin").first():
@@ -243,26 +244,41 @@ def _seed_database(app):
     # Seed establishments
     from models import Establishment, EstablishmentRoom, EstablishmentMenuItem
     if Establishment.query.first() is None:
-        # Create a demo business owner
-        biz_user = User.query.filter_by(username="business_demo").first()
-        if not biz_user:
-            biz_user = User(
-                username="business_demo",
-                email="business@example.com",
+        # Create specialized demo owners
+        dining_owner = User.query.filter_by(username="dining_owner").first()
+        if not dining_owner:
+            dining_owner = User(
+                username="dining_owner",
+                email="dining@example.com",
                 role="business_owner",
                 is_approved=True,
             )
-            biz_user.set_password("business123")
-            db.session.add(biz_user)
-            db.session.flush()
+            dining_owner.set_password("dining123")
+            db.session.add(dining_owner)
+
+        hospitality_owner = User.query.filter_by(username="hospitality_owner").first()
+        if not hospitality_owner:
+            hospitality_owner = User(
+                username="hospitality_owner",
+                email="hospitality@example.com",
+                role="business_owner",
+                is_approved=True,
+            )
+            hospitality_owner.set_password("hospitality123")
+            db.session.add(hospitality_owner)
+        
+        db.session.flush()
 
         est_path = os.path.join(app.root_path, "data", "establishments.json")
         if os.path.exists(est_path):
             with open(est_path, "r", encoding="utf-8") as f:
                 est_data = json.load(f)
             for item in est_data:
+                # Assign to correct specialized owner
+                current_owner_id = hospitality_owner.id if item["type"] == "inn" else dining_owner.id
+                
                 est = Establishment(
-                    owner_id=biz_user.id,
+                    owner_id=current_owner_id,
                     name=item["name"],
                     type=item["type"],
                     description=item.get("description", ""),
@@ -299,7 +315,7 @@ def _seed_database(app):
                     ))
 
             db.session.commit()
-            logger.info("Database seeded with sample establishments.")
+            logger.info("Database seeded with specialized owner establishments.")
 
 
 # Entry point for Vercel and local running

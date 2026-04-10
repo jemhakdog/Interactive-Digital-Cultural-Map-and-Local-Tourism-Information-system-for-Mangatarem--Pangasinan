@@ -81,6 +81,27 @@
             </a>
         </div>
 
+        <!-- Smart Filter Notice for Business Owners -->
+        {% if is_auto_filtered %}
+        <div class="bg-emerald-500/10 border border-emerald-500/20 rounded-2xl p-4 mb-6 flex items-center justify-between backdrop-blur-sm">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-400">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h4 class="text-emerald-300 font-bold text-sm">Tailored View Active</h4>
+                    <p class="text-emerald-100/60 text-xs">Showing only <strong>{{ owner_type|title }}{{ 's' if not owner_type.endswith('s') }}</strong> based on your business profile.</p>
+                </div>
+            </div>
+            <a href="{{ url_for('public.establishments', show_all='true') }}" 
+                class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 px-4 rounded-lg transition-all">
+                Show All Types
+            </a>
+        </div>
+        {% endif %}
+
         <!-- Results Count -->
         <p class="text-emerald-100/40 text-sm mb-6">{{ establishments|length }} establishment{{ 's' if establishments|length != 1 }} found</p>
 

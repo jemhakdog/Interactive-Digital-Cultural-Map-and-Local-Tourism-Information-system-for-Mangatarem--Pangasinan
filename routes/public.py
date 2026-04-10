@@ -893,8 +893,19 @@ def establishments():
 
     query = Establishment.query.filter_by(status="approved")
 
-    # Filters
+    # Smart Filters for Business Owners
     type_filter = request.args.get("type")
+    is_auto_filtered = False
+    owner_type = None
+    show_all = request.args.get("show_all") == "true"
+
+    if not type_filter and not show_all and current_user.is_authenticated and current_user.role == "business_owner":
+        owner_establishment = Establishment.query.filter_by(owner_id=current_user.id).first()
+        if owner_establishment:
+            type_filter = owner_establishment.type
+            owner_type = owner_establishment.type
+            is_auto_filtered = True
+
     if type_filter:
         query = query.filter_by(type=type_filter)
 
@@ -917,6 +928,8 @@ def establishments():
         "pagez/establishments.html",
         establishments=establishments_list,
         barangays=barangays,
+        is_auto_filtered=is_auto_filtered,
+        owner_type=owner_type,
     )
 
 

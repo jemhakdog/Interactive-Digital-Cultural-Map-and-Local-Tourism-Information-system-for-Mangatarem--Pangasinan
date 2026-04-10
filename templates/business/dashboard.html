@@ -1,17 +1,28 @@
 {% extends "base.html" %}
 {% block title %}Business Dashboard — GoMangatarem{% endblock %}
+{% block body_class %}{% if establishment and establishment.type in ['restaurant', 'cafe', 'fastfood'] %}bg-orange-950{% else %}bg-emerald-950{% endif %}{% endblock %}
 {% block content %}
-<section class="min-h-screen bg-heritage-gradient bg-gradient-to-br from-emerald-950 via-gray-900 to-emerald-950 pt-8 pb-16 px-4">
+{% set is_dining = establishment and establishment.type in ['restaurant', 'cafe', 'fastfood'] %}
+<section class="min-h-screen pt-8 pb-16 px-4 transition-colors duration-700
+    {% if is_dining %}
+    bg-dining-gradient bg-dining-dark
+    {% else %}
+    bg-heritage-gradient bg-heritage-dark
+    {% endif %}">
     <div class="container mx-auto max-w-6xl">
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
             <div>
-                <h1 class="text-3xl font-bold text-white font-heading tracking-tight">Business Dashboard</h1>
-                <p class="text-emerald-100/60 mt-1">Manage your establishment listing</p>
+                <h1 class="text-3xl font-bold text-white font-heading tracking-tight">
+                    {% if is_dining %}Dining Management{% elif establishment and establishment.type == 'inn' %}Hospitality Portal{% else %}Business Dashboard{% endif %}
+                </h1>
+                <p class="{% if is_dining %}text-orange-100/60{% else %}text-emerald-100/60{% endif %} mt-1">
+                    {% if is_dining %}Manage your restaurant or cafe menu and reviews{% else %}Manage your establishment listing{% endif %}
+                </p>
             </div>
             {% if not establishment %}
             <a href="{{ url_for('business.create_establishment') }}"
-                class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg inline-flex items-center gap-2 hover:scale-[1.02]">
+                class="{% if is_dining %}bg-orange-600 hover:bg-orange-500{% else %}bg-emerald-600 hover:bg-emerald-500{% endif %} text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg inline-flex items-center gap-2 hover:scale-[1.02]">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
@@ -40,12 +51,12 @@
 
         <!-- Stats Grid -->
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-            <div class="bg-emerald-900/30 border border-white/10 rounded-2xl p-5 backdrop-blur-md">
-                <p class="text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">Status</p>
+            <div class="{% if is_dining %}bg-orange-950/40{% else %}bg-emerald-900/40{% endif %} border border-white/10 rounded-2xl p-5 backdrop-blur-md">
+                <p class="{% if is_dining %}text-orange-400{% else %}text-emerald-400{% endif %} text-xs font-bold uppercase tracking-wider mb-1">Status</p>
                 <p class="text-2xl font-bold text-white capitalize">{{ establishment.status }}</p>
             </div>
-            <div class="bg-emerald-900/30 border border-white/10 rounded-2xl p-5 backdrop-blur-md">
-                <p class="text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">Rating</p>
+            <div class="{% if is_dining %}bg-orange-950/40{% else %}bg-emerald-900/40{% endif %} border border-white/10 rounded-2xl p-5 backdrop-blur-md">
+                <p class="{% if is_dining %}text-orange-400{% else %}text-emerald-400{% endif %} text-xs font-bold uppercase tracking-wider mb-1">Rating</p>
                 <p class="text-2xl font-bold text-white">
                     {% if establishment.rating_avg > 0 %}
                     {{ "%.1f"|format(establishment.rating_avg) }} ⭐
@@ -54,22 +65,22 @@
                     {% endif %}
                 </p>
             </div>
-            <div class="bg-emerald-900/30 border border-white/10 rounded-2xl p-5 backdrop-blur-md">
-                <p class="text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">
+            <div class="{% if is_dining %}bg-orange-950/40{% else %}bg-emerald-900/40{% endif %} border border-white/10 rounded-2xl p-5 backdrop-blur-md">
+                <p class="{% if is_dining %}text-orange-400{% else %}text-emerald-400{% endif %} text-xs font-bold uppercase tracking-wider mb-1">
                     {% if establishment.type == 'inn' %}Rooms{% else %}Menu Items{% endif %}
                 </p>
                 <p class="text-2xl font-bold text-white">
                     {% if establishment.type == 'inn' %}{{ stats.room_count }}{% else %}{{ stats.menu_count }}{% endif %}
                 </p>
             </div>
-            <div class="bg-emerald-900/30 border border-white/10 rounded-2xl p-5 backdrop-blur-md">
-                <p class="text-emerald-400 text-xs font-bold uppercase tracking-wider mb-1">Reviews</p>
+            <div class="{% if is_dining %}bg-orange-950/40{% else %}bg-emerald-900/40{% endif %} border border-white/10 rounded-2xl p-5 backdrop-blur-md">
+                <p class="{% if is_dining %}text-orange-400{% else %}text-emerald-400{% endif %} text-xs font-bold uppercase tracking-wider mb-1">Reviews</p>
                 <p class="text-2xl font-bold text-white">{{ stats.total_reviews }}</p>
             </div>
         </div>
 
         <!-- Establishment Info Card -->
-        <div class="bg-emerald-900/20 border border-white/10 rounded-3xl overflow-hidden mb-8 backdrop-blur-md">
+        <div class="{% if is_dining %}bg-orange-900/20{% else %}bg-emerald-900/20{% endif %} border border-white/10 rounded-3xl overflow-hidden mb-8 backdrop-blur-md">
             {% if establishment.cover_image_url %}
             <div class="h-48 bg-cover bg-center" style="background-image: url('{{ establishment.cover_image_url }}')">
                 <div class="h-full bg-gradient-to-t from-emerald-950/80 to-transparent"></div>
@@ -119,48 +130,48 @@
             </a>
             {% else %}
             <a href="{{ url_for('business.manage_menu') }}"
-                class="bg-emerald-900/30 border border-white/10 rounded-2xl p-6 hover:bg-emerald-800/30 transition-all group backdrop-blur-md">
+                class="bg-orange-900/30 border border-white/10 rounded-2xl p-6 hover:bg-orange-800/30 transition-all group backdrop-blur-md">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-800/50 flex items-center justify-center group-hover:bg-emerald-700/50 transition-colors">
-                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-12 h-12 rounded-xl bg-orange-800/50 flex items-center justify-center group-hover:bg-orange-700/50 transition-colors">
+                        <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                         </svg>
                     </div>
                     <div>
                         <h3 class="text-white font-bold">Manage Menu</h3>
-                        <p class="text-emerald-100/50 text-sm">{{ stats.menu_count }} items listed</p>
+                        <p class="text-orange-100/50 text-sm">{{ stats.menu_count }} items listed</p>
                     </div>
                 </div>
             </a>
             {% endif %}
 
             <a href="{{ url_for('business.view_reviews') }}"
-                class="bg-emerald-900/30 border border-white/10 rounded-2xl p-6 hover:bg-emerald-800/30 transition-all group backdrop-blur-md">
+                class="{% if is_dining %}bg-orange-950/30 hover:bg-orange-900/30{% else %}bg-emerald-950/30 hover:bg-emerald-900/30{% endif %} border border-white/10 rounded-2xl p-6 transition-all group backdrop-blur-md">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-800/50 flex items-center justify-center group-hover:bg-emerald-700/50 transition-colors">
-                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-12 h-12 rounded-xl {% if is_dining %}bg-orange-800/50 group-hover:bg-orange-700/50 text-orange-400{% else %}bg-emerald-800/50 group-hover:bg-emerald-700/50 text-emerald-400{% endif %} flex items-center justify-center transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
                         </svg>
                     </div>
                     <div>
                         <h3 class="text-white font-bold">Reviews</h3>
-                        <p class="text-emerald-100/50 text-sm">{{ stats.total_reviews }} reviews</p>
+                        <p class="{% if is_dining %}text-orange-100/50{% else %}text-emerald-100/50{% endif %} text-sm">{{ stats.total_reviews }} reviews</p>
                     </div>
                 </div>
             </a>
 
             <a href="{{ url_for('business.edit_establishment') }}"
-                class="bg-emerald-900/30 border border-white/10 rounded-2xl p-6 hover:bg-emerald-800/30 transition-all group backdrop-blur-md">
+                class="{% if is_dining %}bg-orange-950/30 hover:bg-orange-900/30{% else %}bg-emerald-950/30 hover:bg-emerald-900/30{% endif %} border border-white/10 rounded-2xl p-6 transition-all group backdrop-blur-md">
                 <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-800/50 flex items-center justify-center group-hover:bg-emerald-700/50 transition-colors">
-                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="w-12 h-12 rounded-xl {% if is_dining %}bg-orange-800/50 group-hover:bg-orange-700/50 text-orange-400{% else %}bg-emerald-800/50 group-hover:bg-emerald-700/50 text-emerald-400{% endif %} flex items-center justify-center transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
                     </div>
                     <div>
                         <h3 class="text-white font-bold">Settings</h3>
-                        <p class="text-emerald-100/50 text-sm">Edit details & hours</p>
+                        <p class="{% if is_dining %}text-orange-100/50{% else %}text-emerald-100/50{% endif %} text-sm">Edit details & hours</p>
                     </div>
                 </div>
             </a>

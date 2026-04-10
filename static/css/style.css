@@ -320,9 +320,10 @@ form select option {
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Ensure headings and primary text in business portal stay white */
+/* Ensure headings and primary text in business portal stay white with shadow for contrast */
 .font-heading, h1, h2, h3, .text-white {
     color: #ffffff !important;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
 }
 
 /* Fallback for emerald text shades */
@@ -355,5 +356,70 @@ form select option {
 .bg-emerald-900\/20 .text-white {
     color: #ffffff !important;
     text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+}
+
+
+/* --- Dining / Restaurant Portal Robustness (Orange Theme) --- */
+
+.bg-dining-dark {
+    background-color: #431407 !important; /* orange-950 fallback */
+}
+
+.bg-dining-gradient {
+    background: #431407 !important;
+    background: linear-gradient(135deg, #431407 0%, #111827 50%, #451a03 100%) !important;
+    background-attachment: fixed !important;
+}
+
+.text-orange-contrast-muted {
+    color: rgba(255, 247, 237, 0.85) !important; /* orange-50/85 */
+}
+
+/* Force dark inputs on dining backgrounds */
+.bg-dining-gradient input, 
+.bg-dining-gradient select,
+.bg-dining-gradient textarea,
+.bg-dining-dark input,
+.bg-dining-dark select,
+.bg-dining-dark textarea {
+    background-color: #431407 !important;
+    color: white !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.bg-dining-gradient input::placeholder,
+.bg-dining-dark input::placeholder {
+    color: rgba(255, 247, 237, 0.4) !important;
+}
+
+.bg-dining-gradient option,
+.bg-dining-dark option {
+    background-color: #431407 !important;
+    color: white !important;
+}
+
+/* Overrides for specific tailwind orange classes used in dashboard */
+.bg-orange-950\/20, 
+.bg-orange-950\/30,
+.bg-orange-900\/30,
+.bg-orange-800\/50 {
+    background-color: rgba(67, 20, 7, 0.5) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(12px) !important;
+}
+
+/* Text color helpers for dining */
+.bg-orange-950\/20 .text-white,
+.bg-orange-950\/30 .text-white,
+.bg-orange-900\/30 .text-white {
+    color: #ffffff !important;
+}
+
+.text-orange-400, .text-orange-300 {
+    color: #fb923c !important;
+}
+
+.text-orange-100\/60, .text-orange-100\/50 {
+    color: rgba(255, 237, 213, 0.7) !important;
 }
 

@@ -51,7 +51,7 @@
 
 </head>
 
-<body class="bg-gray-50 text-gray-800 flex flex-col {% block body_height %}min-h-screen{% endblock %}">
+<body class="{% block body_class %}bg-gray-50{% endblock %} text-gray-800 flex flex-col {% block body_height %}min-h-screen{% endblock %}">
     <!-- AUTH_DEBUG: is_authenticated={{ current_user.is_authenticated }}, role={{ current_user.role if current_user.is_authenticated else 'anonymous' }} -->
 
     <!-- Navigation -->
