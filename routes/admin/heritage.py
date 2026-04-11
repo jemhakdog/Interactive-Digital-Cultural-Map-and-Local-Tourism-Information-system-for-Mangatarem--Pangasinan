@@ -143,7 +143,7 @@ def admin_heritage_dashboard():
 @admin_bp.route("/heritage/<heritage_type>")
 @login_required
 def admin_heritage_list(heritage_type):
-    """List all entries for a specific heritage type."""
+    """List all entries for a specific heritage type with pagination."""
     log_entry("admin", "heritage_list", heritage_type=heritage_type)
     _require_admin()
 
@@ -152,23 +152,27 @@ def admin_heritage_list(heritage_type):
         abort(404)
 
     model = config["model"]
-    # Get all profiles of this type, join with detail, order by profile's created_at
-    profiles = HeritageProfile.query.filter_by(asset_type=heritage_type).order_by(HeritageProfile.created_at.desc()).all()
-    
-    # We load details sequentially or use a joinedload. Since this is admin, a simple lookup is fine.
-    # To keep template compatible, we yield proxy objects.
-    items = []
-    for p in profiles:
-        # The relationship is usually dynamically named or we can query it
-        # The PK of the detail model is usually profile_id
-        detail = model.query.get(p.id)
-        if detail:
-            items.append(ProxyItem(p, detail))
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
 
-    log_success("admin", "heritage_list", f"Loaded {len(items)} {config['label']} entries")
+    # Get all profiles of this type, join with detail, order by profile's created_at
+    # We use a joined query to avoid N+1 problem
+    paginated = (
+        db.session.query(HeritageProfile, model)
+        .outerjoin(model, HeritageProfile.id == model.heritage_profile_id)
+        .filter(HeritageProfile.asset_type == heritage_type)
+        .order_by(HeritageProfile.created_at.desc())
+        .paginate(page=page, per_page=per_page, error_out=False)
+    )
+    
+    # Map results to ProxyItem for template compatibility
+    items = [ProxyItem(p, d) for p, d in paginated.items if d]
+
+    log_success("admin", "heritage_list", f"Loaded {len(items)} {config['label']} entries (Page {page})")
     return render_template(
         "admin/heritage_list.html",
         items=items,
+        pagination=paginated,
         heritage_type=heritage_type,
         config=config,
     )
@@ -296,7 +300,7 @@ def admin_heritage_delete(heritage_type, item_id):
 @admin_bp.route("/heritage/<heritage_type>/json")
 @login_required
 def admin_heritage_json(heritage_type):
-    """Return heritage items as JSON (for AJAX tables, datatables, etc.)."""
+    """Return heritage items as JSON with pagination support."""
     _require_admin()
 
     config = get_heritage_config(heritage_type)
@@ -304,17 +308,25 @@ def admin_heritage_json(heritage_type):
         return jsonify({"error": "Invalid heritage type"}), 404
 
     model = config["model"]
-    profiles = HeritageProfile.query.filter_by(asset_type=heritage_type).order_by(HeritageProfile.created_at.desc()).all()
+    page = request.args.get('page', 1, type=int)
+    per_page = request.args.get('per_page', 50, type=int)
+
+    paginated = (
+        db.session.query(HeritageProfile, model)
+        .outerjoin(model, HeritageProfile.id == model.heritage_profile_id)
+        .filter(HeritageProfile.asset_type == heritage_type)
+        .order_by(HeritageProfile.created_at.desc())
+        .paginate(page=page, per_page=per_page, error_out=False)
+    )
     
-    json_items = []
-    for p in profiles:
-        detail = model.query.get(p.id)
-        if detail:
-            json_items.append(_item_to_dict(p, detail, config))
+    json_items = [_item_to_dict(p, d, config) for p, d in paginated.items if d]
 
     return jsonify({
         "heritage_type": heritage_type,
         "label": config["label"],
         "count": len(json_items),
+        "total": paginated.total,
+        "page": page,
+        "pages": paginated.pages,
         "items": json_items,
     })

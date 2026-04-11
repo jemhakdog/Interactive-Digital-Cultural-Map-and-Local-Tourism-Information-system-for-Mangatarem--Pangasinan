@@ -18,6 +18,7 @@
     </div>
 
     <form method="POST" class="max-w-4xl">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <div class="glass-card p-8 mb-8">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                 {% for field_name, label, field_type, required in config.fields %}

@@ -13,6 +13,7 @@
         <div class="bg-emerald-900/20 border border-white/10 rounded-3xl p-8 backdrop-blur-md mb-8">
             <h2 class="text-lg font-bold text-emerald-300 mb-5">Add New Room</h2>
             <form method="POST" action="{{ url_for('business.add_room') }}" class="space-y-5">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div>
                         <label class="block text-sm font-bold text-emerald-300/80 mb-2">Room Name *</label>
@@ -100,6 +101,7 @@
                     {% endif %}
                     <div class="flex items-center gap-2">
                         <form method="POST" action="{{ url_for('business.delete_room', room_id=room.id) }}" class="inline" onsubmit="return confirm('Delete this room?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="text-red-400 hover:text-red-300 text-sm font-medium transition-colors">Delete</button>
                         </form>
                     </div>

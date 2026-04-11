@@ -19,6 +19,7 @@
 
         <form method="POST" action="{{ url_for('business.edit_establishment') if establishment else url_for('business.create_establishment') }}"
             class="{% if is_dining %}bg-orange-950/20{% else %}bg-emerald-900/20{% endif %} border border-white/10 rounded-3xl p-8 backdrop-blur-md space-y-8 shadow-2xl">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
             <!-- Basic Info -->
             <div class="space-y-5">

@@ -61,13 +61,16 @@
                         </span>
                         {% if est.status == 'pending' %}
                         <form method="POST" action="{{ url_for('admin.approve_establishment', id=est.id) }}" class="inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-bold py-2 px-4 rounded-xl transition-all">Approve</button>
                         </form>
                         <form method="POST" action="{{ url_for('admin.reject_establishment', id=est.id) }}" class="inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="bg-red-600/80 hover:bg-red-500 text-white text-sm font-bold py-2 px-4 rounded-xl transition-all">Reject</button>
                         </form>
                         {% endif %}
                         <form method="POST" action="{{ url_for('admin.delete_establishment', id=est.id) }}" class="inline" onsubmit="return confirm('Delete this establishment?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="text-red-400 hover:text-red-300 text-sm font-medium transition-colors">🗑️</button>
                         </form>
                     </div>

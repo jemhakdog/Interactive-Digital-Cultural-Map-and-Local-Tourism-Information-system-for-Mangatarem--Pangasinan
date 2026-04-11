@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% from 'includes/pagination.html' import render_pagination %}
 
 {% block title %}Events & Festivals | GoMangatarem Heritage{% endblock %}
 
@@ -101,6 +102,12 @@
             </div>
         {% endif %}
     </div>
+    
+    {% if pagination and pagination.pages > 1 %}
+    <div class="mt-16">
+        {{ render_pagination(pagination, 'public.events') }}
+    </div>
+    {% endif %}
 
     <div class="mt-32 pt-24 border-t border-gray-100 flex flex-col items-center">
         <div class="text-center mb-16">

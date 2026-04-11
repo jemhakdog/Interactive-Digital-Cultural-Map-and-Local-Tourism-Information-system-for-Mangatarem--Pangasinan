@@ -10,7 +10,7 @@ import sys
 import logging
 from flask import Flask, render_template, request, send_from_directory
 from werkzeug.middleware.proxy_fix import ProxyFix
-from extensions import db, login_manager, limiter
+from extensions import db, login_manager, limiter, csrf
 from config import config_by_name
 from routes import register_blueprints
 from dotenv import load_dotenv
@@ -66,6 +66,7 @@ def create_app(config_name=None):
     db.init_app(app)
     login_manager.init_app(app)
     limiter.init_app(app)
+    csrf.init_app(app)
     
     @login_manager.user_loader
     def load_user(user_id):
@@ -81,6 +82,9 @@ def create_app(config_name=None):
     
     # Initialize Lazy-loaded Supabase support
     _init_supabase_support(app)
+    
+    # Initialize Redis support for caching
+    _init_redis_support(app)
     
     # Register core application hooks and handlers
     _register_error_handlers(app)
@@ -114,6 +118,28 @@ def _init_supabase_support(app: Flask) -> None:
             return get_lazy_supabase()
 
     app.__class__.supabase = LazySupabase()
+
+
+def _init_redis_support(app: Flask) -> None:
+    """Adds global Redis client to the app instance."""
+    redis_url = os.environ.get("UPSTASH_REDIS_REST_URL")
+    redis_token = os.environ.get("UPSTASH_REDIS_REST_TOKEN")
+
+    if not redis_url or not redis_token:
+        logger.warning("Redis credentials not found, caching disabled")
+        app.redis_client = None
+        return
+
+    try:
+        from upstash_redis import Client
+        app.redis_client = Client(url=redis_url, token=redis_token)
+        logger.info("Global Redis client initialized")
+    except ImportError:
+        logger.warning("upstash-redis not installed, caching disabled")
+        app.redis_client = None
+    except Exception as e:
+        logger.error(f"Failed to initialize global Redis client: {e}")
+        app.redis_client = None
 
 
 def _register_error_handlers(app: Flask) -> None:

@@ -20,6 +20,7 @@
         <!-- Form -->
         <div class="bg-white rounded-[2rem] shadow-xl shadow-emerald-900/5 p-8 md:p-12 border border-emerald-900/5">
             <form action="{{ url_for('barangay.barangay_add_attraction') }}" method="POST" enctype="multipart/form-data" class="space-y-8">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- Name -->
                     <div class="md:col-span-2">

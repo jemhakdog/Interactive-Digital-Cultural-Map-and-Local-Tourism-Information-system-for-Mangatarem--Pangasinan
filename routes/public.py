@@ -10,6 +10,8 @@ from utils.logger_helper import (
     log_render,
 )
 import logging
+import threading
+from flask import current_app
 
 public_bp = Blueprint("public", __name__)
 logger = logging.getLogger(__name__)
@@ -49,30 +51,37 @@ def index():
     # Get featured attractions (limit 3)
     featured = Attraction.query.filter_by(status="approved").limit(3).all()
 
-    logger.info(f"Home page loaded with {len(featured)} featured attractions")
+    logger.info("Home page loaded with featured attractions")
     return render_template("pagez/index.html", featured=featured)
 
 
 def record_view(view_type, item_id=None, page_name=None):
     """
-    Record a page view (non-blocking best-effort).
-    
-    Uses a savepoint so failures don't break the main transaction
-    or delay the response.
+    Record a page view in a background thread to avoid delaying the response.
     """
-    try:
-        user_id = current_user.id if current_user.is_authenticated else None
-        view = AnalyticsPageView(
-            view_type=view_type,
-            item_id=item_id,
-            page_name=page_name,
-            user_id=user_id,
-            timestamp=datetime.utcnow(),
-        )
-        db.session.add(view)
-        db.session.flush()  # Write to DB within current transaction; avoid separate commit overhead
-    except Exception:
-        db.session.rollback()
+    user_id = current_user.id if current_user.is_authenticated else None
+    
+    # Get app context from current_app
+    app = current_app._get_current_object()
+
+    def _async_record():
+        with app.app_context():
+            try:
+                view = AnalyticsPageView(
+                    view_type=view_type,
+                    item_id=item_id,
+                    page_name=page_name,
+                    user_id=user_id,
+                    timestamp=datetime.utcnow(),
+                )
+                db.session.add(view)
+                db.session.commit()
+            except Exception as e:
+                logger.error(f"Error recording view in background: {e}")
+                db.session.rollback()
+
+    # Start thread
+    threading.Thread(target=_async_record, daemon=True).start()
 
 
 @public_bp.route("/map")
@@ -102,7 +111,7 @@ def map_view():
     barangay_list = [b[0] for b in barangays]
 
     logger.info(
-        f"Map page loaded with {attractions_count} attractions and {len(barangay_list)} barangays"
+        "Map page loaded with attractions and barangays"
     )
     return render_template(
         "pagez/map.html", barangays=barangay_list, attractions_count=attractions_count
@@ -121,7 +130,7 @@ def attraction_detail(id):
         Rendered detail template with attraction information.
     """
     log_entry("public", "attraction_detail", id=id)
-    logger.info(f"Attraction detail page accessed for ID {id}")
+    logger.info("Attraction detail page accessed")
 
     log_query("public", "attraction_detail", f"Fetching attraction ID {id}")
     attraction = Attraction.query.get_or_404(id)
@@ -153,7 +162,7 @@ def attraction_detail(id):
         "attraction_detail",
         f"Displaying attraction '{attraction.name}', Found {len(nearby)} nearby places"
     )
-    logger.info(f"Showing attraction '{attraction.name}' (ID: {id})")
+    logger.info("Showing attraction detail")
 
     # Fetch nearby establishments (within ~5km radius)
     nearby_stay = []
@@ -202,17 +211,20 @@ def events():
     log_entry("public", "events")
     logger.info("Events page accessed")
 
-    # Record view
-    record_view("page", page_name="events")
+    page = request.args.get('page', 1, type=int)
+    per_page = 12
 
-    log_query("public", "events", "Fetching approved events")
-    events = Event.query.filter_by(status="approved").order_by(Event.date.asc()).all()
+    log_query("public", "events", "Fetching approved events with pagination")
+    paginated = Event.query.filter_by(status="approved").order_by(Event.date.asc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+    events = paginated.items
 
-    log_success("public", "events", f"Displaying {len(events)} approved events")
-    logger.info(f"Events page loaded with {len(events)} approved events")
+    log_success("public", "events", f"Displaying {len(events)} approved events (Page {page})")
+    logger.info("Events page loaded")
 
     log_render("public", "events", "events.html")
-    return render_template("pagez/events.html", events=events)
+    return render_template("pagez/events.html", events=events, pagination=paginated)
 
 
 @public_bp.route("/gallery")
@@ -232,12 +244,16 @@ def gallery():
     # Record view
     record_view("page", page_name="gallery")
 
-    log_query("public", "gallery", "Fetching approved gallery items")
-    items = (
+    page = request.args.get('page', 1, type=int)
+    per_page = 12
+
+    log_query("public", "gallery", "Fetching approved gallery items with pagination")
+    paginated = (
         GalleryItem.query.filter_by(status="approved")
         .order_by(GalleryItem.created_at.desc())
-        .all()
+        .paginate(page=page, per_page=per_page, error_out=False)
     )
+    items = paginated.items
 
     # Get list of unique barangays from approved gallery items for the filter
     log_query("public", "gallery", "Fetching unique barangays for gallery")
@@ -257,11 +273,11 @@ def gallery():
         "gallery",
         f"Gallery loaded with {len(items)} items from {len(barangay_list)} barangays"
     )
-    logger.info(f"Gallery page loaded with {len(items)} approved items")
+    logger.info("Gallery page loaded")
 
     log_render("public", "gallery", "gallery.html")
     return render_template(
-        "pagez/gallery.html", gallery_items=items, barangays=barangay_list
+        "pagez/gallery.html", gallery_items=items, barangays=barangay_list, pagination=paginated
     )
 
 
@@ -278,7 +294,7 @@ def search():
         category=request.args.get('category', ''),
         barangay=request.args.get('barangay', '')
     )
-    logger.info(f"Search page accessed with query: {request.args.get('q', '')}")
+    logger.info("Search page accessed")
 
     query = request.args.get("q", "").strip()
     category_filter = request.args.get("category", "")
@@ -540,7 +556,7 @@ def barangay_profile(name):
         f"Barangay profile for '{name}': {len(attractions)} attractions, {len(events)} events, {len(gallery_items)} gallery items"
     )
 
-    logger.info(f"Rendering barangay_profile.html")
+    logger.info("Rendering barangay_profile.html")
     return render_template(
         "pagez/barangay_profile.html",
         barangay_name=name,

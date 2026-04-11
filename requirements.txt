@@ -1592,3 +1592,5 @@ yarl==1.22.0 \
     #   supabase
     #   supabase-functions
 upstash-redis==1.0.0 
+f l a s k - w t f  
+ 

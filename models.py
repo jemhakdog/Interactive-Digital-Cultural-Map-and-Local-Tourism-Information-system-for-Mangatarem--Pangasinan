@@ -11,10 +11,10 @@ class User(UserMixin, db.Model):
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(255), nullable=False) # Renamed from password_hash to match ERD
-    role = db.Column(db.String(20), default="user")  # 'admin', 'contributor', or 'user'
-    barangay_id = db.Column(db.Integer, db.ForeignKey('BARANGAY_INFO.id'), nullable=True) # Renamed from barangay to match ERD
-    is_approved = db.Column(db.Boolean, default=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    role = db.Column(db.String(20), default="user", index=True)  # 'admin', 'contributor', or 'user'
+    barangay_id = db.Column(db.Integer, db.ForeignKey('BARANGAY_INFO.id'), nullable=True, index=True) # Renamed from barangay to match ERD
+    is_approved = db.Column(db.Boolean, default=False, index=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
 
     barangay = db.relationship('BarangayInfo', backref='users')
 
@@ -68,13 +68,13 @@ class HeritageProfile(db.Model):
     __tablename__ = 'HERITAGE_PROFILE'
     
     id = db.Column(db.Integer, primary_key=True)
-    asset_type = db.Column(db.String(50), nullable=False) # 'built', 'natural', etc.
+    asset_type = db.Column(db.String(50), nullable=False, index=True) # 'built', 'natural', etc.
     form_control_number = db.Column(db.String(100), unique=True, nullable=True) # Link to manual form
     
     # ERD Fields
     name_of_asset = db.Column(db.String(200), nullable=True)
     common_name = db.Column(db.String(200), nullable=True)
-    barangay_id = db.Column(db.Integer, db.ForeignKey('BARANGAY_INFO.id'), nullable=True)
+    barangay_id = db.Column(db.Integer, db.ForeignKey('BARANGAY_INFO.id'), nullable=True, index=True)
     location_details = db.Column(db.Text, nullable=True)
     contact_person = db.Column(db.String(200), nullable=True)
     contact_number = db.Column(db.String(50), nullable=True)
@@ -92,7 +92,7 @@ class HeritageProfile(db.Model):
     mapper_name = db.Column(db.String(200), nullable=True)
     date_profiled = db.Column(db.Date, nullable=True)
     status = db.Column(db.String(20), default='pending', index=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=True, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     
     # Relationships
@@ -110,7 +110,7 @@ class Attraction(db.Model):
     longitude = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(500), nullable=True)
     
-    barangay_id = db.Column(db.Integer, db.ForeignKey('BARANGAY_INFO.id'), nullable=True)
+    barangay_id = db.Column(db.Integer, db.ForeignKey('BARANGAY_INFO.id'), nullable=True, index=True)
     heritage_profile_id = db.Column(db.Integer, db.ForeignKey("HERITAGE_PROFILE.id"), nullable=True)
     
     barangay = db.relationship('BarangayInfo', backref='attractions')
@@ -125,17 +125,17 @@ class Event(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(200), nullable=False) # Renamed from title to match ERD
     description = db.Column(db.Text, nullable=False)
-    date = db.Column(db.DateTime, nullable=False)
+    date = db.Column(db.DateTime, nullable=False, index=True)
     location = db.Column(db.String(255), nullable=False)
-    barangay_id = db.Column(db.Integer, db.ForeignKey('BARANGAY_INFO.id'), nullable=True)
+    barangay_id = db.Column(db.Integer, db.ForeignKey('BARANGAY_INFO.id'), nullable=True, index=True)
     image_url = db.Column(db.String(500), nullable=True)
     
     barangay = db.relationship('BarangayInfo', backref='events')
     
-    category = db.Column(db.String(50), nullable=False, default="Civic")
-    status = db.Column(db.String(20), default="pending")
-    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    category = db.Column(db.String(50), nullable=False, default="Civic", index=True)
+    status = db.Column(db.String(20), default="pending", index=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=True, index=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
 
 
 class GalleryItem(db.Model):
@@ -144,9 +144,9 @@ class GalleryItem(db.Model):
     type = db.Column(db.String(20), nullable=False)  # 'photo' or 'video'
     url = db.Column(db.String(500), nullable=False)
     caption = db.Column(db.Text, nullable=True) # Changed from String(200) to Text
-    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=True)
-    status = db.Column(db.String(20), default="pending")
-    created_at = db.Column(db.DateTime, default=datetime.utcnow) # Renamed from uploaded_at
+    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=True, index=True)
+    status = db.Column(db.String(20), default="pending", index=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True) # Renamed from uploaded_at
 
 
 class BarangayInfo(db.Model):
@@ -162,11 +162,11 @@ class AnalyticsPageView(db.Model):
     __tablename__ = 'ANALYTICS_PAGE_VIEW'
     id = db.Column(db.Integer, primary_key=True)
     page_url = db.Column(db.String(500), nullable=True) # Kept for compatibility
-    view_type = db.Column(db.String(50), nullable=True)  # 'attraction', 'event', 'page'
-    item_id = db.Column(db.Integer, nullable=True)       # ID of the attraction or event, if applicable
-    page_name = db.Column(db.String(100), nullable=True) # Name of the page (e.g., 'home', 'map', 'events')
-    user_id = db.Column(db.Integer, nullable=True)
-    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+    view_type = db.Column(db.String(50), nullable=True, index=True)  # 'attraction', 'event', 'page'
+    item_id = db.Column(db.Integer, nullable=True, index=True)       # ID of the attraction or event, if applicable
+    page_name = db.Column(db.String(100), nullable=True, index=True) # Name of the page (e.g., 'home', 'map', 'events')
+    user_id = db.Column(db.Integer, nullable=True, index=True)
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     session_id = db.Column(db.String(100), nullable=True)
     ip_address = db.Column(db.String(45), nullable=True)
     device_info = db.Column(db.Text, nullable=True)

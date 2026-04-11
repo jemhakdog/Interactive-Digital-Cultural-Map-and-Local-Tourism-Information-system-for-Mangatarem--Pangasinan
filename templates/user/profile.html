@@ -60,6 +60,7 @@
                         <span class="text-green-600">📝</span> Account Details
                     </h2>
                     <form action="{{ url_for('user.profile') }}" method="POST" class="space-y-6">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
                             <div class="space-y-1">
                                 <label class="block text-sm font-medium text-gray-700 ml-1">Username</label>

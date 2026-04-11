@@ -90,6 +90,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     function setupMVTSource() {
+        // Guard: Check if source already exists
+        if (map.getSource('mvt-tiles')) {
+            return;
+        }
+        
         // Add vector tile source
         map.addSource('mvt-tiles', {
             type: 'vector',

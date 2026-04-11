@@ -209,6 +209,7 @@
                 </div>
 
                 <form action="{{ url_for('admin.admin_document_import') }}" method="POST" enctype="multipart/form-data" class="space-y-10">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="group/file relative h-64 rounded-[2.5rem] border-2 border-dashed border-emerald-100 hover:border-emerald-500 hover:bg-emerald-50 transition-all flex flex-col items-center justify-center gap-6 cursor-pointer overflow-hidden">
                         <input type="file" name="docx_file" class="absolute inset-0 opacity-0 cursor-pointer" id="fileInput" onchange="updateFileName()">
                         <div class="w-20 h-20 bg-emerald-500 text-white rounded-3xl flex items-center justify-center shadow-2xl shadow-emerald-500/40 group-hover/file:scale-110 transition-transform duration-500">

@@ -154,11 +154,11 @@ def generate_mvt_tile(
     # Calculate tile bounds in WGS84 (EPSG:4326)
     tile_bounds = _xyz_to_bounds(x, y, z)
 
-    # Build the SQL query
-    query = _build_mvt_query(config, tile_bounds, z, filters)
+    # Build the SQL query and parameters
+    query, params = _build_mvt_query(config, tile_bounds, z, filters)
 
     try:
-        result = db.session.execute(text(query)).scalar()
+        result = db.session.execute(text(query), params).scalar()
         if result:
             logger.debug(
                 f"Generated MVT tile for {layer_name} at z={z}, x={x}, y={y} "
@@ -228,13 +228,16 @@ def generate_multi_layer_mvt(
         if not config:
             continue
 
-        query = _build_mvt_subquery(config, tile_bounds, z, filters, layer_name)
-        layer_queries.append(query)
-
-    if not layer_queries:
-        return None
-
     # Combine all layers into a single MVT
+    all_params = {}
+    # We need unique parameter names across subqueries if they differ
+    # but here filters are global. 
+    # To be safe, we'll collect all bounds params too.
+    for i, _ in enumerate(layer_queries):
+        query_str, params = layer_queries[i]
+        layer_queries[i] = query_str
+        all_params.update(params)
+
     combined_query = f"""
         SELECT ST_AsMVT(
             (
@@ -248,7 +251,7 @@ def generate_multi_layer_mvt(
     """
 
     try:
-        result = db.session.execute(text(combined_query)).scalar()
+        result = db.session.execute(text(combined_query), all_params).scalar()
         if result:
             return bytes(result)
         return b""
@@ -270,8 +273,6 @@ def _xyz_to_bounds(x: int, y: int, z: int) -> Dict[str, float]:
     Returns:
         Dictionary with min_x, min_y, max_x, max_y in WGS84 coordinates
     """
-    import math
-
     # Tile size in degrees
     tile_size = 360.0 / (2**z)
 
@@ -297,20 +298,14 @@ def _build_mvt_query(
     tile_bounds: Dict[str, float],
     z: int,
     filters: Optional[Dict[str, Any]] = None,
-) -> str:
+) -> tuple[str, dict]:
     """
     Build a complete ST_AsMVT query for a single layer.
 
-    Args:
-        config: Layer configuration dictionary
-        tile_bounds: Bounding box coordinates
-        z: Zoom level
-        filters: Optional filters
-
     Returns:
-        Complete SQL query string
+        Tuple of (SQL query string, parameter dictionary)
     """
-    subquery = _build_mvt_subquery(config, tile_bounds, z, filters, "layer")
+    subquery, params = _build_mvt_subquery(config, tile_bounds, z, filters, "layer")
 
     query = f"""
         SELECT ST_AsMVT(
@@ -322,7 +317,7 @@ def _build_mvt_query(
         )
     """
 
-    return query
+    return query, params
 
 
 def _build_mvt_subquery(
@@ -331,51 +326,48 @@ def _build_mvt_subquery(
     z: int,
     filters: Optional[Dict[str, Any]] = None,
     layer_name: str = "layer",
-) -> str:
+) -> tuple[str, dict]:
     """
     Build the subquery for ST_AsMVT generation.
 
-    Args:
-        config: Layer configuration dictionary
-        tile_bounds: Bounding box coordinates
-        z: Zoom level
-        filters: Optional filters
-        layer_name: Name for the layer
-
     Returns:
-        SQL subquery string
+        Tuple of (SQL subquery string, parameter dictionary)
     """
     # Select columns
     columns = config["columns"]
     select_list = ", ".join(columns)
 
-    # Build WHERE clause
+    # Build WHERE clause and params
     where_clauses = []
+    params = {
+        "min_x": tile_bounds["min_x"],
+        "min_y": tile_bounds["min_y"],
+        "max_x": tile_bounds["max_x"],
+        "max_y": tile_bounds["max_y"],
+    }
 
     # Spatial filter (bounding box)
     where_clauses.append(
         f"ST_Intersects({config['geom_column']}, "
-        f"ST_MakeEnvelope({tile_bounds['min_x']}, {tile_bounds['min_y']}, "
-        f"{tile_bounds['max_x']}, {tile_bounds['max_y']}, 4326))"
+        f"ST_MakeEnvelope(:min_x, :min_y, :max_x, :max_y, 4326))"
     )
 
     # Status filter (default to approved only)
     if filters and "status" in filters:
-        where_clauses.append(f"status = '{filters['status']}'")
+        where_clauses.append("status = :status")
+        params["status"] = filters["status"]
     else:
         where_clauses.append("status = 'approved'")
 
     # Additional filters
     if filters:
         for key, value in filters.items():
-            if key != "status":
-                where_clauses.append(f"{key} = '{value}'")
+            if key != "status" and key in columns:
+                param_key = f"filter_{key}"
+                where_clauses.append(f"{key} = :{param_key}")
+                params[param_key] = value
 
     where_clause = " AND ".join(where_clauses)
-
-    # Determine geometry type and transform if needed
-    # For point data, we use ST_AsMVTGeom directly
-    # For polygon/line data, we might need simplification at lower zoom levels
 
     # Build the subquery
     subquery = f"""
@@ -383,8 +375,7 @@ def _build_mvt_subquery(
             {select_list},
             ST_AsMVTGeom(
                 {config['geom_column']},
-                ST_MakeEnvelope({tile_bounds['min_x']}, {tile_bounds['min_y']},
-                               {tile_bounds['max_x']}, {tile_bounds['max_y']}, 4326),
+                ST_MakeEnvelope(:min_x, :min_y, :max_x, :max_y, 4326),
                 {MVT_TILE_SIZE}, {MVT_TILE_SIZE},
                 true, true
             ) AS {config['geom_column']}
@@ -392,7 +383,7 @@ def _build_mvt_subquery(
         WHERE {where_clause})
     """
 
-    return subquery
+    return subquery, params
 
 
 def get_tile_cache_key(z: int, x: int, y: int, layer_name: str = "attractions") -> str:

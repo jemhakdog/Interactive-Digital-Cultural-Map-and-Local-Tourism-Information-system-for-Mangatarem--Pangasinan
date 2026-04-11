@@ -38,17 +38,20 @@ class Config:
     # Use request host by default, don't force SERVER_NAME in base config
     # unless explicitly needed for background tasks.
     PREFERRED_URL_SCHEME = "https"
+    WTF_CSRF_TIME_LIMIT = None  # Token valid for session duration
 
 class DevelopmentConfig(Config):
     """Development configuration."""
     DEBUG = True
     SESSION_COOKIE_SECURE = False
     PREFERRED_URL_SCHEME = "http"
+    WTF_CSRF_SSL_STRICT = False
 
 class ProductionConfig(Config):
     """Production configuration."""
     DEBUG = False
     SESSION_COOKIE_SECURE = True
+    WTF_CSRF_SSL_STRICT = True
     
     # Vercel specific adjustments usually go here
     # but many are handled by ProxyFix in app.py

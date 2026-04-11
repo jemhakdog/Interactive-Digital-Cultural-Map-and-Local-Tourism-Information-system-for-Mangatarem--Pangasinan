@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 @admin_bp.route("/attractions")
 @login_required
 def admin_attractions():
-    """Display attractions management page."""
+    """Display attractions management page with pagination."""
     log_entry("admin", "admin_attractions")
     
     if current_user.role != "admin":
@@ -20,14 +20,21 @@ def admin_attractions():
         flash("Access denied.")
         return redirect(url_for("public.index"))
     
-    all_attractions = Attraction.query.order_by(Attraction.created_at.desc()).all()
-    pending_attractions = [a for a in all_attractions if a.status == "pending"]
+    page = request.args.get('page', 1, type=int)
+    per_page = 20
     
-    log_success("admin", "admin_attractions", f"Loaded {len(all_attractions)} total attractions")
+    paginated = Attraction.query.order_by(Attraction.created_at.desc()).paginate(
+        page=page, per_page=per_page, error_out=False
+    )
+    all_attractions = paginated.items
+    pending_attractions = Attraction.query.filter_by(status="pending").all()
+    
+    log_success("admin", "admin_attractions", f"Loaded {len(all_attractions)} attractions (Page {page})")
     return render_template(
         "admin/attractions.html",
         pending_attractions=pending_attractions,
         all_attractions=all_attractions,
+        pagination=paginated,
     )
 
 

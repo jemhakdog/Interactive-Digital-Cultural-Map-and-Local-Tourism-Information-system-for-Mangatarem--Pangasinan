@@ -23,6 +23,7 @@ dependencies = [
     "python-docx>=1.2.0",
     "flaskwebgui>=1.1.8",
     "waitress>=3.0.0",
+    "flask-wtf>=1.2.0",
 ]
 
 [tool.uv]

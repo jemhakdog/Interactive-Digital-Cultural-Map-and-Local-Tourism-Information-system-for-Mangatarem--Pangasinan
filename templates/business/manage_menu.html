@@ -22,6 +22,7 @@
         <div class="{% if is_dining %}bg-orange-950/20{% else %}bg-emerald-900/20{% endif %} border border-white/10 rounded-3xl p-8 backdrop-blur-md mb-8">
             <h2 class="text-lg font-bold {% if is_dining %}text-orange-300{% else %}text-emerald-300{% endif %} mb-5">Add Menu Item</h2>
             <form method="POST" action="{{ url_for('business.add_menu_item') }}" class="space-y-5">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                     <div>
                         <label class="block text-sm font-bold {% if is_dining %}text-orange-300/80{% else %}text-emerald-300/80{% endif %} mb-2">Item Name *</label>
@@ -102,6 +103,7 @@
                                 {{ 'Available' if item.is_available else 'Unavailable' }}
                             </span>
                             <form method="POST" action="{{ url_for('business.delete_menu_item', item_id=item.id) }}" class="inline" onsubmit="return confirm('Delete this item?')">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="text-red-400/80 hover:text-red-400 text-xs font-medium transition-colors">Delete</button>
                             </form>
                         </div>

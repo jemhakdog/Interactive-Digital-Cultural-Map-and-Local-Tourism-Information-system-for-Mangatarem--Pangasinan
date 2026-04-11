@@ -37,6 +37,7 @@ Edit Attraction - {% if current_user.role == 'admin' %}Admin{% else %}Barangay{%
         <div class="max-w-4xl mx-auto">
             <form action="{{ url_for('admin.edit_attraction', id=attraction.id) }}" method="POST"
                 enctype="multipart/form-data">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <!-- Left Column: Basic Info -->
                     <div class="lg:col-span-2 space-y-8">

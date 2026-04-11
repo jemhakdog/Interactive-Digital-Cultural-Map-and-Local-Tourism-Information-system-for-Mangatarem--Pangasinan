@@ -9,6 +9,7 @@
 
         <form action="{{ url_for('barangay.barangay_edit_gallery', id=gallery_item.id) }}" method="POST"
             enctype="multipart/form-data">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="space-y-6">
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Current Media</label>

@@ -45,6 +45,7 @@
             </div>
 
             <form class="space-y-6" action="{{ url_for('auth.login') }}" method="POST">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <!-- Username -->
                 <div class="space-y-2">
                     <label for="username" class="block text-sm font-medium text-emerald-200/80 ml-1">Username</label>

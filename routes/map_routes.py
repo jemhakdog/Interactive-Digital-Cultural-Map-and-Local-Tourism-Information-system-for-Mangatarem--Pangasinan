@@ -16,7 +16,7 @@ Architecture:
 - Response time: < 50ms for cached tiles, < 200ms for uncached
 """
 
-from flask import Blueprint, Response, jsonify, request, make_response
+from flask import Blueprint, jsonify, request, make_response, current_app
 from extensions import limiter
 import logging
 from datetime import datetime, timedelta
@@ -36,30 +36,9 @@ from utils.tile_generator import (
     get_tile_cache_key,
 )
 
-# Redis client (lazy-loaded)
-_redis_client = None
-
-
 def get_redis_client():
-    """Lazy-load Redis client for caching."""
-    global _redis_client
-    if _redis_client is None:
-        try:
-            from upstash_redis import Client
-
-            redis_url = request.environ.get("UPSTASH_REDIS_REST_URL")
-            redis_token = request.environ.get("UPSTASH_REDIS_REST_TOKEN")
-
-            if redis_url and redis_token:
-                _redis_client = Client(url=redis_url, token=redis_token)
-                logger.info("Redis client initialized for tile caching")
-            else:
-                logger.warning("Redis credentials not found, caching disabled")
-        except ImportError:
-            logger.warning("upstash-redis not installed, caching disabled")
-        except Exception as e:
-            logger.error(f"Failed to initialize Redis client: {e}")
-    return _redis_client
+    """Returns the global Redis client from the current application context."""
+    return getattr(current_app, 'redis_client', None)
 
 
 def get_tile_from_cache(cache_key: str) -> Optional[bytes]:

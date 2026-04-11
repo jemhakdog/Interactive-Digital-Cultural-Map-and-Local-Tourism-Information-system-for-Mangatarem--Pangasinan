@@ -37,6 +37,12 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
 
+    // Exclude API tile requests from caching (they're dynamic and large)
+    if (url.pathname.startsWith('/api/tiles/')) {
+        // Let tile requests go to network directly
+        return;
+    }
+
     // Special handling for Mapbox Tiles and Styles
     if (url.hostname.includes('mapbox.com')) {
         event.respondWith(
@@ -45,7 +51,14 @@ self.addEventListener('fetch', (event) => {
                     const fetchPromise = fetch(event.request).then((networkResponse) => {
                         // Only cache successful tile/style requests
                         if (networkResponse.ok && (url.pathname.includes('/tiles/') || url.pathname.includes('/styles/'))) {
-                            cache.put(event.request, networkResponse.clone());
+                            // Check if response is cacheable
+                            const canCache = networkResponse.type === 'basic' || 
+                                             networkResponse.type === 'cors' || 
+                                             networkResponse.type === 'default';
+                            
+                            if (canCache) {
+                                cache.put(event.request, networkResponse.clone());
+                            }
                         }
                         return networkResponse;
                     });
@@ -66,27 +79,47 @@ self.addEventListener('fetch', (event) => {
     // Stale-While-Revalidate for static assets
     const staleWhileRevalidate = () => {
         return caches.match(event.request).then((cacheResponse) => {
-            const fetchPromise = fetch(event.request).then((networkResponse) => {
+            // Always fetch from network to get fresh content
+            fetch(event.request).then((networkResponse) => {
+                // Only cache successful GET requests that are cacheable
                 if (networkResponse.ok && event.request.method === 'GET') {
-                    caches.open(CACHE_NAME).then((cache) => {
-                        cache.put(event.request, networkResponse.clone());
-                    });
+                    const canCache = networkResponse.type === 'basic' || 
+                                     networkResponse.type === 'cors' || 
+                                     networkResponse.type === 'default';
+                    
+                    if (canCache) {
+                        // Clone before caching so the original can be returned
+                        const responseToCache = networkResponse.clone();
+                        caches.open(CACHE_NAME).then((cache) => {
+                            cache.put(event.request, responseToCache);
+                        });
+                    }
                 }
-                return networkResponse;
             }).catch(() => {
                 // ignore fetch errors
             });
-            return cacheResponse || fetchPromise;
+            
+            // Return cached response if available, otherwise the fetch will update cache for next time
+            return cacheResponse || fetch(event.request);
         });
     };
 
     // Network-First for dynamic routes
     const networkFirst = () => {
         return fetch(event.request).then((networkResponse) => {
+            // Only cache successful GET requests that are cacheable
             if (networkResponse.ok && event.request.method === 'GET') {
-                caches.open(CACHE_NAME).then((cache) => {
-                    cache.put(event.request, networkResponse.clone());
-                });
+                const canCache = networkResponse.type === 'basic' || 
+                                 networkResponse.type === 'cors' || 
+                                 networkResponse.type === 'default';
+                
+                if (canCache) {
+                    // Clone before caching so the original can be returned
+                    const responseToCache = networkResponse.clone();
+                    caches.open(CACHE_NAME).then((cache) => {
+                        cache.put(event.request, responseToCache);
+                    });
+                }
             }
             return networkResponse;
         }).catch(() => {
