@@ -7,6 +7,7 @@
     <title>{% block title %}GoMangatarem Information System{% endblock %}</title>
     <!-- google verification -->
     <meta name="google-site-verification" content="4mfuNe7nRXoBiOxX-xs1-UC63vsLiUy8xOSBQQWUVEI" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
     <!-- Tailwind CSS (Build-time) -->
 
@@ -336,6 +337,8 @@
     <script src="{{ url_for('static', filename='js/components/flash-messages.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/components/delete-confirm.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/components/service-worker-registration.js') }}" defer></script>
+    <!-- CSRF Protection -->
+    <script src="{{ url_for('static', filename='js/components/csrf.js') }}"></script>
 </body>
 
 
