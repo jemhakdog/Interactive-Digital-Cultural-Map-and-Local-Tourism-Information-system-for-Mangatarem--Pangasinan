@@ -73,7 +73,7 @@ def set_tile_in_cache(cache_key: str, tile_data: bytes, ttl: int = 3600) -> None
 
 
 @map_bp.route("/<int:z>/<int:x>/<int:y>.pbf", methods=["GET"])
-@limiter.limit("60 per minute")
+@limiter.limit("2000 per minute")
 def get_tile(z: int, x: int, y: int):
     """
     Get a Mapbox Vector Tile for the specified coordinates.
@@ -146,7 +146,7 @@ def get_tile(z: int, x: int, y: int):
 
 
 @map_bp.route("/combined/<int:z>/<int:x>/<int:y>.pbf", methods=["GET"])
-@limiter.limit("60 per minute")
+@limiter.limit("2000 per minute")
 def get_combined_tile(z: int, x: int, y: int):
     """
     Get a combined Mapbox Vector Tile with multiple layers.

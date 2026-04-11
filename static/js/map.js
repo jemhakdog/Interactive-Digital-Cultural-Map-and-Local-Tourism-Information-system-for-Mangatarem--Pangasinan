@@ -278,6 +278,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // 6. FLYTO ANIMATION
     // ========================================
     function flyToLocation(id, lat, lng) {
+        // Validate coordinates
+        if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
+            console.warn('Invalid coordinates for attraction:', id, { lat, lng });
+            alert('This location does not have valid coordinates.');
+            return;
+        }
+
         map.flyTo([lat, lng], 16, {
             animate: true,
             duration: 1.5
@@ -366,7 +373,12 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
 
             // FlyTo functionality
-            card.addEventListener('click', () => flyToLocation(attraction.id, attraction.lat, attraction.lng));
+            card.addEventListener('click', () => {
+                // Use latitude/longitude from API (not lat/lng)
+                const lat = attraction.latitude || attraction.lat;
+                const lng = attraction.longitude || attraction.lng;
+                flyToLocation(attraction.id, lat, lng);
+            });
             listContainer.appendChild(card);
         });
     }

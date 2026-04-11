@@ -94,13 +94,14 @@ document.addEventListener('DOMContentLoaded', function () {
         if (map.getSource('mvt-tiles')) {
             return;
         }
-        
+
+        // Create absolute URL for tiles (Mapbox requires absolute URLs)
+        const tileUrl = `${window.location.origin}/api/tiles/{z}/{x}/{y}.pbf?layer=attractions`;
+
         // Add vector tile source
         map.addSource('mvt-tiles', {
             type: 'vector',
-            tiles: [
-                '/api/tiles/{z}/{x}/{y}.pbf?layer=attractions'
-            ],
+            tiles: [tileUrl],
             minzoom: 0,
             maxzoom: 20,
             scheme: 'xyz',
@@ -505,6 +506,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // 9. FLYTO ANIMATION
     // ========================================
     function flyToLocation(id, lat, lng) {
+        // Validate coordinates
+        if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
+            console.warn('Invalid coordinates for attraction:', id, { lat, lng });
+            alert('This location does not have valid coordinates.');
+            return;
+        }
+
         map.flyTo({
             center: [lng, lat],
             zoom: 16,
@@ -528,9 +536,19 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
+        // Deduplicate attractions by ID to prevent duplicates
+        const seen = new Set();
+        const uniqueAttractions = attractions.filter(attraction => {
+            if (seen.has(attraction.id)) {
+                return false;
+            }
+            seen.add(attraction.id);
+            return true;
+        });
+
         listContainer.innerHTML = '';
 
-        attractions.forEach(attraction => {
+        uniqueAttractions.forEach(attraction => {
             const categoryConfig = iconConfig[attraction.category] || iconConfig.default;
             const categoryLabel = attraction.category.toUpperCase();
 
@@ -541,23 +559,28 @@ document.addEventListener('DOMContentLoaded', function () {
             const card = document.createElement('div');
             card.className = 'group bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer overflow-hidden flex flex-row h-32';
             card.innerHTML = `
-                <div class="w-1/3 h-full bg-gray-200 relative">
+                <div class="w-1/3 h-full bg-gray-200 relative flex-shrink-0">
                     <img src="${attraction.image}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="${attraction.name}" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
                     <div class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold" style="color: ${categoryConfig.color}">${categoryLabel}</div>
                 </div>
-                <div class="w-2/3 p-3 flex flex-col justify-between">
+                <div class="w-2/3 p-3 flex flex-col justify-between bg-white" style="background-color: #ffffff !important;">
                     <div>
-                        <h3 class="font-bold text-gray-800 text-sm leading-tight mb-1 group-hover:text-green-700 transition line-clamp-1">${attraction.name}</h3>
-                        <p class="text-xs text-gray-500 line-clamp-2">${attraction.description}</p>
+                        <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-1" style="color: #111827 !important; -webkit-text-fill-color: #111827 !important;">${attraction.name}</h3>
+                        <p class="text-xs line-clamp-2 mt-1" style="color: #374151 !important; -webkit-text-fill-color: #374151 !important;">${attraction.description}</p>
                     </div>
                     <div class="flex justify-between items-end mt-2">
-                        <div class="text-xs text-amber-500 font-bold">${stars} <span class="text-gray-400 font-normal">(${reviewCount})</span></div>
-                        <button class="text-[10px] bg-green-50 text-green-700 px-2 py-1 rounded hover:bg-green-100 transition">View on Map ➔</button>
+                        <div class="text-xs font-bold" style="color: #f59e0b !important;">${stars} <span style="color: #9ca3af !important;">(${reviewCount})</span></div>
+                        <button class="text-[10px] px-2 py-1 rounded transition font-semibold" style="background-color: #ecfdf5 !important; color: #047857 !important;">View on Map ➔</button>
                     </div>
                 </div>
             `;
 
-            card.addEventListener('click', () => flyToLocation(attraction.id, attraction.lat, attraction.lng));
+            card.addEventListener('click', () => {
+                // Use latitude/longitude from API (not lat/lng)
+                const lat = attraction.latitude || attraction.lat;
+                const lng = attraction.longitude || attraction.lng;
+                flyToLocation(attraction.id, lat, lng);
+            });
             listContainer.appendChild(card);
         });
     }

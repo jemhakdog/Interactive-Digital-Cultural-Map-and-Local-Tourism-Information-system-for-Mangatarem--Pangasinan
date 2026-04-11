@@ -290,18 +290,25 @@
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         const mapEl = document.getElementById('establishment-map');
-        if (mapEl) {
+        const longitude = {{ establishment.longitude }};
+        const latitude = {{ establishment.latitude }};
+        
+        if (mapEl && longitude && latitude && !isNaN(longitude) && !isNaN(latitude)) {
             mapboxgl.accessToken = '{{ config.get("MAPBOX_ACCESS_TOKEN", "") }}';
             const map = new mapboxgl.Map({
                 container: 'establishment-map',
                 style: 'mapbox://styles/mapbox/dark-v11',
-                center: [{{ establishment.longitude }}, {{ establishment.latitude }}],
+                center: [longitude, latitude],
                 zoom: 15,
                 interactive: false
             });
             new mapboxgl.Marker({ color: '#10b981' })
-                .setLngLat([{{ establishment.longitude }}, {{ establishment.latitude }}])
+                .setLngLat([longitude, latitude])
                 .addTo(map);
+        } else if (mapEl) {
+            // Hide map container if no valid coordinates
+            mapEl.parentElement.style.display = 'none';
+            console.warn('Invalid coordinates for establishment map:', { longitude, latitude });
         }
     });
 </script>
