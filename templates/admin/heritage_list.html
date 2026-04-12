@@ -105,8 +105,8 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-5m-5 5l.5-4.5 9-9-4.5-.5-9 9l4.5 4.5z"></path>
                                     </svg>
                                 </a>
-                                <form action="{{ url_for('admin.admin_heritage_delete', heritage_type=heritage_type, item_id=item.id) }}" 
-                                      method="POST" onsubmit="return confirm('Archive this record? Permanent removal.');" class="inline">
+                                <form action="{{ url_for('admin.admin_heritage_delete', heritage_type=heritage_type, item_id=item.id) }}"
+                                      method="POST" data-action="confirm-delete" data-confirm-message="Archive this records? Permanent removal." class="inline">
                                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                     <button type="submit" class="p-2 hover:bg-red-500/10 text-red-400 rounded transition-colors" title="Delete">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

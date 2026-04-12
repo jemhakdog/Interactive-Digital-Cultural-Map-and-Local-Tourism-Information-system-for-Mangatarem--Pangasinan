@@ -1,0 +1,59 @@
+/* Utility classes for refactored inline styles */
+
+/* Dot pattern background for gallery */
+.bg-dot-pattern {
+    background-image: radial-gradient(circle at 2px 2px, rgba(255, 255, 255, 0.1) 1px, transparent 0);
+    background-size: 40px 40px;
+}
+
+/* Map card color overrides */
+.map-card-title {
+    color: #064e3b !important;
+    -webkit-text-fill-color: #064e3b !important;
+}
+
+.map-card-subtitle {
+    color: #6b7280 !important;
+    -webkit-text-fill-color: #6b7280 !important;
+}
+
+.map-card-bg {
+    background-color: #ffffff !important;
+}
+
+.map-card-text {
+    color: #111827 !important;
+    -webkit-text-fill-color: #111827 !important;
+}
+
+.map-card-description {
+    color: #374151 !important;
+    -webkit-text-fill-color: #374151 !important;
+}
+
+.map-card-badge-bg {
+    background-color: #ecfdf5 !important;
+}
+
+.map-card-badge-icon {
+    color: #10b981 !important;
+}
+
+.map-card-badge-text {
+    color: #047857 !important;
+}
+
+.map-card-category-nature {
+    background-color: #f0fdf4 !important;
+    color: #15803d !important;
+}
+
+.map-card-category-default {
+    background-color: #f9fafb !important;
+    color: #4b5563 !important;
+}
+
+.map-card-button {
+    background-color: #111827 !important;
+    color: #ffffff !important;
+}

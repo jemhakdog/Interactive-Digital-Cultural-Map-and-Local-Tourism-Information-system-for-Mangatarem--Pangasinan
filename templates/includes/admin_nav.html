@@ -45,7 +45,7 @@
 <div class="relative" id="admin-more-dropdown">
     <button type="button"
         class="flex items-center gap-2 transition-all duration-300 group text-gray-300 hover:text-emerald-400"
-        onclick="toggleAdminMoreDropdown()">
+        id="admin-more-toggle">
         <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor"
             viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -114,29 +114,4 @@
         class="bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 px-5 py-2 rounded-full hover:bg-emerald-600 hover:text-white transition-all duration-300 text-sm font-bold">Logout</a>
 </div>
 
-<script>
-function toggleAdminMoreDropdown() {
-    const menu = document.getElementById('admin-more-menu');
-    const chevron = document.getElementById('more-dropdown-chevron');
-    
-    if (menu.classList.contains('hidden')) {
-        menu.classList.remove('hidden');
-        chevron.style.transform = 'rotate(180deg)';
-    } else {
-        menu.classList.add('hidden');
-        chevron.style.transform = 'rotate(0deg)';
-    }
-}
-
-// Close dropdown when clicking outside
-document.addEventListener('click', function(event) {
-    const dropdown = document.getElementById('admin-more-dropdown');
-    const menu = document.getElementById('admin-more-menu');
-    const chevron = document.getElementById('more-dropdown-chevron');
-    
-    if (dropdown && !dropdown.contains(event.target)) {
-        menu.classList.add('hidden');
-        chevron.style.transform = 'rotate(0deg)';
-    }
-});
-</script>
+<script src="{{ url_for('static', filename='js/components/admin-nav.js') }}" defer></script>

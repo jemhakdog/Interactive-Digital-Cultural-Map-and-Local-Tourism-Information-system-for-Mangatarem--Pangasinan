@@ -69,42 +69,42 @@
 
 {% block content %}
 <!-- Hero Section - Cinematic Glass Bento -->
-<section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-emerald-950">
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-forest-black">
     <!-- Immersive Background -->
     <div class="absolute inset-0 z-0">
         <img src="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DJI_0218.jpg" alt="Mangatarem Landscape"
             class="w-full h-full object-cover scale-105 animate-slow-zoom">
-        <div class="absolute inset-0 bg-gradient-to-b from-emerald-950/40 via-transparent to-emerald-950"></div>
+        <div class="absolute inset-0 bg-gradient-to-b from-forest-black/40 via-transparent to-forest-black"></div>
     </div>
 
     <!-- Hero Glass Card -->
     <div class="container mx-auto px-6 relative z-10">
         <div class="max-w-4xl mx-auto glass-aura p-12 md:p-20 rounded-[2.5rem] text-center" data-aos="zoom-in" data-aos-duration="1500">
             <span
-                class="inline-block px-4 py-1.5 rounded-full bg-emerald-500/20 text-emerald-400 text-xs font-bold uppercase tracking-[0.2em] mb-8 border border-emerald-500/30" data-aos="fade-down" data-aos-delay="400">
+                class="source-code-label mb-8" data-aos="fade-down" data-aos-delay="400">
                 Pangasinan's Hidden Sanctuary
             </span>
-            <h1 class="hero-title text-white !mb-6 !transform-none !opacity-100" data-aos="fade-up" data-aos-delay="600">
+            <h1 class="text-6xl md:text-8xl font-bold text-white font-display !mb-6 !transform-none !opacity-100" data-aos="fade-up" data-aos-delay="600">
                 Mangatarem
             </h1>
-            <p class="text-xl md:text-2xl mb-12 text-emerald-50 font-light leading-relaxed max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="800">
+            <p class="text-xl md:text-2xl mb-12 text-silver-teal font-light leading-relaxed max-w-2xl mx-auto" data-aos="fade-up" data-aos-delay="800">
                 Discover the 82 barangays of a town where history breathes and nature thrives in every corner.
             </p>
 
             <!-- Quick Action Bento -->
             <div class="flex flex-col md:flex-row items-center justify-center gap-6">
-                <a href="{{ url_for('public.map_view') }}" class="btn-heritage group !rounded-full !px-10">
+                <a href="{{ url_for('public.map_view') }}" class="btn-pill-primary">
                     Explore Interactive Map
-                    <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none"
+                    <svg class="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                     </svg>
                 </a>
-                <form action="{{ url_for('public.search') }}" method="GET" class="relative group min-w-[300px]">
+                <form action="{{ url_for('public.search') }}" method="GET" class="relative group min-w-[320px]">
                     <input type="text" name="q" placeholder="What are you looking for?"
-                        class="w-full bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white rounded-full px-8 py-4 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 transition-all">
-                    <button type="submit" class="absolute right-4 top-3 text-white/50 group-hover:text-emerald-400">
+                        class="w-full bg-white/10 backdrop-blur-md border border-white/20 text-white placeholder-white rounded-full pl-8 pr-16 py-4 focus:outline-none focus:ring-1 focus:ring-mongodb-green transition-all">
+                    <button type="submit" class="absolute right-6 top-1/2 -translate-y-1/2 text-white/50 group-hover:text-mongodb-green transition-colors">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -127,23 +127,23 @@
 <div class="relative z-20 -mt-10 mb-20">
     <div class="container mx-auto px-6">
         <div
-            class="glass-card !bg-white/90 p-8 md:p-12 rounded-[2rem] shadow-2xl flex flex-wrap justify-around gap-12 border border-white/50">
+            class="bg-white p-8 md:p-12 rounded-[2rem] shadow-forest flex flex-wrap justify-around gap-12 border border-white/50 relative z-20 overflow-hidden">
             <div class="text-center group">
                 <span
-                    class="block text-4xl font-bold text-emerald-900 group-hover:scale-110 transition-transform">82</span>
-                <span class="text-xs uppercase tracking-widest text-emerald-600/60 font-bold">Barangays</span>
+                    class="block text-4xl font-bold text-forest-black font-display group-hover:scale-110 transition-transform">82</span>
+                <span class="source-code-label !text-teal-gray !text-[10px]">Barangays</span>
             </div>
-            <div class="w-px h-12 bg-emerald-900/10 hidden md:block"></div>
+            <div class="w-px h-12 bg-forest-black/10 hidden md:block"></div>
             <div class="text-center group">
                 <span
-                    class="block text-4xl font-bold text-emerald-900 group-hover:scale-110 transition-transform">1835</span>
-                <span class="text-xs uppercase tracking-widest text-emerald-600/60 font-bold">Established</span>
+                    class="block text-4xl font-bold text-forest-black font-display group-hover:scale-110 transition-transform">1835</span>
+                <span class="source-code-label !text-teal-gray !text-[10px]">Established</span>
             </div>
-            <div class="w-px h-12 bg-emerald-900/10 hidden md:block"></div>
+            <div class="w-px h-12 bg-forest-black/10 hidden md:block"></div>
             <div class="text-center group">
                 <span
-                    class="block text-4xl font-bold text-emerald-900 group-hover:scale-110 transition-transform">150+</span>
-                <span class="text-xs uppercase tracking-widest text-emerald-600/60 font-bold">Heritage Sites</span>
+                    class="block text-4xl font-bold text-forest-black font-display group-hover:scale-110 transition-transform">150+</span>
+                <span class="source-code-label !text-teal-gray !text-[10px]">Heritage Sites</span>
             </div>
         </div>
     </div>
@@ -154,13 +154,14 @@
     <div class="container mx-auto px-6">
         <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
             <div class="max-w-2xl" data-aos="fade-right">
-                <span class="caption-serif">Curated Masterpieces</span>
-                <h2 class="text-5xl md:text-6xl font-bold text-emerald-950 mt-4 leading-tight" style="color: #022c22 !important;">Heritage Spotlight</h2>
-                <p class="text-gray-600 text-lg mt-6 leading-relaxed">
+                <span class="source-code-label">Curated Masterpieces</span>
+                <h2 class="text-5xl md:text-6xl font-bold text-forest-black font-display mt-4 leading-tight">
+                    <span class="accent-underline">Heritage</span> Spotlight</h2>
+                <p class="text-teal-gray text-lg mt-6 leading-relaxed">
                     A collection of the most significant cultural and natural landmarks that define our town's identity.
                 </p>
             </div>
-            <a href="{{ url_for('public.barangays') }}" class="btn-heritage-outline !rounded-full group" data-aos="fade-left">
+            <a href="{{ url_for('public.barangays') }}" class="btn-pill-secondary group" data-aos="fade-left">
                 Browse All Places
                 <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
@@ -178,26 +179,26 @@
                 data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
                 <img src="{{ attraction.image_url }}" alt="{{ attraction.name }}"
                     class="w-full h-full object-cover spotlight-img">
-                <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/95 via-emerald-950/40 to-transparent">
+                <div class="absolute inset-0 bg-gradient-to-t from-forest-black/95 via-forest-black/40 to-transparent">
                 </div>
 
                 <div class="absolute top-6 left-6">
                     <span
-                        class="bg-emerald-500 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-white border border-emerald-400">
+                        class="bg-mongodb-green px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-forest-black border border-mongodb-green">
                         {{ attraction.category }}
                     </span>
                 </div>
 
                 <div class="absolute bottom-0 left-0 p-8 w-full group-hover:pb-10 transition-all">
                     <h3
-                        class="{% if loop.index == 1 %}text-4xl{% else %}text-2xl{% endif %} font-bold text-white mb-3 leading-tight text-shadow-md">
+                        class="{% if loop.index == 1 %}text-4xl{% else %}text-2xl{% endif %} font-bold text-white mb-3 font-display leading-tight">
                         {{ attraction.name }}
                     </h3>
-                    <p class="text-white/90 text-sm mb-6 line-clamp-2 font-medium">
+                    <p class="text-silver-teal text-sm mb-6 line-clamp-2 font-medium">
                         {{ attraction.description }}
                     </p>
                     <a href="{{ url_for('public.attraction_detail', id=attraction.id) }}"
-                        class="inline-flex items-center text-emerald-300 hover:text-emerald-400 font-bold text-sm group/link">
+                        class="inline-flex items-center text-mongodb-green hover:text-white font-bold text-sm group/link transition-colors">
                         <span>Explore Story</span>
                         <svg class="w-4 h-4 ml-2 group-hover/link:translate-x-1 transition-transform" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
@@ -222,8 +223,9 @@
 <section id="experiences" class="py-24 bg-white overflow-hidden">
     <div class="container mx-auto px-6">
         <div class="mb-16 reveal">
-            <span class="caption-serif">Exploration Tracks</span>
-            <h2 class="text-4xl md:text-5xl font-bold text-emerald-950 mt-4 leading-tight" style="color: #022c22 !important;">Curated Journeys</h2>
+            <span class="source-code-label">Exploration Tracks</span>
+            <h2 class="text-4xl md:text-5xl font-bold text-forest-black font-display mt-4 leading-tight">
+                <span class="accent-underline">Curated</span> Journeys</h2>
         </div>
 
         <div class="bento-grid">
@@ -232,16 +234,16 @@
                 <img src="{{ url_for('static', filename='img/st_raymund_church.webp') }}" alt="Heritage Walk"
                     class="w-full h-full object-cover spotlight-img">
                 <div
-                    class="absolute inset-0 bg-emerald-950/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-10">
-                    <span class="caption-serif !text-emerald-400 mb-2">History & Architecture</span>
-                    <h3 class="text-3xl font-bold text-white mb-4">The Heritage Walk</h3>
-                    <p class="text-emerald-50 mb-8 font-light">Explore centuries-old structures that tell the story
+                    class="absolute inset-0 bg-forest-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-10">
+                    <span class="source-code-label !text-mongodb-green mb-2">History & Architecture</span>
+                    <h3 class="text-3xl font-bold text-white font-display mb-4">The Heritage Walk</h3>
+                    <p class="text-silver-teal mb-8 font-light">Explore centuries-old structures that tell the story
                         of our town's Spanish colonial legacy.</p>
                     <a href="{{ url_for('public.map_view') }}"
-                        class="btn-heritage !rounded-full !py-3 !text-sm w-max">Start Journey</a>
+                        class="btn-pill-primary !py-3 !text-sm w-max">Start Journey</a>
                 </div>
                 <div class="absolute bottom-6 left-6 group-hover:opacity-0 transition-opacity">
-                    <h3 class="text-2xl font-bold text-white shadow-sm">Heritage Walk</h3>
+                    <h3 class="text-2xl font-bold text-white">Heritage Walk</h3>
                 </div>
             </div>
 
@@ -250,16 +252,16 @@
                 <img src="{{ url_for('static', filename='img/manleluag_spring.webp') }}" alt="Eco-Trail"
                     class="w-full h-full object-cover spotlight-img">
                 <div
-                    class="absolute inset-0 bg-emerald-950/60 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-10">
-                    <span class="caption-serif !text-emerald-400 mb-2">Nature & Expedition</span>
-                    <h3 class="text-3xl font-bold text-white mb-4">The Eco-Trail</h3>
-                    <p class="text-emerald-50 mb-8 font-light">Immerse yourself in lush forests and therapeutic hot
+                    class="absolute inset-0 bg-forest-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-10">
+                    <span class="source-code-label !text-mongodb-green mb-2">Nature & Expedition</span>
+                    <h3 class="text-3xl font-bold text-white font-display mb-4">The Eco-Trail</h3>
+                    <p class="text-silver-teal mb-8 font-light">Immerse yourself in lush forests and therapeutic hot
                         springs at Manleluag Spring National Park.</p>
                     <a href="{{ url_for('public.map_view') }}"
-                        class="btn-heritage !rounded-full !py-3 !text-sm w-max">Plan Your Trek</a>
+                        class="btn-pill-primary !py-3 !text-sm w-max">Plan Your Trek</a>
                 </div>
                 <div class="absolute bottom-6 left-6 group-hover:opacity-0 transition-opacity">
-                    <h3 class="text-2xl font-bold text-white shadow-sm">Eco-Trail</h3>
+                    <h3 class="text-2xl font-bold text-white">Eco-Trail</h3>
                 </div>
             </div>
         </div>
@@ -267,7 +269,7 @@
 </section>
 
 <!-- Interactive Map Teaser - Premium Glass Bento Integration -->
-<section class="py-24 bg-emerald-950 relative overflow-hidden">
+<section class="py-24 bg-forest-black relative overflow-hidden">
     <div class="aurora-bg absolute inset-0">
         <div class="aurora-glow glow-1"></div>
         <div class="aurora-glow glow-2"></div>
@@ -278,14 +280,14 @@
             <div
                 class="col-span-4 row-span-3 glass-aura rounded-[3rem] p-8 md:p-16 flex flex-col md:flex-row items-center gap-16 reveal">
                 <div class="md:w-1/2">
-                    <span class="caption-serif !text-emerald-400">Digital Atlas</span>
-                    <h2 class="text-5xl md:text-6xl font-bold text-white mt-4 mb-8 leading-tight">Navigate the Legacy
+                    <span class="source-code-label">Digital Atlas</span>
+                    <h2 class="text-5xl md:text-6xl font-bold text-white font-display mt-4 mb-8 leading-tight">Navigate the Legacy
                     </h2>
-                    <p class="text-emerald-50 text-lg mb-12 font-light leading-relaxed">
+                    <p class="text-silver-teal text-lg mb-12 font-light leading-relaxed">
                         Our interactive cultural map provides a window into the 82 barangays. Filter by heritage sites,
                         local eateries, or natural landmarks.
                     </p>
-                    <a href="{{ url_for('public.map_view') }}" class="btn-heritage !rounded-full !px-12 group">
+                    <a href="{{ url_for('public.map_view') }}" class="btn-pill-primary !px-12 group">
                         Open Map Interface
                         <svg class="w-5 h-5 ml-2 group-hover:rotate-45 transition-transform" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
@@ -296,7 +298,7 @@
                 </div>
                 <div class="md:w-1/2 relative group">
                     <div
-                        class="absolute -inset-4 bg-emerald-500/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity">
+                        class="absolute -inset-4 bg-mongodb-green/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity">
                     </div>
                     <img src="{{ url_for('static', filename='img/mangatarem_map_teaser.webp') }}" alt="Map Preview"
                         class="w-full h-auto aspect-video object-cover rounded-2xl border border-white/10 shadow-2xl relative z-10 transform group-hover:scale-[1.02] transition-transform duration-500">
@@ -311,16 +313,16 @@
     <div class="container mx-auto px-6">
         <div class="bento-grid">
             <!-- Events Card -->
-            <div class="col-span-2 row-span-2 glass-card !bg-white p-12 border-l-8 border-emerald-600 reveal group">
-                <span class="caption-serif">Live Culture</span>
-                <h3 class="text-4xl font-bold text-emerald-950 mt-4 mb-6 leading-tight" style="color: #022c22 !important;">Upcoming Festivals</h3>
-                <p class="text-gray-600 mb-10 leading-relaxed font-light">
+            <div class="col-span-2 row-span-2 bg-white p-12 border-l-8 border-mongodb-green shadow-forest reveal group">
+                <span class="source-code-label !text-teal-gray">Live Culture</span>
+                <h3 class="text-4xl font-bold text-forest-black font-display mt-4 mb-6 leading-tight">Upcoming Festivals</h3>
+                <p class="text-teal-gray mb-10 leading-relaxed font-light">
                     Celebrate the vibrant traditions that bring our 82 barangays together in community and spirit.
                 </p>
                 <a href="{{ url_for('public.events') }}"
-                    class="inline-flex items-center text-emerald-700 font-bold group/link">
-                    <span class="border-b-2 border-emerald-700 pb-1">View Calendar</span>
-                    <svg class="w-5 h-5 ml-4 group-hover/link:translate-x-2 transition-transform" fill="none"
+                    class="inline-flex items-center text-forest-black font-bold group/link">
+                    <span class="accent-underline accent-underline-blue pb-1">View Calendar</span>
+                    <svg class="w-5 h-5 ml-4 group-hover/link:translate-x-2 transition-transform text-action-blue" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
@@ -329,16 +331,16 @@
             </div>
 
             <!-- Gallery Card -->
-            <div class="col-span-2 row-span-2 glass-card !bg-white p-12 border-l-8 border-emerald-300 reveal group">
-                <span class="caption-serif">Visual Archive</span>
-                <h3 class="text-4xl font-bold text-emerald-950 mt-4 mb-6 leading-tight" style="color: #022c22 !important;">Community Stories</h3>
-                <p class="text-gray-600 mb-10 leading-relaxed font-light">
+            <div class="col-span-2 row-span-2 bg-white p-12 border-l-8 border-silver-teal shadow-forest reveal group">
+                <span class="source-code-label !text-teal-gray">Visual Archive</span>
+                <h3 class="text-4xl font-bold text-forest-black font-display mt-4 mb-6 leading-tight">Community Stories</h3>
+                <p class="text-teal-gray mb-10 leading-relaxed font-light">
                     Explore a curated collection of memories and moments shared by our residents and guests.
                 </p>
                 <a href="{{ url_for('public.gallery') }}"
-                    class="inline-flex items-center text-emerald-700 font-bold group/link">
-                    <span class="border-b-2 border-emerald-700 pb-1">Browse Gallery</span>
-                    <svg class="w-5 h-5 ml-4 group-hover/link:translate-x-2 transition-transform" fill="none"
+                    class="inline-flex items-center text-forest-black font-bold group/link">
+                    <span class="accent-underline pb-1">Browse Gallery</span>
+                    <svg class="w-5 h-5 ml-4 group-hover/link:translate-x-2 transition-transform text-mongodb-green" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
@@ -350,18 +352,18 @@
 </section>
 
 <!-- Newsletter Section - Premium Glassmorphism -->
-<section class="py-32 bg-emerald-950 relative overflow-hidden">
+<section class="py-32 bg-forest-black relative overflow-hidden">
     <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/felt.png')]"></div>
     <div class="container mx-auto px-6 text-center relative z-10" data-aos="zoom-in">
         <div class="max-w-3xl mx-auto glass-aura p-16 rounded-[3rem] border-white/5 shadow-inner">
-            <span class="caption-serif !text-emerald-400 mb-6">Stay Connected</span>
-            <h2 class="text-4xl md:text-5xl font-bold text-white mb-8">Join the Digital Archive</h2>
-            <p class="text-emerald-50 text-lg mb-12 font-light max-w-xl mx-auto leading-relaxed">
+            <span class="source-code-label mb-6">Stay Connected</span>
+            <h2 class="text-4xl md:text-5xl font-bold text-white font-display mb-8">Join the Digital Archive</h2>
+            <p class="text-silver-teal text-lg mb-12 font-light max-w-xl mx-auto leading-relaxed">
                 Receive the latest cultural discoveries, festival schedules, and community heritage stories directly in
                 your inbox.
             </p>
 
-            <form class="max-w-md mx-auto group" onsubmit="return handleNewsletterSubmit(event)">
+            <form class="max-w-md mx-auto group" data-action="newsletter-submit">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div
                     class="relative flex items-center p-1.5 bg-white/10 hover:bg-white/15 border border-white/20 focus-within:ring-2 focus-within:ring-emerald-500/50 rounded-full transition-all">
@@ -369,7 +371,7 @@
                         class="w-full pl-10 pr-2 py-3 bg-transparent text-white placeholder-white focus:outline-none"
                         placeholder="Enter your email" required aria-label="Email address" />
                     <button type="submit"
-                        class="shrink-0 px-8 py-3 bg-emerald-500 hover:bg-emerald-400 text-emerald-950 font-bold rounded-full transition-all text-sm uppercase tracking-widest">
+                        class="shrink-0 px-8 py-3 bg-mongodb-green hover:bg-white text-forest-black font-bold rounded-full transition-all text-sm uppercase tracking-widest">
                         Join
                     </button>
                 </div>

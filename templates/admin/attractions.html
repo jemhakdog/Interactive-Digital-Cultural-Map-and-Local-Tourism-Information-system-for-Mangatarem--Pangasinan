@@ -164,9 +164,8 @@
                                     class="flex-grow action-btn bg-emerald-600 hover:bg-emerald-700 text-white py-2 rounded-xl text-xs font-black text-center shadow-lg shadow-emerald-600/20">
                                     Approve Landmark
                                 </a>
-                                <button data-url="{{ url_for('admin.delete_attraction', id=attraction.id) }}"
-                                    data-msg="Reject this submission?"
-                                    onclick="confirmDelete(this.dataset.url, this.dataset.msg)"
+                                <button data-delete-url="{{ url_for('admin.delete_attraction', id=attraction.id) }}"
+                                    data-delete-message="Reject this submission?"
                                     class="action-btn bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-xl text-xs font-black transition-colors">
                                     Reject
                                 </button>
@@ -267,8 +266,7 @@
                                                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                     </a>
-                                    <button data-url="{{ url_for('admin.delete_attraction', id=attraction.id) }}"
-                                        onclick="confirmDelete(this.dataset.url)"
+                                    <button data-delete-url="{{ url_for('admin.delete_attraction', id=attraction.id) }}"
                                         class="action-btn p-2.5 bg-white border border-red-100 text-red-500 rounded-xl hover:bg-red-50 hover:border-red-200 transition-all shadow-sm">
                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -311,11 +309,5 @@
 </div>
 
 <script src="{{ url_for('static', filename='js/pages/admin_attractions.js') }}" defer></script>
-<script>
-    function confirmDelete(url, message = 'Are you sure you want to delete this attraction? This action cannot be undone.') {
-        if (confirm(message)) {
-            window.location.href = url;
-        }
-    }
-</script>
+<script src="{{ url_for('static', filename='js/components/delete-confirmation.js') }}" defer></script>
 {% endblock %}

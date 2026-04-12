@@ -42,7 +42,7 @@
                         <a href="{{ url_for('barangay.barangay_edit_attraction', id=attraction.id) }}"
                             class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
                         <button
-                            onclick="confirmDelete('{{ url_for('barangay.barangay_delete_attraction', id=attraction.id) }}')"
+                            data-delete-url="{{ url_for('barangay.barangay_delete_attraction', id=attraction.id) }}"
                             class="text-red-600 hover:text-red-800 font-medium">Delete</button>
                     </div>
                 </li>

@@ -1,3 +1,49 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  body {
+    @apply font-body font-light text-forest-black bg-white antialiased;
+  }
+}
+
+@layer components {
+  .btn-pill-primary {
+    @apply px-10 py-3.5 rounded-full bg-mongodb-green text-black font-body font-bold text-sm transition-all duration-300 hover:scale-105 active:scale-95 border-2 border-mongodb-green shadow-xl shadow-mongodb-green/10 hover:shadow-mongodb-green/20;
+  }
+  
+  .btn-pill-secondary {
+    @apply px-10 py-3.5 rounded-full bg-deep-teal text-white font-body font-medium text-sm transition-all duration-300 hover:bg-forest-black hover:text-mongodb-green hover:border-mongodb-green/30 border-2 border-teal-gray/20 shadow-lg;
+  }
+}
+
+@layer utilities {
+  .accent-underline {
+    position: relative;
+    display: inline-block;
+  }
+  
+  .accent-underline::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: #00ed64; /* mongodb-green */
+    transition: width 0.3s ease;
+  }
+
+  .accent-underline-blue::after {
+    background-color: #006cfa; /* action-blue */
+  }
+
+  .source-code-label {
+    @apply font-code text-[14px] uppercase tracking-[2px] font-medium text-mongodb-green;
+  }
+
+  .shadow-forest {
+    box-shadow: rgba(0, 30, 43, 0.12) 0px 26px 44px, rgba(0, 0, 0, 0.13) 0px 7px 13px;
+  }
+}

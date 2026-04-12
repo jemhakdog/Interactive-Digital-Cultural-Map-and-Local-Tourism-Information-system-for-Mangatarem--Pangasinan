@@ -63,9 +63,7 @@
     <div class="absolute inset-0 bg-black/40"></div>
 
     <!-- Decorative Mesh -->
-    <div class="absolute inset-0 opacity-20 pointer-events-none"
-        style="background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0); background-size: 40px 40px;">
-    </div>
+    <div class="absolute inset-0 opacity-20 pointer-events-none bg-dot-pattern"></div>
 
     <div class="relative z-10 text-center text-white px-6 max-w-5xl staggered-entry">
         <span
@@ -80,7 +78,7 @@
             Explore the emerald soul of our town through the eyes of those who call it home.
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <button onclick="document.getElementById('upload-modal').classList.remove('hidden')"
+            <button data-action="open-modal" data-modal-id="upload-modal"
                 class="btn-premium group relative bg-white text-emerald-950 px-10 py-4 rounded-full font-bold text-base hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-300 flex items-center gap-3">
                 <svg class="w-5 h-5 group-hover:translate-y-[-2px] transition-transform" fill="none"
                     stroke="currentColor" viewBox="0 0 24 24">
@@ -170,7 +168,7 @@
                 data-caption="{{ item.caption }}"
                 data-barangay="{{ item.user.barangay if item.user and item.user.barangay else 'Mangatarem' }}"
                 data-username="{{ item.user.username if item.user else 'Curator' }}"
-                data-date="{{ item.uploaded_at.isoformat() }}" onclick="handleItemClick(this)">
+                data-date="{{ item.uploaded_at.isoformat() }}" data-action="handle-item-click">
 
                 {% if item.type == 'photo' %}
                 <div class="w-full aspect-auto overflow-hidden">
@@ -237,7 +235,7 @@
             <h3 class="text-3xl font-cultural font-bold text-gray-900 mb-4">Capturing our History</h3>
             <p class="text-gray-500 mb-10 leading-relaxed font-medium">There are currently no media entries. Be the
                 first to immortalize our heritage by contributing your photos or videos.</p>
-            <button onclick="document.getElementById('upload-modal').classList.remove('hidden')"
+            <button data-action="open-modal" data-modal-id="upload-modal"
                 class="bg-emerald-950 text-white px-10 py-3.5 rounded-full font-bold hover:shadow-xl hover:shadow-emerald-950/20 transition-all duration-300">
                 Submit First Entry
             </button>
@@ -260,7 +258,7 @@
             </div>
             <div class="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">GoMangatarem Cinema</div>
         </div>
-        <button onclick="closeLightbox()"
+        <button data-action="close-lightbox"
             class="p-4 rounded-full bg-white/5 hover:bg-white/10 text-white transition-all group">
             <svg class="w-6 h-6 group-hover:rotate-90 transition-transform" fill="none" stroke="currentColor"
                 viewBox="0 0 24 24">
@@ -312,7 +310,7 @@
     class="fixed inset-0 z-[100] bg-emerald-950/40 hidden flex items-center justify-center backdrop-blur-md transition-all">
     <div
         class="bg-white rounded-[2.5rem] p-12 max-w-md w-full mx-4 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] transform transition-all relative">
-        <button onclick="document.getElementById('upload-modal').classList.add('hidden')"
+        <button data-action="close-modal" data-modal-id="upload-modal"
             class="absolute top-8 right-8 p-2 text-gray-400 hover:text-emerald-950 transition-colors">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
@@ -348,7 +346,7 @@
                 class="flex items-center justify-center bg-emerald-950 text-white py-4 rounded-2xl font-bold hover:bg-emerald-900 shadow-xl shadow-emerald-950/10 transition-all duration-300">
                 Sign In to Contribute
             </a>
-            <button onclick="document.getElementById('upload-modal').classList.add('hidden')"
+            <button data-action="close-modal" data-modal-id="upload-modal"
                 class="w-full py-4 text-emerald-600 font-bold hover:text-emerald-800 transition-colors">
                 Return to Gallery
             </button>

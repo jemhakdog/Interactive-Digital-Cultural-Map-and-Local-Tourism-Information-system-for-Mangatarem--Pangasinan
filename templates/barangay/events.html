@@ -42,7 +42,7 @@
                     <div class="flex gap-3 text-sm">
                         <a href="{{ url_for('barangay.barangay_edit_event', id=event.id) }}"
                             class="text-blue-600 hover:text-blue-800 font-medium">Edit</a>
-                        <button onclick="confirmDelete('{{ url_for('barangay.barangay_delete_event', id=event.id) }}')"
+                        <button data-delete-url="{{ url_for('barangay.barangay_delete_event', id=event.id) }}"
                             class="text-red-600 hover:text-red-800 font-medium">Delete</button>
                     </div>
                 </li>

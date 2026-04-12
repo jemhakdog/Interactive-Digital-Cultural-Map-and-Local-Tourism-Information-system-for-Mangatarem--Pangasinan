@@ -1,7 +1,8 @@
 from flask import Blueprint, jsonify, request, make_response
-from models import Attraction, db
+from models import Attraction, Establishment, db
 from extensions import limiter
 import logging
+import math
 from datetime import datetime, timedelta
 
 api_bp = Blueprint("api", __name__, url_prefix="/api")
@@ -190,6 +191,118 @@ def api_heritage_list(heritage_type):
         "%a, %d %b %Y %H:%M:%S GMT"
     )
     return response
+
+
+@api_bp.route("/establishments")
+@limiter.limit("20 per minute")
+def api_establishments():
+    """
+    API endpoint to retrieve approved establishments with pagination.
+
+    Query Parameters:
+    - page: Page number (default: 1)
+    - per_page: Number of establishments per page (default: 20, max: 100)
+    - type: Filter by type (inn/restaurant/cafe/fastfood)
+    - price_range: Filter by price range (budget/moderate/premium)
+    - barangay: Filter by barangay
+    - lat: User latitude for distance sorting
+    - lng: User longitude for distance sorting
+    - radius: Search radius in km (default: 10)
+
+    Returns JSON array of establishment objects.
+    """
+    logger.info("API endpoint /api/establishments called")
+
+    page = request.args.get("page", 1, type=int)
+    per_page = min(request.args.get("per_page", 20, type=int), 100)
+
+    est_type = request.args.get("type")
+    price_range = request.args.get("price_range")
+    barangay = request.args.get("barangay")
+    user_lat = request.args.get("lat", type=float)
+    user_lng = request.args.get("lng", type=float)
+    radius = request.args.get("radius", 10, type=float)
+
+    query = Establishment.query.filter(Establishment.status == "approved")
+
+    if est_type and est_type != "all":
+        query = query.filter(Establishment.type == est_type)
+    if price_range:
+        query = query.filter(Establishment.price_range == price_range)
+    if barangay and barangay != "all":
+        query = query.filter(Establishment.barangay == barangay)
+
+    paginated_establishments = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    result = []
+    for est in paginated_establishments.items:
+        est_dict = {
+            "id": est.id,
+            "name": est.name,
+            "type": est.type,
+            "description": est.description or "",
+            "address": est.address or "",
+            "latitude": est.latitude,
+            "longitude": est.longitude,
+            "contact_number": est.contact_number,
+            "price_range": est.price_range,
+            "rating_avg": est.rating_avg or 0,
+            "review_count": est.review_count or 0,
+            "cover_image_url": est.cover_image_url,
+            "logo_url": est.logo_url,
+            "amenities": est.amenities or [],
+            "barangay": est.barangay.name if est.barangay else None,
+        }
+
+        if user_lat and user_lng:
+            dist = _haversine_distance(user_lat, user_lng, est.latitude, est.longitude)
+            est_dict["distance"] = round(dist, 2)
+
+        result.append(est_dict)
+
+    if user_lat and user_lng:
+        result.sort(key=lambda x: x.get("distance", float("inf")))
+        result = [e for e in result if e.get("distance", float("inf")) <= radius]
+
+    response_data = {
+        "establishments": result,
+        "pagination": {
+            "page": page,
+            "per_page": per_page,
+            "total": paginated_establishments.total,
+            "pages": paginated_establishments.pages,
+            "has_next": paginated_establishments.has_next,
+            "has_prev": paginated_establishments.has_prev,
+        },
+    }
+
+    logger.info(
+        "Returning %d approved establishments (page %d/%d)",
+        len(result), page, paginated_establishments.pages,
+    )
+
+    response = make_response(jsonify(response_data))
+    response.headers["Cache-Control"] = "public, max-age=300"
+    response.headers["Expires"] = (datetime.utcnow() + timedelta(minutes=5)).strftime(
+        "%a, %d %b %Y %H:%M:%S GMT"
+    )
+
+    return response
+
+
+def _haversine_distance(lat1, lng1, lat2, lng2):
+    """Calculate distance between two points using Haversine formula (returns km)."""
+    R = 6371
+    dlat = math.radians(lat2 - lat1)
+    dlng = math.radians(lng2 - lng1)
+    a = (
+        math.sin(dlat / 2) ** 2
+        + math.cos(math.radians(lat1))
+        * math.cos(math.radians(lat2))
+        * math.sin(dlng / 2) ** 2
+    )
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return R * c
 
 
 @api_bp.route("/heritage/<heritage_type>/<int:item_id>")

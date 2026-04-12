@@ -1,5 +1,5 @@
 <a href="{{ url_for('public.index') }}"
-    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-emerald-400 font-bold' if request.endpoint == 'public.index' else 'text-gray-300 hover:text-emerald-400' }}">
+    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-mongodb-green font-bold' if request.endpoint == 'public.index' else 'text-gray-300 hover:text-mongodb-green' }}">
     <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor"
         viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -10,7 +10,7 @@
 </a>
 
 <a href="{{ url_for('public.map_view') }}"
-    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-emerald-400 font-bold' if request.endpoint == 'public.map_view' else 'text-gray-300 hover:text-emerald-400' }}">
+    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-mongodb-green font-bold' if request.endpoint == 'public.map_view' else 'text-gray-300 hover:text-mongodb-green' }}">
     <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor"
         viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -21,7 +21,7 @@
 </a>
 
 <a href="{{ url_for('public.barangays') }}"
-    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-emerald-400 font-bold' if request.endpoint == 'public.barangays' else 'text-gray-300 hover:text-emerald-400' }}">
+    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-mongodb-green font-bold' if request.endpoint == 'public.barangays' else 'text-gray-300 hover:text-mongodb-green' }}">
     <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor"
         viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -32,7 +32,7 @@
 </a>
 
 <a href="{{ url_for('public.events') }}"
-    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-emerald-400 font-bold' if request.endpoint == 'public.events' else 'text-gray-300 hover:text-emerald-400' }}">
+    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-mongodb-green font-bold' if request.endpoint == 'public.events' else 'text-gray-300 hover:text-mongodb-green' }}">
     <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor"
         viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -42,7 +42,7 @@
 </a>
 
 <a href="{{ url_for('public.gallery') }}"
-    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-emerald-400 font-bold' if request.endpoint == 'public.gallery' else 'text-gray-300 hover:text-emerald-400' }}">
+    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-mongodb-green font-bold' if request.endpoint == 'public.gallery' else 'text-gray-300 hover:text-mongodb-green' }}">
     <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor"
         viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -53,7 +53,7 @@
 </a>
 
 <a href="{{ url_for('public.establishments') }}"
-    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-emerald-400 font-bold' if request.endpoint == 'public.establishments' else 'text-gray-300 hover:text-emerald-400' }}">
+    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-mongodb-green font-bold' if request.endpoint == 'public.establishments' else 'text-gray-300 hover:text-mongodb-green' }}">
     <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor"
         viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -66,5 +66,5 @@
     <a href="{{ url_for('auth.login') }}"
         class="text-gray-300 font-semibold hover:text-white transition-colors text-sm">Login</a>
     <a href="{{ url_for('auth.register') }}"
-        class="bg-emerald-600 text-white px-5 py-2 rounded-full hover:bg-emerald-500 transition-all duration-300 text-sm font-bold shadow-lg shadow-emerald-900/20">Register</a>
+        class="btn-pill-primary !px-6 !py-2.5 !text-xs">Register</a>
 </div>

@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(mkdir *)"
+      "Bash(mkdir *)",
+      "Read(d:\\porjects\\Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangatarem--Pangasinan\\templates/**)",
+      "Bash(del *)",
+      "Bash(dir *)",
+      "Bash(findstr *)"
     ]
   },
   "$version": 3

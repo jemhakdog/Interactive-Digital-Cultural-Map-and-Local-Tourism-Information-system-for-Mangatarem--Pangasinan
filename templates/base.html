@@ -15,6 +15,9 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='vendor/google/fonts.css') }}">
+    
+    <!-- MongoDB Inspired Fonts (CDN fallbacks) -->
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Source+Code+Pro:wght@400;600&family=Plus+Jakarta+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
 
 
     <!-- SEO Meta Tags -->
@@ -52,19 +55,19 @@
 
 </head>
 
-<body class="{% block body_class %}bg-gray-50{% endblock %} text-gray-800 flex flex-col {% block body_height %}min-h-screen{% endblock %}">
+<body class="{% block body_class %}bg-white{% endblock %} text-forest-black font-body font-light flex flex-col {% block body_height %}min-h-screen{% endblock %}">
     <!-- AUTH_DEBUG: is_authenticated={{ current_user.is_authenticated }}, role={{ current_user.role if current_user.is_authenticated else 'anonymous' }} -->
 
     <!-- Navigation -->
     {% block navbar %}
     <nav
-        class="bg-emerald-950/80 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50 transition-all duration-300">
+        class="bg-forest-black/95 backdrop-blur-2xl border-b border-white/5 sticky top-0 z-50 transition-all duration-300">
         <div class="container mx-auto px-6 py-4">
             <div class="flex justify-between items-center">
 
                 <a href="{{ url_for('public.index') }}"
                     class="text-2xl font-bold text-white flex items-center gap-2 group leading-none">
-                    <svg class="w-8 h-8 text-emerald-500 transform group-hover:rotate-12 transition-transform duration-500"
+                    <svg class="w-8 h-8 text-mongodb-green transform group-hover:rotate-12 transition-transform duration-500"
                         fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M12 21c4.97 0 9-4.03 9-9s-4.03-9-9-9-9 4.03-9 9 4.03 9 9 9zM12 21c-1.5 0-3-1.5-3-3s1.5-3 3-3 3 1.5 3 3-1.5 3-3 3z">
@@ -72,15 +75,15 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                             d="M12 15c1.5-1.5 3-3 3-4.5 0-3-3-4.5-3-4.5s-3 1.5-3 4.5c0 1.5 1.5 3 3 4.5z"></path>
                     </svg>
-                    <span class="tracking-tight font-heading">GoMangatarem</span>
+                    <span class="tracking-tight font-display">GoMangatarem</span>
                 </a>
 
                 <div class="hidden md:flex space-x-8 items-center text-sm font-medium text-gray-300">
                     <form action="{{ url_for('public.search') }}" method="GET" class="relative group">
-                        <input type="text" name="q" placeholder="Explorer..."
-                            class="bg-emerald-900/40 text-emerald-100 placeholder-emerald-500/50 text-xs rounded-full px-5 py-2 focus:outline-none focus:ring-2 focus:ring-emerald-500/50 w-36 focus:w-56 transition-all duration-500 border border-white/10 backdrop-blur-md">
+                        <input type="text" name="q" placeholder="Explore Heritage..."
+                            class="bg-white/5 text-white placeholder-gray-500 text-sm rounded-full pl-6 pr-12 py-2.5 focus:outline-none focus:ring-1 focus:ring-mongodb-green w-48 focus:w-72 transition-all duration-500 border border-white/10 backdrop-blur-md">
                         <button type="submit"
-                            class="absolute right-4 top-2 text-emerald-500/50 group-hover:text-emerald-400 transition-colors">
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 group-hover:text-mongodb-green transition-colors">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -115,13 +118,13 @@
             </div>
         </div>
 
-        <div id="mobile-menu" class="hidden md:hidden bg-gray-800 border-t border-gray-700">
+        <div id="mobile-menu" class="hidden md:hidden bg-forest-black border-t border-white/5">
             <div class="px-6 py-4 space-y-3 flex flex-col text-gray-300">
                 <form action="{{ url_for('public.search') }}" method="GET" class="mb-4 relative group">
                     <input type="text" name="q" placeholder="Explore Mangatarem..."
-                        class="w-full bg-emerald-900/40 text-emerald-100 placeholder-emerald-500/50 text-sm rounded-xl px-5 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 border border-white/10 backdrop-blur-md">
+                        class="w-full bg-white/5 text-white placeholder-gray-500 text-sm rounded-xl px-5 py-3 focus:outline-none focus:ring-1 focus:ring-mongodb-green border border-white/10 backdrop-blur-md">
                     <button type="submit"
-                        class="absolute right-4 top-3 text-emerald-500/50 group-hover:text-white transition-colors">
+                        class="absolute right-4 top-3 text-gray-500 group-hover:text-white transition-colors">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -153,8 +156,7 @@
 
     <!-- Footer -->
     {% block footer %}
-    <footer class="relative bg-emerald-950 text-emerald-50 pt-16 pb-8 overflow-hidden border-t border-emerald-900/50"
-        style="background-color: #022c22;">
+    <footer class="relative bg-forest-black text-white pt-24 pb-12 overflow-hidden border-t border-white/5">
         <!-- Heritage Horizon: Topographic Line Effect -->
         <div class="absolute top-0 left-0 w-full h-full opacity-[0.05] pointer-events-none select-none overflow-hidden"
             aria-hidden="true">
@@ -168,7 +170,7 @@
         </div>
 
         <!-- Large Typographic Background -->
-        <div class="absolute -bottom-10 -left-10 text-[15rem] font-bold text-emerald-400/[0.03] leading-none pointer-events-none select-none font-heading uppercase tracking-tighter"
+        <div class="absolute -bottom-10 -left-10 text-[15rem] font-bold text-mongodb-green/[0.02] leading-none pointer-events-none select-none font-display uppercase tracking-tighter"
             aria-hidden="true">
             Mangatarem
         </div>
@@ -180,8 +182,8 @@
                     <div class="space-y-6">
                         <a href="{{ url_for('public.index') }}" class="inline-flex items-center gap-4 group">
                             <div
-                                class="w-16 h-16 rounded-2xl bg-emerald-800/40 backdrop-blur-md border border-emerald-700/50 flex items-center justify-center transform group-hover:rotate-6 transition-all duration-500 shadow-2xl">
-                                <svg class="w-10 h-10 text-emerald-400" fill="none" stroke="currentColor"
+                                class="w-16 h-16 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 flex items-center justify-center transform group-hover:rotate-6 transition-all duration-500 shadow-forest">
+                                <svg class="w-10 h-10 text-mongodb-green" fill="none" stroke="currentColor"
                                     viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                                         d="M12 21c4.97 0 9-4.03 9-9s-4.03-9-9-9-9 4.03-9 9 4.03 9 9 9zM12 21c-1.5 0-3-1.5-3-3s1.5-3 3-3 3 1.5 3 3-1.5 3-3 3z">
@@ -192,9 +194,9 @@
                                 </svg>
                             </div>
                             <div>
-                                <h2 class="text-3xl font-bold text-white tracking-tight font-heading leading-tight">
+                                <h2 class="text-3xl font-bold text-white tracking-tight font-display leading-tight">
                                     GoMangatarem</h2>
-                                <p class="text-emerald-400 font-medium text-sm uppercase tracking-widest">Heritage
+                                <p class="text-mongodb-green font-code font-medium text-xs uppercase tracking-[0.2em]">Heritage
                                     Portal</p>
                             </div>
                         </a>
@@ -231,7 +233,7 @@
                 <!-- Link Sections -->
                 <div class="flex-grow grid grid-cols-2 md:grid-cols-3 gap-12 text-sm">
                     <div class="space-y-6 lg:mt-12">
-                        <h4 class="text-emerald-400 font-bold uppercase tracking-widest font-heading">Explore</h4>
+                        <h4 class="text-mongodb-green font-code text-xs uppercase tracking-[0.2em] font-medium">Explore</h4>
                         <ul class="space-y-4 font-body">
                             <li><a href="{{ url_for('public.map_view') }}"
                                     class="text-emerald-100/60 hover:text-white hover:translate-x-1 transition-all inline-block">Interactive
@@ -248,7 +250,7 @@
                         </ul>
                     </div>
                     <div class="space-y-6 lg:mt-0">
-                        <h4 class="text-emerald-400 font-bold uppercase tracking-widest font-heading">Heritage</h4>
+                        <h4 class="text-mongodb-green font-code text-xs uppercase tracking-[0.2em] font-medium">Heritage</h4>
                         <ul class="space-y-4 font-body">
                             <li><a href="{{ url_for('public.events') }}"
                                     class="text-emerald-100/60 hover:text-white hover:translate-x-1 transition-all inline-block">Festivals</a>
@@ -265,7 +267,7 @@
                         </ul>
                     </div>
                     <div class="space-y-6 lg:mt-24">
-                        <h4 class="text-emerald-400 font-bold uppercase tracking-widest font-heading">Connect</h4>
+                        <h4 class="text-mongodb-green font-code text-xs uppercase tracking-[0.2em] font-medium">Connect</h4>
                         <ul class="space-y-4 font-body">
                             <li><a href="{{ url_for('auth.login') }}"
                                     class="text-emerald-100/60 hover:text-white hover:translate-x-1 transition-all inline-block">Contributor
@@ -300,8 +302,8 @@
                     </div>
                 </div>
                 <!-- Gradient Fades -->
-                <div class="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-[#022c22] to-transparent z-10"></div>
-                <div class="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-[#022c22] to-transparent z-10"></div>
+                <div class="absolute inset-y-0 left-0 w-32 bg-gradient-to-r from-forest-black to-transparent z-10"></div>
+                <div class="absolute inset-y-0 right-0 w-32 bg-gradient-to-l from-forest-black to-transparent z-10"></div>
             </div>
 
             <div
@@ -309,7 +311,7 @@
                 <p>&copy; 2025 GoMangatarem Heritage System. All rights reserved.</p>
                 <div class="flex gap-12">
                     <span>Mangatarem, Pangasinan</span>
-                    <button onclick="window.scrollTo({top: 0, behavior: 'smooth'})"
+                    <button data-action="scroll-to-top"
                         class="hover:text-emerald-400 transition-colors flex items-center gap-2">
                         Back to top
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -335,6 +337,7 @@
     <!-- Component Scripts -->
     <script src="{{ url_for('static', filename='js/components/mobile-nav.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/components/flash-messages.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/components/event-handlers.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/components/delete-confirm.js') }}" defer></script>
     <script src="{{ url_for('static', filename='js/components/service-worker-registration.js') }}" defer></script>
     <!-- CSRF Protection -->

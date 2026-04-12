@@ -100,7 +100,7 @@
                     </div>
                     {% endif %}
                     <div class="flex items-center gap-2">
-                        <form method="POST" action="{{ url_for('business.delete_room', room_id=room.id) }}" class="inline" onsubmit="return confirm('Delete this room?')">
+                        <form method="POST" action="{{ url_for('business.delete_room', room_id=room.id) }}" class="inline" data-action="confirm-delete" data-confirm-message="Delete this room?">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <button type="submit" class="text-red-400 hover:text-red-300 text-sm font-medium transition-colors">Delete</button>
                         </form>

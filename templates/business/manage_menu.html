@@ -102,7 +102,7 @@
                             <span class="text-xs {% if item.is_available %}{% if is_dining %}text-orange-400{% else %}text-emerald-400{% endif %}{% else %}text-red-400{% endif %}">
                                 {{ 'Available' if item.is_available else 'Unavailable' }}
                             </span>
-                            <form method="POST" action="{{ url_for('business.delete_menu_item', item_id=item.id) }}" class="inline" onsubmit="return confirm('Delete this item?')">
+                            <form method="POST" action="{{ url_for('business.delete_menu_item', item_id=item.id) }}" class="inline" data-action="confirm-delete" data-confirm-message="Delete this item?">
                                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                 <button type="submit" class="text-red-400/80 hover:text-red-400 text-xs font-medium transition-colors">Delete</button>
                             </form>

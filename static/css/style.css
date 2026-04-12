@@ -320,23 +320,17 @@ form select option {
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Ensure headings and primary text in business portal stay white with shadow for contrast */
-.font-heading, h1, h2, h3, .text-white {
-    color: #ffffff !important;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
 /* Fallback for emerald text shades */
 .text-emerald-100\/70,
 .text-emerald-100\/60,
 .text-emerald-100\/50,
 .text-emerald-100\/40 {
-    color: rgba(209, 250, 229, 0.85) !important;
+    color: currentColor;
 }
 
 .text-emerald-400,
 .text-emerald-300 {
-    color: #34d399 !important;
+    color: inherit;
 }
 
 

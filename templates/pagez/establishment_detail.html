@@ -267,7 +267,11 @@
 
                 <!-- Map -->
                 <div class="bg-emerald-900/20 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-md">
-                    <div id="establishment-map" class="h-48 w-full"></div>
+                    <div id="establishment-map" 
+                         class="h-48 w-full"
+                         data-lng="{{ establishment.longitude }}"
+                         data-lat="{{ establishment.latitude }}"
+                         data-access-token="{{ config.get('MAPBOX_ACCESS_TOKEN', '') }}"></div>
                     <div class="p-4">
                         <a href="https://www.google.com/maps?q={{ establishment.latitude }},{{ establishment.longitude }}" target="_blank"
                             class="text-emerald-400 hover:text-emerald-300 text-sm font-medium">
@@ -287,29 +291,6 @@
 {% endblock %}
 
 {% block scripts %}
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const mapEl = document.getElementById('establishment-map');
-        const longitude = {{ establishment.longitude }};
-        const latitude = {{ establishment.latitude }};
-        
-        if (mapEl && longitude && latitude && !isNaN(longitude) && !isNaN(latitude)) {
-            mapboxgl.accessToken = '{{ config.get("MAPBOX_ACCESS_TOKEN", "") }}';
-            const map = new mapboxgl.Map({
-                container: 'establishment-map',
-                style: 'mapbox://styles/mapbox/dark-v11',
-                center: [longitude, latitude],
-                zoom: 15,
-                interactive: false
-            });
-            new mapboxgl.Marker({ color: '#10b981' })
-                .setLngLat([longitude, latitude])
-                .addTo(map);
-        } else if (mapEl) {
-            // Hide map container if no valid coordinates
-            mapEl.parentElement.style.display = 'none';
-            console.warn('Invalid coordinates for establishment map:', { longitude, latitude });
-        }
-    });
-</script>
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.js"></script>
+<script src="{{ url_for('static', filename='js/pages/establishment-map.js') }}" defer></script>
 {% endblock %}

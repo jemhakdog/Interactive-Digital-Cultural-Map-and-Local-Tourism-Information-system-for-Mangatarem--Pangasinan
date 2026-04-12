@@ -82,7 +82,7 @@
 
                     <div class="event-actions">
                         <button
-                            onclick="addToCalendar('{{ event.title }}', '{{ event.location }}', '{{ event.date.isoformat() }}')"
+                            data-action="add-to-calendar" data-event-title="{{ event.title }}" data-event-location="{{ event.location }}" data-event-date="{{ event.date.isoformat() }}"
                             class="btn-editorial btn-editorial-text">
                             Remind Me
                         </button>
@@ -94,8 +94,8 @@
             </article>
             {% endfor %}
         {% else %}
-            <div class="event-item" style="grid-column: span 12; width: 100%;">
-                <div class="text-center py-16 glass-card border-dashed border-2 border-emerald-900/10 mb-24" style="border-radius: 2.5rem;">
+            <div class="event-item col-span-12 w-full">
+                <div class="text-center py-16 glass-card border-dashed border-2 border-emerald-900/10 mb-24 rounded-[2.5rem]">
                     <p class="text-gray-500 italic text-xl">No upcoming events are currently scheduled.</p>
                     <p class="text-gray-400 mt-2">Check out our annual highlights below.</p>
                 </div>
@@ -115,7 +115,7 @@
             <h2 class="section-title">The Calendar.</h2>
         </div>
         <!-- Calendar Widget -->
-        <div class="calendar-container w-full shrink-0 mb-16 shimmer" style="margin-top: 2rem;" id="calendarSection" data-aos="fade-up">
+        <div class="calendar-container w-full shrink-0 mb-16 shimmer mt-8" id="calendarSection" data-aos="fade-up">
             <div class="calendar-header">
                 <button id="prevMonth" class="cal-nav-btn">&lt;</button>
                 <h3 id="currentMonthYear" class="cal-month-title"></h3>

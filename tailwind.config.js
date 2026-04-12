@@ -18,10 +18,28 @@ module.exports = {
                     950: '#052e16',
                 },
                 accent: '#EAB308', // Gold/Yellow
+                'forest-black': '#001e2b',
+                'mongodb-green': '#00ed64',
+                'dark-green': '#00684a',
+                'action-blue': '#006cfa',
+                'hover-blue': '#3860be',
+                'teal-active': '#1eaedb',
+                'deep-teal': '#1c2d38',
+                'teal-gray': '#3d4f58',
+                'silver-teal': '#b8c4c2',
+                'light-input': '#e8edeb',
             },
             fontFamily: {
+                display: ['"MongoDB Value Serif"', '"Playfair Display"', 'serif'],
+                body: ['"Euclid Circular A"', '"Plus Jakarta Sans"', 'sans-serif'],
+                code: ['"Source Code Pro"', 'monospace'],
                 serif: ['"Noto Serif TC"', 'serif'],
                 sans: ['"Noto Sans TC"', 'sans-serif'],
+            },
+            boxShadow: {
+                'forest': 'rgba(0, 30, 43, 0.12) 0px 26px 44px, rgba(0, 0, 0, 0.13) 0px 7px 13px',
+                'standard': 'rgba(0, 0, 0, 0.15) 0px 3px 20px',
+                'subtle': 'rgba(0, 0, 0, 0.1) 0px 2px 4px',
             },
             animation: {
                 'aurora-slow': 'aurora 20s linear infinite',

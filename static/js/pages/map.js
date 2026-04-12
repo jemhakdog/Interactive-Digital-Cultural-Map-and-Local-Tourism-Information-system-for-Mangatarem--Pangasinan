@@ -495,6 +495,34 @@ document.addEventListener('DOMContentLoaded', function () {
         placeCard.classList.remove('translate-y-full');
     }
 
+    function updateEstablishmentCard(est) {
+        if (!placeCard) return;
+
+        cardTitle.textContent = est.name;
+        cardAddress.textContent = est.address || (est.barangay ? `${est.barangay}, Mangatarem` : 'Mangatarem, Pangasinan');
+        cardDescription.textContent = est.description;
+
+        // Show actual rating if available
+        if (est.rating_avg > 0) {
+            cardRating.textContent = est.rating_avg.toFixed(1);
+        } else {
+            cardRating.textContent = 'New';
+        }
+
+        // Update hours with contact number if available
+        if (cardHours && est.contact_number) {
+            cardHours.textContent = `📞 ${est.contact_number}`;
+        }
+
+        // Update distance if available
+        if (cardDistance && est.distance) {
+            cardDistance.textContent = `${est.distance} km away`;
+        }
+
+        placeCard.classList.remove('hidden');
+        placeCard.classList.remove('translate-y-full');
+    }
+
     const closeCardBtn = placeCard?.querySelector('button');
     if (closeCardBtn) {
         closeCardBtn.addEventListener('click', () => {
@@ -525,6 +553,24 @@ document.addEventListener('DOMContentLoaded', function () {
             if (attraction) {
                 updateCard(attraction);
             }
+        }, 1600);
+    }
+
+    function flyToEstablishmentLocation(est) {
+        if (!est.latitude || !est.longitude || isNaN(est.latitude) || isNaN(est.longitude)) {
+            console.warn('Invalid coordinates for establishment:', est.id, { lat: est.latitude, lng: est.longitude });
+            alert('This location does not have valid coordinates.');
+            return;
+        }
+
+        map.flyTo({
+            center: [est.longitude, est.latitude],
+            zoom: 16,
+            duration: 1500
+        });
+
+        setTimeout(() => {
+            updateEstablishmentCard(est);
         }, 1600);
     }
 
@@ -657,7 +703,341 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ========================================
-    // 12. GEOLOCATION "NEAR ME"
+    // 12. ESTABLISHMENTS (NEARBY)
+    // ========================================
+    let establishmentsData = [];
+    let currentEstType = null;
+    let estPage = 1;
+    let estTotalPages = 1;
+    let estHasMore = true;
+    let estUserLat = null;
+    let estUserLng = null;
+    let estMarkersSource = null;
+
+    const estTypeConfig = {
+        restaurant: { color: '#f97316', emoji: '🍽️', label: 'Restaurant' },
+        cafe: { color: '#d97706', emoji: '☕', label: 'Café' },
+        fastfood: { color: '#ef4444', emoji: '🍔', label: 'Fast Food' },
+        inn: { color: '#3b82f6', emoji: '🏨', label: 'Inn' },
+    };
+
+    // Establishment filter buttons
+    const estFilterBtns = document.querySelectorAll('.est-filter-btn');
+    const estNearMeBtn = document.getElementById('est-near-me-btn');
+
+    estFilterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const isActive = btn.classList.contains('bg-orange-600') || btn.classList.contains('bg-amber-600') || btn.classList.contains('bg-red-600') || btn.classList.contains('bg-blue-600');
+
+            // Toggle active state
+            if (isActive) {
+                btn.classList.remove('bg-orange-600', 'text-white', 'bg-amber-600', 'text-white', 'bg-red-600', 'text-white', 'bg-blue-600', 'text-white');
+                btn.classList.add('bg-white/80', 'border', 'border-gray-200', 'text-gray-600');
+                currentEstType = null;
+            } else {
+                // Clear other active states
+                estFilterBtns.forEach(b => {
+                    b.classList.remove('bg-orange-600', 'text-white', 'bg-amber-600', 'text-white', 'bg-red-600', 'text-white', 'bg-blue-600', 'text-white');
+                    b.classList.add('bg-white/80', 'border', 'border-gray-200', 'text-gray-600');
+                });
+
+                // Set active
+                const type = btn.dataset.estType;
+                const cfg = estTypeConfig[type];
+                btn.classList.remove('bg-white/80', 'border', 'border-gray-200', 'text-gray-600');
+                btn.classList.add('text-white');
+                btn.style.backgroundColor = cfg.color;
+                btn.style.borderColor = cfg.color;
+
+                currentEstType = type;
+            }
+
+            estPage = 1;
+            fetchEstablishments(estPage, true);
+        });
+    });
+
+    // Near Me button for establishments
+    if (estNearMeBtn) {
+        estNearMeBtn.addEventListener('click', () => {
+            estNearMeBtn.classList.add('animate-pulse');
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        estNearMeBtn.classList.remove('animate-pulse');
+                        estUserLat = position.coords.latitude;
+                        estUserLng = position.coords.longitude;
+
+                        // If no type selected, default to showing all
+                        if (!currentEstType) {
+                            // Activate first establishment filter (restaurant)
+                            const firstBtn = estFilterBtns[0];
+                            if (firstBtn) {
+                                firstBtn.click();
+                            }
+                        } else {
+                            estPage = 1;
+                            fetchEstablishments(estPage, true);
+                        }
+                    },
+                    (error) => {
+                        estNearMeBtn.classList.remove('animate-pulse');
+                        alert('Unable to get your location. Please check your browser settings.');
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                estNearMeBtn.classList.remove('animate-pulse');
+                alert('Geolocation is not supported by your browser.');
+            }
+        });
+    }
+
+    async function fetchEstablishments(page = 1, reset = false) {
+        if (isLoading || !currentEstType) return;
+        isLoading = true;
+
+        if (reset) {
+            const listContainer = document.getElementById('places-content');
+            listContainer.innerHTML = '<div class="text-center text-gray-500 py-4">Loading nearby establishments...</div>';
+
+            // Clear existing establishment markers
+            if (estMarkersSource && map.getSource(estMarkersSource)) {
+                map.getSource(estMarkersSource).setData({ type: 'FeatureCollection', features: [] });
+            }
+        }
+
+        try {
+            const params = new URLSearchParams({
+                page: page,
+                per_page: 20,
+                type: currentEstType,
+            });
+
+            if (estUserLat && estUserLng) {
+                params.append('lat', estUserLat);
+                params.append('lng', estUserLng);
+                params.append('radius', 15);
+            }
+
+            const response = await fetch(`/api/establishments?${params}`);
+            const result = await response.json();
+
+            if (reset) {
+                establishmentsData = result.establishments;
+                estTotalPages = result.pagination.pages;
+                estPage = result.pagination.page;
+                estHasMore = result.pagination.has_next;
+
+                renderEstablishments(establishmentsData);
+                addEstablishmentMarkers(establishmentsData);
+            } else {
+                establishmentsData = [...establishmentsData, ...result.establishments];
+                estTotalPages = result.pagination.pages;
+                estPage = result.pagination.page;
+                estHasMore = result.pagination.has_next;
+
+                renderEstablishments(establishmentsData);
+                addEstablishmentMarkers(establishmentsData);
+            }
+        } catch (error) {
+            console.error('Error fetching establishments:', error);
+        } finally {
+            isLoading = false;
+            if (loadingIndicator) {
+                loadingIndicator.classList.add('hidden');
+            }
+        }
+    }
+
+    function renderEstablishments(establishments) {
+        const listContainer = document.getElementById('places-content');
+
+        if (establishments.length === 0) {
+            listContainer.innerHTML = '<div class="text-center text-gray-500 py-4">No establishments found nearby. Try expanding your search or check back later.</div>';
+            return;
+        }
+
+        // Deduplicate
+        const seen = new Set();
+        const uniqueEst = establishments.filter(est => {
+            if (seen.has(est.id)) return false;
+            seen.add(est.id);
+            return true;
+        });
+
+        listContainer.innerHTML = '';
+
+        uniqueEst.forEach(est => {
+            const cfg = estTypeConfig[est.type] || { color: '#6b7280', emoji: '📍', label: est.type };
+            const priceLabel = est.price_range ? { budget: '₱ Budget', moderate: '₱₱ Moderate', premium: '₱₱₱ Premium' }[est.price_range] : '';
+            const distText = est.distance ? `${est.distance} km away` : '';
+
+            const card = document.createElement('div');
+            card.className = 'group bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer overflow-hidden flex flex-row h-32';
+            card.innerHTML = `
+                <div class="w-1/3 h-full bg-gray-200 relative flex-shrink-0">
+                    <img src="${est.cover_image_url || 'https://via.placeholder.com/300x200?text=No+Image'}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="${est.name}" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+                    <div class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold" style="color: ${cfg.color}">${cfg.emoji} ${cfg.label.toUpperCase()}</div>
+                </div>
+                <div class="w-2/3 p-3 flex flex-col justify-between bg-white" style="background-color: #ffffff !important;">
+                    <div>
+                        <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-1" style="color: #111827 !important;">${est.name}</h3>
+                        <p class="text-xs line-clamp-2 mt-1" style="color: #374151 !important;">${est.description}</p>
+                    </div>
+                    <div class="flex justify-between items-end mt-2">
+                        <div class="text-[10px] font-bold" style="color: #6b7280 !important;">
+                            ${est.rating_avg > 0 ? `★ ${est.rating_avg.toFixed(1)}` : ''} ${priceLabel ? '· ' + priceLabel : ''} ${distText ? '· ' + distText : ''}
+                        </div>
+                        <button class="text-[10px] px-2 py-1 rounded transition font-semibold" style="background-color: #ecfdf5 !important; color: #047857 !important;">View on Map ➔</button>
+                    </div>
+                </div>
+            `;
+
+            card.addEventListener('click', () => {
+                flyToEstablishmentLocation(est);
+            });
+            listContainer.appendChild(card);
+        });
+    }
+
+    function addEstablishmentMarkers(establishments) {
+        // Use GeoJSON source for establishment markers
+        const sourceId = 'establishments-geojson';
+
+        if (!map.getSource(sourceId)) {
+            map.addSource(sourceId, {
+                type: 'geojson',
+                data: { type: 'FeatureCollection', features: [] }
+            });
+
+            // Circle layer
+            map.addLayer({
+                id: 'est-circles',
+                type: 'circle',
+                source: sourceId,
+                paint: {
+                    'circle-radius': [
+                        'interpolate', ['linear'], ['zoom'],
+                        10, 5,
+                        14, 10,
+                        16, 14
+                    ],
+                    'circle-color': ['get', 'color'],
+                    'circle-stroke-width': 2,
+                    'circle-stroke-color': '#ffffff',
+                    'circle-opacity': 0.9
+                }
+            }, 'mvt-labels');
+
+            // Label layer
+            map.addLayer({
+                id: 'est-labels',
+                type: 'symbol',
+                source: sourceId,
+                layout: {
+                    'text-field': ['get', 'name'],
+                    'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Regular'],
+                    'text-size': 10,
+                    'text-offset': [0, 1.5],
+                    'text-anchor': 'top',
+                    'text-allow-overlap': false
+                },
+                paint: {
+                    'text-color': '#333333',
+                    'text-halo-color': '#ffffff',
+                    'text-halo-width': 1.5
+                }
+            }, 'mvt-labels');
+
+            // Click handler for establishment markers
+            map.on('click', 'est-circles', (e) => {
+                const feature = e.features[0];
+                if (!feature) return;
+
+                const props = feature.properties;
+                map.flyTo({
+                    center: feature.geometry.coordinates,
+                    zoom: 16,
+                    duration: 1500
+                });
+
+                setTimeout(() => {
+                    updateEstablishmentCard({
+                        id: props.id,
+                        name: props.name,
+                        type: props.type,
+                        barangay: props.barangay,
+                        description: props.description,
+                        cover_image_url: props.cover_image_url,
+                        lat: feature.geometry.coordinates[1],
+                        lng: feature.geometry.coordinates[0],
+                        rating_avg: props.rating_avg,
+                        price_range: props.price_range,
+                        address: props.address,
+                        contact_number: props.contact_number
+                    });
+                }, 1600);
+            });
+
+            map.on('mouseenter', 'est-circles', () => {
+                map.getCanvas().style.cursor = 'pointer';
+            });
+
+            map.on('mouseleave', 'est-circles', () => {
+                map.getCanvas().style.cursor = '';
+            });
+        }
+
+        // Build GeoJSON features
+        const features = establishments.map(est => ({
+            type: 'Feature',
+            geometry: {
+                type: 'Point',
+                coordinates: [est.longitude, est.latitude]
+            },
+            properties: {
+                id: est.id,
+                name: est.name,
+                type: est.type,
+                color: (estTypeConfig[est.type] || estTypeConfig.restaurant).color,
+                description: est.description,
+                barangay: est.barangay,
+                cover_image_url: est.cover_image_url,
+                distance: est.distance,
+                rating_avg: est.rating_avg,
+                price_range: est.price_range,
+                address: est.address,
+                contact_number: est.contact_number
+            }
+        }));
+
+        map.getSource(sourceId).setData({
+            type: 'FeatureCollection',
+            features: features
+        });
+    }
+
+    // Override infinite scroll to handle establishments
+    contentArea.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            const { scrollTop, scrollHeight, clientHeight } = contentArea;
+            if (scrollTop + clientHeight >= scrollHeight - 100 && !isLoading) {
+                if (currentEstType && estHasMore) {
+                    estPage++;
+                    fetchEstablishments(estPage, false);
+                } else if (hasMorePages) {
+                    currentPage++;
+                    fetchAttractions(currentPage, false);
+                }
+            }
+        }, 200);
+    });
+
+    // ========================================
+    // 13. GEOLOCATION "NEAR ME"
     // ========================================
     const locateBtn = document.getElementById('locate-me');
     let userLocationMarker = null;
@@ -671,9 +1051,18 @@ document.addEventListener('DOMContentLoaded', function () {
                     locateBtn.classList.remove('animate-pulse');
                     const { latitude, longitude, accuracy } = position.coords;
 
+                    // Store for establishment searches
+                    estUserLat = latitude;
+                    estUserLng = longitude;
+
                     // Remove previous marker
                     if (userLocationMarker) {
                         userLocationMarker.remove();
+                    }
+
+                    // Remove previous radius circle
+                    if (userLocationRadius) {
+                        userLocationRadius.remove();
                     }
 
                     // Create user location marker
@@ -692,12 +1081,69 @@ document.addEventListener('DOMContentLoaded', function () {
                         .setLngLat([longitude, latitude])
                         .addTo(map);
 
+                    // Draw radius circle showing search area
+                    const radiusMeters = 5000;
+                    userLocationRadius = mapboxgl.LngLatBounds.convert(
+                        [[longitude - 0.05, latitude - 0.05], [longitude + 0.05, latitude + 0.05]]
+                    );
+
+                    // Add a visible circle around user location
+                    const radiusSourceId = 'user-radius';
+                    if (!map.getSource(radiusSourceId)) {
+                        map.addSource(radiusSourceId, {
+                            type: 'geojson',
+                            data: {
+                                type: 'Feature',
+                                geometry: {
+                                    type: 'Polygon',
+                                    coordinates: [generateCircleCoordinates(longitude, latitude, radiusMeters)]
+                                }
+                            }
+                        });
+
+                        map.addLayer({
+                            id: 'user-radius-fill',
+                            type: 'fill',
+                            source: radiusSourceId,
+                            paint: {
+                                'fill-color': '#3b82f6',
+                                'fill-opacity': 0.08
+                            }
+                        });
+
+                        map.addLayer({
+                            id: 'user-radius-line',
+                            type: 'line',
+                            source: radiusSourceId,
+                            paint: {
+                                'line-color': '#3b82f6',
+                                'line-width': 2,
+                                'line-dasharray': [4, 4],
+                                'line-opacity': 0.5
+                            }
+                        });
+                    } else {
+                        map.getSource(radiusSourceId).setData({
+                            type: 'Feature',
+                            geometry: {
+                                type: 'Polygon',
+                                coordinates: [generateCircleCoordinates(longitude, latitude, radiusMeters)]
+                            }
+                        });
+                    }
+
                     // Fly to location
                     map.flyTo({
                         center: [longitude, latitude],
                         zoom: 15,
                         duration: 1500
                     });
+
+                    // If establishment filter is active, fetch nearby
+                    if (currentEstType) {
+                        estPage = 1;
+                        fetchEstablishments(estPage, true);
+                    }
 
                     // Show popup
                     new mapboxgl.Popup({ offset: 25 })
@@ -986,6 +1432,34 @@ document.addEventListener('DOMContentLoaded', function () {
         cancelDownloadBtn.addEventListener('click', () => {
             downloadCard.classList.add('hidden');
         });
+    }
+
+    // ========================================
+    // HELPER: Generate circle coordinates for GeoJSON polygon
+    // ========================================
+    function generateCircleCoordinates(centerLng, centerLat, radiusMeters, steps = 64) {
+        const coordinates = [];
+        const earthRadius = 6378137; // meters
+        const distanceKm = radiusMeters / 1000;
+        const radiusRad = distanceKm / (earthRadius / 1000);
+
+        for (let i = 0; i < steps; i++) {
+            const angle = (i * 2 * Math.PI) / steps;
+            const lat2 = Math.asin(
+                Math.sin(centerLat * Math.PI / 180) * Math.cos(radiusRad) +
+                Math.cos(centerLat * Math.PI / 180) * Math.sin(radiusRad) * Math.cos(angle)
+            );
+            const lng2 = centerLng * Math.PI / 180 + Math.atan2(
+                Math.sin(angle) * Math.sin(radiusRad) * Math.cos(centerLat * Math.PI / 180),
+                Math.cos(radiusRad) - Math.sin(centerLat * Math.PI / 180) * Math.sin(lat2)
+            );
+
+            coordinates.push([lng2 * 180 / Math.PI, lat2 * 180 / Math.PI]);
+        }
+
+        // Close the polygon
+        coordinates.push(coordinates[0]);
+        return coordinates;
     }
 
 });

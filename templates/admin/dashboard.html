@@ -191,7 +191,7 @@
                                                     </svg>
                                                 </a>
                                                 <button
-                                                    onclick="confirmDelete('{{ url_for('admin.reject_user', id=user.id) }}')"
+                                                    data-delete-url="{{ url_for('admin.reject_user', id=user.id) }}"
                                                     class="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
@@ -249,7 +249,7 @@
                                                     </svg>
                                                 </a>
                                                 <button
-                                                    onclick="confirmDelete('{{ url_for('admin.reject_review', id=review.id) }}')"
+                                                    data-delete-url="{{ url_for('admin.reject_review', id=review.id) }}"
                                                     class="p-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor"
                                                         viewBox="0 0 24 24">
@@ -302,63 +302,11 @@
 <script src="{{ url_for('static', filename='vendor/chartjs/chart.min.js') }}"></script>
 {% block dashboard_scripts %}
 {% if engagement_data %}
-<script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const ctx = document.getElementById('engagementChart').getContext('2d');
-
-        // Custom gradient for chart
-        const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-        gradient.addColorStop(0, 'rgba(16, 185, 129, 0.4)');
-        gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
-
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: {{ engagement_data.dates | tojson }},
-        datasets: [{
-            label: 'Explorer Activity',
-            data: {{ engagement_data.counts | tojson }},
-        borderColor: '#10b981',
-        borderWidth: 4,
-        backgroundColor: gradient,
-        fill: true,
-        tension: 0.4,
-        pointBackgroundColor: '#10b981',
-        pointBorderColor: '#fff',
-        pointBorderWidth: 2,
-        pointRadius: 6,
-        pointHoverRadius: 8
-                }]
-            },
-        options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-            legend: { display: false },
-            tooltip: {
-                backgroundColor: '#064e3b',
-                titleFont: { family: 'Plus Jakarta Sans', size: 13, weight: 'bold' },
-                bodyFont: { family: 'Plus Jakarta Sans', size: 12 },
-                padding: 12,
-                cornerRadius: 12,
-                displayColors: false
-            }
-        },
-        scales: {
-            y: {
-                beginAtZero: true,
-                grid: { color: 'rgba(0,0,0,0.03)', drawBorder: false },
-                ticks: { color: '#64748b', font: { size: 11, weight: '600' } }
-            },
-            x: {
-                grid: { display: false },
-                ticks: { color: '#64748b', font: { size: 11, weight: '600' } }
-            }
-        }
-    }
-        });
-    });
-</script>
+<div id="engagement-chart-data" 
+     data-dates='{{ engagement_data.dates | tojson }}' 
+     data-counts='{{ engagement_data.counts | tojson }}'
+     class="hidden"></div>
+<script src="{{ url_for('static', filename='js/pages/admin-dashboard.js') }}" defer></script>
 {% endif %}
 {% endblock %}
 {% endblock %}

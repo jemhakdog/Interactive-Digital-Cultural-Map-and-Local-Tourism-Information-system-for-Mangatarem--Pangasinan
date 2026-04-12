@@ -4,42 +4,7 @@
 
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/auth.css') }}">
-<style>
-    /* Custom animations for pending state */
-    @keyframes pulse-ring {
-        0% {
-            transform: scale(0.8);
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
-        }
-        70% {
-            transform: scale(1);
-            box-shadow: 0 0 0 20px rgba(16, 185, 129, 0);
-        }
-        100% {
-            transform: scale(0.8);
-            box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
-        }
-    }
-
-    .animate-pulse-ring {
-        animation: pulse-ring 2.5s infinite cubic-bezier(0.215, 0.61, 0.355, 1);
-    }
-    
-    @keyframes bounce-subtle {
-        0%, 100% {
-            transform: translateY(-5%);
-            animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-        }
-        50% {
-            transform: translateY(0);
-            animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-        }
-    }
-    
-    .animate-bounce-subtle {
-        animation: bounce-subtle 2s infinite;
-    }
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/auth-animations.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -56,8 +21,7 @@
 
     <!-- Animated Glow Blobs -->
     <div class="absolute top-1/4 -left-20 w-80 h-80 bg-emerald-600/20 rounded-full blur-[100px] animate-float"></div>
-    <div class="absolute bottom-1/4 -right-20 w-80 h-80 bg-teal-600/20 rounded-full blur-[100px] animate-float"
-        style="animation-delay: -5s;"></div>
+    <div class="absolute bottom-1/4 -right-20 w-80 h-80 bg-teal-600/20 rounded-full blur-[100px] animate-float animation-delay-blob"></div>
 
     <div class="relative w-full max-w-lg z-10">
         <!-- Glassmorphism Container -->
