@@ -5,6 +5,9 @@ import stat
 import urllib.request
 import subprocess
 
+# Add project root to path so paths resolve correctly from build/
+PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
 # Determine platform
 system = platform.system().lower()
 machine = platform.machine().lower()
@@ -52,9 +55,9 @@ def build_tailwind():
     # Ensure binary exists
     download_tailwind()
 
-    # Determine paths relative to root directory
-    input_css = os.path.join(".", "static", "css", "input.css")
-    output_css = os.path.join(".", "static", "css", "main.css")
+    # Determine paths relative to project root
+    input_css = os.path.join(PROJECT_ROOT, "static", "css", "input.css")
+    output_css = os.path.join(PROJECT_ROOT, "static", "css", "main.css")
     executable = os.path.abspath(binary_name)
 
     # Base command arguments

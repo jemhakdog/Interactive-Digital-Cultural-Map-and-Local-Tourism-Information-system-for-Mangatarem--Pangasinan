@@ -5,13 +5,12 @@ block_cipher = None
 
 a = Analysis(
     ['desktop.py'],
-    pathex=[],
+    pathex=['.'],
     binaries=[],
     datas=[
-        ('templates', 'templates'),
-        ('static', 'static'),
-        ('data', 'data'),
-        ('.env', '.'),  # Optional: include .env if needed, but usually local settings are better
+        ('../templates', 'templates'),
+        ('../static', 'static'),
+        ('../data', 'data'),
     ],
     hiddenimports=[
         'flask_sqlalchemy', 

@@ -6,7 +6,12 @@ __pycache__/
 env/
 venv/
 ENV/
-build/
+build/*.egg-info/
+build/lib/
+build/bdist.*/
+build/scripts-*/
+build/temp.*/
+build/pycache/
 develop-eggs/
 dist/
 downloads/

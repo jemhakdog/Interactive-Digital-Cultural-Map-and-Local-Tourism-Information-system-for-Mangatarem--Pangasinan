@@ -18,7 +18,7 @@ ENV PATH="/root/.cargo/bin:$PATH"
 WORKDIR /app
 
 # Copy dependency files
-COPY pyproject.toml uv.lock ./
+COPY build/pyproject.toml build/uv.lock ./
 
 # Install Python dependencies using uv
 RUN uv sync --frozen --no-dev
