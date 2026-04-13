@@ -42,7 +42,7 @@ def barangay_add_event():
                 image_url = uploaded_url
 
         event = Event(
-            title=request.form["title"],
+            name=request.form["title"],
             date=datetime.strptime(request.form["date"], "%Y-%m-%d").date(),
             location=request.form["location"],
             category=request.form["category"],
@@ -55,7 +55,7 @@ def barangay_add_event():
         db.session.add(event)
         db.session.commit()
 
-        logger.info("New event '%s' submitted by %s", event.title, current_user.username)
+        logger.info("New event '%s' submitted by %s", event.name, current_user.username)
         flash("Event submitted for approval!")
         return redirect(url_for("barangay.barangay_dashboard"))
 
@@ -74,7 +74,7 @@ def barangay_edit_event(id):
         return redirect(url_for("barangay.barangay_dashboard"))
 
     if request.method == "POST":
-        event.title = request.form["title"]
+        event.name = request.form["title"]
         event.date = datetime.strptime(request.form["date"], "%Y-%m-%d").date()
         event.location = request.form["location"]
         event.category = request.form["category"]
@@ -91,7 +91,7 @@ def barangay_edit_event(id):
         event.status = "pending"
         db.session.commit()
 
-        logger.info("Event '%s' (ID: %d) updated by %s", event.title, id, current_user.username)
+        logger.info("Event '%s' (ID: %d) updated by %s", event.name, id, current_user.username)
         flash("Event updated and submitted for approval.")
         return redirect(url_for("barangay.barangay_dashboard"))
 
@@ -109,7 +109,7 @@ def barangay_delete_event(id):
         flash("Access denied.")
         return redirect(url_for("barangay.barangay_dashboard"))
 
-    event_title = event.title
+    event_title = event.name
     db.session.delete(event)
     db.session.commit()
 

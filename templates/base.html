@@ -331,7 +331,7 @@
     
     <!-- Flash Messages Data -->
     <script type="application/json" id="flash-messages-data">
-        {{ get_flashed_messages(with_categories=True) | tojson | safe }}
+        {{ get_flashed_messages(with_categories=True) | tojson }}
     </script>
 
     <!-- Component Scripts -->

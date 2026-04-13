@@ -34,6 +34,31 @@ This platform serves as a central digital resource for residents, students, and 
 - **Platform**: Optimized for [Vercel](https://vercel.com/) with Edge Caching and ProxyFix support.
 - **Environment**: Python 3.12+
 
+## 🛡️ Security Features
+
+This platform implements comprehensive security measures to protect against common web vulnerabilities:
+
+### XSS Prevention
+- **Content Security Policy (CSP)**: Restricts resource loading to trusted sources only
+- **Input Sanitization**: All user inputs validated and sanitized using the `bleach` library
+- **Output Encoding**: Context-aware encoding via custom Jinja2 filters (`|sanitize`, `|escape_strict`, `|safe_url`)
+- **Defense-in-Depth**: 6 layers of protection against injection attacks
+
+### Session Security
+- **HttpOnly Cookies**: Prevents JavaScript access to session cookies
+- **SameSite=Lax**: Protects against cross-site request forgery (CSRF)
+- **Secure Flag**: Enforced in production (HTTPS only)
+
+### Additional Protections
+- **Security Headers**: X-Frame-Options, X-Content-Type-Options, HSTS, Referrer-Policy
+- **File Upload Security**: Double filename sanitization + extension validation
+- **Rate Limiting**: Prevents brute-force attacks on authentication endpoints
+- **CSRF Protection**: Flask-WTF CSRF tokens on all forms
+
+📖 **Learn More**: [Security Implementation Guide](SECURITY_IMPLEMENTATION.md) | [Developer Best Practices](SECURITY_BEST_PRACTICES.md)
+
+---
+
 ## 🚀 Getting Started
 ### Prerequisites
 - Python 3.12+
@@ -65,14 +90,25 @@ python app.py
 The application will be available at `http://127.0.0.1:5000`.
 
 ## 📚 Documentation
-Detailed documentation is available in the [docs/](docs/README.md) directory:
-- [Architecture Guide](docs/architecture.md)
-- [Database Migration](docs/database_migration.md)
-- [API Reference](docs/api_reference.md)
-- [User Manual](docs/user_manual.md)
-- [Administrative Guide](docs/admin_guide.md)
-- [Contributor Guide](docs/contributor_guide.md)
-- [Performance Optimization](docs/optimization.md)
+
+### Core Documentation
+- [Architecture Guide](architecture.md)
+- [Database Migration](database_migration.md)
+- [API Reference](api_reference.md)
+- [User Manual](user_manual.md)
+- [Administrative Guide](admin_guide.md)
+- [Contributor Guide](contributor_guide.md)
+- [Performance Optimization](optimization.md)
+
+### Security Documentation
+- [Security Implementation Guide](SECURITY_IMPLEMENTATION.md) - Comprehensive security architecture and implementation details
+- [Developer Security Best Practices](SECURITY_BEST_PRACTICES.md) - Guidelines for developers on secure coding practices
+- [Deployment Security Checklist](DEPLOYMENT_SECURITY_CHECKLIST.md) - Pre-deployment and post-deployment security verification
+
+### Technical Documentation
+- [MVT Implementation](MVT_IMPLEMENTATION.md) - Mapbox Vector Tiles implementation
+- [Testing Guide](TESTING_GUIDE.md) - Testing procedures and test coverage
+- [Bug Fix: LngLat NaN Error](BUGFIX_lnglat_nan_error.md) - Bug fix documentation
 
 ## 📂 Project Structure
 - `/app.py`: Main application entry point and factory.

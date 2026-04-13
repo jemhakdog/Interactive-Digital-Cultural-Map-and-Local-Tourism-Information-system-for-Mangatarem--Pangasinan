@@ -10,6 +10,7 @@ import logging
 from typing import Optional
 from flask import current_app, url_for
 from werkzeug.utils import secure_filename
+from utils.security import sanitize_filename
 
 logger = logging.getLogger(__name__)
 
@@ -17,16 +18,20 @@ ALLOWED_EXTENSIONS_DEFAULT = {"png", "jpg", "jpeg", "gif", "mp4"}
 VIDEO_EXTENSIONS = {"mp4", "avi", "mov", "wmv"}
 
 
-def allowed_file(filename: str) -> bool:
+def allowed_file(filename: str, allowed_extensions: Optional[set] = None) -> bool:
     """Check if a filename has an allowed extension.
 
     Args:
         filename: Name of the file to validate.
+        allowed_extensions: Optional set of allowed extensions.
 
     Returns:
         True if the extension is in the allowed set.
     """
-    allowed = current_app.config.get("ALLOWED_EXTENSIONS", ALLOWED_EXTENSIONS_DEFAULT)
+    if allowed_extensions is None:
+        allowed = current_app.config.get("ALLOWED_EXTENSIONS", ALLOWED_EXTENSIONS_DEFAULT)
+    else:
+        allowed = allowed_extensions
     return "." in filename and filename.rsplit(".", 1)[1].lower() in allowed
 
 
@@ -35,6 +40,10 @@ def save_uploaded_file(
     upload_folder: Optional[str] = None,
 ) -> Optional[str]:
     """Save an uploaded file and return its static URL.
+
+    Performs double sanitization on filename for security:
+    1. secure_filename() from Werkzeug
+    2. Custom sanitize_filename() for additional hardening
 
     Args:
         file: Werkzeug FileStorage object from request.files.
@@ -48,7 +57,15 @@ def save_uploaded_file(
         return None
 
     folder = upload_folder or current_app.config["UPLOAD_FOLDER"]
-    filename = secure_filename(file.filename)
+    
+    # Double sanitization for security
+    filename = secure_filename(sanitize_filename(file.filename))
+    
+    # Additional validation after sanitization
+    if not filename or not allowed_file(filename):
+        logger.warning("Rejected uploaded file with invalid name: %s", file.filename)
+        return None
+    
     file.save(os.path.join(folder, filename))
 
     logger.debug("Saved uploaded file: %s", filename)

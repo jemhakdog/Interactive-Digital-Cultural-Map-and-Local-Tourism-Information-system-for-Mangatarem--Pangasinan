@@ -10,14 +10,21 @@ os.environ['DB_PROVIDER'] = 'supabase'
 
 try:
     uri = get_database_uri()
-    print(f"Connecting to host...") 
+    print(f"Connecting to host...")
     engine = create_engine(uri)
     with engine.connect() as conn:
         for table in ['USER', 'ATTRACTION', 'EVENT', 'BARANGAY_INFO', 'HERITAGE_PROFILE']:
-            result = conn.execute(text(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{table.lower()}'"))
+            # FIXED: Use parameterized queries instead of f-strings
+            result = conn.execute(
+                text("SELECT column_name FROM information_schema.columns WHERE table_name = :table_name"),
+                {"table_name": table.lower()}
+            )
             cols = [row[0] for row in result]
             if not cols:
-                 result = conn.execute(text(f"SELECT column_name FROM information_schema.columns WHERE table_name = '{table}'"))
+                 result = conn.execute(
+                     text("SELECT column_name FROM information_schema.columns WHERE table_name = :table_name"),
+                     {"table_name": table}
+                 )
                  cols = [row[0] for row in result]
             print(f"TABLE {table}: {cols}")
 

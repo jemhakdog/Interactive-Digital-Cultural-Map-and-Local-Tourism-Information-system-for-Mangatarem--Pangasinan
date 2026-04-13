@@ -13,6 +13,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from extensions import db, login_manager, limiter, csrf
 from config import config_by_name
 from routes import register_blueprints
+from utils.template_filters import register_filters
 from dotenv import load_dotenv
 
 # Load environment variables early
@@ -79,7 +80,10 @@ def create_app(config_name=None):
 
     # Register Blueprints
     register_blueprints(app)
-    
+
+    # Register template filters for secure output encoding
+    register_filters(app)
+
     # Initialize Lazy-loaded Supabase support
     _init_supabase_support(app)
     
@@ -143,15 +147,40 @@ def _init_redis_support(app: Flask) -> None:
 
 
 def _register_error_handlers(app: Flask) -> None:
-    """Register custom error page handlers."""
+    """Register custom error page handlers with sanitized error messages."""
     error_codes = [400, 401, 403, 404, 408, 429, 451, 500]
-    
+
     def handle_error(e):
         code = getattr(e, 'code', 500)
-        return render_template(f"errors/{code}.html"), code
+        
+        # Log detailed error server-side for debugging
+        if code >= 500:
+            logger.error(f"Server error {code}: {str(e)}", exc_info=True)
+        
+        # Sanitize error message - never expose internal details to users
+        # In production, return generic messages
+        is_prod = app.config.get("FLASK_ENV") == "production"
+        
+        return render_template(
+            f"errors/{code}.html",
+            error_message="An unexpected error occurred" if code >= 500 and is_prod else str(e)
+        ), code
 
     for code in error_codes:
         app.errorhandler(code)(handle_error)
+    
+    # Catch-all handler for unhandled exceptions
+    @app.errorhandler(Exception)
+    def handle_uncaught_exception(e):
+        # Log the full exception server-side
+        logger.critical(f"Uncaught exception: {str(e)}", exc_info=True)
+        
+        # Return generic 500 error to user
+        if app.config.get("FLASK_ENV") == "production":
+            return render_template("errors/500.html", error_message="An unexpected error occurred"), 500
+        else:
+            # In development, show the actual error for debugging
+            raise e
 
 
 def _register_context_processors(app: Flask) -> None:
@@ -191,13 +220,53 @@ def _register_request_hooks(app: Flask) -> None:
                 response.status_code,
             )
 
+        # === Security Headers ===
+
+        # Content Security Policy - Prevents XSS by restricting resource sources
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self';"
+            "script-src 'self' https://fonts.googleapis.com https://maps.mapbox.com https://api.mapbox.com https://accounts.google.com 'unsafe-inline';"
+            "style-src 'self' https://fonts.googleapis.com https://api.mapbox.com 'unsafe-inline';"
+            "img-src 'self' data: https: blob:;"
+            "font-src 'self' https://fonts.gstatic.com data:;"
+            "connect-src 'self' https://api.mapbox.com https://events.mapbox.com https://*.supabase.co https://*.upstash.io https://accounts.google.com;"
+            "worker-src 'self' blob:;"
+            "frame-ancestors 'none';"
+            "base-uri 'self';"
+            "form-action 'self';"
+            "object-src 'none';"
+            "upgrade-insecure-requests;"
+        )
+
+        # Prevent MIME type sniffing
+        response.headers["X-Content-Type-Options"] = "nosniff"
+
+        # Prevent clickjacking
+        response.headers["X-Frame-Options"] = "DENY"
+
+        # Referrer Policy
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+
+        # Permissions Policy (restrict browser features)
+        response.headers["Permissions-Policy"] = (
+            "camera=(), microphone=(), geolocation=(self), payment=()"
+        )
+
+        # Cross-Origin protection
         response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
-        
+        response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+
+        # HSTS for production (only if SESSION_COOKIE_SECURE is enabled)
+        if app.config.get("SESSION_COOKIE_SECURE"):
+            response.headers["Strict-Transport-Security"] = (
+                "max-age=31536000; includeSubDomains"
+            )
+
         # Smart Cache-Control logic
         is_vercel = "VERCEL" in os.environ
         if is_vercel and request.method == "GET" and response.status_code == 200:
             _apply_cache_headers(response, request.path)
-            
+
         return response
 
 

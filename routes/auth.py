@@ -11,6 +11,12 @@ from flask_login import login_user, logout_user, login_required, current_user
 from models import db, User, PasswordResetToken
 from extensions import limiter
 from utils.email_sender import send_password_reset_email
+from utils.security import (
+    validate_email_format,
+    validate_username,
+    validate_password_strength,
+    validate_and_escape,
+)
 from google.oauth2 import id_token
 from google.auth.transport import requests as google_requests
 from utils.logger_helper import (
@@ -325,30 +331,48 @@ def register():
     logger.info("Registration page accessed")
     
     if request.method == "POST":
-        username = request.form.get("username")
-        email = request.form.get("email")
-        password = request.form.get("password")
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
         role = request.form.get("role", "user")
         barangay_id = request.form.get("barangay")
-        
+
         log_query("auth", "register", f"Checking existence for username='{username}', email='{email}'")
-        
+
+        # Input format validation
+        if not validate_username(username):
+            flash("Username must be 3-30 characters and contain only letters, numbers, and underscores.", "error")
+            return redirect(url_for("auth.register"))
+
+        if not validate_email_format(email):
+            flash("Please enter a valid email address.", "error")
+            return redirect(url_for("auth.register"))
+
+        is_valid, error_msg = validate_password_strength(password)
+        if not is_valid:
+            flash(error_msg, "error")
+            return redirect(url_for("auth.register"))
+
         # Validation chain
         if not _validate_username_available(username):
             flash("Username already exists.", "error")
             return redirect(url_for("auth.register"))
-        
+
         if not _validate_email_available(email):
             flash("Email already exists.", "error")
             return redirect(url_for("auth.register"))
-        
+
         if not _validate_barangay_representative(barangay_id, role):
             flash("This Barangay already has a registered representative.", "error")
             return redirect(url_for("auth.register"))
-        
+
+        # Sanitize inputs before saving
+        username = validate_and_escape(username)
+        email = validate_and_escape(email)
+
         # Create user
         _create_user_from_form(username, email, password, role, barangay_id)
-        
+
         if role == "contributor":
             return redirect(url_for("auth.pending_approval"))
         else:
@@ -371,21 +395,39 @@ def register_business():
     logger.info("Business registration page accessed")
     
     if request.method == "POST":
-        username = request.form.get("username")
-        email = request.form.get("email")
-        password = request.form.get("password")
-        business_name = request.form.get("business_name")
-        business_type = request.form.get("business_type")
-        
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+        business_name = request.form.get("business_name", "").strip()
+        business_type = request.form.get("business_type", "").strip()
+
+        # Input format validation
+        if not validate_username(username):
+            flash("Username must be 3-30 characters and contain only letters, numbers, and underscores.", "error")
+            return redirect(url_for("auth.register_business"))
+
+        if not validate_email_format(email):
+            flash("Please enter a valid email address.", "error")
+            return redirect(url_for("auth.register_business"))
+
+        is_valid, error_msg = validate_password_strength(password)
+        if not is_valid:
+            flash(error_msg, "error")
+            return redirect(url_for("auth.register_business"))
+
         # Validation
         if not _validate_username_available(username):
             flash("Username already exists.", "error")
             return redirect(url_for("auth.register_business"))
-        
+
         if not _validate_email_available(email):
             flash("Email already exists.", "error")
             return redirect(url_for("auth.register_business"))
-        
+
+        # Sanitize inputs before saving
+        username = validate_and_escape(username)
+        email = validate_and_escape(email)
+
         # Create business owner user
         user = User(
             username=username,
@@ -396,10 +438,10 @@ def register_business():
         user.set_password(password)
         db.session.add(user)
         db.session.commit()
-        
+
         log_success("auth", "register_business", f"Business owner '{username}' registered for '{business_name}'")
         logger.info(f"New business owner '{username}' registered, awaiting approval")
-        
+
         return redirect(url_for("auth.pending_approval"))
     
     return render_template("auth/register_business.html")

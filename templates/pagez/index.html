@@ -68,6 +68,18 @@
 {% endblock %}
 
 {% block content %}
+<!-- Spotlight Carousel Script -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.querySelector('.spotlight-carousel__btn--next');
+    const inner = document.querySelector('.spotlight-carousel__inner');
+    if (btn && inner) {
+        btn.addEventListener('click', function() {
+            inner.scrollBy({ left: 300, behavior: 'smooth' });
+        });
+    }
+});
+</script>
 <!-- Hero Section - Cinematic Glass Bento -->
 <section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-forest-black">
     <!-- Immersive Background -->
@@ -93,9 +105,9 @@
 
             <!-- Quick Action Bento -->
             <div class="flex flex-col md:flex-row items-center justify-center gap-6">
-                <a href="{{ url_for('public.map_view') }}" class="btn-pill-primary">
-                    Explore Interactive Map
-                    <svg class="w-5 h-5 ml-2 transition-transform group-hover:translate-x-1" fill="none"
+                <a href="{{ url_for('public.map_view') }}" class="btn-pill-primary inline-flex items-center whitespace-nowrap">
+                    <span>Explore Interactive Map</span>
+                    <svg class="w-5 h-5 ml-2 flex-shrink-0 transition-transform group-hover:translate-x-1" fill="none"
                         stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
@@ -149,66 +161,54 @@
     </div>
 </div>
 
-<!-- Bento Spotlight - Premium Heritage Collection -->
+<!-- Spotlight Section - Horizontal Cards -->
 <section id="featured" class="py-24 bg-heritage-cream paper-texture overflow-hidden">
     <div class="container mx-auto px-6">
-        <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-8">
-            <div class="max-w-2xl" data-aos="fade-right">
-                <span class="source-code-label">Curated Masterpieces</span>
-                <h2 class="text-5xl md:text-6xl font-bold text-forest-black font-display mt-4 leading-tight">
-                    <span class="accent-underline">Heritage</span> Spotlight</h2>
-                <p class="text-teal-gray text-lg mt-6 leading-relaxed">
-                    A collection of the most significant cultural and natural landmarks that define our town's identity.
+        <div class="flex items-end justify-between mb-10">
+            <div data-aos="fade-right">
+                <span class="spotlight-label">Featured</span>
+                <h2 class="spotlight-title">Heritage Spotlight</h2>
+                <p class="spotlight-subtitle">
+                    Discover the most significant cultural and natural landmarks that define our town's identity.
                 </p>
             </div>
-            <a href="{{ url_for('public.barangays') }}" class="btn-pill-secondary group" data-aos="fade-left">
-                Browse All Places
-                <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3">
-                    </path>
+            <a href="{{ url_for('public.barangays') }}" class="spotlight-link" data-aos="fade-left">
+                <span>Browse All Places</span>
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
                 </svg>
             </a>
         </div>
 
         {% if featured and featured|length > 0 %}
-        <div class="bento-grid min-h-[600px]">
-            {% for attraction in featured[:5] %}
-            <div
-                class="bento-item spotlight-card group {% if loop.index == 1 %}col-span-2 row-span-2{% elif loop.index == 2 %}col-span-2 row-span-1{% elif loop.index == 3 %}col-span-1 row-span-1{% elif loop.index == 4 %}col-span-1 row-span-1{% elif loop.index == 5 %}col-span-2 row-span-1{% endif %}"
-                data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
-                <img src="{{ attraction.image_url }}" alt="{{ attraction.name }}"
-                    class="w-full h-full object-cover spotlight-img">
-                <div class="absolute inset-0 bg-gradient-to-t from-forest-black/95 via-forest-black/40 to-transparent">
-                </div>
-
-                <div class="absolute top-6 left-6">
-                    <span
-                        class="bg-mongodb-green px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest text-forest-black border border-mongodb-green">
-                        {{ attraction.category }}
-                    </span>
-                </div>
-
-                <div class="absolute bottom-0 left-0 p-8 w-full group-hover:pb-10 transition-all">
-                    <h3
-                        class="{% if loop.index == 1 %}text-4xl{% else %}text-2xl{% endif %} font-bold text-white mb-3 font-display leading-tight">
-                        {{ attraction.name }}
-                    </h3>
-                    <p class="text-silver-teal text-sm mb-6 line-clamp-2 font-medium">
-                        {{ attraction.description }}
-                    </p>
-                    <a href="{{ url_for('public.attraction_detail', id=attraction.id) }}"
-                        class="inline-flex items-center text-mongodb-green hover:text-white font-bold text-sm group/link transition-colors">
-                        <span>Explore Story</span>
-                        <svg class="w-4 h-4 ml-2 group-hover/link:translate-x-1 transition-transform" fill="none"
-                            stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7">
-                            </path>
-                        </svg>
-                    </a>
-                </div>
+        <!-- Featured Cards - Horizontal Carousel -->
+        <div class="spotlight-carousel" data-aos="fade-up" data-aos-delay="100">
+            <div class="spotlight-carousel__inner">
+                {% for attraction in featured %}
+                <a href="{{ url_for('public.attraction_detail', id=attraction.id) }}"
+                   class="spotlight-card"
+                   style="--card-color: {{ ['#FCA5A5', '#FCD34D', '#6EE7B7', '#93C5FD', '#C4B5FD', '#FDBA74'][loop.index0 % 6] }}">
+                    <div class="spotlight-card__img-wrap">
+                        <img src="{{ attraction.image_url or url_for('static', filename='img/placeholder.jpg') }}"
+                             alt="{{ attraction.name }}"
+                             class="spotlight-card__img"
+                             loading="lazy" decoding="async">
+                    </div>
+                    <div class="spotlight-card__footer">
+                        <h3 class="spotlight-card__name">{{ attraction.name }}</h3>
+                        <p class="spotlight-card__info">{{ attraction.description }}</p>
+                        <span class="spotlight-card__category">{{ attraction.category or 'Heritage' }}</span>
+                    </div>
+                </a>
+                {% endfor %}
             </div>
-            {% endfor %}
+            {% if featured|length > 3 %}
+            <button class="spotlight-carousel__btn spotlight-carousel__btn--next" aria-label="Next">
+                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </button>
+            {% endif %}
         </div>
         {% else %}
         <div class="text-center py-24 glass-card border-dashed border-2 border-emerald-900/10 reveal">
@@ -287,9 +287,9 @@
                         Our interactive cultural map provides a window into the 82 barangays. Filter by heritage sites,
                         local eateries, or natural landmarks.
                     </p>
-                    <a href="{{ url_for('public.map_view') }}" class="btn-pill-primary !px-12 group">
-                        Open Map Interface
-                        <svg class="w-5 h-5 ml-2 group-hover:rotate-45 transition-transform" fill="none"
+                    <a href="{{ url_for('public.map_view') }}" class="btn-pill-primary !px-12 group inline-flex items-center whitespace-nowrap">
+                        <span>Open Map Interface</span>
+                        <svg class="w-5 h-5 ml-2 flex-shrink-0 group-hover:rotate-45 transition-transform" fill="none"
                             stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M14 5l7 7m0 0l-7 7m7-7H3"></path>
@@ -368,7 +368,8 @@
                 <div
                     class="relative flex items-center p-1.5 bg-white/10 hover:bg-white/15 border border-white/20 focus-within:ring-2 focus-within:ring-emerald-500/50 rounded-full transition-all">
                     <input type="email"
-                        class="w-full pl-10 pr-2 py-3 bg-transparent text-white placeholder-white focus:outline-none"
+                        style="background: transparent !important; -webkit-appearance: none; appearance: none;"
+                        class="w-full px-4 py-3 bg-transparent text-white placeholder-white focus:outline-none focus:border-0 focus:ring-0 border-0"
                         placeholder="Enter your email" required aria-label="Email address" />
                     <button type="submit"
                         class="shrink-0 px-8 py-3 bg-mongodb-green hover:bg-white text-forest-black font-bold rounded-full transition-all text-sm uppercase tracking-widest">

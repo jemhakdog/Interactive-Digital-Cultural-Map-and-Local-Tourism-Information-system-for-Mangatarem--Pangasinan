@@ -49,14 +49,14 @@
                     <main class="event-card-inner">
                         <div class="event-visual">
                             {% if event.image_url %}
-                                <img src="{{ event.image_url }}" alt="{{ event.title }}">
+                                <img src="{{ event.image_url }}" alt="{{ event.name }}">
                             {% else %}
                                 {% if event.category == 'Religious' %}
-                                    <img src="https://images.unsplash.com/photo-1548625361-ec853f0cf786?q=80&w=2070&auto=format&fit=crop" alt="{{ event.title }}">
+                                    <img src="https://images.unsplash.com/photo-1548625361-ec853f0cf786?q=80&w=2070&auto=format&fit=crop" alt="{{ event.name }}">
                                 % elif event.category == 'Entertainment' %}
-                                    <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop" alt="{{ event.title }}">
+                                    <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop" alt="{{ event.name }}">
                                 {% else %}
-                                    <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2070&auto=format&fit=crop" alt="{{ event.title }}">
+                                    <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2070&auto=format&fit=crop" alt="{{ event.name }}">
                                 {% endif %}
                             {% endif %}
                         </div>
@@ -64,7 +64,7 @@
                         <span class="event-date-editorial">{{ event.date.strftime('%b %d') }}</span>
                         <span class="event-tag">{{ event.category }}</span>
                     </div>
-                    <h3 class="event-title-editorial">{{ event.title }}</h3>
+                    <h3 class="event-title-editorial">{{ event.name }}</h3>
                     <p class="event-description-editorial">{{ event.description }}</p>
 
                     <div class="event-location-editorial">
@@ -82,7 +82,7 @@
 
                     <div class="event-actions">
                         <button
-                            data-action="add-to-calendar" data-event-title="{{ event.title }}" data-event-location="{{ event.location }}" data-event-date="{{ event.date.isoformat() }}"
+                            data-action="add-to-calendar" data-event-title="{{ event.name }}" data-event-location="{{ event.location }}" data-event-date="{{ event.date.isoformat() }}"
                             class="btn-editorial btn-editorial-text">
                             Remind Me
                         </button>

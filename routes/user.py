@@ -9,6 +9,7 @@ from models import (
     AttractionReview,
     GalleryItem,
 )
+from utils.security import validate_username, validate_email_format, validate_and_escape
 from functools import wraps
 
 user_bp = Blueprint("user", __name__, url_prefix="/user")
@@ -63,9 +64,33 @@ def dashboard():
 @user_required
 def profile():
     if request.method == "POST":
-        current_user.username = request.form.get("username")
-        current_user.email = request.form.get("email")
-        # In a real app, handle profile picture and password updates here
+        username = request.form.get("username", "").strip()
+        email = request.form.get("email", "").strip().lower()
+
+        # Validate input format
+        if not validate_username(username):
+            flash("Username must be 3-30 characters and contain only letters, numbers, and underscores.", "error")
+            return redirect(url_for("user.profile"))
+
+        if not validate_email_format(email):
+            flash("Please enter a valid email address.", "error")
+            return redirect(url_for("user.profile"))
+
+        # Check if username is taken by another user
+        existing_user = User.query.filter(User.username == username, User.id != current_user.id).first()
+        if existing_user:
+            flash("Username already taken.", "error")
+            return redirect(url_for("user.profile"))
+
+        # Check if email is taken by another user
+        existing_email = User.query.filter(User.email == email, User.id != current_user.id).first()
+        if existing_email:
+            flash("Email already registered.", "error")
+            return redirect(url_for("user.profile"))
+
+        # Sanitize and save
+        current_user.username = validate_and_escape(username)
+        current_user.email = validate_and_escape(email)
         db.session.commit()
         flash("Profile updated successfully!", "success")
         return redirect(url_for("user.profile"))

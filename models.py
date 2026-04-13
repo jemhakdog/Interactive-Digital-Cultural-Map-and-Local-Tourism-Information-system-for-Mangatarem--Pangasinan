@@ -294,6 +294,42 @@ class EstablishmentReview(db.Model):
     user = db.relationship('User', backref=db.backref('establishment_reviews', lazy=True))
 
 
+class DatabaseAuditLog(db.Model):
+    """Audit log for database operations (security monitoring)."""
+    __tablename__ = 'DATABASE_AUDIT_LOG'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('USER.id'), nullable=True, index=True)
+    action = db.Column(db.String(50), nullable=False, index=True)  # INSERT, UPDATE, DELETE, SELECT
+    table_name = db.Column(db.String(100), nullable=False, index=True)
+    record_id = db.Column(db.Integer, nullable=True, index=True)  # ID of affected record
+    ip_address = db.Column(db.String(45), nullable=True)  # IPv4 or IPv6
+    user_agent = db.Column(db.String(500), nullable=True)
+    query_summary = db.Column(db.String(500), nullable=True)  # Brief description, not full query
+    status = db.Column(db.String(20), default='success', index=True)  # success, failed, blocked
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+
+    user = db.relationship('User', backref=db.backref('audit_logs', lazy=True))
+
+    @classmethod
+    def log_operation(cls, user_id, action, table_name, record_id=None, 
+                     ip_address=None, user_agent=None, query_summary=None, status='success'):
+        """Create an audit log entry."""
+        log = cls(
+            user_id=user_id,
+            action=action,
+            table_name=table_name,
+            record_id=record_id,
+            ip_address=ip_address,
+            user_agent=user_agent,
+            query_summary=query_summary,
+            status=status
+        )
+        db.session.add(log)
+        db.session.commit()
+        return log
+
+
 # === Heritage Models (Tourism Forms) ===
 
 # Import heritage models to register them with SQLAlchemy

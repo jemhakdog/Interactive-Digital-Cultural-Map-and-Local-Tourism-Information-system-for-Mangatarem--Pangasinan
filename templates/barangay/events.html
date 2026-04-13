@@ -22,7 +22,7 @@
                 <li class="py-4 flex justify-between items-center">
                     <div class="flex items-center gap-4">
                         {% if event.image_url %}
-                        <img src="{{ event.image_url }}" alt="{{ event.title }}"
+                        <img src="{{ event.image_url }}" alt="{{ event.name }}"
                             class="w-16 h-16 object-cover rounded-lg">
                         {% else %}
                         <div class="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center text-gray-400">
@@ -30,7 +30,7 @@
                         </div>
                         {% endif %}
                         <div>
-                            <h3 class="font-semibold text-lg text-gray-800">{{ event.title }}</h3>
+                            <h3 class="font-semibold text-lg text-gray-800">{{ event.name }}</h3>
                             <p class="text-sm text-gray-500">{{ event.date.strftime('%B %d, %Y') }} • {{ event.location
                                 }}</p>
                             <span

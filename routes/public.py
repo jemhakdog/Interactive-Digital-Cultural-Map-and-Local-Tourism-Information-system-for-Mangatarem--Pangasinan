@@ -11,6 +11,7 @@ from utils.logger_helper import (
 )
 import logging
 import threading
+import random
 from flask import current_app
 
 public_bp = Blueprint("public", __name__)
@@ -48,10 +49,11 @@ def index():
     # Record view
     record_view("page", page_name="home")
 
-    # Get featured attractions (limit 3)
-    featured = Attraction.query.filter_by(status="approved").limit(3).all()
+    # Get all approved attractions and randomly select 5 for featured
+    all_approved = Attraction.query.filter_by(status="approved").all()
+    featured = random.sample(all_approved, min(5, len(all_approved))) if all_approved else []
 
-    logger.info("Home page loaded with featured attractions")
+    logger.info(f"Home page loaded with {len(featured)} featured attractions")
     return render_template("pagez/index.html", featured=featured)
 
 
@@ -296,9 +298,10 @@ def search():
     )
     logger.info("Search page accessed")
 
-    query = request.args.get("q", "").strip()
-    category_filter = request.args.get("category", "")
-    barangay_filter = request.args.get("barangay", "")
+    # Input length limits to prevent abuse
+    query = request.args.get("q", "").strip()[:200]
+    category_filter = request.args.get("category", "")[:50]
+    barangay_filter = request.args.get("barangay", "")[:100]
 
     # Start with base queries
     attractions_query = Attraction.query.filter_by(status="approved")
@@ -314,14 +317,12 @@ def search():
             | (Attraction.category.ilike(search_terms))
         )
         events_query = events_query.filter(
-            (Event.title.ilike(search_terms))
+            (Event.name.ilike(search_terms))
             | (Event.description.ilike(search_terms))
             | (Event.category.ilike(search_terms))
         )
         barangays_info_query = barangays_info_query.filter(
-            (BarangayInfo.name.ilike(search_terms))
-            | (BarangayInfo.history.ilike(search_terms))
-            | (BarangayInfo.cultural_property.ilike(search_terms))
+            BarangayInfo.name.ilike(search_terms)
         )
 
     # Apply Category Filter (only for attractions and events)

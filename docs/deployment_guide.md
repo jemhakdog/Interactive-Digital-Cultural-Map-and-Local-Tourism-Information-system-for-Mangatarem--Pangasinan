@@ -32,7 +32,7 @@ Configure the following variables in the **Vercel Project Settings > Environment
 
 | Variable | Description |
 |----------|-------------|
-| `SECRET_KEY` | Long random string for session security. |
+| `SECRET_KEY` | Long random string for session security. Generate with: `openssl rand -hex 32` |
 | `DATABASE_URL` | Supabase pooler URI (`postgresql://postgres:[PASSWORD]@...:6543/postgres`). |
 | `SUPABASE_URL` | Your Supabase project URL. |
 | `SUPABASE_KEY` | Your Supabase Service Role or Anon key. |
@@ -40,6 +40,8 @@ Configure the following variables in the **Vercel Project Settings > Environment
 | `MAIL_SERVER` | SMTP server for notifications. |
 | `MAIL_USERNAME` | SMTP account email. |
 | `MAIL_PASSWORD` | SMTP account password. |
+
+**Security Note**: Never commit `SECRET_KEY` or passwords to version control. Use Vercel's encrypted environment variables.
 
 ### Build Settings
 - **Framework Preset**: Other (Static / Dynamic)
@@ -49,6 +51,23 @@ Configure the following variables in the **Vercel Project Settings > Environment
 ---
 
 ## 4. Post-Deployment Verification
+
+### Security Verification
+
+Before going live, complete the [Deployment Security Checklist](DEPLOYMENT_SECURITY_CHECKLIST.md):
+
+1. **Security Headers**: Verify CSP, HSTS, X-Frame-Options, etc.
+   ```bash
+   curl -I https://your-domain.com
+   ```
+
+2. **Cookie Security**: Check HttpOnly, Secure, and SameSite flags in browser DevTools
+
+3. **Rate Limiting**: Test authentication endpoints return 429 after limit exceeded
+
+4. **XSS Protection**: Submit test payloads to verify sanitization
+
+### Functional Verification
 
 1. **Cold Start**: Visit the home page. The first load should take <1.5s due to lazy-loaded database drivers.
 2. **API Check**: Visit `/api/attractions`. Verify you receive a JSON response.
