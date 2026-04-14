@@ -5,6 +5,7 @@ from extensions import db, limiter
 from models import Attraction
 from utils.logger_helper import log_entry, log_success, log_error
 from utils.file_helpers import save_uploaded_file
+from utils.security import validate_string_input, validate_float, validate_coordinates, sanitize_html_input
 from . import admin_bp
 
 logger = logging.getLogger(__name__)
@@ -51,26 +52,61 @@ def add_attraction():
         return redirect(url_for("public.index"))
     
     if request.method == "POST":
+        name = request.form.get("name")
+        description = request.form.get("description")
+        category = request.form.get("category")
+        lat_str = request.form.get("latitude")
+        lng_str = request.form.get("longitude")
+
+        # Validate name
+        valid, err = validate_string_input(name, min_length=1, max_length=200, block_sql_injection=True)
+        if not valid:
+            flash(f"Name: {err}", "error")
+            return redirect(url_for("admin.add_attraction"))
+
+        # Validate and sanitize description
+        valid, err = validate_string_input(description, max_length=2000, block_sql_injection=True)
+        if not valid:
+            flash(f"Description: {err}", "error")
+            return redirect(url_for("admin.add_attraction"))
+        description = sanitize_html_input(description)
+
+        # Validate category
+        valid, err = validate_string_input(category, max_length=100, block_sql_injection=True)
+        if not valid:
+            flash(f"Category: {err}", "error")
+            return redirect(url_for("admin.add_attraction"))
+
+        # Validate coordinates
+        valid_lat, lat_val, err_lat = validate_float(lat_str)
+        valid_lng, lng_val, err_lng = validate_float(lng_str)
+        if not valid_lat or not valid_lng:
+            flash("Latitude and longitude must be valid numbers.", "error")
+            return redirect(url_for("admin.add_attraction"))
+        if not validate_coordinates(lat_val, lng_val):
+            flash("Coordinates are out of range.", "error")
+            return redirect(url_for("admin.add_attraction"))
+
         image_url = request.form.get("image_url")
         if "image" in request.files:
             uploaded_url = save_uploaded_file(request.files["image"])
             if uploaded_url:
                 image_url = uploaded_url
-        
+
         attraction = Attraction(
-            name=request.form.get("name"),
-            category=request.form.get("category"),
-            description=request.form.get("description"),
-            latitude=float(request.form.get("latitude")),
-            longitude=float(request.form.get("longitude")),
+            name=name,
+            category=category,
+            description=description,
+            latitude=lat_val,
+            longitude=lng_val,
             image_url=image_url,
             user_id=current_user.id,
-            barangay_id=1, # Admin submissions default to global/center
+            barangay_id=1,
             status="approved",
         )
         db.session.add(attraction)
         db.session.commit()
-        
+
         log_success("admin", "add_attraction", f"New attraction '{attraction.name}' added")
         flash("Attraction added successfully!")
         return redirect(url_for("admin.admin_attractions"))
@@ -135,25 +171,60 @@ def edit_attraction(id):
         return redirect(url_for("public.index"))
     
     if request.method == "POST":
-        attraction.name = request.form.get("name")
-        attraction.category = request.form.get("category")
-        attraction.description = request.form.get("description")
-        attraction.latitude = float(request.form.get("latitude"))
-        attraction.longitude = float(request.form.get("longitude"))
-        
+        name = request.form.get("name")
+        description = request.form.get("description")
+        category = request.form.get("category")
+        lat_str = request.form.get("latitude")
+        lng_str = request.form.get("longitude")
+
+        # Validate name
+        valid, err = validate_string_input(name, min_length=1, max_length=200, block_sql_injection=True)
+        if not valid:
+            flash(f"Name: {err}", "error")
+            return redirect(url_for("admin.edit_attraction", id=id))
+
+        # Validate and sanitize description
+        valid, err = validate_string_input(description, max_length=2000, block_sql_injection=True)
+        if not valid:
+            flash(f"Description: {err}", "error")
+            return redirect(url_for("admin.edit_attraction", id=id))
+        description = sanitize_html_input(description)
+
+        # Validate category
+        valid, err = validate_string_input(category, max_length=100, block_sql_injection=True)
+        if not valid:
+            flash(f"Category: {err}", "error")
+            return redirect(url_for("admin.edit_attraction", id=id))
+
+        # Validate coordinates
+        valid_lat, lat_val, err_lat = validate_float(lat_str)
+        valid_lng, lng_val, err_lng = validate_float(lng_str)
+        if not valid_lat or not valid_lng:
+            flash("Latitude and longitude must be valid numbers.", "error")
+            return redirect(url_for("admin.edit_attraction", id=id))
+        if not validate_coordinates(lat_val, lng_val):
+            flash("Coordinates are out of range.", "error")
+            return redirect(url_for("admin.edit_attraction", id=id))
+
+        attraction.name = name
+        attraction.category = category
+        attraction.description = description
+        attraction.latitude = lat_val
+        attraction.longitude = lng_val
+
         # Handle image upload
         if "image" in request.files:
             uploaded_url = save_uploaded_file(request.files["image"])
             if uploaded_url:
                 attraction.image_url = uploaded_url
-        
+
         if request.form.get("image_url"):
             attraction.image_url = request.form.get("image_url")
-        
+
         # Contributors require re-approval
         if current_user.role == "contributor":
             attraction.status = "pending"
-        
+
         db.session.commit()
         log_success("admin", "edit_attraction", f"Attraction '{attraction.name}' updated")
         flash("Attraction updated.")

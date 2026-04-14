@@ -19,6 +19,7 @@ from utils.heritage_registry import (
     get_display_name,
 )
 from utils.logger_helper import log_entry, log_success, log_error
+from utils.security import detect_sql_injection_attempt, validate_string_input
 from . import admin_bp
 
 logger = logging.getLogger(__name__)
@@ -32,7 +33,7 @@ def _require_admin():
 
 
 def _parse_form_value(value, field_type):
-    """Parse a form value based on field type."""
+    """Parse a form value based on field type with validation."""
     if not value or value.strip() == "":
         return None
 
@@ -48,11 +49,24 @@ def _parse_form_value(value, field_type):
             return None
     elif field_type == "json":
         try:
-            return json.loads(value)
+            parsed = json.loads(value)
+            # Validate JSON size (max 10KB)
+            if len(value) > 10 * 1024:
+                return None
+            return parsed
         except (json.JSONDecodeError, TypeError):
             return value
     else:
-        return value.strip()
+        # Validate string fields
+        stripped = value.strip()
+        # Block SQL injection patterns
+        if detect_sql_injection_attempt(stripped):
+            return None
+        # Enforce max length of 500 for text fields
+        is_valid, _ = validate_string_input(stripped, max_length=500)
+        if not is_valid:
+            return None
+        return stripped
 
 
 def _populate_item_from_form(profile, detail, config, form_data):

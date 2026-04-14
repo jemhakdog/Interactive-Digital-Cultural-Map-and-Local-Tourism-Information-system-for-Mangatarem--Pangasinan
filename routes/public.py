@@ -9,6 +9,7 @@ from utils.logger_helper import (
     log_success,
     log_render,
 )
+from utils.security import validate_email_format, validate_string_input, sanitize_html_input
 import logging
 import threading
 import random
@@ -298,10 +299,21 @@ def search():
     )
     logger.info("Search page accessed")
 
-    # Input length limits to prevent abuse
-    query = request.args.get("q", "").strip()[:200]
-    category_filter = request.args.get("category", "")[:50]
-    barangay_filter = request.args.get("barangay", "")[:100]
+    # Input validation and length limits
+    raw_query = request.args.get("q", "").strip()
+    is_valid, error_msg = validate_string_input(raw_query, max_length=200, block_sql_injection=True)
+    if not is_valid:
+        query = ""  # Reset to empty if invalid
+    else:
+        query = raw_query[:200]
+    
+    raw_category = request.args.get("category", "")
+    is_valid, _ = validate_string_input(raw_category, max_length=50, block_sql_injection=True)
+    category_filter = raw_category[:50] if is_valid else ""
+    
+    raw_barangay = request.args.get("barangay", "")
+    is_valid, _ = validate_string_input(raw_barangay, max_length=100, block_sql_injection=True)
+    barangay_filter = raw_barangay[:100] if is_valid else ""
 
     # Start with base queries
     attractions_query = Attraction.query.filter_by(status="approved")
@@ -637,7 +649,11 @@ def heritage_type_list(heritage_type):
     model = config["model"]
     page = request.args.get("page", 1, type=int)
     per_page = 12
-    search_term = request.args.get("search", "").strip()
+    raw_search = request.args.get("search", "").strip()
+    
+    # Validate search input
+    is_valid, _ = validate_string_input(raw_search, max_length=200, block_sql_injection=True)
+    search_term = raw_search[:200] if is_valid else ""
 
     query = model.query.filter_by(status="approved")
     if search_term:
@@ -846,6 +862,22 @@ def subscribe():
             return jsonify({"status": "error", "message": "Email is required"}), 400
         flash("Email is required", "error")
         return redirect(url_for("public.index"))
+    
+    # Validate email format and check for SQL injection
+    is_valid, error_msg = validate_string_input(email.strip(), max_length=255, block_sql_injection=True)
+    if not is_valid:
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"status": "error", "message": "Invalid email address"}), 400
+        flash("Invalid email address", "error")
+        return redirect(url_for("public.index"))
+    
+    if not validate_email_format(email.strip()):
+        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
+            return jsonify({"status": "error", "message": "Invalid email format"}), 400
+        flash("Invalid email format", "error")
+        return redirect(url_for("public.index"))
+    
+    email = email.strip()
 
     # Check if already subscribed
     existing = NewsletterSubscriber.query.filter_by(email=email).first()
@@ -992,12 +1024,32 @@ def submit_establishment_review(id):
         return redirect(url_for("auth.login"))
 
     establishment = Establishment.query.get_or_404(id)
+    
+    # Validate rating with proper error handling
+    try:
+        rating = int(request.form.get("rating", 5))
+        if rating < 1 or rating > 5:
+            flash("Rating must be between 1 and 5.", "error")
+            return redirect(url_for("public.establishment_detail", id=id))
+    except (ValueError, TypeError):
+        flash("Invalid rating value.", "error")
+        return redirect(url_for("public.establishment_detail", id=id))
+    
+    # Validate and sanitize comment
+    comment = request.form.get("comment", "")
+    is_valid, error_msg = validate_string_input(comment, max_length=2000, block_sql_injection=True)
+    if not is_valid:
+        flash(f"Invalid comment: {error_msg}", "error")
+        return redirect(url_for("public.establishment_detail", id=id))
+    
+    # Sanitize HTML but allow basic formatting
+    sanitized_comment = sanitize_html_input(comment)
 
     review = EstablishmentReview(
         user_id=current_user.id,
         establishment_id=establishment.id,
-        rating=int(request.form.get("rating", 5)),
-        comment=request.form.get("comment"),
+        rating=rating,
+        comment=sanitized_comment,
         status="pending",
     )
     db.session.add(review)

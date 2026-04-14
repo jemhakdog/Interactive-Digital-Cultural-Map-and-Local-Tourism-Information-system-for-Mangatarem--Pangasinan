@@ -5,6 +5,7 @@ from extensions import db, limiter
 from models import Event
 from datetime import datetime
 from utils.file_helpers import save_uploaded_file
+from utils.security import validate_string_input, sanitize_html_input
 from . import barangay_bp
 
 logger = logging.getLogger(__name__)
@@ -35,6 +36,43 @@ def barangay_add_event():
         return redirect(url_for("public.index"))
 
     if request.method == "POST":
+        title = request.form.get("title", "")
+        description = request.form.get("description", "")
+        location = request.form.get("location", "")
+        category = request.form.get("category", "")
+        date_str = request.form.get("date", "")
+
+        # Validate name
+        is_valid, error_msg = validate_string_input(title, max_length=200, block_sql_injection=True)
+        if not is_valid:
+            flash(f"Invalid event name: {error_msg}", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_add_event"))
+
+        # Validate description
+        is_valid, error_msg = validate_string_input(description, max_length=2000, block_sql_injection=True)
+        if not is_valid:
+            flash(f"Invalid description: {error_msg}", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_add_event"))
+
+        # Validate location
+        is_valid, error_msg = validate_string_input(location, max_length=300, block_sql_injection=True)
+        if not is_valid:
+            flash(f"Invalid location: {error_msg}", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_add_event"))
+
+        # Validate category
+        is_valid, error_msg = validate_string_input(category, max_length=100, block_sql_injection=True)
+        if not is_valid:
+            flash(f"Invalid category: {error_msg}", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_add_event"))
+
+        # Validate date
+        try:
+            event_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except (ValueError, TypeError):
+            flash("Invalid date: date must be in YYYY-MM-DD format.", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_add_event"))
+
         image_url = request.form.get("image_url")
         if "image" in request.files:
             uploaded_url = save_uploaded_file(request.files["image"])
@@ -42,11 +80,11 @@ def barangay_add_event():
                 image_url = uploaded_url
 
         event = Event(
-            name=request.form["title"],
-            date=datetime.strptime(request.form["date"], "%Y-%m-%d").date(),
-            location=request.form["location"],
-            category=request.form["category"],
-            description=request.form["description"],
+            name=title,
+            date=event_date,
+            location=location,
+            category=category,
+            description=sanitize_html_input(description),
             image_url=image_url,
             barangay_id=current_user.barangay_id,
             user_id=current_user.id,
@@ -74,11 +112,48 @@ def barangay_edit_event(id):
         return redirect(url_for("barangay.barangay_dashboard"))
 
     if request.method == "POST":
-        event.name = request.form["title"]
-        event.date = datetime.strptime(request.form["date"], "%Y-%m-%d").date()
-        event.location = request.form["location"]
-        event.category = request.form["category"]
-        event.description = request.form["description"]
+        title = request.form.get("title", "")
+        description = request.form.get("description", "")
+        location = request.form.get("location", "")
+        category = request.form.get("category", "")
+        date_str = request.form.get("date", "")
+
+        # Validate name
+        is_valid, error_msg = validate_string_input(title, max_length=200, block_sql_injection=True)
+        if not is_valid:
+            flash(f"Invalid event name: {error_msg}", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_edit_event", id=event.id))
+
+        # Validate description
+        is_valid, error_msg = validate_string_input(description, max_length=2000, block_sql_injection=True)
+        if not is_valid:
+            flash(f"Invalid description: {error_msg}", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_edit_event", id=event.id))
+
+        # Validate location
+        is_valid, error_msg = validate_string_input(location, max_length=300, block_sql_injection=True)
+        if not is_valid:
+            flash(f"Invalid location: {error_msg}", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_edit_event", id=event.id))
+
+        # Validate category
+        is_valid, error_msg = validate_string_input(category, max_length=100, block_sql_injection=True)
+        if not is_valid:
+            flash(f"Invalid category: {error_msg}", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_edit_event", id=event.id))
+
+        # Validate date
+        try:
+            event_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except (ValueError, TypeError):
+            flash("Invalid date: date must be in YYYY-MM-DD format.", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_edit_event", id=event.id))
+
+        event.name = title
+        event.date = event_date
+        event.location = location
+        event.category = category
+        event.description = sanitize_html_input(description)
 
         if "image" in request.files:
             uploaded_url = save_uploaded_file(request.files["image"])

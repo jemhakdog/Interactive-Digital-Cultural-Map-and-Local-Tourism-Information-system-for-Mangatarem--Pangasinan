@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for
 from flask_login import login_required, current_user
 from models import db, NewsletterSubscriber
 from utils.email_sender import send_email
+from utils.security import validate_string_input, sanitize_html_input
 import csv
 import io
 from datetime import datetime
@@ -37,7 +38,26 @@ def compose():
     if request.method == "POST":
         subject = request.form.get("subject")
         content = request.form.get("content")
-        
+
+        # Validate subject (max 200, no newlines to prevent email header injection)
+        valid, err = validate_string_input(subject, min_length=1, max_length=200, block_sql_injection=True,
+                                           allowed_pattern=r'^[^\r\n]+$')
+        if not valid:
+            flash(f"Subject: {err}", "error")
+            return render_template("admin/newsletter/compose.html")
+
+        # Check for newlines explicitly (additional header injection protection)
+        if '\n' in subject or '\r' in subject:
+            flash("Subject must not contain line breaks.", "error")
+            return render_template("admin/newsletter/compose.html")
+
+        # Validate and sanitize content
+        valid, err = validate_string_input(content, max_length=5000, block_sql_injection=True)
+        if not valid:
+            flash(f"Content: {err}", "error")
+            return render_template("admin/newsletter/compose.html")
+        content = sanitize_html_input(content)
+
         if not subject or not content:
             flash("Subject and content are required.", "error")
             return render_template("admin/newsletter/compose.html")

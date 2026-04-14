@@ -225,8 +225,8 @@ def _register_request_hooks(app: Flask) -> None:
         # Content Security Policy - Prevents XSS by restricting resource sources
         response.headers["Content-Security-Policy"] = (
             "default-src 'self';"
-            "script-src 'self' https://fonts.googleapis.com https://maps.mapbox.com https://api.mapbox.com https://accounts.google.com 'unsafe-inline';"
-            "style-src 'self' https://fonts.googleapis.com https://api.mapbox.com 'unsafe-inline';"
+            "script-src 'self' https://fonts.googleapis.com https://maps.mapbox.com https://api.mapbox.com https://accounts.google.com https://unpkg.com 'unsafe-inline';"
+            "style-src 'self' https://fonts.googleapis.com https://api.mapbox.com https://unpkg.com 'unsafe-inline';"
             "img-src 'self' data: https: blob:;"
             "font-src 'self' https://fonts.gstatic.com data:;"
             "connect-src 'self' https://api.mapbox.com https://events.mapbox.com https://*.supabase.co https://*.upstash.io https://accounts.google.com;"
@@ -252,9 +252,10 @@ def _register_request_hooks(app: Flask) -> None:
             "camera=(), microphone=(), geolocation=(self), payment=()"
         )
 
-        # Cross-Origin protection
-        response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
-        response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
+        # Cross-Origin protection (only meaningful with HTTPS)
+        if app.config.get("SESSION_COOKIE_SECURE"):
+            response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
+            response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
 
         # HSTS for production (only if SESSION_COOKIE_SECURE is enabled)
         if app.config.get("SESSION_COOKIE_SECURE"):

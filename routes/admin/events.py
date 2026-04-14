@@ -6,6 +6,7 @@ from models import Event
 from datetime import datetime
 from utils.logger_helper import log_entry, log_success, log_error
 from utils.file_helpers import save_uploaded_file
+from utils.security import validate_string_input, sanitize_html_input, validate_integer
 from . import admin_bp
 
 logger = logging.getLogger(__name__)
@@ -86,26 +87,71 @@ def add_event():
         return redirect(url_for("public.index"))
     
     if request.method == "POST":
+        name = request.form.get("name")
+        location = request.form.get("location")
+        category = request.form.get("category")
+        description = request.form.get("description")
+        date_str = request.form.get("date")
+        barangay_id_str = request.form.get("barangay_id", "1")
+
+        # Validate name
+        valid, err = validate_string_input(name, min_length=1, max_length=200, block_sql_injection=True)
+        if not valid:
+            flash(f"Name: {err}", "error")
+            return redirect(url_for("admin.add_event"))
+
+        # Validate and sanitize description
+        valid, err = validate_string_input(description, max_length=2000, block_sql_injection=True)
+        if not valid:
+            flash(f"Description: {err}", "error")
+            return redirect(url_for("admin.add_event"))
+        description = sanitize_html_input(description)
+
+        # Validate location
+        valid, err = validate_string_input(location, max_length=300, block_sql_injection=True)
+        if not valid:
+            flash(f"Location: {err}", "error")
+            return redirect(url_for("admin.add_event"))
+
+        # Validate category
+        valid, err = validate_string_input(category, max_length=100, block_sql_injection=True)
+        if not valid:
+            flash(f"Category: {err}", "error")
+            return redirect(url_for("admin.add_event"))
+
+        # Validate date (existing strptime validation)
+        try:
+            event_date = datetime.strptime(date_str, "%Y-%m-%d")
+        except (ValueError, TypeError):
+            flash("Invalid date format. Use YYYY-MM-DD.", "error")
+            return redirect(url_for("admin.add_event"))
+
+        # Validate barangay_id
+        valid_bar, barangay_id, err_bar = validate_integer(barangay_id_str, min_value=1)
+        if not valid_bar:
+            flash("Invalid barangay ID.", "error")
+            return redirect(url_for("admin.add_event"))
+
         image_url = request.form.get("image_url")
         if "image" in request.files:
             uploaded_url = save_uploaded_file(request.files["image"])
             if uploaded_url:
                 image_url = uploaded_url
-        
+
         event = Event(
-            name=request.form["name"],
-            date=datetime.strptime(request.form["date"], "%Y-%m-%d"),
-            location=request.form["location"],
-            category=request.form["category"],
-            description=request.form["description"],
+            name=name,
+            date=event_date,
+            location=location,
+            category=category,
+            description=description,
             image_url=image_url,
-            barangay_id=int(request.form.get("barangay_id", 1)), # Default to ID 1 if not provided
+            barangay_id=barangay_id,
             user_id=current_user.id,
             status="approved",
         )
         db.session.add(event)
         db.session.commit()
-        
+
         log_success("admin", "add_event", f"New event '{event.name}' added")
         flash("Event added successfully!")
         return redirect(url_for("admin.admin_events"))
@@ -127,21 +173,67 @@ def edit_event(id):
         return redirect(url_for("public.index"))
     
     if request.method == "POST":
-        event.name = request.form["name"]
-        event.date = datetime.strptime(request.form["date"], "%Y-%m-%d")
-        event.location = request.form["location"]
-        event.category = request.form["category"]
-        event.description = request.form["description"]
-        event.barangay_id = int(request.form.get("barangay_id", event.barangay_id))
-        
+        name = request.form.get("name")
+        location = request.form.get("location")
+        category = request.form.get("category")
+        description = request.form.get("description")
+        date_str = request.form.get("date")
+        barangay_id_str = request.form.get("barangay_id")
+
+        # Validate name
+        valid, err = validate_string_input(name, min_length=1, max_length=200, block_sql_injection=True)
+        if not valid:
+            flash(f"Name: {err}", "error")
+            return redirect(url_for("admin.edit_event", id=id))
+
+        # Validate and sanitize description
+        valid, err = validate_string_input(description, max_length=2000, block_sql_injection=True)
+        if not valid:
+            flash(f"Description: {err}", "error")
+            return redirect(url_for("admin.edit_event", id=id))
+        description = sanitize_html_input(description)
+
+        # Validate location
+        valid, err = validate_string_input(location, max_length=300, block_sql_injection=True)
+        if not valid:
+            flash(f"Location: {err}", "error")
+            return redirect(url_for("admin.edit_event", id=id))
+
+        # Validate category
+        valid, err = validate_string_input(category, max_length=100, block_sql_injection=True)
+        if not valid:
+            flash(f"Category: {err}", "error")
+            return redirect(url_for("admin.edit_event", id=id))
+
+        # Validate date
+        try:
+            event_date = datetime.strptime(date_str, "%Y-%m-%d")
+        except (ValueError, TypeError):
+            flash("Invalid date format. Use YYYY-MM-DD.", "error")
+            return redirect(url_for("admin.edit_event", id=id))
+
+        # Validate barangay_id if provided
+        if barangay_id_str:
+            valid_bar, barangay_id, err_bar = validate_integer(barangay_id_str, min_value=1)
+            if not valid_bar:
+                flash("Invalid barangay ID.", "error")
+                return redirect(url_for("admin.edit_event", id=id))
+            event.barangay_id = barangay_id
+
+        event.name = name
+        event.date = event_date
+        event.location = location
+        event.category = category
+        event.description = description
+
         if "image" in request.files:
             uploaded_url = save_uploaded_file(request.files["image"])
             if uploaded_url:
                 event.image_url = uploaded_url
-        
+
         if request.form.get("image_url") and not ("image" in request.files and request.files["image"].filename):
             event.image_url = request.form.get("image_url")
-        
+
         db.session.commit()
         log_success("admin", "edit_event", f"Event '{event.name}' updated")
         flash("Event updated successfully!")

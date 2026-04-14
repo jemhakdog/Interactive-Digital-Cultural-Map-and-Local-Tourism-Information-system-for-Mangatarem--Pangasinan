@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from extensions import db, limiter
 from models import GalleryItem
 from utils.file_helpers import save_uploaded_file, detect_media_type
+from utils.security import validate_string_input, sanitize_html_input, sanitize_url
 from . import barangay_bp
 
 logger = logging.getLogger(__name__)
@@ -35,7 +36,13 @@ def barangay_add_gallery():
 
     if request.method == "POST":
         url = request.form.get("url")
+        caption = request.form.get("caption", "")
         item_type = request.form.get("type", "photo")
+
+        # Validate type against whitelist
+        if item_type not in ("photo", "video"):
+            flash("Invalid media type: must be 'photo' or 'video'.", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_add_gallery"))
 
         if "media_file" in request.files:
             uploaded_url = save_uploaded_file(request.files["media_file"])
@@ -44,13 +51,31 @@ def barangay_add_gallery():
                 item_type = detect_media_type(request.files["media_file"].filename)
 
         if not url:
-            flash("Please provide a media file or URL.")
+            flash("Please provide a media file or URL.", "error")
             return redirect(url_for("barangay.barangay_add_gallery"))
+
+        # Validate URL
+        is_valid, error_msg = validate_string_input(url, max_length=500, block_sql_injection=True)
+        if not is_valid:
+            flash(f"Invalid URL: {error_msg}", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_add_gallery"))
+
+        # Check for javascript: protocol
+        safe_url = sanitize_url(url)
+        if not safe_url:
+            flash("Invalid URL: unsafe protocol detected.", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_add_gallery"))
+
+        # Validate caption
+        is_valid, error_msg = validate_string_input(caption, max_length=500, block_sql_injection=True)
+        if not is_valid:
+            flash(f"Invalid caption: {error_msg}", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_add_gallery"))
 
         gallery_item = GalleryItem(
             type=item_type,
-            url=url,
-            caption=request.form.get("caption"),
+            url=safe_url,
+            caption=sanitize_html_input(caption),
             user_id=current_user.id,
             status="pending",
         )
@@ -76,7 +101,16 @@ def barangay_edit_gallery(id):
         return redirect(url_for("barangay.barangay_dashboard"))
 
     if request.method == "POST":
-        gallery_item.caption = request.form.get("caption")
+        caption = request.form.get("caption", "")
+        url = request.form.get("url", "")
+
+        # Validate caption
+        is_valid, error_msg = validate_string_input(caption, max_length=500, block_sql_injection=True)
+        if not is_valid:
+            flash(f"Invalid caption: {error_msg}", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_edit_gallery", id=gallery_item.id))
+
+        gallery_item.caption = sanitize_html_input(caption)
 
         if "media_file" in request.files:
             uploaded_url = save_uploaded_file(request.files["media_file"])
@@ -84,8 +118,19 @@ def barangay_edit_gallery(id):
                 gallery_item.url = uploaded_url
                 gallery_item.type = detect_media_type(request.files["media_file"].filename)
 
-        if request.form.get("url") and not ("media_file" in request.files and request.files["media_file"].filename):
-            gallery_item.url = request.form.get("url")
+        if url and not ("media_file" in request.files and request.files["media_file"].filename):
+            # Validate URL
+            is_valid, url_error = validate_string_input(url, max_length=500, block_sql_injection=True)
+            if not is_valid:
+                flash(f"Invalid URL: {url_error}", "error")
+                return redirect(request.referrer or url_for("barangay.barangay_edit_gallery", id=gallery_item.id))
+
+            safe_url = sanitize_url(url)
+            if not safe_url:
+                flash("Invalid URL: unsafe protocol detected.", "error")
+                return redirect(request.referrer or url_for("barangay.barangay_edit_gallery", id=gallery_item.id))
+
+            gallery_item.url = safe_url
 
         gallery_item.status = "pending"
         db.session.commit()

@@ -4,6 +4,7 @@ from flask_login import login_required, current_user
 from extensions import db, limiter
 from models import Attraction
 from utils.file_helpers import save_uploaded_file
+from utils.security import validate_string_input, validate_float, validate_coordinates, sanitize_html_input
 from . import barangay_bp
 
 logger = logging.getLogger(__name__)
@@ -36,6 +37,42 @@ def barangay_add_attraction():
         return redirect(url_for("public.index"))
 
     if request.method == "POST":
+        name = request.form.get("name", "")
+        description = request.form.get("description", "")
+        category = request.form.get("category", "")
+        lat_str = request.form.get("latitude", "")
+        lng_str = request.form.get("longitude", "")
+
+        # Validate name
+        is_valid, error_msg = validate_string_input(name, max_length=200, block_sql_injection=True)
+        if not is_valid:
+            flash(f"Invalid name: {error_msg}", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_add_attraction"))
+
+        # Validate description
+        is_valid, error_msg = validate_string_input(description, max_length=2000, block_sql_injection=True)
+        if not is_valid:
+            flash(f"Invalid description: {error_msg}", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_add_attraction"))
+
+        # Validate category
+        is_valid, error_msg = validate_string_input(category, max_length=100, block_sql_injection=True)
+        if not is_valid:
+            flash(f"Invalid category: {error_msg}", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_add_attraction"))
+
+        # Validate coordinates
+        try:
+            lat = float(lat_str)
+            lng = float(lng_str)
+        except (ValueError, TypeError):
+            flash("Invalid coordinates: latitude and longitude must be numeric.", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_add_attraction"))
+
+        if not validate_coordinates(lat, lng):
+            flash("Invalid coordinates: latitude/longitude out of range.", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_add_attraction"))
+
         image_url = request.form.get("image_url")
         if "image" in request.files:
             uploaded_url = save_uploaded_file(request.files["image"])
@@ -43,11 +80,11 @@ def barangay_add_attraction():
                 image_url = uploaded_url
 
         attraction = Attraction(
-            name=request.form["name"],
-            category=request.form["category"],
-            description=request.form["description"],
-            latitude=float(request.form["latitude"]),
-            longitude=float(request.form["longitude"]),
+            name=name,
+            category=category,
+            description=sanitize_html_input(description),
+            latitude=lat,
+            longitude=lng,
             image_url=image_url,
             barangay_id=current_user.barangay_id,
             user_id=current_user.id,
@@ -75,11 +112,47 @@ def barangay_edit_attraction(id):
         return redirect(url_for("barangay.barangay_dashboard"))
 
     if request.method == "POST":
-        attraction.name = request.form["name"]
-        attraction.category = request.form["category"]
-        attraction.description = request.form["description"]
-        attraction.latitude = float(request.form["latitude"])
-        attraction.longitude = float(request.form["longitude"])
+        name = request.form.get("name", "")
+        description = request.form.get("description", "")
+        category = request.form.get("category", "")
+        lat_str = request.form.get("latitude", "")
+        lng_str = request.form.get("longitude", "")
+
+        # Validate name
+        is_valid, error_msg = validate_string_input(name, max_length=200, block_sql_injection=True)
+        if not is_valid:
+            flash(f"Invalid name: {error_msg}", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_edit_attraction", id=attraction.id))
+
+        # Validate description
+        is_valid, error_msg = validate_string_input(description, max_length=2000, block_sql_injection=True)
+        if not is_valid:
+            flash(f"Invalid description: {error_msg}", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_edit_attraction", id=attraction.id))
+
+        # Validate category
+        is_valid, error_msg = validate_string_input(category, max_length=100, block_sql_injection=True)
+        if not is_valid:
+            flash(f"Invalid category: {error_msg}", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_edit_attraction", id=attraction.id))
+
+        # Validate coordinates
+        try:
+            lat = float(lat_str)
+            lng = float(lng_str)
+        except (ValueError, TypeError):
+            flash("Invalid coordinates: latitude and longitude must be numeric.", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_edit_attraction", id=attraction.id))
+
+        if not validate_coordinates(lat, lng):
+            flash("Invalid coordinates: latitude/longitude out of range.", "error")
+            return redirect(request.referrer or url_for("barangay.barangay_edit_attraction", id=attraction.id))
+
+        attraction.name = name
+        attraction.category = category
+        attraction.description = sanitize_html_input(description)
+        attraction.latitude = lat
+        attraction.longitude = lng
 
         if "image" in request.files:
             uploaded_url = save_uploaded_file(request.files["image"])

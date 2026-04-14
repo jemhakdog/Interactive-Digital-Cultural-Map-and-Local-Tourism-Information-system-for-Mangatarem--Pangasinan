@@ -1,16 +1,50 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, current_app
 from extensions import limiter
+from functools import wraps
+from flask_login import current_user
 import subprocess
 import os
 import shutil
 import logging
+import re
 
 update_bp = Blueprint("update", __name__)
 logger = logging.getLogger(__name__)
 
 
+def require_update_token(f):
+    """
+    Decorator to require a valid update token for sensitive operations.
+    
+    Checks for a token in the request JSON that matches the configured
+    UPDATE_TOKEN environment variable. Only admin users can call update endpoints.
+    """
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Check if user is authenticated and is admin
+        if not current_user.is_authenticated:
+            return jsonify({"status": "error", "message": "Authentication required"}), 401
+        
+        if current_user.role != "admin":
+            return jsonify({"status": "error", "message": "Admin access required"}), 403
+        
+        # Verify update token if provided in request
+        token = None
+        if request.is_json:
+            token = request.get_json().get("token")
+        
+        expected_token = os.environ.get("UPDATE_TOKEN")
+        if expected_token and token != expected_token:
+            logger.warning(f"Invalid update token attempt from user: {current_user.username}")
+            return jsonify({"status": "error", "message": "Invalid token"}), 401
+        
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @update_bp.route("/pull", methods=["GET", "POST"])
 @limiter.limit("1 per minute")
+@require_update_token
 def pull_updates():
     """
     Pull updates from GitHub repository and copy files to specified locations.
@@ -36,10 +70,16 @@ def pull_updates():
         # For security, you might want to verify a token or check request headers
         # This is a basic implementation - add more security as needed
 
-        # Define paths
+        # Define paths (hardcoded for security - no user input)
         source_repo = "/home/GoMangatarem/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan"
         dest1 = "/home/GoMangatarem/mysite"
         dest2 = "/home/GoMangatarem"
+        
+        # Validate paths don't contain dangerous characters
+        for path in [source_repo, dest1, dest2]:
+            if not re.match(r'^[a-zA-Z0-9/_\-\.]+$', path):
+                logger.error(f"Invalid path detected: {path}")
+                return jsonify({"status": "error", "message": "Invalid configuration"}), 500
 
         # Change directory to the source repository
         original_cwd = os.getcwd()

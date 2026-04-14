@@ -8,6 +8,7 @@ from flask import render_template, redirect, url_for, flash, request, send_from_
 from flask_login import login_required, current_user
 from extensions import limiter
 from utils.logger_helper import log_entry, log_success, log_error
+from utils.security import validate_string_input, detect_sql_injection_attempt
 from . import admin_bp
 
 # Try to import Document from python-docx for the import feature
@@ -347,7 +348,40 @@ def admin_document_edit(slug):
         try:
             # Handle structured data from the new editor
             if request.form.get("structured_data"):
-                new_form_data = json.loads(request.form.get("structured_data"))
+                raw_structured_data = request.form.get("structured_data")
+                # Validate size (max 50KB)
+                if len(raw_structured_data) > 50 * 1024:
+                    flash("Structured data exceeds maximum allowed size (50KB).")
+                    return render_template("admin/documents_editor.html",
+                                         slug=slug,
+                                         meta=meta,
+                                         data=form_data)
+
+                new_form_data = json.loads(raw_structured_data)
+
+                # Validate string values in JSON for SQL injection
+                def _validate_json_values(obj):
+                    """Recursively check all string values in JSON for SQL injection."""
+                    if isinstance(obj, str):
+                        if detect_sql_injection_attempt(obj):
+                            return False
+                    elif isinstance(obj, dict):
+                        for v in obj.values():
+                            if not _validate_json_values(v):
+                                return False
+                    elif isinstance(obj, list):
+                        for item in obj:
+                            if not _validate_json_values(item):
+                                return False
+                    return True
+
+                if not _validate_json_values(new_form_data):
+                    flash("Structured data contains invalid patterns.")
+                    return render_template("admin/documents_editor.html",
+                                         slug=slug,
+                                         meta=meta,
+                                         data=form_data)
+
                 all_forms_data[meta["key"]] = new_form_data
                 if _save_all_forms(all_forms_data):
                     log_success("admin", "admin_document_edit", f"Updated structure for {slug}")
@@ -467,7 +501,7 @@ def admin_document_import():
     admin_check = _require_admin()
     if admin_check:
         return admin_check
-    
+
     if not HAS_DOCX:
         flash("The 'python-docx' library is not installed. Import feature disabled.")
         return redirect(url_for("admin.admin_documents"))
@@ -475,6 +509,14 @@ def admin_document_import():
     file = request.files.get("docx_file")
     if not file or not file.filename.endswith(".docx"):
         flash("Please upload a valid .docx file.")
+        return redirect(url_for("admin.admin_documents"))
+
+    # Validate file size (max 10MB)
+    file.seek(0, os.SEEK_END)
+    file_size = file.tell()
+    file.seek(0)  # Reset pointer
+    if file_size > 10 * 1024 * 1024:
+        flash("File size exceeds maximum allowed size (10MB).")
         return redirect(url_for("admin.admin_documents"))
 
     flash("Import feature logic is being finalized. Contact support for updates.")

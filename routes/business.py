@@ -9,6 +9,17 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from models import db, Establishment, EstablishmentRoom, EstablishmentMenuItem, EstablishmentReview, BarangayInfo
 from functools import wraps
+from utils.security import (
+    validate_string_input,
+    validate_email_format,
+    validate_float,
+    validate_integer,
+    sanitize_html_input,
+    detect_sql_injection_attempt,
+    validate_coordinates,
+    validate_phone,
+    sanitize_url,
+)
 import logging
 
 business_bp = Blueprint("business", __name__, url_prefix="/business")
@@ -71,7 +82,69 @@ def create_establishment():
         return redirect(url_for("business.edit_establishment"))
 
     if request.method == "POST":
+        # Validate barangay
         barangay_name = request.form.get("barangay")
+
+        # Validate name
+        name = request.form.get("name", "").strip()
+        valid, err = validate_string_input(name, min_length=1, max_length=200, block_sql_injection=True)
+        if not valid:
+            flash(f"Invalid name: {err}", "error")
+            return redirect(url_for("business.create_establishment"))
+
+        # Validate description (sanitize HTML)
+        description = request.form.get("description", "").strip()
+        description = sanitize_html_input(description)
+        valid, err = validate_string_input(description, max_length=2000, block_sql_injection=False)
+        if not valid:
+            flash(f"Invalid description: {err}", "error")
+            return redirect(url_for("business.create_establishment"))
+
+        # Validate address
+        address = request.form.get("address", "").strip()
+        valid, err = validate_string_input(address, min_length=1, max_length=300, block_sql_injection=True)
+        if not valid:
+            flash(f"Invalid address: {err}", "error")
+            return redirect(url_for("business.create_establishment"))
+
+        # Validate coordinates
+        try:
+            latitude = float(request.form.get("latitude", 0))
+            longitude = float(request.form.get("longitude", 0))
+        except (TypeError, ValueError):
+            flash("Invalid coordinates: latitude and longitude must be numbers", "error")
+            return redirect(url_for("business.create_establishment"))
+
+        if not validate_coordinates(latitude, longitude):
+            flash("Invalid coordinates: latitude must be between -90 and 90, longitude between -180 and 180", "error")
+            return redirect(url_for("business.create_establishment"))
+
+        # Validate contact number
+        contact_number = request.form.get("contact_number", "").strip()
+        if contact_number and not validate_phone(contact_number):
+            flash("Invalid contact number: please enter a valid phone number", "error")
+            return redirect(url_for("business.create_establishment"))
+
+        # Validate email
+        email = request.form.get("email", "").strip()
+        if email and not validate_email_format(email):
+            flash("Invalid email: please enter a valid email address", "error")
+            return redirect(url_for("business.create_establishment"))
+
+        # Validate website
+        website = request.form.get("website", "").strip()
+        if website:
+            website = sanitize_url(website)
+            if not website:
+                flash("Invalid website URL", "error")
+                return redirect(url_for("business.create_establishment"))
+
+        # Validate price range
+        price_range = request.form.get("price_range", "").strip()
+        if price_range and price_range not in ("$", "$$", "$$$"):
+            flash("Invalid price range: must be $, $$, or $$$", "error")
+            return redirect(url_for("business.create_establishment"))
+
         barangay = BarangayInfo.query.filter_by(name=barangay_name).first()
         if not barangay and barangay_name:
             barangay = BarangayInfo(name=barangay_name)
@@ -79,17 +152,17 @@ def create_establishment():
             db.session.flush()
 
         establishment = Establishment(
-            name=request.form.get("name"),
+            name=name,
             type=request.form.get("type"),
-            description=request.form.get("description"),
-            address=request.form.get("address"),
-            latitude=float(request.form.get("latitude", 0)),
-            longitude=float(request.form.get("longitude", 0)),
+            description=description,
+            address=address,
+            latitude=latitude,
+            longitude=longitude,
             barangay_id=barangay.id if barangay else None,
-            contact_number=request.form.get("contact_number"),
-            email=request.form.get("email"),
-            website=request.form.get("website"),
-            price_range=request.form.get("price_range"),
+            contact_number=contact_number,
+            email=email,
+            website=website,
+            price_range=price_range,
             cover_image_url=request.form.get("cover_image_url"),
             logo_url=request.form.get("logo_url"),
             owner_id=current_user.id,
@@ -131,23 +204,84 @@ def edit_establishment():
 
     if request.method == "POST":
         barangay_name = request.form.get("barangay")
+
+        # Validate name
+        name = request.form.get("name", "").strip()
+        valid, err = validate_string_input(name, min_length=1, max_length=200, block_sql_injection=True)
+        if not valid:
+            flash(f"Invalid name: {err}", "error")
+            return redirect(url_for("business.edit_establishment"))
+
+        # Validate description (sanitize HTML)
+        description = request.form.get("description", "").strip()
+        description = sanitize_html_input(description)
+        valid, err = validate_string_input(description, max_length=2000, block_sql_injection=False)
+        if not valid:
+            flash(f"Invalid description: {err}", "error")
+            return redirect(url_for("business.edit_establishment"))
+
+        # Validate address
+        address = request.form.get("address", "").strip()
+        valid, err = validate_string_input(address, min_length=1, max_length=300, block_sql_injection=True)
+        if not valid:
+            flash(f"Invalid address: {err}", "error")
+            return redirect(url_for("business.edit_establishment"))
+
+        # Validate coordinates
+        try:
+            latitude = float(request.form.get("latitude", 0))
+            longitude = float(request.form.get("longitude", 0))
+        except (TypeError, ValueError):
+            flash("Invalid coordinates: latitude and longitude must be numbers", "error")
+            return redirect(url_for("business.edit_establishment"))
+
+        if not validate_coordinates(latitude, longitude):
+            flash("Invalid coordinates: latitude must be between -90 and 90, longitude between -180 and 180", "error")
+            return redirect(url_for("business.edit_establishment"))
+
+        # Validate contact number
+        contact_number = request.form.get("contact_number", "").strip()
+        if contact_number and not validate_phone(contact_number):
+            flash("Invalid contact number: please enter a valid phone number", "error")
+            return redirect(url_for("business.edit_establishment"))
+
+        # Validate email
+        email = request.form.get("email", "").strip()
+        if email and not validate_email_format(email):
+            flash("Invalid email: please enter a valid email address", "error")
+            return redirect(url_for("business.edit_establishment"))
+
+        # Validate website
+        website = request.form.get("website", "").strip()
+        if website:
+            website = sanitize_url(website)
+            if not website:
+                flash("Invalid website URL", "error")
+                return redirect(url_for("business.edit_establishment"))
+
+        # Validate price range
+        price_range = request.form.get("price_range", "").strip()
+        if price_range and price_range not in ("$", "$$", "$$$"):
+            flash("Invalid price range: must be $, $$, or $$$", "error")
+            return redirect(url_for("business.edit_establishment"))
+
         barangay = BarangayInfo.query.filter_by(name=barangay_name).first()
         if not barangay and barangay_name:
             barangay = BarangayInfo(name=barangay_name)
             db.session.add(barangay)
             db.session.flush()
 
-        establishment.name = request.form.get("name")
+        establishment.name = name
         establishment.type = request.form.get("type")
-        establishment.description = request.form.get("description")
-        establishment.address = request.form.get("address")
-        establishment.latitude = float(request.form.get("latitude", 0))
-        establishment.longitude = float(request.form.get("longitude", 0))
+        establishment.description = description
+        establishment.address = address
+        establishment.latitude = latitude
+        establishment.longitude = longitude
         establishment.barangay_id = barangay.id if barangay else None
-        establishment.contact_number = request.form.get("contact_number")
-        establishment.email = request.form.get("email")
-        establishment.website = request.form.get("website")
-        establishment.price_range = request.form.get("price_range")
+        establishment.contact_number = contact_number
+        establishment.email = email
+        establishment.website = website
+        establishment.price_range = price_range
         establishment.cover_image_url = request.form.get("cover_image_url")
         establishment.logo_url = request.form.get("logo_url")
 
@@ -199,12 +333,44 @@ def add_room():
         flash("Create your establishment first.", "warning")
         return redirect(url_for("business.create_establishment"))
 
+    # Validate name
+    name = request.form.get("name", "").strip()
+    valid, err = validate_string_input(name, min_length=1, max_length=200, block_sql_injection=True)
+    if not valid:
+        flash(f"Invalid room name: {err}", "error")
+        return redirect(url_for("business.manage_rooms"))
+
+    # Validate description
+    description = request.form.get("description", "").strip()
+    description = sanitize_html_input(description)
+    valid, err = validate_string_input(description, max_length=1000, block_sql_injection=False)
+    if not valid:
+        flash(f"Invalid room description: {err}", "error")
+        return redirect(url_for("business.manage_rooms"))
+
+    # Validate price
+    price_raw = request.form.get("price_per_night")
+    if price_raw:
+        valid, price_val, err = validate_float(price_raw, min_value=0)
+        if not valid:
+            flash(f"Invalid price per night: {err}", "error")
+            return redirect(url_for("business.manage_rooms"))
+    else:
+        price_val = None
+
+    # Validate capacity
+    capacity_raw = request.form.get("capacity")
+    valid, capacity_val, err = validate_integer(capacity_raw if capacity_raw else 2, min_value=1, max_value=100)
+    if not valid:
+        flash(f"Invalid capacity: {err}", "error")
+        return redirect(url_for("business.manage_rooms"))
+
     room = EstablishmentRoom(
         establishment_id=establishment.id,
-        name=request.form.get("name"),
-        description=request.form.get("description"),
-        price_per_night=float(request.form.get("price_per_night", 0)) if request.form.get("price_per_night") else None,
-        capacity=int(request.form.get("capacity", 2)),
+        name=name,
+        description=description,
+        price_per_night=price_val,
+        capacity=capacity_val,
         is_available=request.form.get("is_available") == "on",
     )
 
@@ -236,10 +402,42 @@ def edit_room(room_id):
         flash("Access denied.", "error")
         return redirect(url_for("business.dashboard"))
 
-    room.name = request.form.get("name")
-    room.description = request.form.get("description")
-    room.price_per_night = float(request.form.get("price_per_night", 0)) if request.form.get("price_per_night") else None
-    room.capacity = int(request.form.get("capacity", 2))
+    # Validate name
+    name = request.form.get("name", "").strip()
+    valid, err = validate_string_input(name, min_length=1, max_length=200, block_sql_injection=True)
+    if not valid:
+        flash(f"Invalid room name: {err}", "error")
+        return redirect(url_for("business.manage_rooms"))
+
+    # Validate description
+    description = request.form.get("description", "").strip()
+    description = sanitize_html_input(description)
+    valid, err = validate_string_input(description, max_length=1000, block_sql_injection=False)
+    if not valid:
+        flash(f"Invalid room description: {err}", "error")
+        return redirect(url_for("business.manage_rooms"))
+
+    # Validate price
+    price_raw = request.form.get("price_per_night")
+    if price_raw:
+        valid, price_val, err = validate_float(price_raw, min_value=0)
+        if not valid:
+            flash(f"Invalid price per night: {err}", "error")
+            return redirect(url_for("business.manage_rooms"))
+    else:
+        price_val = None
+
+    # Validate capacity
+    capacity_raw = request.form.get("capacity")
+    valid, capacity_val, err = validate_integer(capacity_raw if capacity_raw else 2, min_value=1, max_value=100)
+    if not valid:
+        flash(f"Invalid capacity: {err}", "error")
+        return redirect(url_for("business.manage_rooms"))
+
+    room.name = name
+    room.description = description
+    room.price_per_night = price_val
+    room.capacity = capacity_val
     room.is_available = request.form.get("is_available") == "on"
 
     amenities = request.form.getlist("room_amenities")
@@ -312,12 +510,44 @@ def add_menu_item():
         flash("Create your establishment first.", "warning")
         return redirect(url_for("business.create_establishment"))
 
+    # Validate name
+    name = request.form.get("name", "").strip()
+    valid, err = validate_string_input(name, min_length=1, max_length=200, block_sql_injection=True)
+    if not valid:
+        flash(f"Invalid menu item name: {err}", "error")
+        return redirect(url_for("business.manage_menu"))
+
+    # Validate description
+    description = request.form.get("description", "").strip()
+    description = sanitize_html_input(description)
+    valid, err = validate_string_input(description, max_length=1000, block_sql_injection=False)
+    if not valid:
+        flash(f"Invalid menu item description: {err}", "error")
+        return redirect(url_for("business.manage_menu"))
+
+    # Validate price
+    price_raw = request.form.get("price")
+    if price_raw:
+        valid, price_val, err = validate_float(price_raw, min_value=0)
+        if not valid:
+            flash(f"Invalid price: {err}", "error")
+            return redirect(url_for("business.manage_menu"))
+    else:
+        price_val = None
+
+    # Validate category
+    category = request.form.get("category", "").strip()
+    valid, err = validate_string_input(category, min_length=1, max_length=100, block_sql_injection=True)
+    if not valid:
+        flash(f"Invalid category: {err}", "error")
+        return redirect(url_for("business.manage_menu"))
+
     item = EstablishmentMenuItem(
         establishment_id=establishment.id,
-        name=request.form.get("name"),
-        description=request.form.get("description"),
-        price=float(request.form.get("price", 0)) if request.form.get("price") else None,
-        category=request.form.get("category"),
+        name=name,
+        description=description,
+        price=price_val,
+        category=category,
         image_url=request.form.get("image_url"),
         is_available=request.form.get("is_available") == "on",
         is_bestseller=request.form.get("is_bestseller") == "on",
@@ -341,10 +571,42 @@ def edit_menu_item(item_id):
         flash("Access denied.", "error")
         return redirect(url_for("business.dashboard"))
 
-    item.name = request.form.get("name")
-    item.description = request.form.get("description")
-    item.price = float(request.form.get("price", 0)) if request.form.get("price") else None
-    item.category = request.form.get("category")
+    # Validate name
+    name = request.form.get("name", "").strip()
+    valid, err = validate_string_input(name, min_length=1, max_length=200, block_sql_injection=True)
+    if not valid:
+        flash(f"Invalid menu item name: {err}", "error")
+        return redirect(url_for("business.manage_menu"))
+
+    # Validate description
+    description = request.form.get("description", "").strip()
+    description = sanitize_html_input(description)
+    valid, err = validate_string_input(description, max_length=1000, block_sql_injection=False)
+    if not valid:
+        flash(f"Invalid menu item description: {err}", "error")
+        return redirect(url_for("business.manage_menu"))
+
+    # Validate price
+    price_raw = request.form.get("price")
+    if price_raw:
+        valid, price_val, err = validate_float(price_raw, min_value=0)
+        if not valid:
+            flash(f"Invalid price: {err}", "error")
+            return redirect(url_for("business.manage_menu"))
+    else:
+        price_val = None
+
+    # Validate category
+    category = request.form.get("category", "").strip()
+    valid, err = validate_string_input(category, min_length=1, max_length=100, block_sql_injection=True)
+    if not valid:
+        flash(f"Invalid category: {err}", "error")
+        return redirect(url_for("business.manage_menu"))
+
+    item.name = name
+    item.description = description
+    item.price = price_val
+    item.category = category
     item.image_url = request.form.get("image_url")
     item.is_available = request.form.get("is_available") == "on"
     item.is_bestseller = request.form.get("is_bestseller") == "on"
