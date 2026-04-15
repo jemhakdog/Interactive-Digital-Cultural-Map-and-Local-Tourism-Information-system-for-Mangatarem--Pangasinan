@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Project Gantt Chart - Cultural Map & Tourism System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #718096;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .legend {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: #f7fafc;
+            border-radius: 8px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+        }
+
+        .gantt-container {
+            overflow-x: auto;
+            margin-top: 20px;
+        }
+
+        .gantt-chart {
+            min-width: 1200px;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        .gantt-chart th,
+        .gantt-chart td {
+            padding: 10px 8px;
+            text-align: left;
+            border: 1px solid #e2e8f0;
+        }
+
+        .gantt-chart th {
+            background: #4a5568;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .gantt-chart th.task-header {
+            min-width: 250px;
+        }
+
+        .gantt-chart th.month-header {
+            min-width: 200px;
+            text-align: center;
+        }
+
+        .gantt-chart tbody tr:nth-child(even) {
+            background: #f7fafc;
+        }
+
+        .gantt-chart tbody tr:hover {
+            background: #edf2f7;
+        }
+
+        .task-name {
+            font-weight: 500;
+            color: #2d3748;
+            font-size: 13px;
+        }
+
+        .phase-row {
+            background: #e2e8f0 !important;
+            font-weight: 700;
+        }
+
+        .phase-row .task-name {
+            color: #2d3748;
+            font-size: 14px;
+        }
+
+        .gantt-bar-container {
+            position: relative;
+            height: 24px;
+            padding: 2px 0;
+        }
+
+        .gantt-bar {
+            position: absolute;
+            height: 20px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .gantt-bar:hover {
+            transform: scaleY(1.2);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .gantt-bar.complete {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .gantt-bar.in-progress {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+            animation: pulse 2s infinite;
+        }
+
+        .gantt-bar.planned {
+            background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);
+        }
+
+        .gantt-bar.milestone {
+            background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+            height: 24px;
+            border-radius: 12px;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.8; }
+        }
+
+        .progress-summary {
+            margin-top: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .progress-card {
+            background: #f7fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #4a5568;
+        }
+
+        .progress-card h3 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .progress-bar-container {
+            background: #e2e8f0;
+            border-radius: 10px;
+            height: 20px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: 700;
+            color: #4a5568;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #718096;
+            margin-top: 5px;
+        }
+
+        .milestone-list {
+            margin-top: 30px;
+        }
+
+        .milestone-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .milestone-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        .milestone-icon.complete {
+            background: #48bb78;
+            color: white;
+        }
+
+        .milestone-icon.in-progress {
+            background: #ed8936;
+            color: white;
+        }
+
+        .milestone-icon.planned {
+            background: #a0aec0;
+            color: white;
+        }
+
+        .milestone-info {
+            flex: 1;
+        }
+
+        .milestone-name {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .milestone-date {
+            font-size: 12px;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Project Gantt Chart</h1>
+        <p class="subtitle">Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan</p>
+
+        <div class="legend">
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);"></div>
+                <span>Complete</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);"></div>
+                <span>In Progress</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #a0aec0 0%, #718096 100%);"></div>
+                <span>Planned</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);"></div>
+                <span>Milestone</span>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value">75%</div>
+                <div class="stat-label">Overall Progress</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">11/17</div>
+                <div class="stat-label">Phases Complete</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">6</div>
+                <div class="stat-label">Phases Remaining</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">45</div>
+                <div class="stat-label">Days to Deadline</div>
+            </div>
+        </div>
+
+        <div class="gantt-container">
+            <table class="gantt-chart">
+                <thead>
+                    <tr>
+                        <th class="task-header">Task</th>
+                        <th class="month-header" colspan="4">January 2026</th>
+                        <th class="month-header" colspan="4">February 2026</th>
+                        <th class="month-header" colspan="4">March 2026</th>
+                        <th class="month-header" colspan="4">April 2026</th>
+                        <th class="month-header" colspan="4">May 2026</th>
+                    </tr>
+                    <tr>
+                        <th class="task-header"></th>
+                        <th>W1</th><th>W2</th><th>W3</th><th>W4</th>
+                        <th>W1</th><th>W2</th><th>W3</th><th>W4</th>
+                        <th>W1</th><th>W2</th><th>W3</th><th>W4</th>
+                        <th>W1</th><th>W2</th><th>W3</th><th>W4</th>
+                        <th>W1</th><th>W2</th><th>W3</th><th>W4</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Phase 1 -->
+                    <tr class="phase-row">
+                        <td class="task-name">Phase 1: Foundation</td>
+                        <td colspan="4" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar complete" style="left: 0%; width: 100%;">✓</div>
+                            </div>
+                        </td>
+                        <td colspan="16"></td>
+                    </tr>
+                    <tr>
+                        <td class="task-name">&nbsp;&nbsp;Project Setup</td>
+                        <td colspan="4" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar complete" style="left: 0%; width: 100%;"></div>
+                            </div>
+                        </td>
+                        <td colspan="16"></td>
+                    </tr>
+                    <tr>
+                        <td class="task-name">&nbsp;&nbsp;Requirements Analysis</td>
+                        <td colspan="4" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar complete" style="left: 0%; width: 100%;"></div>
+                            </div>
+                        </td>
+                        <td colspan="16"></td>
+                    </tr>
+
+                    <!-- Phase 2 -->
+                    <tr class="phase-row">
+                        <td class="task-name">Phase 2: Core Infrastructure</td>
+                        <td colspan="8" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar complete" style="left: 0%; width: 100%;"></div>
+                            </div>
+                        </td>
+                        <td colspan="12"></td>
+                    </tr>
+
+                    <!-- Phase 3 -->
+                    <tr class="phase-row">
+                        <td class="task-name">Phase 3: Authentication</td>
+                        <td colspan="4"></td>
+                        <td colspan="4" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar complete" style="left: 0%; width: 100%;"></div>
+                            </div>
+                        </td>
+                        <td colspan="12"></td>
+                    </tr>
+
+                    <!-- Phase 4 -->
+                    <tr class="phase-row">
+                        <td class="task-name">Phase 4: Database Models</td>
+                        <td colspan="8"></td>
+                        <td colspan="4" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar complete" style="left: 0%; width: 100%;"></div>
+                            </div>
+                        </td>
+                        <td colspan="8"></td>
+                    </tr>
+
+                    <!-- Phase 5 -->
+                    <tr class="phase-row">
+                        <td class="task-name">Phase 5: Public Pages</td>
+                        <td colspan="12"></td>
+                        <td colspan="4" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar complete" style="left: 0%; width: 100%;"></div>
+                            </div>
+                        </td>
+                        <td colspan="4"></td>
+                    </tr>
+
+                    <!-- Phase 6 -->
+                    <tr class="phase-row">
+                        <td class="task-name">Phase 6: Admin Dashboard</td>
+                        <td colspan="16"></td>
+                        <td colspan="4" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar complete" style="left: 0%; width: 100%;"></div>
+                            </div>
+                        </td>
+                        <td colspan="4"></td>
+                    </tr>
+
+                    <!-- Phase 7 -->
+                    <tr class="phase-row">
+                        <td class="task-name">Phase 7: Barangay Dashboard</td>
+                        <td colspan="20"></td>
+                        <td colspan="4" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar complete" style="left: 0%; width: 100%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Phase 8 -->
+                    <tr class="phase-row">
+                        <td class="task-name">Phase 8: Business Portal</td>
+                        <td colspan="24"></td>
+                        <td colspan="4" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar complete" style="left: 0%; width: 100%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Phase 9 -->
+                    <tr class="phase-row">
+                        <td class="task-name">Phase 9: Map & Tile System</td>
+                        <td colspan="24"></td>
+                        <td colspan="4" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar complete" style="left: 0%; width: 100%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Phase 10 -->
+                    <tr class="phase-row">
+                        <td class="task-name">Phase 10: Security</td>
+                        <td colspan="28"></td>
+                        <td colspan="4" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar complete" style="left: 0%; width: 100%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Phase 11 -->
+                    <tr class="phase-row">
+                        <td class="task-name">Phase 11: Heritage Registry</td>
+                        <td colspan="32"></td>
+                        <td colspan="4" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar complete" style="left: 0%; width: 100%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Phase 12 - IN PROGRESS -->
+                    <tr class="phase-row" style="background: #fef5e7 !important;">
+                        <td class="task-name">Phase 12: Trip Cost Estimator 🔄</td>
+                        <td colspan="36"></td>
+                        <td colspan="4" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar in-progress" style="left: 0%; width: 100%;">40%</div>
+                            </div>
+                        </td>
+                        <td colspan="4"></td>
+                    </tr>
+
+                    <!-- Phase 13 -->
+                    <tr class="phase-row">
+                        <td class="task-name">Phase 13: Documentation</td>
+                        <td colspan="40"></td>
+                        <td colspan="4" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar planned" style="left: 0%; width: 100%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Phase 14 -->
+                    <tr class="phase-row">
+                        <td class="task-name">Phase 14: Testing & QA</td>
+                        <td colspan="44"></td>
+                        <td colspan="4" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar planned" style="left: 0%; width: 100%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Phase 15 -->
+                    <tr class="phase-row">
+                        <td class="task-name">Phase 15: Performance Optimization</td>
+                        <td colspan="48"></td>
+                        <td colspan="3" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar planned" style="left: 0%; width: 100%;"></div>
+                            </div>
+                        </td>
+                        <td colspan="1"></td>
+                    </tr>
+
+                    <!-- Phase 16 -->
+                    <tr class="phase-row">
+                        <td class="task-name">Phase 16: Capstone Defense Prep</td>
+                        <td colspan="51"></td>
+                        <td colspan="3" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar planned" style="left: 0%; width: 100%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+
+                    <!-- Phase 17 -->
+                    <tr class="phase-row">
+                        <td class="task-name">Phase 17: Deployment</td>
+                        <td colspan="54"></td>
+                        <td colspan="2" style="position: relative;">
+                            <div class="gantt-bar-container">
+                                <div class="gantt-bar planned" style="left: 0%; width: 100%;"></div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="milestone-list">
+            <h2 style="margin-bottom: 20px; color: #2d3748;">🎯 Key Milestones</h2>
+            
+            <div class="milestone-item">
+                <div class="milestone-icon complete">✓</div>
+                <div class="milestone-info">
+                    <div class="milestone-name">Project Kickoff</div>
+                    <div class="milestone-date">January 6, 2026</div>
+                </div>
+            </div>
+
+            <div class="milestone-item">
+                <div class="milestone-icon complete">✓</div>
+                <div class="milestone-info">
+                    <div class="milestone-name">Core Infrastructure Complete</div>
+                    <div class="milestone-date">January 20, 2026</div>
+                </div>
+            </div>
+
+            <div class="milestone-item">
+                <div class="milestone-icon complete">✓</div>
+                <div class="milestone-info">
+                    <div class="milestone-name">Authentication System</div>
+                    <div class="milestone-date">January 27, 2026</div>
+                </div>
+            </div>
+
+            <div class="milestone-item">
+                <div class="milestone-icon complete">✓</div>
+                <div class="milestone-info">
+                    <div class="milestone-name">Database Models & Migrations</div>
+                    <div class="milestone-date">February 3, 2026</div>
+                </div>
+            </div>
+
+            <div class="milestone-item">
+                <div class="milestone-icon complete">✓</div>
+                <div class="milestone-info">
+                    <div class="milestone-name">Public Pages (Tourism)</div>
+                    <div class="milestone-date">February 17, 2026</div>
+                </div>
+            </div>
+
+            <div class="milestone-item">
+                <div class="milestone-icon complete">✓</div>
+                <div class="milestone-info">
+                    <div class="milestone-name">Admin Dashboard</div>
+                    <div class="milestone-date">March 3, 2026</div>
+                </div>
+            </div>
+
+            <div class="milestone-item">
+                <div class="milestone-icon complete">✓</div>
+                <div class="milestone-info">
+                    <div class="milestone-name">Barangay Dashboard</div>
+                    <div class="milestone-date">March 10, 2026</div>
+                </div>
+            </div>
+
+            <div class="milestone-item">
+                <div class="milestone-icon complete">✓</div>
+                <div class="milestone-info">
+                    <div class="milestone-name">Business Portal</div>
+                    <div class="milestone-date">March 17, 2026</div>
+                </div>
+            </div>
+
+            <div class="milestone-item">
+                <div class="milestone-icon complete">✓</div>
+                <div class="milestone-info">
+                    <div class="milestone-name">Map & Tile System</div>
+                    <div class="milestone-date">March 24, 2026</div>
+                </div>
+            </div>
+
+            <div class="milestone-item">
+                <div class="milestone-icon complete">✓</div>
+                <div class="milestone-info">
+                    <div class="milestone-name">Security Implementation</div>
+                    <div class="milestone-date">March 31, 2026</div>
+                </div>
+            </div>
+
+            <div class="milestone-item">
+                <div class="milestone-icon complete">✓</div>
+                <div class="milestone-info">
+                    <div class="milestone-name">Heritage Registry (Forms 01-07)</div>
+                    <div class="milestone-date">April 7, 2026</div>
+                </div>
+            </div>
+
+            <div class="milestone-item">
+                <div class="milestone-icon in-progress">◐</div>
+                <div class="milestone-info">
+                    <div class="milestone-name">Trip Cost Estimator</div>
+                    <div class="milestone-date">April 25, 2026 (In Progress)</div>
+                </div>
+            </div>
+
+            <div class="milestone-item">
+                <div class="milestone-icon planned">○</div>
+                <div class="milestone-info">
+                    <div class="milestone-name">Documentation & DFD Updates</div>
+                    <div class="milestone-date">May 5, 2026</div>
+                </div>
+            </div>
+
+            <div class="milestone-item">
+                <div class="milestone-icon planned">○</div>
+                <div class="milestone-info">
+                    <div class="milestone-name">Testing & QA</div>
+                    <div class="milestone-date">May 15, 2026</div>
+                </div>
+            </div>
+
+            <div class="milestone-item">
+                <div class="milestone-icon planned">○</div>
+                <div class="milestone-info">
+                    <div class="milestone-name">Performance Optimization</div>
+                    <div class="milestone-date">May 22, 2026</div>
+                </div>
+            </div>
+
+            <div class="milestone-item">
+                <div class="milestone-icon planned">○</div>
+                <div class="milestone-info">
+                    <div class="milestone-name">Capstone Defense Prep</div>
+                    <div class="milestone-date">May 28, 2026</div>
+                </div>
+            </div>
+
+            <div class="milestone-item">
+                <div class="milestone-icon planned">○</div>
+                <div class="milestone-info">
+                    <div class="milestone-name">Project Completion</div>
+                    <div class="milestone-date">May 30, 2026</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress-summary">
+            <div class="progress-card">
+                <h3>Overall Progress</h3>
+                <div style="font-size: 36px; font-weight: 700; color: #48bb78;">75%</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: 75%;">75%</div>
+                </div>
+            </div>
+
+            <div class="progress-card">
+                <h3>Features Complete</h3>
+                <div style="font-size: 36px; font-weight: 700; color: #48bb78;">11/17</div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" style="width: 65%;">65%</div>
+                </div>
+            </div>
+
+            <div class="progress-card">
+                <h3>Remaining Work</h3>
+                <div style="font-size: 36px; font-weight: 700; color: #ed8936;">6 Phases</div>
+                <p style="font-size: 12px; color: #718096; margin-top: 10px;">~75-90 hours estimated</p>
+            </div>
+
+            <div class="progress-card">
+                <h3>Days to Deadline</h3>
+                <div style="font-size: 36px; font-weight: 700; color: #4a5568;">45</div>
+                <p style="font-size: 12px; color: #718096; margin-top: 10px;">Target: May 30, 2026</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
