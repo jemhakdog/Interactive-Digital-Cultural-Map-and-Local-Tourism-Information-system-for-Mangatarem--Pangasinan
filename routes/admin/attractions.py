@@ -2,10 +2,10 @@ import logging
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from extensions import db, limiter
-from models import Attraction
+from models import Attraction, BarangayInfo
 from utils.logger_helper import log_entry, log_success, log_error
 from utils.file_helpers import save_uploaded_file
-from utils.security import validate_string_input, validate_float, validate_coordinates, sanitize_html_input
+from utils.security import validate_string_input, validate_float, validate_coordinates, sanitize_html_input, validate_integer
 from . import admin_bp
 
 logger = logging.getLogger(__name__)
@@ -101,7 +101,7 @@ def add_attraction():
             longitude=lng_val,
             image_url=image_url,
             user_id=current_user.id,
-            barangay_id=1,
+            barangay_id=int(request.form.get("barangay_id", 1)),
             status="approved",
         )
         db.session.add(attraction)
@@ -111,7 +111,8 @@ def add_attraction():
         flash("Attraction added successfully!")
         return redirect(url_for("admin.admin_attractions"))
     
-    return render_template("admin/add_attraction.html")
+    barangays = BarangayInfo.query.order_by(BarangayInfo.name).all()
+    return render_template("admin/add_attraction.html", barangays=barangays)
 
 
 @admin_bp.route("/attractions/approve/<int:id>")
@@ -169,11 +170,11 @@ def edit_attraction(id):
         log_error("admin", "edit_attraction", "Access denied")
         flash("Access denied.")
         return redirect(url_for("public.index"))
-    
     if request.method == "POST":
         name = request.form.get("name")
         description = request.form.get("description")
         category = request.form.get("category")
+        barangay_id_str = request.form.get("barangay_id")
         lat_str = request.form.get("latitude")
         lng_str = request.form.get("longitude")
 
@@ -206,6 +207,13 @@ def edit_attraction(id):
             flash("Coordinates are out of range.", "error")
             return redirect(url_for("admin.edit_attraction", id=id))
 
+        if barangay_id_str:
+            valid_bar, barangay_id, err_bar = validate_integer(barangay_id_str, min_value=1)
+            if not valid_bar:
+                flash("Invalid barangay ID.", "error")
+                return redirect(url_for("admin.edit_attraction", id=id))
+            attraction.barangay_id = barangay_id
+
         attraction.name = name
         attraction.category = category
         attraction.description = description
@@ -230,4 +238,5 @@ def edit_attraction(id):
         flash("Attraction updated.")
         return redirect(url_for("admin.admin_attractions"))
     
-    return render_template("admin/edit_attraction.html", attraction=attraction)
+    barangays = BarangayInfo.query.order_by(BarangayInfo.name).all()
+    return render_template("admin/edit_attraction.html", attraction=attraction, barangays=barangays)

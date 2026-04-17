@@ -143,8 +143,9 @@
                         <div class="p-6 flex-grow flex flex-col justify-between">
                             <div>
                                 <div class="flex justify-between items-start mb-2">
-                                    <span class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">{{
-                                        attraction.category }}</span>
+                                    <p class="text-[10px] font-black text-emerald-900/40 uppercase tracking-widest leading-none">
+                                        {{ attraction.barangay.name if attraction.barangay else 'Mangatarem' }}
+                                    </p>
                                     <span class="text-[10px] font-bold text-gray-400">#{{ attraction.id }}</span>
                                 </div>
                                 <h3 class="text-lg font-black text-emerald-950 mb-1 leading-tight">{{ attraction.name }}
@@ -156,7 +157,7 @@
                                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                                     </svg>
                                     Submitted by {{ attraction.user.username if attraction.user else 'System' }}
-                                    • Brgy. {{ attraction.user.barangay if attraction.user else 'Unknown' }}
+                                    • Brgy. {{ attraction.user.barangay.name if attraction.user and attraction.user.barangay else 'Unknown' }}
                                 </div>
                             </div>
                             <div class="flex gap-2">

@@ -31,6 +31,22 @@ The map system uses a high-performance architecture optimized for Vercel's serve
   - **Secondary**: Upstash Redis for dynamic hot-data caching (< 50ms response time).
 - **Frontend**: Mapbox GL JS consumes vector tiles instead of GeoJSON, enabling instant map loads and smooth interactions.
 
+## Community Stewardship Model (CBIS)
+
+The system implements a **Shared Heritage** stewardship model where data management is decentralized at the barangay level:
+
+- **Unified Asset Management**: Barangay Representatives (Stewards) can view and manage all cultural assets (Attractions and Events) within their barangay, regardless of the original contributor.
+- **Barangay Infrastructure**: The `BarangayInfo` model acts as the central anchor for all community-specific data, including history, mission, and vision statements.
+- **Contributor Roles**: Users with the `contributor` role are automatically mapped to their respective barangays, gaining administrative oversight over local cultural mapping.
+
+## Participatory GIS (PGIS) Mapping
+
+The platform utilizes a participatory mapping approach (PGIS) where community research is directly translated into public geographic data:
+
+- **Harmonized Asset View**: The public map integrates both static cultural attractions and dynamic community events into a single, unified view.
+- **Intelligent Framing**: Using `fitBounds` logic, the map automatically centers and zooms to frame all community-wide assets for visitors when viewing a specific barangay profile.
+- **Dynamic Iconography**: Distinct visual markers are utilized for diverse asset types (e.g., 🏛️ for Attractions and 📅 for Events), providing immediate visual context.
+
 ## Application Structure
 
 The application follows a modular blueprint-based structure:
@@ -65,18 +81,11 @@ The system implements a comprehensive schema aligned with the Cultural Heritage 
 
 - **User**: Authentication (Roles: `admin`, `contributor`, `user`).
 - **HeritageProfile**: Base model for all cultural registry entries. Links to specialized detail tables.
-- **Specialized Heritage Details**:
-    - `NATURAL_HERITAGE_DETAIL` (Form 01A)
-    - `BUILT_HERITAGE_DETAIL` (Form 02A)
-    - `MOVABLE_HERITAGE_DETAIL` (Form 03A)
-    - `INTANGIBLE_HERITAGE_DETAIL` (Form 04A)
-    - `PERSONALITY_PROFILE_DETAIL` (Form 05)
-    - `CULTURAL_INSTITUTION_DETAIL` (Form 06)
-    - `LGU_CULTURE_PROGRAM_DETAIL` (Form 07)
-- **Attraction**: Tourism spots with `latitude` and `longitude`. Optional link to `HeritageProfile`.
-- **Event**: Local festivals and community activities.
-- **BarangayInfo**: Historical and cultural background for each barangay.
-- **GalleryItem**: Photos and videos with content moderation.
+- **Specialized Heritage Details**: (Forms 01-07)
+- **BarangayInfo**: The central hub for community narrative (Mission, Vision, History) and geo data; acts as the primary foreign key anchor for all local assets.
+- **Attraction**: Cultural and tourism spots, linked to `BarangayInfo` via `barangay_id` for community stewardship.
+- **Event**: Local festivals and community activities with integrated geo-coordinates and barangay anchoring.
+- **GalleryItem**: Photos and videos with content moderation and user-level attribution.
 - **AnalyticsPageView**: Page view tracking and engagement.
 - **PasswordResetToken**: Secure, time-limited tokens for account recovery.
 - **NewsletterSubscriber**: Opt-in mailing list management.

@@ -45,8 +45,7 @@
         <div class="flex flex-wrap items-center justify-center gap-4 md:gap-8" data-aos="fade-up" data-aos-delay="200">
             <div class="glass-stats px-6 py-3 rounded-full flex items-center gap-3">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span class="text-[10px] font-bold text-emerald-100 uppercase tracking-[0.2em]">{{ attraction.barangay
-                    or 'Mangatarem' }}</span>
+                <span class="text-[10px] font-bold text-emerald-100 uppercase tracking-[0.2em]">{{ attraction.barangay.name if attraction.barangay else 'Mangatarem' }}</span>
             </div>
             <div class="glass-stats px-6 py-3 rounded-full flex items-center gap-3">
                 <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">

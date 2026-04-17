@@ -143,7 +143,7 @@ def attraction_detail(id):
     # Fetch nearby attractions (same barangay, approved, limit 3, excluding current)
     nearby = (
         Attraction.query.filter(
-            Attraction.barangay == attraction.barangay,
+            Attraction.barangay_id == attraction.barangay_id,
             Attraction.status == "approved",
             Attraction.id != attraction.id,
         )
@@ -155,7 +155,7 @@ def attraction_detail(id):
     # Note: GalleryItem joins with User to check for barangay
     related_gallery = (
         GalleryItem.query.join(User, GalleryItem.user_id == User.id)
-        .filter(User.barangay_id == attraction.barangay, GalleryItem.status == "approved")
+        .filter(User.barangay_id == attraction.barangay_id, GalleryItem.status == "approved")
         .limit(6)
         .all()
     )
@@ -351,10 +351,12 @@ def search():
 
     # Apply Barangay Filter
     if barangay_filter and barangay_filter != "all":
-        attractions_query = attractions_query.filter(
-            Attraction.barangay == barangay_filter
+        attractions_query = attractions_query.join(BarangayInfo, Attraction.barangay_id == BarangayInfo.id).filter(
+            BarangayInfo.name == barangay_filter
         )
-        events_query = events_query.filter(Event.barangay == barangay_filter)
+        events_query = events_query.join(BarangayInfo, Event.barangay_id == BarangayInfo.id).filter(
+            BarangayInfo.name == barangay_filter
+        )
         barangays_info_query = barangays_info_query.filter(
             BarangayInfo.name == barangay_filter
         )
@@ -389,8 +391,9 @@ def search():
     )
 
     available_barangays = (
-        db.session.query(Attraction.barangay)
-        .filter(Attraction.status == "approved", Attraction.barangay_id.is_not(None))
+        db.session.query(BarangayInfo.name)
+        .join(Attraction, Attraction.barangay_id == BarangayInfo.id)
+        .filter(Attraction.status == "approved")
         .distinct()
         .all()
     )
@@ -433,7 +436,7 @@ def barangays():
     record_view("page", page_name="barangays_list")
 
     # Get list of barangays that have active contributors
-    barangay_names_query = (
+    barangay_ids_query = (
         db.session.query(User.barangay_id)
         .filter(
             User.role == "contributor", User.is_approved, User.barangay_id.is_not(None)
@@ -441,26 +444,32 @@ def barangays():
         .distinct()
         .all()
     )
-    barangay_names = [b[0] for b in barangay_names_query]
+    barangay_ids = [b[0] for b in barangay_ids_query]
 
-    if not barangay_names:
+    if not barangay_ids:
         return render_template("pagez/barangays.html", barangays=[])
 
     # Optimize: Fetch all relevant attractions in one query instead of a loop
     all_attractions = Attraction.query.filter(
-        Attraction.barangay.in_(barangay_names), Attraction.status == "approved"
+        Attraction.barangay_id.in_(barangay_ids), Attraction.status == "approved"
     ).all()
 
     # Group attractions by barangay
     from collections import defaultdict
+    from models import BarangayInfo
 
     barangay_data = defaultdict(list)
     for a in all_attractions:
-        barangay_data[a.barangay].append(a)
+        barangay_data[a.barangay_id].append(a)
+
+    # Fetch names for these barangays
+    barangay_infos = BarangayInfo.query.filter(BarangayInfo.id.in_(barangay_ids)).all()
+    barangay_map = {b.id: b.name for b in barangay_infos}
 
     barangay_list = []
-    for name in barangay_names:
-        attractions = barangay_data.get(name, [])
+    for brgy_id in barangay_ids:
+        attractions = barangay_data.get(brgy_id, [])
+        name = barangay_map.get(brgy_id, "Unknown")
 
         # Find a representative image
         image_url = next((a.image_url for a in attractions if a.image_url), None)
@@ -514,35 +523,76 @@ def barangay_profile(name):
         "page", page_name="barangay_profile", item_id=None
     )  # We could count specific barangays if we had IDs
 
-    # Get all approved content for this barangay
+    # Get barangay info (cultural assets, traditions, etc.)
+    barangay_info = BarangayInfo.query.filter_by(name=name).first()
+    barangay_id = barangay_info.id if barangay_info else None
+
+    # Get all approved content for this barangay using ID-based filtering
     log_query(
         "public",
         "barangay_profile",
-        f"Fetching attractions, events, gallery, and info for '{name}'"
+        f"Fetching assets for barangay ID {barangay_id} ('{name}')"
     )
-    attractions = Attraction.query.filter_by(barangay=name, status="approved").all()
-    events = (
-        Event.query.filter_by(barangay=name, status="approved")
-        .order_by(Event.date.asc())
-        .all()
-    )
+    
+    attractions = []
+    events = []
+    gallery_items = []
 
-    # For gallery, we need to join with User since GalleryItem doesn't have barangay field
-    gallery_items = (
-        GalleryItem.query.join(User, GalleryItem.user_id == User.id)
-        .filter(User.barangay_id == name, GalleryItem.status == "approved")
-        .order_by(GalleryItem.created_at.desc())
-        .all()
-    )
+    if barangay_id:
+        attractions = Attraction.query.filter_by(barangay_id=barangay_id, status="approved").all()
+        events = (
+            Event.query.filter_by(barangay_id=barangay_id, status="approved")
+            .order_by(Event.date.asc())
+            .all()
+        )
+        gallery_items = (
+            GalleryItem.query.join(User, GalleryItem.user_id == User.id)
+            .filter(User.barangay_id == barangay_id, GalleryItem.status == "approved")
+            .order_by(GalleryItem.created_at.desc())
+            .all()
+        )
 
-    # Get barangay info (cultural assets, traditions, etc.)
-    barangay_info = BarangayInfo.query.filter_by(name=name).first()
+    # Calculate center coordinates for map (average of all assets with coordinates)
+    # Default: Mangatarem coordinates
+    center_latitude, center_longitude = 15.7890, 120.2856 
+    
+    # Collect all map-able assets
+    map_assets = []
+    coords_list = []
 
-    # Calculate center coordinates for map (average of all attraction coordinates)
-    center_latitude, center_longitude = 15.9949, 120.4869  # Default: Mangatarem coordinates
-    if attractions:
-        center_latitude = sum(a.latitude for a in attractions) / len(attractions)
-        center_longitude = sum(a.longitude for a in attractions) / len(attractions)
+    for a in attractions:
+        map_assets.append({
+            "id": a.id,
+            "name": a.name,
+            "type": "attraction",
+            "category": a.category,
+            "description": a.description,
+            "latitude": a.latitude,
+            "longitude": a.longitude,
+            "image_url": a.image_url,
+            "url": url_for('public.attraction_detail', id=a.id)
+        })
+        coords_list.append((a.latitude, a.longitude))
+
+    for e in events:
+        if e.latitude and e.longitude:
+            map_assets.append({
+                "id": e.id,
+                "name": e.name,
+                "type": "event",
+                "category": e.category,
+                "description": e.description,
+                "latitude": e.latitude,
+                "longitude": e.longitude,
+                "image_url": e.image_url,
+                "date": e.date.strftime('%B %d, %Y'),
+                "url": "#" # Events might not have a detail page yet, but could in future
+            })
+            coords_list.append((e.latitude, e.longitude))
+
+    if coords_list:
+        center_latitude = sum(c[0] for c in coords_list) / len(coords_list)
+        center_longitude = sum(c[1] for c in coords_list) / len(coords_list)
 
     # Convert attractions to dictionaries for JSON serialization
     attractions_json = []
@@ -574,7 +624,7 @@ def barangay_profile(name):
         "pagez/barangay_profile.html",
         barangay_name=name,
         attractions=attractions,
-        attractions_json=attractions_json,
+        map_assets=map_assets,
         events=events,
         gallery_items=gallery_items,
         barangay_info=barangay_info,

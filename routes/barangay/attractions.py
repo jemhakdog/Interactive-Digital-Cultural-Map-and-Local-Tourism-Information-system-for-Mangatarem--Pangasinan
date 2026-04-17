@@ -20,7 +20,7 @@ def barangay_attractions():
         return redirect(url_for("public.index"))
 
     attractions = (
-        Attraction.query.filter_by(user_id=current_user.id)
+        Attraction.query.filter_by(barangay_id=current_user.barangay_id)
         .order_by(Attraction.created_at.desc())
         .all()
     )
@@ -107,8 +107,8 @@ def barangay_edit_attraction(id):
     """Edit an attraction owned by the current contributor (resets to 'pending')."""
     attraction = Attraction.query.get_or_404(id)
 
-    if attraction.user_id != current_user.id:
-        flash("Access denied.")
+    if attraction.barangay_id != current_user.barangay_id:
+        flash("Access denied. This asset belongs to another barangay.")
         return redirect(url_for("barangay.barangay_dashboard"))
 
     if request.method == "POST":
@@ -179,7 +179,7 @@ def barangay_delete_attraction(id):
     """Delete an attraction owned by the current contributor."""
     attraction = Attraction.query.get_or_404(id)
 
-    if attraction.user_id != current_user.id:
+    if attraction.barangay_id != current_user.barangay_id:
         flash("Access denied.")
         return redirect(url_for("barangay.barangay_dashboard"))
 

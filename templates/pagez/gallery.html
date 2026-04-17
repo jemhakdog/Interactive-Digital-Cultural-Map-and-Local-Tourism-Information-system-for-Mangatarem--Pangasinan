@@ -166,9 +166,9 @@
             <div class="gallery-item group relative rounded-3xl overflow-hidden cursor-pointer bg-white border border-gray-100 shadow-sm hover:shadow-2xl hover:-translate-y-1 staggered-entry"
                 style="animation-delay: {{ loop.index0 * 100 }}ms" data-type="{{ item.type }}" data-url="{{ item.url }}"
                 data-caption="{{ item.caption }}"
-                data-barangay="{{ item.user.barangay if item.user and item.user.barangay else 'Mangatarem' }}"
+                data-barangay="{{ item.user.barangay.name if item.user and item.user.barangay else 'Mangatarem' }}"
                 data-username="{{ item.user.username if item.user else 'Curator' }}"
-                data-date="{{ item.uploaded_at.isoformat() }}" data-action="handle-item-click">
+                data-date="{{ item.created_at.isoformat() }}" data-action="handle-item-click">
 
                 {% if item.type == 'photo' %}
                 <div class="w-full aspect-auto overflow-hidden">
@@ -205,7 +205,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                             </svg>
-                            {{ item.user.barangay if item.user and item.user.barangay else 'Mangatarem' }}
+                            {{ item.user.barangay.name if item.user and item.user.barangay else 'Mangatarem' }}
                         </div>
                         <span class="text-[10px] text-white/60 font-medium">by {{ item.user.username if item.user else
                             'Curator' }}</span>

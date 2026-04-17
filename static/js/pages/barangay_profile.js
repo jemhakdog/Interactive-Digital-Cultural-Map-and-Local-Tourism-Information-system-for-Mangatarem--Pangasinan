@@ -14,22 +14,37 @@ document.addEventListener('DOMContentLoaded', () => {
             attribution: '© OpenStreetMap contributors'
         }).addTo(map);
 
-        const dataScript = document.getElementById('attractions-data');
+        const dataScript = document.getElementById('assets-data');
         if (dataScript) {
             try {
-                const attractions = JSON.parse(dataScript.textContent);
+                const assets = JSON.parse(dataScript.textContent);
                 const markers = [];
 
-                attractions.forEach(a => {
-                    const marker = L.marker([a.lat, a.lng]).addTo(map);
+                assets.forEach(a => {
+                    if (!a.latitude || !a.longitude) return;
+
+                    // Choose icon based on type
+                    const iconColor = a.type === 'event' ? '#F59E0B' : '#059669'; // Orange for events, Emerald for attractions
+                    const iconEmoji = a.type === 'event' ? '📅' : '🏰';
+                    
+                    const marker = L.marker([a.latitude, a.longitude]).addTo(map);
+                    
+                    const dateInfo = a.type === 'event' ? `<p class="text-[10px] text-gray-500 font-bold uppercase mt-1">Happening: ${a.date}</p>` : '';
+
                     marker.bindPopup(`
-                        <div class="p-2">
+                        <div class="p-2 min-w-[150px]">
                             <div style="width: 100%; height: 96px; overflow: hidden; border-radius: 0.5rem; margin-bottom: 0.5rem;">
                                 <img src="${a.image_url || 'https://placehold.co/200x120'}" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
-                            <h3 class="font-bold text-gray-800">${a.name}</h3>
-                            <p class="text-xs text-green-600 mb-1 font-semibold">${a.category}</p>
-                            <a href="/attraction/${a.id}" class="text-xs text-blue-600 hover:underline">View Destination</a>
+                            <div class="flex items-center gap-1.5 mb-1">
+                                <span class="text-sm">${iconEmoji}</span>
+                                <h3 class="font-bold text-gray-800 leading-tight">${a.name}</h3>
+                            </div>
+                            <p class="text-[10px] text-green-600 font-semibold mb-1 uppercase tracking-wider">${a.category}</p>
+                            ${dateInfo}
+                            <div class="mt-2 pt-2 border-t border-gray-100">
+                                <a href="${a.url}" class="text-xs text-blue-600 hover:underline font-bold">Details →</a>
+                            </div>
                         </div>
                     `, {
                         maxWidth: 250,
@@ -40,10 +55,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 if (markers.length > 0) {
                     const group = new L.featureGroup(markers);
-                    map.fitBounds(group.getBounds().pad(0.1));
+                    map.fitBounds(group.getBounds().pad(0.2)); // Pad 20% for better framing
                 }
             } catch (e) {
-                console.error("Error parsing attractions data", e);
+                console.error("Error parsing map assets data", e);
             }
         }
     }

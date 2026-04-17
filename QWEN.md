@@ -12,6 +12,15 @@ A Flask-based web platform that showcases the cultural identity, community highl
 - **Students & Researchers** — Educational and historical reference
 - **Visitors** — Digital guide for tourism
 
+### Key Features
+- **CBIS Community Stewardship** — Barangay Representatives have full oversight and management capabilities for all cultural assets within their community jurisdiction.
+- **Harmonized PGIS Map** — A unified interactive map aggregating attractions and events with auto-fit framing and distinct iconography.
+- **Narrative Archetypes** — Integrated Mission, Vision, and History narratives for every barangay, providing deep context for public visitors.
+- **Interactive Cultural Map** — Explore barangay-level highlights using Mapbox GL JS with dual-marker support and chronological event tracking.
+- **Cultural Heritage Registry** — Full implementation of standardized Heritage Forms 01–07 for historical archival.
+- **Tourism Information Portal** — Detailed profiles of local attractions, traditions, and eateries.
+- **Multimedia Gallery** — High-quality photo and video collections of local traditions.
+
 ---
 
 ## Tech Stack
@@ -103,9 +112,9 @@ A Flask-based web platform that showcases the cultural identity, community highl
 
 Core models defined in `models.py`:
 - **User** — User accounts with roles (admin, contributor, user, business_owner)
-- **BarangayInfo** — Barangay (village/district) information and geo data
-- **Attraction** — Tourism attractions with categories and status workflow
-- **Event** — Community events and festivals
+- **BarangayInfo** — Central hub for community narrative (Mission, Vision, History) and geo data; acts as the anchor for all local assets.
+- **Attraction** — Cultural and tourism spots, linked to `BarangayInfo` via `barangay_id` for community stewardship.
+- **Event** — Community events and festivals with integrated geo-coordinates and barangay anchoring.
 - **HeritageProfile** — Base cultural heritage profiles
 - **GalleryItem** — Photo/video gallery items
 - **Establishment** — Business listings (inns, restaurants, cafes)

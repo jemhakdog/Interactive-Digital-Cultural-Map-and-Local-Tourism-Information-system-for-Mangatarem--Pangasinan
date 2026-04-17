@@ -16,7 +16,7 @@ class User(UserMixin, db.Model):
     is_approved = db.Column(db.Boolean, default=False, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
 
-    barangay = db.relationship('BarangayInfo', backref='users')
+    barangay = db.relationship('BarangayInfo', foreign_keys=[barangay_id], backref='residents')
 
     def set_password(self, password):
         self.password = generate_password_hash(password)
@@ -119,6 +119,8 @@ class Attraction(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=True, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
 
+    user = db.relationship('User', foreign_keys=[user_id], backref='attractions')
+
 
 class Event(db.Model):
     __tablename__ = 'EVENT'
@@ -127,6 +129,8 @@ class Event(db.Model):
     description = db.Column(db.Text, nullable=False)
     date = db.Column(db.DateTime, nullable=False, index=True)
     location = db.Column(db.String(255), nullable=False)
+    latitude = db.Column(db.Float, nullable=True) # Added for PGIS Harmonization
+    longitude = db.Column(db.Float, nullable=True) # Added for PGIS Harmonization
     barangay_id = db.Column(db.Integer, db.ForeignKey('BARANGAY_INFO.id'), nullable=True, index=True)
     image_url = db.Column(db.String(500), nullable=True)
     
@@ -136,6 +140,8 @@ class Event(db.Model):
     status = db.Column(db.String(20), default="pending", index=True)
     user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=True, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+
+    user = db.relationship('User', foreign_keys=[user_id], backref='events')
 
 
 class GalleryItem(db.Model):
@@ -153,9 +159,26 @@ class BarangayInfo(db.Model):
     __tablename__ = 'BARANGAY_INFO'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True, nullable=False) # Renamed from barangay_name
+    
+    # Narrative Fields
+    mission = db.Column(db.Text, nullable=True)
+    vision = db.Column(db.Text, nullable=True)
+    history = db.Column(db.Text, nullable=True)
+    cultural_assets = db.Column(db.Text, nullable=True)
+    traditions = db.Column(db.Text, nullable=True)
+    local_practices = db.Column(db.Text, nullable=True)
+    unique_features = db.Column(db.Text, nullable=True)
+    
+    # Metadata
+    user_id = db.Column(db.Integer, db.ForeignKey('USER.id'), nullable=True)
+    
+    # Relationships
+    manager = db.relationship('User', foreign_keys=[user_id], backref='managed_barangay_info')
+    
     map_geo_json = db.Column(db.JSON, nullable=True) # Renamed from cultural_assets/etc to match ERD
     location_data = db.Column(db.JSON, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
 
 
 class AnalyticsPageView(db.Model):

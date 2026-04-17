@@ -7,11 +7,17 @@ Welcome to the **Interactive Digital Cultural Map of Mangatarem**! This guide he
 The interactive map is the heart of the system.
 
 ### 1. Navigating Markers
-- **Click any marker** to see a quick summary of the attraction or event.
+- 🏰 **Attraction Markers**: Represent permanent cultural, natural, or historical sites.
+- 📅 **Event Markers**: Represent dynamic community activities and festivals.
+- **Click any marker** to see a quick summary, image, and (if applicable) event dates.
 - **Cluster Markers**: When multiple items are close together, they appear as a numbered circle. Click to zoom in.
 - **Directions**: Click the link in the popup to get directions via your device's native map application.
 
-### 2. Filtering Content
+### 2. Unified Barangay Profiles
+- When visiting a specific **Barangay Profile**, the map will automatically frame and center to show you every asset in that community.
+- Explore community-specific **Mission and Vision** statements on the profile cards to understand the local cultural context.
+
+### 3. Filtering Content
 - Use the **Category Filter** to switch between Natural, Religious, Historical, or Recreational sites.
 - Filter by **Barangay** to explore specific parts of the town.
 

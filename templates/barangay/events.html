@@ -5,7 +5,7 @@
 {% block content %}
 <div class="container mx-auto px-6 py-12">
     <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-gray-800">My Events</h1>
+        <h1 class="text-3xl font-bold text-gray-800">Community Events</h1>
         <div class="flex gap-4">
             <a href="{{ url_for('barangay.barangay_dashboard') }}"
                 class="text-gray-600 hover:text-gray-800 transition">Back to
@@ -33,10 +33,14 @@
                             <h3 class="font-semibold text-lg text-gray-800">{{ event.name }}</h3>
                             <p class="text-sm text-gray-500">{{ event.date.strftime('%B %d, %Y') }} • {{ event.location
                                 }}</p>
-                            <span
                                 class="inline-block mt-1 text-xs px-2 py-0.5 rounded-full {{ 'bg-green-100 text-green-800' if event.status == 'approved' else 'bg-yellow-100 text-yellow-800' }}">
                                 {{ event.status|capitalize }}
                             </span>
+                            {% if event.user and event.user_id != current_user.id %}
+                            <p class="text-[10px] text-gray-400 mt-1 italic">
+                                Submitted by: {{ event.user.username }}
+                            </p>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="flex gap-3 text-sm">
@@ -47,7 +51,7 @@
                     </div>
                 </li>
                 {% else %}
-                <li class="text-gray-500 text-center py-8">You haven't added any events yet.</li>
+                <li class="text-gray-500 text-center py-8">No community events found for this barangay.</li>
                 {% endfor %}
             </ul>
         </div>

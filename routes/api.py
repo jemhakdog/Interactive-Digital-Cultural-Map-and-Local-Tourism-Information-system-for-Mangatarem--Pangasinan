@@ -43,21 +43,22 @@ def api_attractions():
     logger.debug("Fetching attractions page=%d, per_page=%d", page, per_page)
 
     # Build query with filters and only select needed columns
+    from models import BarangayInfo
     query = db.session.query(
         Attraction.id,
         Attraction.name,
         Attraction.category,
-        Attraction.barangay,
+        BarangayInfo.name,
         Attraction.description,
         Attraction.latitude,
         Attraction.longitude,
         Attraction.image_url,
-    ).filter(Attraction.status == "approved")
+    ).join(BarangayInfo, Attraction.barangay_id == BarangayInfo.id).filter(Attraction.status == "approved")
 
     if category and category != "all":
         query = query.filter(Attraction.category == category)
     if barangay and barangay != "all":
-        query = query.filter(Attraction.barangay == barangay)
+        query = query.filter(BarangayInfo.name == barangay)
 
     # Paginate the results
     paginated_attractions = query.paginate(
@@ -230,7 +231,8 @@ def api_establishments():
     if price_range:
         query = query.filter(Establishment.price_range == price_range)
     if barangay and barangay != "all":
-        query = query.filter(Establishment.barangay == barangay)
+        from models import BarangayInfo
+        query = query.join(BarangayInfo).filter(BarangayInfo.name == barangay)
 
     paginated_establishments = query.paginate(page=page, per_page=per_page, error_out=False)
 

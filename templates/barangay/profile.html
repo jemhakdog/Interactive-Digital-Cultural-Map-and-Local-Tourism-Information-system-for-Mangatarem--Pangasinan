@@ -1,16 +1,35 @@
 {% extends 'base.html' %}
 
-{% block title %}Manage Profile - {{ current_user.barangay }}{% endblock %}
+{% block title %}Manage Profile - {{ current_user.barangay.name }}{% endblock %}
 
 {% block content %}
 <div class="container mx-auto px-6 py-12">
     <div class="max-w-4xl mx-auto bg-white p-8 rounded-xl shadow-lg">
         <h1 class="text-3xl font-bold text-gray-800 mb-2">Manage Barangay Profile</h1>
         <p class="text-gray-600 mb-8">Update the cultural and historical information for Barangay {{
-            current_user.barangay }}.</p>
+            current_user.barangay.name }}.</p>
 
         <form method="POST" class="space-y-8">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Mission -->
+                <div>
+                    <label class="block text-lg font-semibold text-gray-800 mb-2">Mission</label>
+                    <textarea name="mission" rows="4"
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-4"
+                        placeholder="Enter mission here...">{{ info.mission if info else '' }}</textarea>
+                </div>
+
+                <!-- Vision -->
+                <div>
+                    <label class="block text-lg font-semibold text-gray-800 mb-2">Vision</label>
+                    <textarea name="vision" rows="4"
+                        class="w-full rounded-lg border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-4"
+                        placeholder="Enter vision here...">{{ info.vision if info else '' }}</textarea>
+                </div>
+            </div>
+
             <!-- History -->
             <div>
                 <label class="block text-lg font-semibold text-gray-800 mb-2">History & Description</label>

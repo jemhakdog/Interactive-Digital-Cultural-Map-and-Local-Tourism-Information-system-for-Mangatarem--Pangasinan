@@ -42,7 +42,7 @@
                         
                         <div class="absolute top-6 left-6">
                             <span class="glass-stats py-2 px-4 rounded-full text-[10px] font-bold text-white uppercase tracking-widest border border-white/20">
-                                {{ item.barangay or 'Profiled Site' }}
+                                {{ item.barangay.name if item.barangay else 'Profiled Site' }}
                             </span>
                         </div>
                     </div>

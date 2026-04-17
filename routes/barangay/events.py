@@ -19,7 +19,7 @@ def barangay_events():
         return redirect(url_for("public.index"))
 
     events = (
-        Event.query.filter_by(user_id=current_user.id)
+        Event.query.filter_by(barangay_id=current_user.barangay_id)
         .order_by(Event.date.asc())
         .all()
     )
@@ -74,6 +74,9 @@ def barangay_add_event():
             return redirect(request.referrer or url_for("barangay.barangay_add_event"))
 
         image_url = request.form.get("image_url")
+        latitude = request.form.get("latitude")
+        longitude = request.form.get("longitude")
+
         if "image" in request.files:
             uploaded_url = save_uploaded_file(request.files["image"])
             if uploaded_url:
@@ -86,6 +89,8 @@ def barangay_add_event():
             category=category,
             description=sanitize_html_input(description),
             image_url=image_url,
+            latitude=float(latitude) if latitude else None,
+            longitude=float(longitude) if longitude else None,
             barangay_id=current_user.barangay_id,
             user_id=current_user.id,
             status="pending",
@@ -107,7 +112,7 @@ def barangay_edit_event(id):
     """Edit an event owned by the current contributor (resets to 'pending')."""
     event = Event.query.get_or_404(id)
 
-    if event.user_id != current_user.id:
+    if event.barangay_id != current_user.barangay_id:
         flash("Access denied.")
         return redirect(url_for("barangay.barangay_dashboard"))
 
@@ -154,6 +159,11 @@ def barangay_edit_event(id):
         event.location = location
         event.category = category
         event.description = sanitize_html_input(description)
+        
+        latitude = request.form.get("latitude")
+        longitude = request.form.get("longitude")
+        event.latitude = float(latitude) if latitude else None
+        event.longitude = float(longitude) if longitude else None
 
         if "image" in request.files:
             uploaded_url = save_uploaded_file(request.files["image"])
@@ -180,7 +190,7 @@ def barangay_delete_event(id):
     """Delete an event owned by the current contributor."""
     event = Event.query.get_or_404(id)
 
-    if event.user_id != current_user.id:
+    if event.barangay_id != current_user.barangay_id:
         flash("Access denied.")
         return redirect(url_for("barangay.barangay_dashboard"))
 

@@ -2,7 +2,7 @@ import logging
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from extensions import db, limiter
-from models import Event
+from models import Event, BarangayInfo
 from datetime import datetime
 from utils.logger_helper import log_entry, log_success, log_error
 from utils.file_helpers import save_uploaded_file
@@ -156,7 +156,8 @@ def add_event():
         flash("Event added successfully!")
         return redirect(url_for("admin.admin_events"))
     
-    return render_template("admin/add_event.html")
+    barangays = BarangayInfo.query.order_by(BarangayInfo.name).all()
+    return render_template("admin/add_event.html", barangays=barangays)
 
 
 @admin_bp.route("/events/edit/<int:id>", methods=["GET", "POST"])
@@ -239,7 +240,8 @@ def edit_event(id):
         flash("Event updated successfully!")
         return redirect(url_for("admin.admin_events"))
     
-    return render_template("admin/edit_event.html", event=event)
+    barangays = BarangayInfo.query.order_by(BarangayInfo.name).all()
+    return render_template("admin/edit_event.html", event=event, barangays=barangays)
 
 
 @admin_bp.route("/events/delete/<int:id>")
