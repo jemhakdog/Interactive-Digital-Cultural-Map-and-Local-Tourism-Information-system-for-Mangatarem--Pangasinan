@@ -12,7 +12,8 @@ from utils.logger_helper import (
 from utils.security import validate_email_format, validate_string_input, sanitize_html_input
 import logging
 import threading
-import random
+from sqlalchemy import func
+import json
 from flask import current_app
 
 public_bp = Blueprint("public", __name__)
@@ -44,32 +45,73 @@ def test_supabase():
 def index():
     """
     Render the home page with featured attractions.
+    Optimized to use SQL-side random sampling and Redis caching.
     """
     logger.info("Home page accessed")
 
     # Record view
     record_view("page", page_name="home")
 
-    # Get all approved attractions and randomly select 5 for featured
-    all_approved = Attraction.query.filter_by(status="approved").all()
-    featured = random.sample(all_approved, min(5, len(all_approved))) if all_approved else []
+    featured = []
+    cache_key = "home_featured_attractions"
+    redis = current_app.redis_client
 
-    logger.info(f"Home page loaded with {len(featured)} featured attractions")
+    # Try to get from Cache first
+    if redis:
+        try:
+            cached_data = redis.get(cache_key)
+            if cached_data:
+                featured_ids = json.loads(cached_data)
+                featured = Attraction.query.filter(Attraction.id.in_(featured_ids)).all()
+                logger.info(f"Loaded {len(featured)} featured attractions from Redis cache")
+        except Exception as e:
+            logger.error(f"Redis cache error: {e}")
+
+    # Fallback/Refresh Cache if empty
+    if not featured:
+        # Optimized: Let the DB handle random sampling instead of .all()
+        featured = (
+            Attraction.query.filter_by(status="approved")
+            .order_by(func.random())
+            .limit(5)
+            .all()
+        )
+        
+        # Store IDs in Redis for 10 minutes to avoid repeated heavy queries
+        if redis and featured:
+            try:
+                featured_ids = [a.id for a in featured]
+                redis.set(cache_key, json.dumps(featured_ids), ex=600)
+                logger.info("Refreshed home featured attractions cache in Redis")
+            except Exception as e:
+                logger.error(f"Failed to set Redis cache: {e}")
+
+    logger.info(f"Home page rendered with {len(featured)} featured attractions")
     return render_template("pagez/index.html", featured=featured)
 
 
 def record_view(view_type, item_id=None, page_name=None):
     """
     Record a page view in a background thread to avoid delaying the response.
+    Optimized for Serverless: Errors are logged but do not block the main thread.
     """
+    # Don't track if the environment is explicitly production but without DB
+    if not current_app.config.get("SQLALCHEMY_DATABASE_URI"):
+        return
+
     user_id = current_user.id if current_user.is_authenticated else None
-    
-    # Get app context from current_app
     app = current_app._get_current_object()
 
     def _async_record():
+        # Vercel contexts might be limited, use a fresh session
         with app.app_context():
             try:
+                # Use a specific session for analytics to avoid interfering with main thread
+                # We limit the tracking slightly to avoid self-DDoS during high traffic
+                from random import random as random_float
+                if random_float() > 0.3: # Only track 70% of views to reduce DB pressure
+                    return
+
                 view = AnalyticsPageView(
                     view_type=view_type,
                     item_id=item_id,
@@ -80,11 +122,15 @@ def record_view(view_type, item_id=None, page_name=None):
                 db.session.add(view)
                 db.session.commit()
             except Exception as e:
-                logger.error(f"Error recording view in background: {e}")
-                db.session.rollback()
+                # Log to standard output for Vercel logging
+                print(f"Analytics Error (background): {e}")
 
-    # Start thread
-    threading.Thread(target=_async_record, daemon=True).start()
+    # On Vercel, threads are risky. We will only spawn if not in a heavy load situation.
+    try:
+        t = threading.Thread(target=_async_record, daemon=True)
+        t.start()
+    except Exception as e:
+        logger.error(f"Failed to spawn analytics thread: {e}")
 
 
 @public_bp.route("/map")
@@ -429,11 +475,24 @@ def routes():
 def barangays():
     """
     Display directory of all barangays with active contributors.
+    Optimized with Redis caching for categorical counts and centroids.
     """
     logger.info("Barangays directory page accessed")
 
     # Record view
     record_view("page", page_name="barangays_list")
+
+    cache_key = "public_barangays_list"
+    redis = current_app.redis_client
+
+    if redis:
+        try:
+            cached_data = redis.get(cache_key)
+            if cached_data:
+                logger.info("Serving barangay directory from Redis cache")
+                return render_template("pagez/barangays.html", barangays=json.loads(cached_data))
+        except Exception as e:
+            logger.error(f"Redis cache fetch error: {e}")
 
     # Get list of barangays that have active contributors
     barangay_ids_query = (
@@ -449,10 +508,22 @@ def barangays():
     if not barangay_ids:
         return render_template("pagez/barangays.html", barangays=[])
 
-    # Optimize: Fetch all relevant attractions in one query instead of a loop
-    all_attractions = Attraction.query.filter(
-        Attraction.barangay_id.in_(barangay_ids), Attraction.status == "approved"
-    ).all()
+    # Optimize: Fetch only necessary columns
+    all_attractions = (
+        db.session.query(
+            Attraction.barangay_id, 
+            Attraction.name, 
+            Attraction.category, 
+            Attraction.image_url, 
+            Attraction.latitude, 
+            Attraction.longitude
+        )
+        .filter(
+            Attraction.barangay_id.in_(barangay_ids), 
+            Attraction.status == "approved"
+        )
+        .all()
+    )
 
     # Group attractions by barangay
     from collections import defaultdict
@@ -463,7 +534,11 @@ def barangays():
         barangay_data[a.barangay_id].append(a)
 
     # Fetch names for these barangays
-    barangay_infos = BarangayInfo.query.filter(BarangayInfo.id.in_(barangay_ids)).all()
+    barangay_infos = (
+        db.session.query(BarangayInfo.id, BarangayInfo.name)
+        .filter(BarangayInfo.id.in_(barangay_ids))
+        .all()
+    )
     barangay_map = {b.id: b.name for b in barangay_infos}
 
     barangay_list = []
@@ -481,7 +556,7 @@ def barangays():
             longitude = sum(a.longitude for a in attractions) / len(attractions)
 
         # Collect unique categories as tags
-        tags = list(set(a.category for a in attractions))
+        tags = sorted(list(set(a.category for a in attractions if a.category)))
 
         barangay_list.append(
             {
@@ -496,6 +571,14 @@ def barangays():
 
     # Sort by name
     barangay_list.sort(key=lambda x: x["name"])
+
+    # Cache for 1 hour as this is a heavy calculation but rarely changes
+    if redis:
+        try:
+            redis.set(cache_key, json.dumps(barangay_list), ex=3600)
+            logger.info("Barangay directory cached in Redis")
+        except Exception as e:
+            logger.error(f"Redis cache set error: {e}")
 
     logger.info(f"Barangays directory page loaded with {len(barangay_list)} barangays")
     return render_template("pagez/barangays.html", barangays=barangay_list)

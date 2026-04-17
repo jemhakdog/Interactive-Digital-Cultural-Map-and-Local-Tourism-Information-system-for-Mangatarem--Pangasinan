@@ -26,7 +26,7 @@
 <meta property="og:title" content="GoMangatarem | Interactive Cultural Map & Guide">
 <meta property="og:description"
     content="Discover the 82 Barangays of Mangatarem, Pangasinan. Explore our interactive cultural map, find local attractions, events, and experience the rich heritage of our town.">
-<meta property="og:image" content="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DJI_0218.jpg">
+<meta property="og:image" content="{{ url_for('static', filename='img/hero.webp') }}">
 <meta property="og:site_name" content="GoMangatarem Information System">
 
 <!-- Twitter -->
@@ -84,8 +84,9 @@ document.addEventListener('DOMContentLoaded', function() {
 <section class="relative min-h-screen flex items-center justify-center overflow-hidden bg-forest-black">
     <!-- Immersive Background -->
     <div class="absolute inset-0 z-0">
-        <img src="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DJI_0218.jpg" alt="Mangatarem Landscape"
-            class="w-full h-full object-cover scale-105 animate-slow-zoom">
+        <img src="{{ url_for('static', filename='img/hero.webp') }}" alt="Mangatarem Landscape"
+            class="w-full h-full object-cover scale-105 animate-slow-zoom"
+            fetchpriority="high" loading="eager">
         <div class="absolute inset-0 bg-gradient-to-b from-forest-black/40 via-transparent to-forest-black"></div>
     </div>
 
