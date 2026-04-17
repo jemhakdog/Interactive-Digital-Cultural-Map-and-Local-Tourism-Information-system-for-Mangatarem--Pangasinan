@@ -112,8 +112,10 @@
             <a href="{{ url_for('public.establishment_detail', id=est.id) }}"
                 class="bg-emerald-900/20 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-md group hover:border-emerald-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-900/20 hover:-translate-y-1">
                 <!-- Image -->
-                <div class="h-48 bg-emerald-900/40 bg-cover bg-center relative"
-                    {% if est.cover_image_url %}style="background-image: url('{{ est.cover_image_url }}')"{% endif %}>
+                <div class="h-48 bg-emerald-900/40 relative img-skeleton">
+                    <img src="{{ est.cover_image_url }}" alt="{{ est.name }}"
+                        class="w-full h-full object-cover reveal-img"
+                        loading="lazy" decoding="async">
                     <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/80 to-transparent"></div>
                     <!-- Type Badge -->
                     <div class="absolute top-3 left-3">

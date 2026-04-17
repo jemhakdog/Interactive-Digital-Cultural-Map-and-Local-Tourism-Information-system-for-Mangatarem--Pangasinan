@@ -47,16 +47,16 @@
                 <article class="event-item" data-category="{{ event.category|lower }}" data-date="{{ event.date.strftime('%Y-%m-%d') }}"
                     style="animation-delay: {{ loop.index0 * 0.1 }}s">
                     <main class="event-card-inner">
-                        <div class="event-visual">
+                        <div class="event-visual img-skeleton">
                             {% if event.image_url %}
-                                <img src="{{ event.image_url }}" alt="{{ event.name }}">
+                                <img src="{{ event.image_url }}" alt="{{ event.name }}" class="reveal-img" loading="lazy" decoding="async">
                             {% else %}
                                 {% if event.category == 'Religious' %}
-                                    <img src="https://images.unsplash.com/photo-1548625361-ec853f0cf786?q=80&w=2070&auto=format&fit=crop" alt="{{ event.name }}">
-                                % elif event.category == 'Entertainment' %}
-                                    <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop" alt="{{ event.name }}">
+                                    <img src="https://images.unsplash.com/photo-1548625361-ec853f0cf786?q=80&w=2070&auto=format&fit=crop" alt="{{ event.name }}" class="reveal-img" loading="lazy" decoding="async">
+                                {% elif event.category == 'Entertainment' %}
+                                    <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop" alt="{{ event.name }}" class="reveal-img" loading="lazy" decoding="async">
                                 {% else %}
-                                    <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2070&auto=format&fit=crop" alt="{{ event.name }}">
+                                    <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2070&auto=format&fit=crop" alt="{{ event.name }}" class="reveal-img" loading="lazy" decoding="async">
                                 {% endif %}
                             {% endif %}
                         </div>
@@ -141,8 +141,8 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-16 mt-20">
                 <!-- Card 1 -->
                 <div class="highlight-card" data-aos="fade-right" data-aos-delay="100">
-                    <div class="highlight-image">
-                        <img src="https://images.unsplash.com/photo-1548625361-ec853f0cf786?q=80&w=2070&auto=format&fit=crop" alt="Town Fiesta">
+                    <div class="highlight-image img-skeleton">
+                        <img src="https://images.unsplash.com/photo-1548625361-ec853f0cf786?q=80&w=2070&auto=format&fit=crop" alt="Town Fiesta" class="reveal-img" loading="lazy" decoding="async">
                     </div>
                     <div class="highlight-content text-left">
                         <span class="highlight-month">January</span>
@@ -155,9 +155,9 @@
 
                 <!-- Card 2 -->
                 <div class="highlight-card" data-aos="fade-up" data-aos-delay="200">
-                    <div class="highlight-image">
+                    <div class="highlight-image img-skeleton">
                         <img src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2070&auto=format&fit=crop"
-                            alt="Pindang Festival">
+                            alt="Pindang Festival" class="reveal-img" loading="lazy" decoding="async">
                     </div>
                     <div class="highlight-content text-left">
                         <span class="highlight-month">April</span>
@@ -170,8 +170,8 @@
 
                 <!-- Card 3 -->
                 <div class="highlight-card" data-aos="fade-left" data-aos-delay="300">
-                    <div class="highlight-image">
-                        <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2070&auto=format&fit=crop" alt="Holy Week">
+                    <div class="highlight-image img-skeleton">
+                        <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2070&auto=format&fit=crop" alt="Holy Week" class="reveal-img" loading="lazy" decoding="async">
                     </div>
                     <div class="highlight-content text-left">
                         <span class="highlight-month">March / April</span>

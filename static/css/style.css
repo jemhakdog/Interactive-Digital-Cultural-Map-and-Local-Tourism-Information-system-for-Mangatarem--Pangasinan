@@ -417,3 +417,59 @@ form select option {
     color: rgba(255, 237, 213, 0.7) !important;
 }
 
+/* --- Premium Image Loading & Visual Stability --- */
+
+/* Skeleton Loading State for Zero CLS */
+.img-skeleton {
+    position: relative;
+    background: rgba(2, 44, 34, 0.05);
+    overflow: hidden;
+}
+
+.img-skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.05),
+        transparent
+    );
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    100% { transform: translateX(100%); }
+}
+
+/* Premium Reveal Transition */
+.reveal-img {
+    opacity: 0;
+    transform: scale(1.02);
+    filter: blur(5px);
+    transition: 
+        opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1),
+        filter 0.6s ease-out;
+    will-change: opacity, transform, filter;
+}
+
+.reveal-img.loaded {
+    opacity: 1;
+    transform: scale(1);
+    filter: blur(0);
+}
+
+/* Aspect Ratio Safeguards */
+.aspect-heritage {
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+}
+
+.aspect-portrait {
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+}
+

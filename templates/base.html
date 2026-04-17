@@ -9,6 +9,11 @@
     <meta name="google-site-verification" content="4mfuNe7nRXoBiOxX-xs1-UC63vsLiUy8xOSBQQWUVEI" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <!-- Asset Preconnects for performance -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://images.unsplash.com">
+    
     <!-- Tailwind CSS (Build-time) -->
 
     <!-- Custom CSS (Local - Uncomment after running: npm run build:css) -->
@@ -342,6 +347,38 @@
     <script src="{{ url_for('static', filename='js/components/service-worker-registration.js') }}" defer></script>
     <!-- CSRF Protection -->
     <script src="{{ url_for('static', filename='js/components/csrf.js') }}"></script>
+
+    <!-- Global Image Reveal & Performance Handler -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const handleImage = (img) => {
+                if (img.complete) {
+                    img.classList.add('loaded');
+                } else {
+                    img.addEventListener('load', () => img.classList.add('loaded'), { once: true });
+                    // Fallback for broken images
+                    img.addEventListener('error', () => img.parentElement.classList.add('broken'), { once: true });
+                }
+            };
+
+            // Initial check for all reveal images
+            document.querySelectorAll('.reveal-img').forEach(handleImage);
+
+            // MutationObserver to handle dynamic content (Modals, AJAX)
+            const observer = new MutationObserver((mutations) => {
+                mutations.forEach(mutation => {
+                    mutation.addedNodes.forEach(node => {
+                        if (node.nodeType === 1) {
+                            if (node.classList.contains('reveal-img')) handleImage(node);
+                            node.querySelectorAll('.reveal-img').forEach(handleImage);
+                        }
+                    });
+                });
+            });
+
+            observer.observe(document.body, { childList: true, subtree: true });
+        });
+    </script>
 </body>
 
 

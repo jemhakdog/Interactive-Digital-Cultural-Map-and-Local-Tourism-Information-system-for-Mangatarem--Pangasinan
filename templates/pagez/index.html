@@ -189,10 +189,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 <a href="{{ url_for('public.attraction_detail', id=attraction.id) }}"
                    class="spotlight-card"
                    style="--card-color: {{ ['#FCA5A5', '#FCD34D', '#6EE7B7', '#93C5FD', '#C4B5FD', '#FDBA74'][loop.index0 % 6] }}">
-                    <div class="spotlight-card__img-wrap">
+                    <div class="spotlight-card__img-wrap img-skeleton">
                         <img src="{{ attraction.image_url or url_for('static', filename='img/placeholder.jpg') }}"
                              alt="{{ attraction.name }}"
-                             class="spotlight-card__img"
+                             class="spotlight-card__img reveal-img"
                              loading="lazy" decoding="async">
                     </div>
                     <div class="spotlight-card__footer">
@@ -231,9 +231,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         <div class="bento-grid">
             <!-- Experience 1: Heritage Walk -->
-            <div class="bento-item col-span-2 row-span-2 group" data-aos="fade-right">
+            <div class="bento-item col-span-2 row-span-2 group img-skeleton" data-aos="fade-right">
                 <img src="{{ url_for('static', filename='img/st_raymund_church.webp') }}" alt="Heritage Walk"
-                    class="w-full h-full object-cover spotlight-img">
+                    class="w-full h-full object-cover spotlight-img reveal-img" loading="lazy" decoding="async">
                 <div
                     class="absolute inset-0 bg-forest-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-10">
                     <span class="source-code-label !text-mongodb-green mb-2">History & Architecture</span>
@@ -249,9 +249,9 @@ document.addEventListener('DOMContentLoaded', function() {
             </div>
 
             <!-- Experience 2: Eco-Trail -->
-            <div class="bento-item col-span-2 row-span-2 group" data-aos="fade-left">
+            <div class="bento-item col-span-2 row-span-2 group img-skeleton" data-aos="fade-left">
                 <img src="{{ url_for('static', filename='img/manleluag_spring.webp') }}" alt="Eco-Trail"
-                    class="w-full h-full object-cover spotlight-img">
+                    class="w-full h-full object-cover spotlight-img reveal-img" loading="lazy" decoding="async">
                 <div
                     class="absolute inset-0 bg-forest-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-10">
                     <span class="source-code-label !text-mongodb-green mb-2">Nature & Expedition</span>
@@ -297,12 +297,13 @@ document.addEventListener('DOMContentLoaded', function() {
                         </svg>
                     </a>
                 </div>
-                <div class="md:w-1/2 relative group">
+                <div class="md:w-1/2 relative group img-skeleton rounded-2xl">
                     <div
                         class="absolute -inset-4 bg-mongodb-green/20 blur-3xl opacity-0 group-hover:opacity-100 transition-opacity">
                     </div>
                     <img src="{{ url_for('static', filename='img/mangatarem_map_teaser.webp') }}" alt="Map Preview"
-                        class="w-full h-auto aspect-video object-cover rounded-2xl border border-white/10 shadow-2xl relative z-10 transform group-hover:scale-[1.02] transition-transform duration-500">
+                        class="w-full h-auto aspect-video object-cover rounded-2xl border border-white/10 shadow-2xl relative z-10 transform group-hover:scale-[1.02] transition-transform duration-500 reveal-img"
+                        loading="lazy" decoding="async">
                 </div>
             </div>
         </div>

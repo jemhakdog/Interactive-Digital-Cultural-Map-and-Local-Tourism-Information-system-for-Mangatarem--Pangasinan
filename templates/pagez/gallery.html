@@ -171,9 +171,9 @@
                 data-date="{{ item.created_at.isoformat() }}" data-action="handle-item-click">
 
                 {% if item.type == 'photo' %}
-                <div class="w-full aspect-auto overflow-hidden">
-                    <img src="{{ item.url }}" alt="{{ item.caption }}" loading="lazy"
-                        class="w-full h-full object-cover transform group-hover:scale-[1.03] transition duration-700 ease-out">
+                <div class="w-full aspect-auto overflow-hidden img-skeleton">
+                    <img src="{{ item.url }}" alt="{{ item.caption }}" loading="lazy" decoding="async"
+                        class="w-full h-full object-cover transform group-hover:scale-[1.03] transition duration-700 ease-out reveal-img">
                 </div>
                 {% else %}
                 <div
