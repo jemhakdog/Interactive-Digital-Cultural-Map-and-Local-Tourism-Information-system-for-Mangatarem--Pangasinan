@@ -120,6 +120,22 @@ class Attraction(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
 
     user = db.relationship('User', foreign_keys=[user_id], backref='attractions')
+    
+    def to_dict(self):
+        """Convert Attraction to dictionary for JSON serialization."""
+        return {
+            'id': self.id,
+            'name': self.name,
+            'description': self.description,
+            'category': self.category,
+            'latitude': self.latitude,
+            'longitude': self.longitude,
+            'image_url': self.image_url,
+            'barangay_id': self.barangay_id,
+            'barangay_name': self.barangay.name if self.barangay else None,
+            'status': self.status,
+            'created_at': self.created_at.isoformat() if self.created_at else None
+        }
 
 
 class Event(db.Model):

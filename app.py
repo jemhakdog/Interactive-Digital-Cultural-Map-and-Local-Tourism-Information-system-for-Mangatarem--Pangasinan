@@ -267,6 +267,13 @@ def _register_request_hooks(app: Flask) -> None:
         is_vercel = "VERCEL" in os.environ
         if is_vercel and request.method == "GET" and response.status_code == 200:
             _apply_cache_headers(response, request.path)
+            
+            # PERFORMANCE: Drop session cookie for anonymous home page visits.
+            # This ensures Vercel Edge Cache covers the home page for all guests.
+            from flask_login import current_user
+            if request.path == "/" and current_user.is_anonymous:
+                if 'Set-Cookie' in response.headers:
+                    del response.headers['Set-Cookie']
 
         return response
 
@@ -277,11 +284,14 @@ def _apply_cache_headers(response, path: str) -> None:
     if any(path.startswith(p) for p in no_cache_prefixes):
         response.headers["Cache-Control"] = "private, no-store"
     elif "text/html" in response.content_type:
+        # Long-term edge cache (5 mins) with stale-while-revalidate (10 mins)
         response.headers["Cache-Control"] = "public, max-age=60, s-maxage=300, stale-while-revalidate=600"
     elif any(path.endswith(ext) for ext in (".js", ".css", ".png", ".jpg", ".webp", ".woff2")):
+        # Immutable assets (1 year)
         response.headers["Cache-Control"] = "public, max-age=31536000, immutable"
     else:
-        response.headers["Cache-Control"] = "public, max-age=30, s-maxage=120, stale-while-revalidate=300"
+        # Default API/Other responses
+        response.headers["Cache-Control"] = "public, max-age=30, s-maxage=300, stale-while-revalidate=600"
 
 
 def _register_utility_routes(app: Flask) -> None:

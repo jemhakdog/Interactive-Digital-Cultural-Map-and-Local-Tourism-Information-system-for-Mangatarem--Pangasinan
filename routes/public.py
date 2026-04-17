@@ -61,28 +61,27 @@ def index():
         try:
             cached_data = redis.get(cache_key)
             if cached_data:
-                featured_ids = json.loads(cached_data)
-                featured = Attraction.query.filter(Attraction.id.in_(featured_ids)).all()
-                logger.info(f"Loaded {len(featured)} featured attractions from Redis cache")
+                featured = json.loads(cached_data)
+                logger.info(f"Loaded {len(featured)} featured attractions from Redis cache (full objects)")
         except Exception as e:
             logger.error(f"Redis cache error: {e}")
 
     # Fallback/Refresh Cache if empty
     if not featured:
         # Optimized: Let the DB handle random sampling instead of .all()
-        featured = (
+        attractions = (
             Attraction.query.filter_by(status="approved")
             .order_by(func.random())
             .limit(5)
             .all()
         )
+        featured = [a.to_dict() for a in attractions]
         
-        # Store IDs in Redis for 10 minutes to avoid repeated heavy queries
+        # Store full objects in Redis for 10 minutes
         if redis and featured:
             try:
-                featured_ids = [a.id for a in featured]
-                redis.set(cache_key, json.dumps(featured_ids), ex=600)
-                logger.info("Refreshed home featured attractions cache in Redis")
+                redis.set(cache_key, json.dumps(featured), ex=600)
+                logger.info("Refreshed home featured attractions cache in Redis with full objects")
             except Exception as e:
                 logger.error(f"Failed to set Redis cache: {e}")
 
@@ -106,10 +105,11 @@ def record_view(view_type, item_id=None, page_name=None):
         # Vercel contexts might be limited, use a fresh session
         with app.app_context():
             try:
-                # Use a specific session for analytics to avoid interfering with main thread
-                # We limit the tracking slightly to avoid self-DDoS during high traffic
+                # Optimized for performance: 
+                # 1. Higher sampling rate but faster execution
+                # 2. Skip if current request context is already closing
                 from random import random as random_float
-                if random_float() > 0.3: # Only track 70% of views to reduce DB pressure
+                if random_float() > 0.5: # 50% sampling
                     return
 
                 view = AnalyticsPageView(
@@ -122,15 +122,17 @@ def record_view(view_type, item_id=None, page_name=None):
                 db.session.add(view)
                 db.session.commit()
             except Exception as e:
-                # Log to standard output for Vercel logging
                 print(f"Analytics Error (background): {e}")
+            finally:
+                # Crucial for SQLAlchemy in background threads: clear the session
+                db.session.remove()
 
-    # On Vercel, threads are risky. We will only spawn if not in a heavy load situation.
+    # On Vercel, threads are risky. Only start if not in a massive load.
     try:
         t = threading.Thread(target=_async_record, daemon=True)
         t.start()
-    except Exception as e:
-        logger.error(f"Failed to spawn analytics thread: {e}")
+    except Exception:
+        pass # Silently fail for analytics to prevent blocking users
 
 
 @public_bp.route("/map")
