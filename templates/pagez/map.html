@@ -18,7 +18,7 @@
 
 <!-- Mapbox GL JS CSS (Moved to head for better container sizing) -->
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/map.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/map.css') }}?v=20260419-1">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/utility-overrides.css') }}">
 {% endblock %}
 ...
@@ -30,7 +30,6 @@
     window.MAPBOX_TOKEN = "{{ mapbox_token }}";
 </script>
 
-<script src="{{ url_for('static', filename='js/pages/map.js') }}?v=20260411-7"></script>
 
 {% block content %}
 <div class="relative flex flex-col md:flex-row h-[calc(100vh-64px)] overflow-hidden">
@@ -388,5 +387,5 @@
     window.MAPBOX_TOKEN = "{{ mapbox_token }}";
 </script>
 
-<script src="{{ url_for('static', filename='js/pages/map.js') }}?v=20260411-7"></script>
+<script src="{{ url_for('static', filename='js/pages/map.js') }}?v=20260419-1"></script>
 {% endblock %}

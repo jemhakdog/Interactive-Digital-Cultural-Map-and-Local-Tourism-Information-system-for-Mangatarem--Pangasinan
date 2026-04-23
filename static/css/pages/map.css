@@ -35,6 +35,18 @@
     transition: transform 0.2s ease;
 }
 
+/* Hide default Mapbox Geolocate button */
+.mapboxgl-ctrl-geolocate {
+    display: none !important;
+}
+
+.tracking-active {
+    background-color: #ecfdf5 !important;
+    color: #059669 !important;
+    border-color: #10b981 !important;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3) !important;
+}
+
 .custom-marker-icon:hover {
     transform: scale(1.1);
 }

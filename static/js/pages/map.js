@@ -10,6 +10,8 @@
  */
 
 document.addEventListener('DOMContentLoaded', function () {
+    const PLACEHOLDER_IMG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22200%22%20xmlns%3D%22http%3D%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22300%22%20height%3D%22200%22%20fill%3D%22%23eee%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20font-family%3D%22sans-serif%22%20font-size%3D%2216%22%20fill%3D%22%23aaa%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';
+
     // ========================================
     // 1. MAP INITIALIZATION
     // ========================================
@@ -28,6 +30,22 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Add navigation controls
     map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+
+    // ========================================
+    // 1.1 GEOLOCATION ENGINE INITIALIZATION
+    // ========================================
+    // Initialize standard GeolocateControl but hide its default button via CSS
+    // We will trigger it using our custom #locate-me button
+    const geolocate = new mapboxgl.GeolocateControl({
+        positionOptions: {
+            enableHighAccuracy: true
+        },
+        trackUserLocation: true,
+        showUserHeading: true,
+        showAccuracyCircle: true
+    });
+
+    map.addControl(geolocate);
 
     // Force resize calculation for mobile layout
     map.on('load', () => {
@@ -606,7 +624,7 @@ document.addEventListener('DOMContentLoaded', function () {
             card.className = 'group bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer overflow-hidden flex flex-row h-32';
             card.innerHTML = `
                 <div class="w-1/3 h-full bg-gray-200 relative flex-shrink-0">
-                    <img src="${attraction.image}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="${attraction.name}" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+                    <img src="${attraction.image}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="${attraction.name}" onerror="this.src='${PLACEHOLDER_IMG}'">
                     <div class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold" style="color: ${categoryConfig.color}">${categoryLabel}</div>
                 </div>
                 <div class="w-2/3 p-3 flex flex-col justify-between bg-white" style="background-color: #ffffff !important;">
@@ -878,7 +896,7 @@ document.addEventListener('DOMContentLoaded', function () {
             card.className = 'group bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer overflow-hidden flex flex-row h-32';
             card.innerHTML = `
                 <div class="w-1/3 h-full bg-gray-200 relative flex-shrink-0">
-                    <img src="${est.cover_image_url || 'https://via.placeholder.com/300x200?text=No+Image'}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="${est.name}" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+                    <img src="${est.cover_image_url || PLACEHOLDER_IMG}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="${est.name}" onerror="this.src='${PLACEHOLDER_IMG}'">
                     <div class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold" style="color: ${cfg.color}">${cfg.emoji} ${cfg.label.toUpperCase()}</div>
                 </div>
                 <div class="w-2/3 p-3 flex flex-col justify-between bg-white" style="background-color: #ffffff !important;">
@@ -1037,131 +1055,99 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // ========================================
-    // 13. GEOLOCATION "NEAR ME"
+    // 13. GEOLOCATION "NEAR ME" & REAL-TIME ENGINE
     // ========================================
     const locateBtn = document.getElementById('locate-me');
-    let userLocationMarker = null;
+    let userLocationRadius = null;
 
+    // Link custom button to Mapbox Geolocate engine
     locateBtn.addEventListener('click', () => {
+        // Toggle tracking
+        geolocate.trigger();
         locateBtn.classList.add('animate-pulse');
+    });
 
-        if (navigator.geolocation) {
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    locateBtn.classList.remove('animate-pulse');
-                    const { latitude, longitude, accuracy } = position.coords;
+    // Handle Geolocation Events
+    geolocate.on('geolocate', (position) => {
+        locateBtn.classList.remove('animate-pulse');
+        locateBtn.classList.add('bg-green-100'); // Indicate tracking is active
 
-                    // Store for establishment searches
-                    estUserLat = latitude;
-                    estUserLng = longitude;
+        const { latitude, longitude } = position.coords;
 
-                    // Remove previous marker
-                    if (userLocationMarker) {
-                        userLocationMarker.remove();
-                    }
+        // Store for establishment searches
+        estUserLat = latitude;
+        estUserLng = longitude;
 
-                    // Remove previous radius circle
-                    if (userLocationRadius) {
-                        userLocationRadius.remove();
-                    }
-
-                    // Create user location marker
-                    const el = document.createElement('div');
-                    el.className = 'user-location-marker';
-                    el.style.cssText = `
-                        width: 16px;
-                        height: 16px;
-                        background: #3b82f6;
-                        border: 3px solid white;
-                        border-radius: 50%;
-                        box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
-                    `;
-
-                    userLocationMarker = new mapboxgl.Marker(el)
-                        .setLngLat([longitude, latitude])
-                        .addTo(map);
-
-                    // Draw radius circle showing search area
-                    const radiusMeters = 5000;
-                    userLocationRadius = mapboxgl.LngLatBounds.convert(
-                        [[longitude - 0.05, latitude - 0.05], [longitude + 0.05, latitude + 0.05]]
-                    );
-
-                    // Add a visible circle around user location
-                    const radiusSourceId = 'user-radius';
-                    if (!map.getSource(radiusSourceId)) {
-                        map.addSource(radiusSourceId, {
-                            type: 'geojson',
-                            data: {
-                                type: 'Feature',
-                                geometry: {
-                                    type: 'Polygon',
-                                    coordinates: [generateCircleCoordinates(longitude, latitude, radiusMeters)]
-                                }
-                            }
-                        });
-
-                        map.addLayer({
-                            id: 'user-radius-fill',
-                            type: 'fill',
-                            source: radiusSourceId,
-                            paint: {
-                                'fill-color': '#3b82f6',
-                                'fill-opacity': 0.08
-                            }
-                        });
-
-                        map.addLayer({
-                            id: 'user-radius-line',
-                            type: 'line',
-                            source: radiusSourceId,
-                            paint: {
-                                'line-color': '#3b82f6',
-                                'line-width': 2,
-                                'line-dasharray': [4, 4],
-                                'line-opacity': 0.5
-                            }
-                        });
-                    } else {
-                        map.getSource(radiusSourceId).setData({
-                            type: 'Feature',
-                            geometry: {
-                                type: 'Polygon',
-                                coordinates: [generateCircleCoordinates(longitude, latitude, radiusMeters)]
-                            }
-                        });
-                    }
-
-                    // Fly to location
-                    map.flyTo({
-                        center: [longitude, latitude],
-                        zoom: 15,
-                        duration: 1500
-                    });
-
-                    // If establishment filter is active, fetch nearby
-                    if (currentEstType) {
-                        estPage = 1;
-                        fetchEstablishments(estPage, true);
-                    }
-
-                    // Show popup
-                    new mapboxgl.Popup({ offset: 25 })
-                        .setLngLat([longitude, latitude])
-                        .setHTML('<strong>You are here!</strong>')
-                        .addTo(map);
-                },
-                (error) => {
-                    locateBtn.classList.remove('animate-pulse');
-                    alert('Unable to get your location. Please check your browser settings.');
-                    console.error('Geolocation error:', error);
-                },
-                { enableHighAccuracy: true, timeout: 10000 }
-            );
-        } else {
-            locateBtn.classList.remove('animate-pulse');
-            alert('Geolocation is not supported by your browser.');
+        // Update "Near Me" filters dynamically if currently viewing establishments
+        if (currentEstType) {
+            estPage = 1;
+            fetchEstablishments(estPage, true);
         }
+
+        // Custom radius visual (Optional: Enhanced for GoMangatarem "Search Area")
+        const radiusMeters = 5000;
+        const radiusSourceId = 'user-radius';
+
+        if (!map.getSource(radiusSourceId)) {
+            map.addSource(radiusSourceId, {
+                type: 'geojson',
+                data: {
+                    type: 'Feature',
+                    geometry: {
+                        type: 'Polygon',
+                        coordinates: [generateCircleCoordinates(longitude, latitude, radiusMeters)]
+                    }
+                }
+            });
+
+            map.addLayer({
+                id: 'user-radius-fill',
+                type: 'fill',
+                source: radiusSourceId,
+                paint: {
+                    'fill-color': '#3b82f6',
+                    'fill-opacity': 0.05
+                }
+            });
+
+            map.addLayer({
+                id: 'user-radius-line',
+                type: 'line',
+                source: radiusSourceId,
+                paint: {
+                    'line-color': '#3b82f6',
+                    'line-width': 1,
+                    'line-dasharray': [4, 4],
+                    'line-opacity': 0.3
+                }
+            });
+        } else {
+            map.getSource(radiusSourceId).setData({
+                type: 'Feature',
+                geometry: {
+                    type: 'Polygon',
+                    coordinates: [generateCircleCoordinates(longitude, latitude, radiusMeters)]
+                }
+            });
+        }
+    });
+
+    geolocate.on('error', (error) => {
+        locateBtn.classList.remove('animate-pulse');
+        alert('Location access denied or unavailable. Please enable GPS.');
+        console.error('Geolocation error:', error);
+    });
+
+    geolocate.on('trackuserlocationstart', () => {
+        console.log('Real-time tracking started');
+        locateBtn.title = "Tracking Mode: ON (Click to re-center)";
+        locateBtn.classList.add('tracking-active');
+    });
+
+    geolocate.on('trackuserlocationend', () => {
+        console.log('Real-time tracking paused/ended');
+        locateBtn.classList.remove('bg-green-100', 'tracking-active');
+        locateBtn.title = "Find my location";
     });
 
     // ========================================

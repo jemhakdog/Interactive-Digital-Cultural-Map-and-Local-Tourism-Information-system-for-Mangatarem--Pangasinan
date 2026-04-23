@@ -31,7 +31,7 @@ The phases of the RAD methodology utilized by the developers are broken down as 
 
 2. **User Design (Prototyping):** Following requirements gathering, the developers created interactive prototypes, wireframes, and mockups of the system's key modules — including the Interactive Digital Cultural Map, the Admin Dashboard, the Contributor Portal, and the Public User interface — using Figma. These prototypes were presented to stakeholders (LGU staff and select barangay representatives) for review and iterative feedback. Based on stakeholder input, the designs were refined and improved to ensure the user interface and user experience aligned with the expectations and technical capabilities of the target users.
 
-3. **Construction:** Upon approval of the finalized prototypes, the actual coding and system building commenced. Utilizing HTML, CSS, and JavaScript for the frontend interface, and PHP with MySQL for the backend application logic and database management, developers constructed the functional modules in iterative cycles. Each module was continuously tested against the refined requirements, and feedback from internal testing was used to fix bugs and improve features before moving to the next iteration. This phase included the implementation of the interactive map, content submission and moderation workflows, user authentication, and database architecture.
+3. **Construction:** Upon approval of the finalized prototypes, the actual coding and system building commenced. Utilizing HTML, CSS (Tailwind CSS), and JavaScript for the frontend interface, and Python with the Flask framework and SQLAlchemy for the backend application logic and database management, developers constructed the functional modules in iterative cycles. Each module was continuously tested against the refined requirements, and feedback from internal testing was used to fix bugs and improve features before moving to the next iteration. This phase included the implementation of the interactive map using Mapbox GL JS, comprehensive content submission and moderation workflows for cultural heritage profiling, user authentication via Flask-Login, and a robust database architecture hosted on Supabase.
 
 4. **Cutover (Testing, Deployment, and Maintenance):** The final phase involves comprehensive system testing — including functional testing, performance testing, security testing, usability testing, and user acceptance testing — to ensure the system meets all quality standards and stakeholder requirements. Once testing is complete and all critical issues are resolved, the system will be deployed to the LGU's production environment. This phase also includes user training sessions for Tourism Office staff and Barangay Representatives, the distribution of user manuals, and the establishment of a maintenance and support plan for ongoing technical assistance post-deployment.
 
@@ -71,29 +71,27 @@ graph TB
         A4[Student / Researcher<br/>Web Browser]
     end
 
-    subgraph WEB SERVER LAYER
-        B1[Apache / PHP<br/>Application Logic]
+    subgraph CLOUD PLATFORM LAYER (Vercel)
+        B1[Flask Application Logic<br/>(Serverless Functions)]
+        B2[Mapbox API<br/>(Spatial Services)]
     end
 
-    subgraph DATABASE LAYER
-        C1[(MySQL Database<br/>Users, Tourist Spots,<br/>Events, Submissions)]
+    subgraph DATA PERSISTENCE LAYER (Supabase / Upstash)
+        C1[(PostgreSQL Database<br/>Heritage Data, Users,<br/>Establishments, Logs)]
+        C2[(Redis Cache<br/>Session & Global Cache)]
+        C3[Supabase Storage<br/>(Media Assets)]
     end
 
-    A1 -->|HTTP Requests| B1
-    A2 -->|HTTP Requests| B1
-    A3 -->|HTTP Requests| B1
-    A4 -->|HTTP Requests| B1
-
-    B1 -->|Queries / Updates| C1
-    C1 -->|Data Response| B1
-    B1 -->|HTML/CSS/JSON Response| A1
-    B1 -->|HTML/CSS/JSON Response| A2
-    B1 -->|HTML/CSS/JSON Response| A3
-    B1 -->|HTML/CSS/JSON Response| A4
+    A1 & A2 & A3 & A4 -->|HTTPS Requests| B1
+    B1 <-->|SQL Queries| C1
+    B1 <-->|Cache Access| C2
+    B1 <-->|File Upload/Retrieval| C3
+    B1 -->|Map Tiles/Data| B2
+    B2 -->|Rendered Map| A1 & A2 & A3 & A4
 ```
 *(Figure 2: System Architecture Diagram. The diagram illustrates the client-server model with three logical layers.)*
 
-The architecture follows a standard three-tier client-server model. At the **Client Layer**, users — including Public Users, Barangay Representatives, System Administrators, and Students/Researchers — interact with the system through standard web browsers on their devices (desktops, laptops, tablets, or smartphones). The user interface, built with HTML, CSS, and JavaScript, renders the visual components and handles user interactions such as map navigation, form submissions, and content browsing. When a user performs an action, the client sends HTTP requests to the **Web Server Layer**, which is handled by the Apache web server running the PHP application logic. The application logic processes these requests — such as verifying administrator credentials, fetching map coordinates from the database, validating content submissions, or applying content moderation rules. The **Database Layer** consists of a MySQL database that stores all persistent data, including user accounts, tourist spot records, cultural event entries, barangay profiles, and content submission logs. The web server queries the database to retrieve or store information, and once the data is processed, the server sends the appropriate response (HTML pages, JSON data for the interactive map, or status messages) back to the client interface. This three-tier architecture ensures a secure separation between the user-facing interface and the sensitive central repository, allowing each layer to be maintained and scaled independently.
+The architecture follows a modern three-tier cloud-native model. At the **Client Layer**, users — including Public Users, Barangay Representatives, System Administrators, and Students/Researchers — interact with the system through standard web browsers. The user interface is built with HTML, CSS (utilizing the Tailwind CSS framework), and JavaScript, with **Mapbox GL JS** integrated for high-performance spatial visualization. When a user performs an action, the client sends HTTPS requests to the **Cloud Platform Layer**, hosted on **Vercel**. The backend application logic is implemented in **Python** using the **Flask** framework, running as optimized serverless functions. This layer processes requests such as user authentication, cultural heritage form validation, and content moderation workflows. The **Data Persistence Layer** leverages **Supabase** for its primary PostgreSQL database and object storage, and **Upstash** for Redis-based caching. This layer stores all persistent data, including user accounts, detailed heritage profiles (built, natural, and intangible), business establishment records, and system-wide audit logs. This cloud-native architecture ensures a highly available, secure, and performant separation between the interactive interface and the central data repositories.
 
 ### Existing Process Flowchart
 
@@ -185,74 +183,113 @@ An Entity-Relationship Diagram (ERD) visually represents the logical structure o
 ```mermaid
 erDiagram
     USER {
-        int user_id PK
+        int id PK
         string username
-        string password_hash
-        string full_name
         string email
+        string password
         string role
         int barangay_id FK
+        boolean is_approved
         datetime created_at
     }
 
-    BARANGAY {
-        int barangay_id PK
-        string barangay_name
-        string description
-        string contact_person
-        string contact_number
-        text historical_background
+    BARANGAY_INFO {
+        int id PK
+        string name
+        text mission
+        text vision
+        text history
+        text cultural_assets
+        json map_geo_json
     }
 
-    TOURIST_SPOT {
-        int spot_id PK
+    HERITAGE_PROFILE {
+        int id PK
+        string asset_type
+        string name_of_asset
+        int barangay_id FK
+        string usage_status
+        float latitude
+        float longitude
+        string status
+        int user_id FK
+    }
+
+    ATTRACTION {
+        int id PK
         string name
         text description
-        decimal latitude
-        decimal longitude
         string category
-        string media_url
+        float latitude
+        float longitude
         int barangay_id FK
+        int heritage_profile_id FK
         string status
-        datetime created_at
-        datetime updated_at
     }
 
-    CULTURAL_EVENT {
-        int event_id PK
-        string event_name
+    EVENT {
+        int id PK
+        string name
         text description
-        date event_date
+        datetime date
         string location
-        string media_url
         int barangay_id FK
+        string category
         string status
+    }
+
+    ESTABLISHMENT {
+        int id PK
+        string name
+        string type
+        float latitude
+        float longitude
+        int barangay_id FK
+        int owner_id FK
+        string status
+    }
+
+    ESTABLISHMENT_ROOM {
+        int id PK
+        int establishment_id FK
+        string name
+        float price_per_night
+    }
+
+    ESTABLISHMENT_MENU_ITEM {
+        int id PK
+        int establishment_id FK
+        string name
+        float price
+    }
+
+    DATABASE_AUDIT_LOG {
+        int id PK
+        int user_id FK
+        string action
+        string table_name
         datetime created_at
     }
 
-    SUBMISSION {
-        int submission_id PK
-        int user_id FK
-        string entity_type
-        int entity_id
-        string status
-        string admin_notes
-        datetime submitted_at
-        datetime reviewed_at
-        int reviewed_by FK
-    }
+    BARANGAY_INFO ||--o{ ATTRACTION : "located_in"
+    BARANGAY_INFO ||--o{ EVENT : "hosts"
+    BARANGAY_INFO ||--o{ HERITAGE_PROFILE : "contains"
+    BARANGAY_INFO ||--o{ ESTABLISHMENT : "contains"
+    BARANGAY_INFO ||--o{ USER : "jurisdiction_over"
+    
+    USER ||--o{ HERITAGE_PROFILE : "submits"
+    USER ||--o{ ATTRACTION : "manages"
+    USER ||--o{ EVENT : "manages"
+    USER ||--o{ ESTABLISHMENT : "owns"
+    USER ||--o{ DATABASE_AUDIT_LOG : "triggers"
 
-    BARANGAY ||--o{ TOURIST_SPOT : has
-    BARANGAY ||--o{ CULTURAL_EVENT : hosts
-    BARANGAY ||--o{ USER : contains
-    USER ||--o{ SUBMISSION : submits
-    USER ||--o{ SUBMISSION : reviews_as_admin
-    TOURIST_SPOT ||--o{ SUBMISSION : referenced_in
-    CULTURAL_EVENT ||--o{ SUBMISSION : referenced_in
+    HERITAGE_PROFILE ||--o| ATTRACTION : "links_to"
+    ESTABLISHMENT ||--o{ ESTABLISHMENT_ROOM : "offers"
+    ESTABLISHMENT ||--o{ ESTABLISHMENT_MENU_ITEM : "serves"
 ```
-*(Figure 5: Entity-Relationship Diagram. Entities are in uppercase singular form. Primary keys (PK) are underlined. Foreign keys (FK) are marked. Cardinality is shown with relationship lines.)*
+*(Figure 5: Entity-Relationship Diagram. The diagram reflects the integrated heritage and tourism ecosystem models.)*
 
-The ERD illustrates the core data tables and their relationships in the system. The **USER** entity stores account credentials, personal information, and role types (Admin, Contributor), dictating access levels across the system. A user is linked to a specific barangay via the `barangay_id` foreign key. The **BARANGAY** entity holds localized barangay information including the barangay name, description, contact details, and a historical background section. The **TOURIST_SPOT** entity stores details about individual attractions, including name, description, geographic coordinates (latitude and longitude), category (e.g., nature, historical, cultural), media URL for images, and a status field (Pending, Approved, Rejected). Each tourist spot is associated with a barangay through a one-to-many relationship. The **CULTURAL_EVENT** entity stores information about community events, including event name, description, date, location, media URL, and status, also linked to a barangay. The **SUBMISSION** entity serves as the moderation tracking table, linking a submitted item (identified by `entity_type` and `entity_id` — either a Tourist Spot or Cultural Event) to the user who submitted it (`user_id`), the admin who reviewed it (`reviewed_by`), and the review status with optional admin notes. This structure ensures full traceability of all content from submission to publication.
+The ERD illustrates the comprehensive data structure of the system, which has evolved beyond simple tourism pins to a full heritage and business management ecosystem. The **USER** entity manages role-based access for Admins, Barangay Contributors, and Business Owners, linked to **BARANGAY_INFO** which serves as the geographic and administrative anchor for all content. The **HERITAGE_PROFILE** acts as a central repository for technical documentation (built, natural, and intangible assets), which can be optionally linked to a public **ATTRACTION** entry. The **EVENT** entity manages the municipality's cultural calendar. To support local commerce, the **ESTABLISHMENT** model manages dining and accommodation data, including child entities like **ESTABLISHMENT_ROOM** and **ESTABLISHMENT_MENU_ITEM**. Finally, the **DATABASE_AUDIT_LOG** ensures security and accountability by tracking all administrative actions. This relational structure ensures that cultural data is preserved with high integrity while providing a flexible foundation for tourism promotion.
 
 ### Implementation Plan
 
@@ -277,16 +314,16 @@ gantt
     Stakeholder Review & Design Iteration  :w4, 1w
 
     section Construction
-    Database Design & Setup                :w5, 1w
-    Frontend Development (Map, UI)         :w5, 5w
-    Backend Development (PHP, API)         :w6, 5w
-    Content Moderation Workflow             :w8, 3w
+    Database Design & Setup (PostgreSQL)   :w5, 1w
+    Frontend Development (Tailwind, Mapbox) :w5, 5w
+    Backend Development (Python, Flask API) :w6, 5w
+    Heritage & Business Workflows          :w8, 3w
     Internal Integration Testing            :w10, 2w
 
     section Cutover
-    System Testing (Functional, Usability, Security) :w11, 2w
+    System Testing (Functional, Performance) :w11, 2w
     User Training & Manual Preparation     :w12, 1w
-    Deployment & Launch                    :w13, 1w
+    Deployment to Vercel & Supabase        :w13, 1w
 ```
 *(Figure 6: Gantt Chart — Project Timeline. Critical milestones include prototype approval at Week 4, feature-complete build at Week 10, and deployment at Week 13.)*
 
@@ -296,9 +333,9 @@ The deployment of the system will follow a phased approach to minimize risk and 
 
 1. **Pilot Testing (Internal):** The system will first be deployed to a staging environment accessible only to the LGU Tourism Office staff and a select group of 3–5 Barangay Representatives. During this phase, the content moderation workflow will be validated end-to-end — from submission by a barangay representative, through admin review, to publication on the map. Feedback from pilot users will be collected and used to make final adjustments to the user interface, form fields, and notification messages.
 
-2. **Production Deployment:** Following successful pilot testing and resolution of identified issues, the system will be migrated to a live production web hosting server. The production environment will be configured with SSL/TLS certification (HTTPS) to ensure secure data transmission, a production MySQL database seeded with initial content from the pilot phase, and optimized server settings for public access. DNS records will be updated to point the system's domain to the production server.
+2. **Production Deployment:** Following successful pilot testing and resolution of identified issues, the system will be migrated to a live production environment. The production setup utilizes **Vercel** for frontend and serverless backend execution, and **Supabase** for the managed PostgreSQL database and asset storage. The environment will be configured with automated SSL/TLS certification, production-grade security headers, and an optimized caching strategy using **Upstash Redis**. DNS records will be configured to point to the Vercel deployment.
 
-3. **User Training and Launch:** A formal training session will be conducted for all System Administrators and registered Barangay Representatives. Training will cover account login, content submission procedures, moderation workflows, and basic troubleshooting. Printed and digital user manuals will be distributed. Following training, the system will be officially launched to the public in coordination with the LGU, with an announcement through official municipal channels and social media platforms.
+3. **User Training and Launch:** A formal training session will be conducted for System Administrators, Barangay Representatives, and Business Owners. Training will cover account management, heritage profiling procedures, business listing updates, and moderation workflows. Printed and digital user manuals will be distributed. Following training, the system will be officially launched to the public via official municipal channels.
 
 4. **Post-Launch Support:** After the public launch, the development team will provide a defined support period (e.g., 30 days) during which bugs, user-reported issues, and minor adjustments will be addressed. A maintenance schedule will be established for regular database backups, software updates, and monitoring of system performance.
 
@@ -312,9 +349,9 @@ The following resources are essential for the successful implementation and oper
 - End-user devices: Standard smartphones, tablets, or personal computers with web browser access for Public Users, Barangay Representatives, and Students/Researchers.
 
 **Software Resources:**
-- Development environment: Visual Studio Code (or equivalent IDE), XAMPP (Apache + MySQL) for local development and testing, and Git for version control.
-- Design tools: Figma (free tier) for UI/UX prototyping and wireframing.
-- Production environment: A cloud or shared web hosting service with PHP 8.x support, MySQL 5.7+ or MariaDB, SSL/TLS certificate (HTTPS), and sufficient bandwidth to handle expected municipal traffic levels.
+- Development environment: Visual Studio Code, Python 3.12+, Git for version control, and the `uv` package manager for dependency management.
+- Design tools: Figma for UI/UX prototyping and wireframing.
+- Production environment: Vercel for web hosting and serverless compute, Supabase for PostgreSQL database and object storage, and Upstash for Redis caching.
 - End-user software: Updated standard web browsers (Google Chrome, Microsoft Edge, Mozilla Firefox, or Safari).
 
 **Human Resources:**
