@@ -1,6 +1,6 @@
-# Administrative Guide
+# Administrative and Stakeholder Guide
 
-This guide is for the LGU Tourism Office and system administrators responsible for maintaining the platform.
+This guide is for **Category 1 Users** (LGU Tourism Office and authorized representatives) responsible for maintaining the platform and overseeing the municipality's tourism data.
 
 ## Admin Dashboard
 

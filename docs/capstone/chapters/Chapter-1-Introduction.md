@@ -27,12 +27,9 @@ This Capstone Project was conducted in order to centralize and digitize the tour
 
 Once the proposed Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan is implemented to the Local Government Unit (LGU) of Mangatarem, it will hold particular significance for the following beneficiaries:
 
-1. **Local Government Unit (LGU) of Mangatarem** – We're giving the LGU a reliable tool for tourism promotion and data management. It helps them verify and post accurate facts from every barangay so the public always sees the right news.
-2. **System Administrators (Tourism and IT Staff)** – These workers get a simple dashboard to manage user accounts and content. It cuts down the hours they usually spend digging through old physical files or deciphering messy handwritten notes.
-3. **Barangay Representatives (Contributors)** – We're providing a dedicated portal where they can upload photos and local events directly. They don’t have to wait on slow phone calls or text messages anymore to get their barangay noticed.
-4. **Public Users (Tourists and Visitors)** – They gain an interactive map to help them find hidden gems and landmarks. They can filter what they want to see on their phones, making their travel experience much smoother and more fun.
-5. **Students and Researchers** – We're offering a way to find history and cultural profiles from home. They won’t need to travel to the tourism office just to gather basic information for their school work.
-6. **Residents of Mangatarem** – Families get a digital archive that protects their traditions and festivals. It helps them feel proud of their town because their heritage is now saved in a secure spot for their kids to see.
+1. **Administrative and Stakeholder Users (LGU Tourism Office and Barangay Representatives)** – This category is the primary beneficiary, as it provides a centralized platform for the LGU to promote tourism and manage cultural data. It allows the Tourism Office staff to verify facts from every barangay, ensuring the public receives accurate and authoritative information. Barangay representatives benefit from a dedicated portal to directly upload content, streamlining the flow of information from the grassroots level to the municipal dashboard.
+2. **General Public and Academic Users (Tourists, Visitors, and Researchers)** – This category benefits from an interactive and educational tool to explore Mangatarem’s heritage. Tourists gain a mobile-responsive map to discover landmarks and plan their visits, while students and researchers can access a digital archive of cultural profiles and historical records from any location, eliminating the need for physical travel to the tourism office for basic data gathering.
+3. **Residents of Mangatarem** – The community at large gains a digital safeguard for their traditions and festivals, fostering local pride and ensuring that their heritage is preserved in a secure, accessible format for future generations.
 
 We see that the current way of using text messages and paper forms is just too slow. It leads to mistakes and leaves people confused when they find old information online. By using digital maps and a single format, we're building a source of truth for the whole town. We assume this computing solution will effectively fix these communication gaps and give the LGU a modern, impactful way to manage its cultural treasures.
 
@@ -43,11 +40,9 @@ The main objective of the study is to design and develop an Interactive Digital 
 Furthermore, the developers aim to achieve the following specific objectives:
 
 1. To analyze the existing process of how the town currently collects and shares tourism and cultural facts to identify where things get messy and where we can make improvements.
-2. To identify the key features of the system for the following users:
-    * System Administrator (Tourism/IT Staff)
-    * Barangay Representative (Contributor)
-    * Public User (Tourists / Visitors)
-    * Students and Researchers
+2. To identify the key features of the system for the following user categories:
+    * Administrative and Stakeholder Users (LGU Staff and Contributors)
+    * General Public and Academic Users (Visitors and Researchers)
 3. To test and evaluate the system’s functionality, performance, security, usability, and acceptability to ensure it meets user requirements and professional standards.
 4. To prepare an implementation plan for the deployment of the system so the LGU can start using it effectively.
 
@@ -78,7 +73,7 @@ The final product is the Interactive Digital Cultural Map and Local Tourism Info
 ```mermaid
 graph TD
     subgraph INPUT
-        K["**Knowledge Requirements**<br/>- Skills in web system development (HTML, CSS, JavaScript, Python, PostgreSQL)<br/>- Knowledge of tourism information management processes<br/>- Understanding of expected user roles: Admin, Contributor, Tourist, Researcher"]
+        K["**Knowledge Requirements**<br/>- Skills in web system development (HTML, CSS, JavaScript, Python, PostgreSQL)<br/>- Knowledge of tourism information management processes<br/>- Understanding of expected user categories: Administrative/Stakeholder and Public/Academic"]
         H["**Hardware Requirements**<br/>- Processor: Intel Core i5 / AMD Ryzen 5<br/>- RAM: 8GB (16GB recommended)<br/>- Storage: 500GB SSD<br/>- Display: 1080p resolution<br/>- Peripherals: Keyboard, Mouse"]
         S["**Software Requirements**<br/>- OS: Windows 10/11, Linux, or macOS<br/>- Code Editor: Visual Studio Code<br/>- DBMS: PostgreSQL (Supabase)<br/>- Cloud Platform: Vercel<br/>- UI Design: Figma"]
     end
@@ -102,7 +97,7 @@ The conceptual framework illustrated above delineates the systematic flow of the
 
 ### Scope
 
-The project focuses on the development of a web-based Interactive Digital Cultural Map and Local Tourism Information System for the Local Government Unit (LGU) of Mangatarem, Pangasinan. The system will be built utilizing web technologies including HTML, CSS (Tailwind CSS), and JavaScript for the frontend interface, Python with the Flask framework for server-side application logic, and PostgreSQL as the primary relational database management system — managed via Supabase for cloud-native persistence and real-time features. Figma will be utilized for user interface and user experience design during the prototyping phase. The key functionalities provided by the software include a public-facing interactive map where tourists can browse, locate, and filter tourist attractions and cultural heritage sites by category such as historical landmarks, natural attractions, and local events. The system features a decentralized content contribution portal that allows authorized Barangay Representatives to submit, upload, and propose updates for local tourism content including photos, historical descriptions, and event announcements. A critical component of the system is the integrated cultural heritage documentation module, which allows for the structured profiling of tangible and intangible assets following national standards. Additionally, the system includes a centralized administrative dashboard for LGU Tourism Office staff to moderate all content submissions through an approve-or-reject workflow, manage user accounts and role-based access permissions, and publish municipal-wide tourism announcements. Students and researchers are provided with structured access to archived barangay cultural profiles and historical records to support academic data gathering and heritage research.
+The project focuses on the development of a web-based Interactive Digital Cultural Map and Local Tourism Information System for the Local Government Unit (LGU) of Mangatarem, Pangasinan. The system will be built utilizing web technologies including HTML, CSS (Tailwind CSS), and JavaScript for the frontend interface, Python with the Flask framework for server-side application logic, and PostgreSQL as the primary relational database management system — managed via Supabase for cloud-native persistence and real-time features. Figma will be utilized for user interface and user experience design during the prototyping phase. The key functionalities provided by the software include a public-facing interactive map where the **Public and Academic** category can browse, locate, and filter tourist attractions and cultural heritage sites by category such as historical landmarks, natural attractions, and local events. For **Administrative and Stakeholder** users, the system features a decentralized content contribution portal that allows authorized Barangay Representatives to submit, upload, and propose updates for local tourism content, alongside a centralized administrative dashboard for LGU Tourism Office staff to moderate all submissions through an approve-or-reject workflow, manage user accounts, and publish municipal-wide tourism announcements. Students and researchers within the public category are provided with structured access to archived cultural profiles and historical records to support academic data gathering and heritage research.
 
 ### Limitations
 
@@ -112,11 +107,9 @@ While the system aims to provide comprehensive tourism information management fo
 
 For clarity and consistency, the following key terms are defined operationally as they are used in this study:
 
-- **Admin / System Administrator** — Refers to the LGU Tourism Office staff or designated IT personnel who hold full access to the system's administrative dashboard. They are responsible for reviewing, approving, or rejecting content submissions, managing user accounts and role permissions, and overseeing the overall technical maintenance and operational integrity of the platform.
+- **Administrative and Stakeholder Users** — This consolidated category refers to the LGU Tourism Office staff (System Administrators) and authorized Barangay Representatives (Contributors) who hold internal access to the system. This category is responsible for submitting, reviewing, and approving cultural heritage data, managing the platform's operational integrity, and overseeing the municipality's digital tourism presence.
 
-- **Barangay Representative** — An authorized user role assigned to designated individuals from each barangay who are responsible for submitting, updating, and uploading local tourism and cultural information (such as photos, historical descriptions, and event details) to the system on behalf of their specific jurisdiction.
-
-- **Contributor** — A general term for any user role with permissions to propose new or updated content to the platform. In this study, contributors are specifically the Barangay Representatives who submit materials for administrative review before publication.
+- **General Public and Academic Users** — This category refers to tourists, visitors, students, and researchers who access the system to navigate the interactive map, search for points of interest, and view published cultural and tourism information. These users consume the data for leisure, travel planning, or academic data gathering without requiring administrative privileges.
 
 - **Interactive Digital Cultural Map** — The core feature of the system that provides a visual, geographical, and navigable representation of tourist spots, historical landmarks, natural attractions, and cultural heritage sites within the municipality of Mangatarem, Pangasinan. Users can interact with the map by clicking pins, filtering categories, and viewing detailed multimedia information for each location.
 

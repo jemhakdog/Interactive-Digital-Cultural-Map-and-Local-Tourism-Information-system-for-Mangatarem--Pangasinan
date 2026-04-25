@@ -27,9 +27,20 @@ document.addEventListener('DOMContentLoaded', () => {
                     const iconColor = a.type === 'event' ? '#F59E0B' : '#059669'; // Orange for events, Emerald for attractions
                     const iconEmoji = a.type === 'event' ? '📅' : '🏰';
                     
+                    // Escape HTML to prevent XSS
+                    const escapeHTML = (str) => {
+                        if (!str) return '';
+                        return str.replace(/[&<>"']/g, (m) => ({
+                            '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+                        }[m]));
+                    };
+
+                    const safeName = escapeHTML(a.name);
+                    const safeCategory = escapeHTML(a.category);
+                    
                     const marker = L.marker([a.latitude, a.longitude]).addTo(map);
                     
-                    const dateInfo = a.type === 'event' ? `<p class="text-[10px] text-gray-500 font-bold uppercase mt-1">Happening: ${a.date}</p>` : '';
+                    const dateInfo = a.type === 'event' ? `<p class="text-[10px] text-gray-500 font-bold uppercase mt-1">Happening: ${escapeHTML(a.date)}</p>` : '';
 
                     marker.bindPopup(`
                         <div class="p-2 min-w-[150px]">
@@ -38,9 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
                             </div>
                             <div class="flex items-center gap-1.5 mb-1">
                                 <span class="text-sm">${iconEmoji}</span>
-                                <h3 class="font-bold text-gray-800 leading-tight">${a.name}</h3>
+                                <h3 class="font-bold text-gray-800 leading-tight">${safeName}</h3>
                             </div>
-                            <p class="text-[10px] text-green-600 font-semibold mb-1 uppercase tracking-wider">${a.category}</p>
+                            <p class="text-[10px] text-green-600 font-semibold mb-1 uppercase tracking-wider">${safeCategory}</p>
                             ${dateInfo}
                             <div class="mt-2 pt-2 border-t border-gray-100">
                                 <a href="${a.url}" class="text-xs text-blue-600 hover:underline font-bold">Details →</a>

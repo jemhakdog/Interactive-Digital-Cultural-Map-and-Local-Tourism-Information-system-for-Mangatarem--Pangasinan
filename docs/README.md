@@ -12,7 +12,7 @@ This platform serves as a central digital resource for residents, students, and 
 - **Cultural Heritage Registry**: Full implementation of standardized Heritage Forms 01-07 for deep historical archival.
 - **Tourism Information Portal**: Detailed profiles of local attractions, traditions, and eateries.
 - **Multimedia Gallery**: High-quality photo and video collections of local traditions.
-- **Admin & Contributor Dashboard**: Secure management for LGU and barangay representatives to review and update content.
+- **Administrative & Stakeholder Portal**: Secure unified management for LGU (Tourism Office) and Barangay Representatives to review, verify, and update municipal content.
 - **Analytics Dashboard**: Insights into popular locations and user engagement levels.
 
 ## 🛠️ Technical Stack
@@ -119,11 +119,9 @@ The application will be available at `http://127.0.0.1:5000`.
 - `/static/`: CSS, JS, and uploaded assets.
 - `/utils/`: Core utility modules (Registry, DB Manager, Email Sender).
 
-## 👤 Stakeholders
-- **LGU Mangatarem**: Primary beneficiary for tourism promotion and cultural archival.
-- **Barangay Representatives**: Local content contributors.
-- **Students & Researchers**: For educational and historical reference.
-- **Visitors**: Digital guide for tourism.
+## 👥 User Categories
+- **Category 1: Administrative and Stakeholders**: LGU Tourism Office (Primary Stakeholder/Admin) and Barangay Representatives (Contributors) responsible for data governance.
+- **Category 2: General Public and Academic Users**: Tourists, Visitors, Students, and Researchers who utilize the platform for exploration and reference.
 
 ---
 *Built for Mangatarem, Pangasinan.*

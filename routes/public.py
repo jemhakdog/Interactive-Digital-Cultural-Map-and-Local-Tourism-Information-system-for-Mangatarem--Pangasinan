@@ -8,8 +8,10 @@ from utils.logger_helper import (
     log_query,
     log_success,
     log_render,
+    log_error,
 )
 from utils.security import validate_email_format, validate_string_input, sanitize_html_input
+from utils.validators import validate_form_data, validate_query_params, validate_json_input
 import logging
 import threading
 from sqlalchemy import func
@@ -334,34 +336,21 @@ def gallery():
 
 @public_bp.route("/search")
 @limiter.limit("20 per minute")
+@validate_query_params({
+    'q': {'type': 'string', 'max_length': 200, 'required': False},
+    'category': {'type': 'string', 'max_length': 50, 'required': False},
+    'barangay': {'type': 'string', 'max_length': 50, 'required': False}
+})
 def search():
     """
-    Search for attractions, events, and barangay info with advanced filtering.
+    Unified search route for attractions, events, and barangays.
+    Uses centralized validation via decorators.
     """
-    log_entry(
-        "public",
-        "search",
-        q=request.args.get('q', ''),
-        category=request.args.get('category', ''),
-        barangay=request.args.get('barangay', '')
-    )
-    logger.info("Search page accessed")
-
-    # Input validation and length limits
-    raw_query = request.args.get("q", "").strip()
-    is_valid, error_msg = validate_string_input(raw_query, max_length=200, block_sql_injection=True)
-    if not is_valid:
-        query = ""  # Reset to empty if invalid
-    else:
-        query = raw_query[:200]
+    log_entry("public", "search", args=request.args)
     
-    raw_category = request.args.get("category", "")
-    is_valid, _ = validate_string_input(raw_category, max_length=50, block_sql_injection=True)
-    category_filter = raw_category[:50] if is_valid else ""
-    
-    raw_barangay = request.args.get("barangay", "")
-    is_valid, _ = validate_string_input(raw_barangay, max_length=100, block_sql_injection=True)
-    barangay_filter = raw_barangay[:100] if is_valid else ""
+    query = request.args.get("q", "").strip()
+    category_filter = request.args.get("category", "")
+    barangay_filter = request.args.get("barangay", "")
 
     # Start with base queries
     attractions_query = Attraction.query.filter_by(status="approved")
@@ -987,33 +976,15 @@ def verify_site():
 
 
 @public_bp.route("/subscribe", methods=["POST"])
+@validate_form_data({
+    'email': {'type': 'email', 'required': True}
+})
 def subscribe():
     """
     Handle newsletter subscription requests.
     """
-    email = request.form.get("email")
-    if not email:
-        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return jsonify({"status": "error", "message": "Email is required"}), 400
-        flash("Email is required", "error")
-        return redirect(url_for("public.index"))
+    email = request.validated_data['email']
     
-    # Validate email format and check for SQL injection
-    is_valid, error_msg = validate_string_input(email.strip(), max_length=255, block_sql_injection=True)
-    if not is_valid:
-        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return jsonify({"status": "error", "message": "Invalid email address"}), 400
-        flash("Invalid email address", "error")
-        return redirect(url_for("public.index"))
-    
-    if not validate_email_format(email.strip()):
-        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return jsonify({"status": "error", "message": "Invalid email format"}), 400
-        flash("Invalid email format", "error")
-        return redirect(url_for("public.index"))
-    
-    email = email.strip()
-
     # Check if already subscribed
     existing = NewsletterSubscriber.query.filter_by(email=email).first()
     if existing:
@@ -1152,6 +1123,10 @@ def establishment_detail(id):
 
 
 @public_bp.route("/establishment/<int:id>/review", methods=["POST"])
+@validate_form_data({
+    'rating': {'type': 'int', 'min': 1, 'max': 5, 'required': True},
+    'comment': {'type': 'string', 'max_length': 2000, 'required': True}
+})
 def submit_establishment_review(id):
     """Submit a review for an establishment."""
     if not current_user.is_authenticated:
@@ -1159,23 +1134,8 @@ def submit_establishment_review(id):
         return redirect(url_for("auth.login"))
 
     establishment = Establishment.query.get_or_404(id)
-    
-    # Validate rating with proper error handling
-    try:
-        rating = int(request.form.get("rating", 5))
-        if rating < 1 or rating > 5:
-            flash("Rating must be between 1 and 5.", "error")
-            return redirect(url_for("public.establishment_detail", id=id))
-    except (ValueError, TypeError):
-        flash("Invalid rating value.", "error")
-        return redirect(url_for("public.establishment_detail", id=id))
-    
-    # Validate and sanitize comment
+    rating = int(request.form.get("rating"))
     comment = request.form.get("comment", "")
-    is_valid, error_msg = validate_string_input(comment, max_length=2000, block_sql_injection=True)
-    if not is_valid:
-        flash(f"Invalid comment: {error_msg}", "error")
-        return redirect(url_for("public.establishment_detail", id=id))
     
     # Sanitize HTML but allow basic formatting
     sanitized_comment = sanitize_html_input(comment)

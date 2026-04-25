@@ -1,6 +1,6 @@
 # Barangay Contributor Guide
 
-Thank you for helping document and preserve the cultural heritage of Mangatarem! As a Barangay Contributor, you play a vital role in keeping our system accurate and vibrant.
+Thank you for helping document and preserve the cultural heritage of Mangatarem! As a **Category 1 User** (Administrative and Stakeholder portal), you play a vital role in keeping our system accurate and vibrant at the grassroots level.
 
 ## Your Role and Responsibilities
 

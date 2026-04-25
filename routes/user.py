@@ -1,7 +1,9 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
+from utils.validators import validate_form_data
 from models import (
     db,
+    User,
     Attraction,
     Event,
     UserFavoriteAttraction,
@@ -9,7 +11,6 @@ from models import (
     AttractionReview,
     GalleryItem,
 )
-from utils.security import validate_username, validate_email_format, validate_and_escape
 from functools import wraps
 
 user_bp = Blueprint("user", __name__, url_prefix="/user")
@@ -62,19 +63,14 @@ def dashboard():
 @user_bp.route("/profile", methods=["GET", "POST"])
 @login_required
 @user_required
+@validate_form_data({
+    'username': {'type': 'string', 'min_length': 3, 'max_length': 30, 'required': True},
+    'email': {'type': 'email', 'required': True}
+})
 def profile():
     if request.method == "POST":
-        username = request.form.get("username", "").strip()
-        email = request.form.get("email", "").strip().lower()
-
-        # Validate input format
-        if not validate_username(username):
-            flash("Username must be 3-30 characters and contain only letters, numbers, and underscores.", "error")
-            return redirect(url_for("user.profile"))
-
-        if not validate_email_format(email):
-            flash("Please enter a valid email address.", "error")
-            return redirect(url_for("user.profile"))
+        username = request.validated_data["username"]
+        email = request.validated_data["email"].lower()
 
         # Check if username is taken by another user
         existing_user = User.query.filter(User.username == username, User.id != current_user.id).first()
@@ -88,9 +84,9 @@ def profile():
             flash("Email already registered.", "error")
             return redirect(url_for("user.profile"))
 
-        # Sanitize and save
-        current_user.username = validate_and_escape(username)
-        current_user.email = validate_and_escape(email)
+        # Save
+        current_user.username = username
+        current_user.email = email
         db.session.commit()
         flash("Profile updated successfully!", "success")
         return redirect(url_for("user.profile"))

@@ -12,6 +12,13 @@
 document.addEventListener('DOMContentLoaded', function () {
     const PLACEHOLDER_IMG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22200%22%20xmlns%3D%22http%3D%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22300%22%20height%3D%22200%22%20fill%3D%22%23eee%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20font-family%3D%22sans-serif%22%20font-size%3D%2216%22%20fill%3D%22%23aaa%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';
 
+    const escapeHTML = (str) => {
+        if (!str) return '';
+        const p = document.createElement('p');
+        p.textContent = str;
+        return p.innerHTML;
+    };
+
     // ========================================
     // 1. MAP INITIALIZATION
     // ========================================
@@ -250,8 +257,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 .setLngLat(e.lngLat)
                 .setHTML(`
                     <div class="text-sm">
-                        <strong class="text-green-800">${feature.properties.name}</strong>
-                        <div class="text-xs text-gray-600">${feature.properties.category}</div>
+                        <strong class="text-green-800">${escapeHTML(feature.properties.name)}</strong>
+                        <div class="text-xs text-gray-600">${escapeHTML(feature.properties.category)}</div>
                     </div>
                 `)
                 .addTo(map);
@@ -620,17 +627,21 @@ document.addEventListener('DOMContentLoaded', function () {
             const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
             const reviewCount = attraction.review_count || Math.floor(Math.random() * 50);
 
+            const safeName = escapeHTML(attraction.name);
+            const safeDescription = escapeHTML(attraction.description);
+            const safeImage = attraction.image ? attraction.image.replace(/"/g, '&quot;') : PLACEHOLDER_IMG;
+
             const card = document.createElement('div');
             card.className = 'group bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-all cursor-pointer overflow-hidden flex flex-row h-32';
             card.innerHTML = `
                 <div class="w-1/3 h-full bg-gray-200 relative flex-shrink-0">
-                    <img src="${attraction.image}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="${attraction.name}" onerror="this.src='${PLACEHOLDER_IMG}'">
+                    <img src="${safeImage}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="${safeName}" onerror="this.src='${PLACEHOLDER_IMG}'">
                     <div class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold" style="color: ${categoryConfig.color}">${categoryLabel}</div>
                 </div>
                 <div class="w-2/3 p-3 flex flex-col justify-between bg-white" style="background-color: #ffffff !important;">
                     <div>
-                        <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-1" style="color: #111827 !important; -webkit-text-fill-color: #111827 !important;">${attraction.name}</h3>
-                        <p class="text-xs line-clamp-2 mt-1" style="color: #374151 !important; -webkit-text-fill-color: #374151 !important;">${attraction.description}</p>
+                        <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-1" style="color: #111827 !important; -webkit-text-fill-color: #111827 !important;">${safeName}</h3>
+                        <p class="text-xs line-clamp-2 mt-1" style="color: #374151 !important; -webkit-text-fill-color: #374151 !important;">${safeDescription}</p>
                     </div>
                     <div class="flex justify-between items-end mt-2">
                         <div class="text-xs font-bold" style="color: #f59e0b !important;">${stars} <span style="color: #9ca3af !important;">(${reviewCount})</span></div>

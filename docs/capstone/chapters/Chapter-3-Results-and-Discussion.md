@@ -6,38 +6,26 @@ This chapter provides a comprehensive exposition of the outcomes derived from th
 
 The operational workflow of the Interactive Digital Cultural Map is characterized by a centralized, role-based pipeline designed to ensure data integrity and administrative oversight. The process initiates at the grassroots level, where designated Barangay Representatives capture and input cultural heritage data—encompassing built, natural, and intangible assets—into the Contributor Portal. This submission triggers a conditional logic sequence within the backend architecture:
 
-1.  **Data Ingestion:** The system captures the submitted metadata, geographic coordinates via Mapbox integration, and high-resolution media stored within the Supabase object storage layer.
-2.  **Moderation Queue:** Submissions are held in a "Pending" state and routed to the System Administrator’s moderation dashboard.
-3.  **Administrative Review:** The administrator performs a qualitative and quantitative audit of the submission. If the data meets the LGU’s verification standards, the entry is approved; otherwise, it is rejected with specific revision notes returned to the contributor.
-4.  **Public Publication:** Upon approval, the system updates the PostgreSQL database, and the new cultural asset is dynamically rendered as an interactive pin on the public-facing Mapbox GL JS interface, making it accessible to global users in real-time.
+1.  **Data Ingestion:** The system captures metadata, geographic coordinates, and media submitted by users within the **Administrative and Stakeholder** category.
+2.  **Moderation Queue:** Submissions are held in a "Pending" state and routed to the central moderation dashboard.
+3.  **Administrative Review:** The **Administrative and Stakeholder** user (Tourism Office staff) performs a qualitative audit. Entries are approved or rejected based on verification standards.
+4.  **Public Publication:** Approved assets are dynamically rendered on the Mapbox GL JS interface, becoming accessible to **General Public and Academic Users** in real-time.
 
 ## System Features and User Interfaces
 
-The architecture of the system is distilled into four primary functional modules, each tailored to the specific requirements of its user ecosystem. The following sections describe these modules and their respective user interfaces:
+The architecture of the system is distilled into two primary functional categories, each tailored to the specific requirements of its user ecosystem:
 
-### 1. Interactive Heritage Map (Public Interface)
-The cornerstone of the platform, the Interactive Heritage Map, leverages Mapbox GL JS to provide a high-performance, geographically accurate visualization of Mangatarem’s tourism assets. 
-- **Key Features:** Dynamic layering, real-time spatial filtering by heritage category, and interactive info-modals for each attraction.
-- **UI Description:** The interface features a full-screen map with custom-styled pins. A floating search bar and category filters allow for seamless discovery, while a "Spotlight" section highlights featured landmarks.
-*(See: Figure 3.1 - Interactive Heritage Map Homepage)*
+### 1. General Public and Academic Portal
+This category encompasses the **Interactive Heritage Map** and the **Digital Cultural Atlas**, designed for high-performance discovery and academic research.
+- **Key Features:** Real-time spatial filtering, heritage categories (built, natural, intangible), barangay-specific profiles, and interactive galleries.
+- **UI Description:** Utilizes a full-screen Mapbox interface and a card-based "glassmorphic" atlas for readable, engaging exploration of Mangatarem’s heritage.
+*(See: Figure 3.1 & 3.2)*
 
-### 2. Digital Cultural Atlas (Information Portal)
-This module serves as a comprehensive digital repository for the 82 barangays of Mangatarem, providing in-depth profiles for each locality and its heritage sites.
-- **Key Features:** Barangay-specific heritage lists, high-definition image galleries, and historical narratives.
-- **UI Description:** Utilizes a clean, card-based layout with premium typography and glassmorphic elements to present cultural data in an engaging, readable format.
-*(See: Figure 3.2 - Heritage Site Profile View)*
-
-### 3. Contributor Portal (Barangay Representatives)
-A streamlined data-entry environment optimized for field-level documentation, ensuring that cultural heritage data is captured with technical precision.
-- **Key Features:** Secure multi-step submission forms, coordinate picker for precise geolocation, and media upload management.
-- **UI Description:** A focused, minimalist dashboard that guides the user through the data submission process with real-time validation and status tracking.
-*(See: Figure 3.3 - Contributor Submission Interface)*
-
-### 4. Administrative Moderation Dashboard (LGU Admins)
-A sophisticated administrative interface providing role-based access control and a centralized moderation hub for validating municipal data.
-- **Key Features:** Real-time analytics on heritage engagement, user role management, and a conditional approval workflow for pending submissions.
-- **UI Description:** A high-level overview dashboard featuring metric cards and a data table for managing heritage records, events, and user accounts.
-*(See: Figure 3.4 - Admin Moderation Dashboard)*
+### 2. Administrative and Stakeholder Portal
+This category includes the **Content Contribution** and **Moderation Dashboard**, providing a unified environment for LGU staff and barangay leaders.
+- **Key Features:** Secure data entry forms with coordinate pickers, role-based moderation workflows, and real-time engagement analytics.
+- **UI Description:** A focused, minimalist administrative dashboard that guides users through the submission and verification process with clear status tracking.
+*(See: Figure 3.3 & 3.4)*
 
 ## System Testing and Evaluation
 
@@ -48,7 +36,7 @@ To ensure the technical robustness and organizational relevance of the system, a
 **Significance:** Functional testing serves as the primary mechanism for verifying that the system’s multifaceted features operate in strict accordance with the defined technical requirements. This process ensures that the logic governing user authentication, spatial data rendering, and content moderation is flawless.
 
 **Test Case Definitions:**
-- **Authentication Integrity:** Validating the secure login/logout workflows (Admin/Contributor).
+- **Authentication Integrity:** Validating secure login/logout workflows for the **Administrative and Stakeholder** category.
 - **Data Submission Logic:** Ensuring accurate capture and storage of heritage metadata.
 - **Moderation Workflow:** Verifying the state transitions from "Pending" to "Approved".
 - **Map Interaction:** Testing pin responsiveness and spatial filtering.
@@ -110,7 +98,7 @@ Success Rate = (3 / 3) × 100% = **100%**
 | :--- | :--- | :--- | :--- | :--- |
 | Login with wrong password | Show "Invalid credentials" message | Works as expected | Pass | N/A |
 | SQL Injection attempt in login | System rejects malicious input | Malicious input sanitized | Pass | SQLAlchemy ORM used |
-| View admin dashboard as a normal user | Access denied / Redirect | Access restricted | Pass | Role-based access active |
+| View admin portal as a public user | Access denied / Redirect | Access restricted | Pass | Role-based access active |
 
 **Success Rate Calculation:**
 Success Rate = (Number of Passed Tests / Total Tests) × 100%

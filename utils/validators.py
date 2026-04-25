@@ -6,7 +6,7 @@ they reach route handlers, preventing SQL injection and other attacks.
 """
 
 from functools import wraps
-from flask import request, jsonify, abort
+from flask import request, jsonify
 from utils.security import (
     validate_string_input,
     validate_integer,
@@ -15,8 +15,6 @@ from utils.security import (
     detect_sql_injection_attempt,
     validate_email_format,
     validate_phone,
-    validate_username,
-    validate_password_strength,
     validate_coordinates
 )
 import logging
@@ -47,6 +45,10 @@ def validate_form_data(validations):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
+            # Skip validation for GET requests
+            if request.method == 'GET':
+                return f(*args, **kwargs)
+
             validated_data = {}
             errors = []
 
@@ -166,6 +168,10 @@ def validate_json_input(validations):
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
+            # Skip validation for GET requests
+            if request.method == 'GET':
+                return f(*args, **kwargs)
+
             if not request.is_json:
                 return jsonify({'success': False, 'errors': ['Request must be JSON']}), 400
 
@@ -246,61 +252,84 @@ def validate_json_input(validations):
     return decorator
 
 
-def validate_query_params(allowed_params):
+def validate_query_params(validations):
     """
-    Decorator to validate query parameters (whitelist approach).
+    Decorator to validate query parameters (whitelist approach with optional rules).
 
     Usage:
-        @validate_query_params(['page', 'per_page', 'sort', 'category'])
+        @validate_query_params({
+            'page': {'type': 'int', 'min': 1},
+            'q': {'type': 'string', 'max_length': 200},
+            'category': {'type': 'string', 'max_length': 50}
+        })
         def list_items():
             page = request.validated_params.get('page', 1)
 
     Args:
-        allowed_params: List of allowed query parameter names
-
-    Returns:
-        Decorator function
+        validations: List of allowed parameter names OR Dict mapping names to rules
     """
     def decorator(f):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             validated_params = {}
             errors = []
+            
+            is_dict = isinstance(validations, dict)
+            allowed_list = validations.keys() if is_dict else validations
 
             # Check for disallowed parameters
             for param in request.args:
-                if param not in allowed_params:
+                if param not in allowed_list:
                     errors.append(f"Parameter '{param}' is not allowed")
                     continue
 
-                # Validate specific parameters
-                if param == 'page' or param == 'per_page':
-                    is_valid, int_value, error_msg = validate_integer(
-                        request.args.get(param),
-                        min_value=1,
-                        max_value=1000
-                    )
-                    if is_valid:
-                        validated_params[param] = int_value
-                    else:
-                        errors.append(f"{param}: {error_msg}")
+                raw_value = request.args.get(param)
+                if not raw_value:
+                    continue
 
-                elif param == 'sort':
-                    # Whitelist allowed sort fields
-                    value = request.args.get(param)
-                    allowed_sort = ['name', 'created_at', 'rating', 'price']
-                    if value.lower() in allowed_sort:
-                        validated_params[param] = value.lower()
-                    else:
-                        errors.append(f"{param}: Invalid sort field")
+                if is_dict:
+                    rules = validations[param]
+                    field_type = rules.get('type', 'string')
 
+                    if field_type == 'int':
+                        is_valid, int_value, error_msg = validate_integer(
+                            raw_value,
+                            min_value=rules.get('min'),
+                            max_value=rules.get('max')
+                        )
+                        if is_valid:
+                            validated_params[param] = int_value
+                        else:
+                            errors.append(f"{param}: {error_msg}")
+                    
+                    elif field_type == 'string':
+                        is_valid, error_msg = validate_string_input(
+                            raw_value,
+                            max_length=rules.get('max_length', 500),
+                            block_sql_injection=rules.get('block_sql_injection', True)
+                        )
+                        if is_valid:
+                            validated_params[param] = raw_value
+                        else:
+                            errors.append(f"{param}: {error_msg}")
+                    else:
+                        # Fallback for other types
+                        if detect_sql_injection_attempt(raw_value):
+                            errors.append(f"{param}: Invalid characters detected")
+                        else:
+                            validated_params[param] = raw_value
                 else:
-                    # For other params, just sanitize
-                    value = request.args.get(param)
-                    if detect_sql_injection_attempt(value):
+                    # Legacy list-based behavior
+                    if param in ['page', 'per_page']:
+                        is_valid, int_value, error_msg = validate_integer(raw_value, min_value=1)
+                        if is_valid:
+                            validated_params[param] = int_value
+                        else:
+                            errors.append(f"{param}: {error_msg}")
+                    elif detect_sql_injection_attempt(raw_value):
                         errors.append(f"{param}: Invalid characters detected")
                     else:
-                        validated_params[param] = value
+                        validated_params[param] = raw_value
 
             if errors:
                 logger.warning(f"Query param validation failed: {', '.join(errors)}")

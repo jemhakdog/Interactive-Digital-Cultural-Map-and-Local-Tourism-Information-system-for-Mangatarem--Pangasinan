@@ -73,6 +73,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Map Initialization
     function initMap() {
+        const escapeHTML = (str) => {
+            if (!str) return '';
+            const p = document.createElement('p');
+            p.textContent = str;
+            return p.innerHTML;
+        };
+
         map = L.map('barangayMap').setView([15.7888, 120.2990], 11);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -86,16 +93,19 @@ document.addEventListener('DOMContentLoaded', function () {
             barangaysData.forEach(b => {
                 if (b.lat && b.lng) {
                     const marker = L.marker([b.lat, b.lng]).addTo(map);
+                    const safeName = escapeHTML(b.name);
+                    const safeImageUrl = b.image_url ? b.image_url.replace(/"/g, '&quot;') : null;
+                    const encodedName = encodeURIComponent(b.name);
 
                     const popupContent = `
                         <div class="text-center">
                             <div class="h-32 overflow-hidden mb-0">
-                                ${b.image_url ? `<img src="${b.image_url}" class="w-full h-full object-cover">` : '<div class="w-full h-full bg-heritage-green/5 flex items-center justify-center">RECORD</div>'}
+                                ${safeImageUrl ? `<img src="${safeImageUrl}" class="w-full h-full object-cover" alt="${safeName}">` : '<div class="w-full h-full bg-heritage-green/5 flex items-center justify-center">RECORD</div>'}
                             </div>
                             <div class="p-4 bg-heritage-cream">
-                                <h3 class="font-bold text-lg text-heritage-green mb-1">${b.name}</h3>
-                                <div class="text-[10px] uppercase tracking-widest text-heritage-gold mb-3">${b.attraction_count} Attractions</div>
-                                <a href="/barangay/${b.name}" class="btn-heritage !py-2 !px-4 !text-[10px] !gap-2">
+                                <h3 class="font-bold text-lg text-heritage-green mb-1">${safeName}</h3>
+                                <div class="text-[10px] uppercase tracking-widest text-heritage-gold mb-3">${parseInt(b.attraction_count) || 0} Attractions</div>
+                                <a href="/barangay/${encodedName}" class="btn-heritage !py-2 !px-4 !text-[10px] !gap-2">
                                     Open Profile
                                 </a>
                             </div>

@@ -9,13 +9,13 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import login_required, current_user
 from models import db, Establishment, EstablishmentRoom, EstablishmentMenuItem, EstablishmentReview, BarangayInfo
 from functools import wraps
+from utils.validators import validate_form_data
 from utils.security import (
     validate_string_input,
     validate_email_format,
     validate_float,
     validate_integer,
     sanitize_html_input,
-    detect_sql_injection_attempt,
     validate_coordinates,
     validate_phone,
     sanitize_url,
@@ -74,6 +74,17 @@ def dashboard():
 @business_bp.route("/establishment/create", methods=["GET", "POST"])
 @login_required
 @business_owner_required
+@validate_form_data({
+    "name": {"type": "string", "required": True, "min_length": 1, "max_length": 200},
+    "description": {"type": "string", "max_length": 2000},
+    "address": {"type": "string", "required": True, "min_length": 1, "max_length": 300},
+    "latitude": {"type": "float", "required": True},
+    "longitude": {"type": "float", "required": True},
+    "contact_number": {"type": "string", "max_length": 20},
+    "email": {"type": "string", "max_length": 100},
+    "website": {"type": "string", "max_length": 200},
+    "price_range": {"type": "string", "max_length": 10}
+})
 def create_establishment():
     """Create a new establishment listing."""
     existing = _get_owner_establishment()
@@ -82,68 +93,17 @@ def create_establishment():
         return redirect(url_for("business.edit_establishment"))
 
     if request.method == "POST":
-        # Validate barangay
+        # Data is already validated by decorator
+        name = request.form.get("name")
+        description = sanitize_html_input(request.form.get("description", ""))
+        address = request.form.get("address")
+        latitude = float(request.form.get("latitude"))
+        longitude = float(request.form.get("longitude"))
+        contact_number = request.form.get("contact_number")
+        email = request.form.get("email")
+        website = sanitize_url(request.form.get("website", ""))
+        price_range = request.form.get("price_range")
         barangay_name = request.form.get("barangay")
-
-        # Validate name
-        name = request.form.get("name", "").strip()
-        valid, err = validate_string_input(name, min_length=1, max_length=200, block_sql_injection=True)
-        if not valid:
-            flash(f"Invalid name: {err}", "error")
-            return redirect(url_for("business.create_establishment"))
-
-        # Validate description (sanitize HTML)
-        description = request.form.get("description", "").strip()
-        description = sanitize_html_input(description)
-        valid, err = validate_string_input(description, max_length=2000, block_sql_injection=False)
-        if not valid:
-            flash(f"Invalid description: {err}", "error")
-            return redirect(url_for("business.create_establishment"))
-
-        # Validate address
-        address = request.form.get("address", "").strip()
-        valid, err = validate_string_input(address, min_length=1, max_length=300, block_sql_injection=True)
-        if not valid:
-            flash(f"Invalid address: {err}", "error")
-            return redirect(url_for("business.create_establishment"))
-
-        # Validate coordinates
-        try:
-            latitude = float(request.form.get("latitude", 0))
-            longitude = float(request.form.get("longitude", 0))
-        except (TypeError, ValueError):
-            flash("Invalid coordinates: latitude and longitude must be numbers", "error")
-            return redirect(url_for("business.create_establishment"))
-
-        if not validate_coordinates(latitude, longitude):
-            flash("Invalid coordinates: latitude must be between -90 and 90, longitude between -180 and 180", "error")
-            return redirect(url_for("business.create_establishment"))
-
-        # Validate contact number
-        contact_number = request.form.get("contact_number", "").strip()
-        if contact_number and not validate_phone(contact_number):
-            flash("Invalid contact number: please enter a valid phone number", "error")
-            return redirect(url_for("business.create_establishment"))
-
-        # Validate email
-        email = request.form.get("email", "").strip()
-        if email and not validate_email_format(email):
-            flash("Invalid email: please enter a valid email address", "error")
-            return redirect(url_for("business.create_establishment"))
-
-        # Validate website
-        website = request.form.get("website", "").strip()
-        if website:
-            website = sanitize_url(website)
-            if not website:
-                flash("Invalid website URL", "error")
-                return redirect(url_for("business.create_establishment"))
-
-        # Validate price range
-        price_range = request.form.get("price_range", "").strip()
-        if price_range and price_range not in ("$", "$$", "$$$"):
-            flash("Invalid price range: must be $, $$, or $$$", "error")
-            return redirect(url_for("business.create_establishment"))
 
         barangay = BarangayInfo.query.filter_by(name=barangay_name).first()
         if not barangay and barangay_name:
@@ -326,6 +286,12 @@ def manage_rooms():
 @business_bp.route("/rooms/add", methods=["POST"])
 @login_required
 @business_owner_required
+@validate_form_data({
+    "name": {"type": "string", "required": True, "min_length": 1, "max_length": 200},
+    "description": {"type": "string", "max_length": 1000},
+    "price_per_night": {"type": "float", "min_value": 0},
+    "capacity": {"type": "integer", "min_value": 1, "max_value": 100}
+})
 def add_room():
     """Add a new room to the establishment."""
     establishment = _get_owner_establishment()
@@ -333,37 +299,11 @@ def add_room():
         flash("Create your establishment first.", "warning")
         return redirect(url_for("business.create_establishment"))
 
-    # Validate name
-    name = request.form.get("name", "").strip()
-    valid, err = validate_string_input(name, min_length=1, max_length=200, block_sql_injection=True)
-    if not valid:
-        flash(f"Invalid room name: {err}", "error")
-        return redirect(url_for("business.manage_rooms"))
-
-    # Validate description
-    description = request.form.get("description", "").strip()
-    description = sanitize_html_input(description)
-    valid, err = validate_string_input(description, max_length=1000, block_sql_injection=False)
-    if not valid:
-        flash(f"Invalid room description: {err}", "error")
-        return redirect(url_for("business.manage_rooms"))
-
-    # Validate price
-    price_raw = request.form.get("price_per_night")
-    if price_raw:
-        valid, price_val, err = validate_float(price_raw, min_value=0)
-        if not valid:
-            flash(f"Invalid price per night: {err}", "error")
-            return redirect(url_for("business.manage_rooms"))
-    else:
-        price_val = None
-
-    # Validate capacity
-    capacity_raw = request.form.get("capacity")
-    valid, capacity_val, err = validate_integer(capacity_raw if capacity_raw else 2, min_value=1, max_value=100)
-    if not valid:
-        flash(f"Invalid capacity: {err}", "error")
-        return redirect(url_for("business.manage_rooms"))
+    # Data is already validated by decorator
+    name = request.form.get("name")
+    description = sanitize_html_input(request.form.get("description", ""))
+    price_val = float(request.form.get("price_per_night")) if request.form.get("price_per_night") else None
+    capacity_val = int(request.form.get("capacity", 2))
 
     room = EstablishmentRoom(
         establishment_id=establishment.id,
