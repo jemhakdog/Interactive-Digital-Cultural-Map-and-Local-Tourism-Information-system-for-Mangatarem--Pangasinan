@@ -1,14 +1,18 @@
 """
-Business owner dashboard routes.
-
-Handles establishment CRUD, room management, and menu item management
-for users with the 'business_owner' role.
+Routes for the Business module.
+Handles both public directory and business owner dashboard.
 """
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, make_response
 from flask_login import login_required, current_user
-from models import db, Establishment, EstablishmentRoom, EstablishmentMenuItem, EstablishmentReview, BarangayInfo
+from extensions import db, limiter
+from .models import Establishment, EstablishmentRoom, EstablishmentMenuItem, EstablishmentReview
+from modules.barangay.models import BarangayInfo
 from functools import wraps
+from core.logger import log_entry, log_render
+from datetime import datetime, timedelta
+import math
+import logging
 from utils.validators import validate_form_data
 from utils.security import (
     validate_string_input,
@@ -25,6 +29,7 @@ import logging
 business_bp = Blueprint("business", __name__, url_prefix="/business")
 logger = logging.getLogger(__name__)
 
+# --- Decorators ---
 
 def business_owner_required(f):
     """Decorator to restrict access to business_owner role."""
@@ -36,11 +41,124 @@ def business_owner_required(f):
         return f(*args, **kwargs)
     return decorated
 
-
 def _get_owner_establishment():
     """Get the current business owner's establishment."""
     return Establishment.query.filter_by(owner_id=current_user.id).first()
 
+# --- Public Routes ---
+
+@business_bp.route("/")
+def index():
+    """Public establishment directory with filters."""
+    log_entry("business", "index", method=request.method)
+    logger.info("Establishments directory accessed")
+
+    query = Establishment.query.filter_by(status="approved")
+
+    # Smart Filters for Business Owners
+    type_filter = request.args.get("type")
+    is_auto_filtered = False
+    owner_type = None
+    show_all = request.args.get("show_all") == "true"
+
+    if not type_filter and not show_all and current_user.is_authenticated and current_user.role == "business_owner":
+        owner_establishment = _get_owner_establishment()
+        if owner_establishment:
+            type_filter = owner_establishment.type
+            owner_type = owner_establishment.type
+            is_auto_filtered = True
+
+    if type_filter:
+        query = query.filter_by(type=type_filter)
+
+    price_filter = request.args.get("price_range")
+    if price_filter:
+        query = query.filter_by(price_range=price_filter)
+
+    barangay_filter = request.args.get("barangay")
+    if barangay_filter:
+        query = query.join(BarangayInfo).filter(BarangayInfo.name == barangay_filter)
+
+    search = request.args.get("q")
+    if search:
+        query = query.filter(Establishment.name.ilike(f"%{search}%"))
+
+    establishments_list = query.order_by(Establishment.is_featured.desc(), Establishment.rating_avg.desc()).all()
+    barangays = BarangayInfo.query.order_by(BarangayInfo.name).all()
+
+    log_render("business", "index", "establishments.html")
+    return render_template(
+        "pagez/establishments.html",
+        establishments=establishments_list,
+        barangays=barangays,
+        is_auto_filtered=is_auto_filtered,
+        owner_type=owner_type,
+    )
+
+@business_bp.route("/<int:id>")
+def detail(id):
+    """Public establishment detail page."""
+    log_entry("business", "detail", id=id)
+    establishment = Establishment.query.get_or_404(id)
+
+    if establishment.status != "approved":
+        flash("This establishment is not yet published.", "warning")
+        return redirect(url_for("business.index"))
+
+    rooms = []
+    menu_items = []
+
+    if establishment.type == "inn":
+        rooms = EstablishmentRoom.query.filter_by(
+            establishment_id=establishment.id, is_available=True
+        ).all()
+    else:
+        menu_items = EstablishmentMenuItem.query.filter_by(
+            establishment_id=establishment.id, is_available=True
+        ).order_by(EstablishmentMenuItem.category, EstablishmentMenuItem.name).all()
+
+    reviews = EstablishmentReview.query.filter_by(
+        establishment_id=establishment.id, status="approved"
+    ).order_by(EstablishmentReview.created_at.desc()).all()
+
+    log_render("business", "detail", "establishment_detail.html")
+    return render_template(
+        "pagez/establishment_detail.html",
+        establishment=establishment,
+        rooms=rooms,
+        menu_items=menu_items,
+        reviews=reviews,
+    )
+
+@business_bp.route("/<int:id>/review", methods=["POST"])
+@login_required
+@validate_form_data({
+    'rating': {'type': 'int', 'min': 1, 'max': 5, 'required': True},
+    'comment': {'type': 'string', 'max_length': 2000, 'required': True}
+})
+def submit_review(id):
+    """Submit a review for an establishment."""
+    establishment = Establishment.query.get_or_404(id)
+    rating = int(request.form.get("rating"))
+    comment = request.form.get("comment", "")
+    
+    # Sanitize HTML but allow basic formatting
+    sanitized_comment = sanitize_html_input(comment)
+
+    review = EstablishmentReview(
+        user_id=current_user.id,
+        establishment_id=establishment.id,
+        rating=rating,
+        comment=sanitized_comment,
+        status="pending",
+    )
+    db.session.add(review)
+    db.session.commit()
+
+    flash("Your review has been submitted and is pending approval.", "success")
+    return redirect(url_for("business.detail", id=id))
+
+# --- Dashboard Routes ---
 
 @business_bp.route("/dashboard")
 @login_required
@@ -70,7 +188,6 @@ def dashboard():
         stats=stats,
     )
 
-
 @business_bp.route("/establishment/create", methods=["GET", "POST"])
 @login_required
 @business_owner_required
@@ -93,7 +210,6 @@ def create_establishment():
         return redirect(url_for("business.edit_establishment"))
 
     if request.method == "POST":
-        # Data is already validated by decorator
         name = request.form.get("name")
         description = sanitize_html_input(request.form.get("description", ""))
         address = request.form.get("address")
@@ -129,11 +245,9 @@ def create_establishment():
             status="pending",
         )
 
-        # Parse amenities from checkboxes
         amenities = request.form.getlist("amenities")
         establishment.amenities = amenities if amenities else None
 
-        # Parse operating hours from form
         operating_hours = {}
         for day in ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]:
             open_time = request.form.get(f"hours_{day}_open")
@@ -152,7 +266,6 @@ def create_establishment():
     barangays = BarangayInfo.query.order_by(BarangayInfo.name).all()
     return render_template("business/edit_establishment.html", establishment=None, barangays=barangays)
 
-
 @business_bp.route("/establishment/edit", methods=["GET", "POST"])
 @login_required
 @business_owner_required
@@ -165,14 +278,12 @@ def edit_establishment():
     if request.method == "POST":
         barangay_name = request.form.get("barangay")
 
-        # Validate name
         name = request.form.get("name", "").strip()
         valid, err = validate_string_input(name, min_length=1, max_length=200, block_sql_injection=True)
         if not valid:
             flash(f"Invalid name: {err}", "error")
             return redirect(url_for("business.edit_establishment"))
 
-        # Validate description (sanitize HTML)
         description = request.form.get("description", "").strip()
         description = sanitize_html_input(description)
         valid, err = validate_string_input(description, max_length=2000, block_sql_injection=False)
@@ -180,14 +291,12 @@ def edit_establishment():
             flash(f"Invalid description: {err}", "error")
             return redirect(url_for("business.edit_establishment"))
 
-        # Validate address
         address = request.form.get("address", "").strip()
         valid, err = validate_string_input(address, min_length=1, max_length=300, block_sql_injection=True)
         if not valid:
             flash(f"Invalid address: {err}", "error")
             return redirect(url_for("business.edit_establishment"))
 
-        # Validate coordinates
         try:
             latitude = float(request.form.get("latitude", 0))
             longitude = float(request.form.get("longitude", 0))
@@ -199,19 +308,16 @@ def edit_establishment():
             flash("Invalid coordinates: latitude must be between -90 and 90, longitude between -180 and 180", "error")
             return redirect(url_for("business.edit_establishment"))
 
-        # Validate contact number
         contact_number = request.form.get("contact_number", "").strip()
         if contact_number and not validate_phone(contact_number):
             flash("Invalid contact number: please enter a valid phone number", "error")
             return redirect(url_for("business.edit_establishment"))
 
-        # Validate email
         email = request.form.get("email", "").strip()
         if email and not validate_email_format(email):
             flash("Invalid email: please enter a valid email address", "error")
             return redirect(url_for("business.edit_establishment"))
 
-        # Validate website
         website = request.form.get("website", "").strip()
         if website:
             website = sanitize_url(website)
@@ -219,7 +325,6 @@ def edit_establishment():
                 flash("Invalid website URL", "error")
                 return redirect(url_for("business.edit_establishment"))
 
-        # Validate price range
         price_range = request.form.get("price_range", "").strip()
         if price_range and price_range not in ("$", "$$", "$$$"):
             flash("Invalid price range: must be $, $$, or $$$", "error")
@@ -245,11 +350,9 @@ def edit_establishment():
         establishment.cover_image_url = request.form.get("cover_image_url")
         establishment.logo_url = request.form.get("logo_url")
 
-        # Parse amenities
         amenities = request.form.getlist("amenities")
         establishment.amenities = amenities if amenities else None
 
-        # Parse operating hours
         operating_hours = {}
         for day in ["mon", "tue", "wed", "thu", "fri", "sat", "sun"]:
             open_time = request.form.get(f"hours_{day}_open")
@@ -266,9 +369,6 @@ def edit_establishment():
     barangays = BarangayInfo.query.order_by(BarangayInfo.name).all()
     return render_template("business/edit_establishment.html", establishment=establishment, barangays=barangays)
 
-
-# === Room Management ===
-
 @business_bp.route("/rooms")
 @login_required
 @business_owner_required
@@ -281,7 +381,6 @@ def manage_rooms():
 
     rooms = EstablishmentRoom.query.filter_by(establishment_id=establishment.id).all()
     return render_template("business/manage_rooms.html", establishment=establishment, rooms=rooms)
-
 
 @business_bp.route("/rooms/add", methods=["POST"])
 @login_required
@@ -299,7 +398,6 @@ def add_room():
         flash("Create your establishment first.", "warning")
         return redirect(url_for("business.create_establishment"))
 
-    # Data is already validated by decorator
     name = request.form.get("name")
     description = sanitize_html_input(request.form.get("description", ""))
     price_val = float(request.form.get("price_per_night")) if request.form.get("price_per_night") else None
@@ -314,11 +412,9 @@ def add_room():
         is_available=request.form.get("is_available") == "on",
     )
 
-    # Parse amenities
     amenities = request.form.getlist("room_amenities")
     room.amenities = amenities if amenities else None
 
-    # Parse image URLs (comma-separated)
     images_raw = request.form.get("image_urls", "")
     image_urls = [url.strip() for url in images_raw.split(",") if url.strip()]
     room.image_urls = image_urls if image_urls else None
@@ -328,7 +424,6 @@ def add_room():
 
     flash(f"Room '{room.name}' added successfully!", "success")
     return redirect(url_for("business.manage_rooms"))
-
 
 @business_bp.route("/rooms/<int:room_id>/edit", methods=["POST"])
 @login_required
@@ -342,14 +437,12 @@ def edit_room(room_id):
         flash("Access denied.", "error")
         return redirect(url_for("business.dashboard"))
 
-    # Validate name
     name = request.form.get("name", "").strip()
     valid, err = validate_string_input(name, min_length=1, max_length=200, block_sql_injection=True)
     if not valid:
         flash(f"Invalid room name: {err}", "error")
         return redirect(url_for("business.manage_rooms"))
 
-    # Validate description
     description = request.form.get("description", "").strip()
     description = sanitize_html_input(description)
     valid, err = validate_string_input(description, max_length=1000, block_sql_injection=False)
@@ -357,7 +450,6 @@ def edit_room(room_id):
         flash(f"Invalid room description: {err}", "error")
         return redirect(url_for("business.manage_rooms"))
 
-    # Validate price
     price_raw = request.form.get("price_per_night")
     if price_raw:
         valid, price_val, err = validate_float(price_raw, min_value=0)
@@ -367,7 +459,6 @@ def edit_room(room_id):
     else:
         price_val = None
 
-    # Validate capacity
     capacity_raw = request.form.get("capacity")
     valid, capacity_val, err = validate_integer(capacity_raw if capacity_raw else 2, min_value=1, max_value=100)
     if not valid:
@@ -391,7 +482,6 @@ def edit_room(room_id):
     flash(f"Room '{room.name}' updated!", "success")
     return redirect(url_for("business.manage_rooms"))
 
-
 @business_bp.route("/rooms/<int:room_id>/delete", methods=["POST"])
 @login_required
 @business_owner_required
@@ -409,9 +499,6 @@ def delete_room(room_id):
     flash("Room deleted.", "success")
     return redirect(url_for("business.manage_rooms"))
 
-
-# === Menu Item Management ===
-
 @business_bp.route("/menu")
 @login_required
 @business_owner_required
@@ -426,7 +513,6 @@ def manage_menu():
         EstablishmentMenuItem.category, EstablishmentMenuItem.name
     ).all()
 
-    # Group by category
     from collections import defaultdict
     grouped = defaultdict(list)
     for item in items:
@@ -439,7 +525,6 @@ def manage_menu():
         grouped_items=dict(grouped),
     )
 
-
 @business_bp.route("/menu/add", methods=["POST"])
 @login_required
 @business_owner_required
@@ -450,14 +535,12 @@ def add_menu_item():
         flash("Create your establishment first.", "warning")
         return redirect(url_for("business.create_establishment"))
 
-    # Validate name
     name = request.form.get("name", "").strip()
     valid, err = validate_string_input(name, min_length=1, max_length=200, block_sql_injection=True)
     if not valid:
         flash(f"Invalid menu item name: {err}", "error")
         return redirect(url_for("business.manage_menu"))
 
-    # Validate description
     description = request.form.get("description", "").strip()
     description = sanitize_html_input(description)
     valid, err = validate_string_input(description, max_length=1000, block_sql_injection=False)
@@ -465,7 +548,6 @@ def add_menu_item():
         flash(f"Invalid menu item description: {err}", "error")
         return redirect(url_for("business.manage_menu"))
 
-    # Validate price
     price_raw = request.form.get("price")
     if price_raw:
         valid, price_val, err = validate_float(price_raw, min_value=0)
@@ -475,7 +557,6 @@ def add_menu_item():
     else:
         price_val = None
 
-    # Validate category
     category = request.form.get("category", "").strip()
     valid, err = validate_string_input(category, min_length=1, max_length=100, block_sql_injection=True)
     if not valid:
@@ -498,7 +579,6 @@ def add_menu_item():
     flash(f"Menu item '{item.name}' added!", "success")
     return redirect(url_for("business.manage_menu"))
 
-
 @business_bp.route("/menu/<int:item_id>/edit", methods=["POST"])
 @login_required
 @business_owner_required
@@ -511,14 +591,12 @@ def edit_menu_item(item_id):
         flash("Access denied.", "error")
         return redirect(url_for("business.dashboard"))
 
-    # Validate name
     name = request.form.get("name", "").strip()
     valid, err = validate_string_input(name, min_length=1, max_length=200, block_sql_injection=True)
     if not valid:
         flash(f"Invalid menu item name: {err}", "error")
         return redirect(url_for("business.manage_menu"))
 
-    # Validate description
     description = request.form.get("description", "").strip()
     description = sanitize_html_input(description)
     valid, err = validate_string_input(description, max_length=1000, block_sql_injection=False)
@@ -526,7 +604,6 @@ def edit_menu_item(item_id):
         flash(f"Invalid menu item description: {err}", "error")
         return redirect(url_for("business.manage_menu"))
 
-    # Validate price
     price_raw = request.form.get("price")
     if price_raw:
         valid, price_val, err = validate_float(price_raw, min_value=0)
@@ -536,7 +613,6 @@ def edit_menu_item(item_id):
     else:
         price_val = None
 
-    # Validate category
     category = request.form.get("category", "").strip()
     valid, err = validate_string_input(category, min_length=1, max_length=100, block_sql_injection=True)
     if not valid:
@@ -555,7 +631,6 @@ def edit_menu_item(item_id):
     flash(f"Menu item '{item.name}' updated!", "success")
     return redirect(url_for("business.manage_menu"))
 
-
 @business_bp.route("/menu/<int:item_id>/delete", methods=["POST"])
 @login_required
 @business_owner_required
@@ -572,7 +647,6 @@ def delete_menu_item(item_id):
     db.session.commit()
     flash("Menu item deleted.", "success")
     return redirect(url_for("business.manage_menu"))
-
 
 @business_bp.route("/reviews")
 @login_required
@@ -604,7 +678,6 @@ def browse_peers():
         flash("Please create your establishment profile first to browse peers.", "info")
         return redirect(url_for("business.create_establishment"))
 
-    # Mapping for friendly labels
     type_labels = {
         "inn": "Inns & Lodges",
         "restaurant": "Restaurants",
@@ -613,7 +686,6 @@ def browse_peers():
     }
     type_label = type_labels.get(establishment.type, establishment.type.title() + "s")
 
-    # Get approved establishments of the same type, excluding own
     peers = Establishment.query.filter_by(
         type=establishment.type,
         status="approved"
@@ -628,3 +700,98 @@ def browse_peers():
         peers=peers,
         type_label=type_label
     )
+
+
+# --- API Routes ---
+
+@business_bp.route("/api")
+@limiter.limit("20 per minute")
+def api_list():
+    """API endpoint to retrieve approved establishments with pagination."""
+    logger.info("API endpoint /business/api called")
+
+    page = request.args.get("page", 1, type=int)
+    per_page = min(request.args.get("per_page", 20, type=int), 100)
+
+    est_type = request.args.get("type")
+    price_range = request.args.get("price_range")
+    barangay = request.args.get("barangay")
+    user_lat = request.args.get("lat", type=float)
+    user_lng = request.args.get("lng", type=float)
+    radius = request.args.get("radius", 10, type=float)
+
+    query = Establishment.query.filter(Establishment.status == "approved")
+
+    if est_type and est_type != "all":
+        query = query.filter(Establishment.type == est_type)
+    if price_range:
+        query = query.filter(Establishment.price_range == price_range)
+    if barangay and barangay != "all":
+        query = query.join(BarangayInfo).filter(BarangayInfo.name == barangay)
+
+    paginated_establishments = query.paginate(page=page, per_page=per_page, error_out=False)
+
+    result = []
+    for est in paginated_establishments.items:
+        est_dict = {
+            "id": est.id,
+            "name": est.name,
+            "type": est.type,
+            "description": est.description or "",
+            "address": est.address or "",
+            "latitude": est.latitude,
+            "longitude": est.longitude,
+            "contact_number": est.contact_number,
+            "price_range": est.price_range,
+            "rating_avg": est.rating_avg or 0,
+            "review_count": est.review_count or 0,
+            "cover_image_url": est.cover_image_url,
+            "logo_url": est.logo_url,
+            "amenities": est.amenities or [],
+            "barangay": est.barangay.name if est.barangay else None,
+        }
+
+        if user_lat and user_lng:
+            dist = _haversine_distance(user_lat, user_lng, est.latitude, est.longitude)
+            est_dict["distance"] = round(dist, 2)
+
+        result.append(est_dict)
+
+    if user_lat and user_lng:
+        result.sort(key=lambda x: x.get("distance", float("inf")))
+        result = [e for e in result if e.get("distance", float("inf")) <= radius]
+
+    response_data = {
+        "establishments": result,
+        "pagination": {
+            "page": page,
+            "per_page": per_page,
+            "total": paginated_establishments.total,
+            "pages": paginated_establishments.pages,
+            "has_next": paginated_establishments.has_next,
+            "has_prev": paginated_establishments.has_prev,
+        },
+    }
+
+    response = make_response(jsonify(response_data))
+    response.headers["Cache-Control"] = "public, max-age=300"
+    response.headers["Expires"] = (datetime.utcnow() + timedelta(minutes=5)).strftime(
+        "%a, %d %b %Y %H:%M:%S GMT"
+    )
+
+    return response
+
+
+def _haversine_distance(lat1, lng1, lat2, lng2):
+    """Calculate distance between two points using Haversine formula (returns km)."""
+    R = 6371
+    dlat = math.radians(lat2 - lat1)
+    dlng = math.radians(lng2 - lng1)
+    a = (
+        math.sin(dlat / 2) ** 2
+        + math.cos(math.radians(lat1))
+        * math.cos(math.radians(lat2))
+        * math.sin(dlng / 2) ** 2
+    )
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return R * c

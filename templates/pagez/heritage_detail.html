@@ -13,9 +13,9 @@
         <div class="container mx-auto px-6 relative z-10 text-center">
             <nav class="mb-8" data-aos="fade-up">
                 <ol class="flex justify-center text-[10px] uppercase tracking-[0.3em] text-emerald-400/80 font-bold">
-                    <li><a href="{{ url_for('public.heritage_index') }}" class="hover:text-emerald-300 transition">Heritage Registry</a></li>
+                    <li><a href="{{ url_for('heritage.index') }}" class="hover:text-emerald-300 transition">Heritage Registry</a></li>
                     <li class="mx-3 text-emerald-400/30">/</li>
-                    <li><a href="{{ url_for('public.heritage_list', heritage_type=heritage_type) }}" class="hover:text-emerald-300 transition">{{ config.label }}</a></li>
+                    <li><a href="{{ url_for('heritage.type_list', heritage_type=heritage_type) }}" class="hover:text-emerald-300 transition">{{ config.label }}</a></li>
                     <li class="mx-3 text-emerald-400/30">/</li>
                     <li class="text-white">{{ item.name or item.municipality }}</li>
                 </ol>

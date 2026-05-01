@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gomangatarem-v1';
+const CACHE_NAME = 'gomangatarem-v3';
 const MAP_CACHE_NAME = 'mapbox-tiles';
 const STATIC_ASSETS = [
     '/map',
@@ -61,9 +61,11 @@ self.addEventListener('fetch', (event) => {
                             }
                         }
                         return networkResponse;
+                    }).catch(() => {
+                        return null; // Return null on fetch failure
                     });
-                    // Return cache if available, else fetch from network
-                    return response || fetchPromise;
+                    // Return cache if available, else fetch from network (with fallback)
+                    return response || fetchPromise.then(res => res || new Response('Map Error', { status: 503 }));
                 });
             })
         );
@@ -80,7 +82,7 @@ self.addEventListener('fetch', (event) => {
     const staleWhileRevalidate = () => {
         return caches.match(event.request).then((cacheResponse) => {
             // Always fetch from network to get fresh content
-            fetch(event.request).then((networkResponse) => {
+            const fetchPromise = fetch(event.request).then((networkResponse) => {
                 // Only cache successful GET requests that are cacheable
                 if (networkResponse.ok && event.request.method === 'GET') {
                     const canCache = networkResponse.type === 'basic' || 
@@ -95,12 +97,18 @@ self.addEventListener('fetch', (event) => {
                         });
                     }
                 }
+                return networkResponse;
             }).catch(() => {
-                // ignore fetch errors
+                // If fetch fails and no cache, we'll return the error later
+                return null;
             });
             
-            // Return cached response if available, otherwise the fetch will update cache for next time
-            return cacheResponse || fetch(event.request);
+            // Return cached response if available, otherwise wait for fetch
+            return cacheResponse || fetchPromise.then(res => res || new Response('Offline or Network Error', {
+                status: 503,
+                statusText: 'Service Unavailable',
+                headers: new Headers({ 'Content-Type': 'text/plain' })
+            }));
         });
     };
 
@@ -123,7 +131,12 @@ self.addEventListener('fetch', (event) => {
             }
             return networkResponse;
         }).catch(() => {
-            return caches.match(event.request);
+            return caches.match(event.request).then(cached => {
+                return cached || new Response('Network Error', {
+                    status: 503,
+                    headers: new Headers({ 'Content-Type': 'text/plain' })
+                });
+            });
         });
     };
 

@@ -118,7 +118,7 @@
                 <a href="{{ url_for('public.map_view') }}"
                     class="px-8 py-3 bg-emerald-900 text-white font-bold rounded-xl hover:bg-emerald-800 transition">Interactive
                     Map</a>
-                <a href="{{ url_for('public.barangays') }}"
+                <a href="{{ url_for('barangay.index') }}"
                     class="px-8 py-3 border-2 border-emerald-900 text-emerald-900 font-bold rounded-xl hover:bg-emerald-50 transition">Browse
                     Barangays</a>
             </div>
@@ -149,7 +149,7 @@
                             <p class="text-[10px] font-bold text-emerald-600 uppercase tracking-widest">Heritage Profile
                             </p>
                         </div>
-                        <a href="{{ url_for('public.barangay_profile', name=info.barangay_name) }}"
+                        <a href="{{ url_for('barangay.profile', name=info.barangay_name) }}"
                             class="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center text-emerald-900 hover:bg-emerald-900 hover:text-white transition">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -232,7 +232,7 @@
                         <p class="text-emerald-900/60 text-sm leading-relaxed line-clamp-2 mb-8">{{
                             attraction.description }}</p>
 
-                        <a href="{{ url_for('public.attraction_detail', id=attraction.id) }}"
+                        <a href="{{ url_for('attractions.detail', id=attraction.id) }}"
                             class="inline-flex items-center justify-center w-full py-4 bg-emerald-50 text-emerald-900 font-bold rounded-xl hover:bg-emerald-900 hover:text-white transition-all duration-300">
                             Discover More
                         </a>
@@ -290,7 +290,7 @@
                             </svg>
                             {{ event.location }}
                         </div>
-                        <a href="{{ url_for('public.events') }}"
+                        <a href="{{ url_for('events.index') }}"
                             class="px-8 py-3 text-center bg-emerald-900 text-white font-bold rounded-xl hover:bg-emerald-800 transition">Event
                             Details</a>
                     </div>

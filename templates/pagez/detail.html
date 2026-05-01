@@ -203,7 +203,7 @@
                     <h3 class="text-xl font-cultural font-bold text-emerald-950 mb-6">Nearby Discovery</h3>
                     <div class="space-y-6">
                         {% for place in nearby %}
-                        <a href="{{ url_for('public.attraction_detail', id=place.id) }}"
+                        <a href="{{ url_for('attractions.detail', id=place.id) }}"
                             class="flex items-center gap-4 group">
                             <div class="w-16 h-16 rounded-2xl overflow-hidden img-skeleton flex-shrink-0">
                                 <img src="{{ place.image_url }}" alt="{{ place.name }}"
@@ -230,7 +230,7 @@
                     <p class="text-[10px] font-bold text-emerald-900/40 uppercase tracking-widest mb-6">Nearby Accommodations</p>
                     <div class="space-y-4">
                         {% for est in nearby_stay %}
-                        <a href="{{ url_for('public.establishment_detail', id=est.id) }}"
+                        <a href="{{ url_for('business.detail', id=est.id) }}"
                             class="flex items-center gap-4 group p-3 rounded-2xl hover:bg-emerald-50 transition-all">
                             {% if est.cover_image_url %}
                             <img src="{{ est.cover_image_url }}" alt="{{ est.name }}"
@@ -265,7 +265,7 @@
                     <p class="text-[10px] font-bold text-emerald-900/40 uppercase tracking-widest mb-6">Nearby Dining</p>
                     <div class="space-y-4">
                         {% for est in nearby_eat %}
-                        <a href="{{ url_for('public.establishment_detail', id=est.id) }}"
+                        <a href="{{ url_for('business.detail', id=est.id) }}"
                             class="flex items-center gap-4 group p-3 rounded-2xl hover:bg-emerald-50 transition-all">
                             {% if est.cover_image_url %}
                             <img src="{{ est.cover_image_url }}" alt="{{ est.name }}"

@@ -21,15 +21,8 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/map.css') }}?v=20260419-1">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/utility-overrides.css') }}">
 {% endblock %}
-...
-<!-- Mapbox GL JS -->
-<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
 
-<!-- Pass Mapbox Token to JavaScript -->
-<script>
-    window.MAPBOX_TOKEN = "{{ mapbox_token }}";
-</script>
-
+{% block body_height %}h-screen overflow-hidden{% endblock %}
 
 {% block content %}
 <div class="relative flex flex-col md:flex-row h-[calc(100vh-64px)] overflow-hidden">
@@ -67,9 +60,13 @@
                 class="tab-btn flex-1 py-3 text-sm font-semibold text-green-700 border-b-2 border-green-700 bg-green-50 transition">
                 Places
             </button>
+            <button id="tab-recommended"
+                class="tab-btn flex-1 py-3 text-sm font-medium text-gray-500 hover:text-green-700 hover:bg-gray-50 transition">
+                Recommended
+            </button>
             <button id="tab-routes"
                 class="tab-btn flex-1 py-3 text-sm font-medium text-gray-500 hover:text-green-700 hover:bg-gray-50 transition">
-                Suggested Routes
+                Routes
             </button>
         </div>
 
@@ -120,10 +117,29 @@
             </button>
         </div>
 
-        <!-- Establishment Filters (Nearby) -->
-        <div
-            class="px-5 py-3 flex gap-2 overflow-x-auto no-scrollbar border-b border-gray-100 bg-white/50 backdrop-blur-md">
-            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider self-center mr-1 flex-shrink-0">Nearby:</span>
+        <!-- Quick Search Chips -->
+        <div class="px-5 py-3 flex gap-2 overflow-x-auto no-scrollbar border-b border-gray-100 bg-white">
+            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider self-center mr-1 flex-shrink-0">Quick Find:</span>
+            <button onclick="findNearest('cafe')"
+                class="px-3 py-1.5 text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-100 rounded-full hover:bg-orange-100 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm flex-shrink-0">
+                ☕ Coffee
+            </button>
+            <button onclick="findNearest('restaurant')"
+                class="px-3 py-1.5 text-xs font-semibold bg-rose-50 text-rose-700 border border-rose-100 rounded-full hover:bg-rose-100 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm flex-shrink-0">
+                🍽️ Food
+            </button>
+            <button onclick="findNearest('Historical', 'attraction')"
+                class="px-3 py-1.5 text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-100 rounded-full hover:bg-amber-100 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm flex-shrink-0">
+                🏛️ Heritage
+            </button>
+            <button onclick="findNearest('Nature', 'attraction')"
+                class="px-3 py-1.5 text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-100 rounded-full hover:bg-emerald-100 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm flex-shrink-0">
+                🌿 Nature
+            </button>
+        </div>
+
+        <!-- Establishment Filters -->
+        <div class="px-5 py-3 flex gap-2 overflow-x-auto no-scrollbar border-b border-gray-100 bg-white">
             <button
                 class="est-filter-btn px-3 py-1.5 text-xs font-semibold bg-white/80 border border-gray-200 text-gray-600 rounded-full hover:border-orange-500 hover:text-orange-700 hover:bg-orange-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm flex-shrink-0"
                 data-est-type="restaurant">
@@ -241,8 +257,8 @@
         </div>
     </div>
 
-    <!-- Map Container with Floating Controls -->
-    <div class="relative flex-1 order-1 md:order-2 h-[400px] md:h-full">
+    <!-- Map Area -->
+    <div class="relative flex-1 order-1 md:order-2 h-full min-h-[400px]">
         <div id="map" class="w-full h-full z-0"></div>
 
         <!-- Place Details Card (Floating) -->
@@ -377,6 +393,8 @@
 
 </div>
 {% endblock %}
+
+{% block footer %}{% endblock %}
 
 {% block scripts %}
 <!-- Mapbox GL JS -->

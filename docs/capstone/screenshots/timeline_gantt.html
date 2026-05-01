@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gantt Chart - Mangatarem Tourism System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .arrow-bar {
+            clip-path: polygon(0% 0%, calc(100% - 15px) 0%, 100% 50%, calc(100% - 15px) 100%, 0% 100%);
+        }
+        .red-flag {
+            width: 0;
+            height: 0;
+            border-top: 8px solid transparent;
+            border-bottom: 8px solid transparent;
+            border-left: 12px solid red;
+            position: absolute;
+        }
+        .flag-pole {
+            width: 2px;
+            height: 20px;
+            background-color: red;
+            position: absolute;
+        }
+        .flag-container {
+            position: absolute;
+            top: 10px;
+            z-index: 20;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 p-8 flex justify-center items-center min-h-screen">
+
+    <div class="w-full max-w-6xl bg-white p-6 rounded-lg shadow-xl border border-gray-200">
+        <h1 class="text-center text-3xl font-extrabold text-[#1a237e] mb-6 tracking-wide uppercase">Gantt Chart</h1>
+
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse table-fixed min-w-[900px]">
+                <thead>
+                    <!-- Q1 - Q4 Row -->
+                    <tr>
+                        <th class="w-1/5 border-none"></th>
+                        <th colspan="3" class="w-1/5 bg-[#e2e8f0] border border-gray-300 text-center py-3 text-gray-800 font-bold text-lg">Q1</th>
+                        <th colspan="3" class="w-1/5 bg-[#e2e8f0] border border-gray-300 text-center py-3 text-gray-800 font-bold text-lg">Q2</th>
+                        <th colspan="3" class="w-1/5 bg-[#e2e8f0] border border-gray-300 text-center py-3 text-gray-800 font-bold text-lg">Q3</th>
+                        <th colspan="3" class="w-1/5 bg-[#e2e8f0] border border-gray-300 text-center py-3 text-gray-800 font-bold text-lg">Q4</th>
+                    </tr>
+                    <!-- Months Row -->
+                    <tr>
+                        <th class="border-none bg-white"></th>
+                        <th class="bg-black text-white text-sm py-2 border-r border-gray-600">JAN</th>
+                        <th class="bg-black text-white text-sm py-2 border-r border-gray-600">FEB</th>
+                        <th class="bg-black text-white text-sm py-2 border-r border-gray-600">MAR</th>
+                        <th class="bg-black text-white text-sm py-2 border-r border-gray-600">APR</th>
+                        <th class="bg-black text-white text-sm py-2 border-r border-gray-600">MAY</th>
+                        <th class="bg-black text-white text-sm py-2 border-r border-gray-600">JUN</th>
+                        <th class="bg-black text-white text-sm py-2 border-r border-gray-600">JUL</th>
+                        <th class="bg-black text-white text-sm py-2 border-r border-gray-600">AUG</th>
+                        <th class="bg-black text-white text-sm py-2 border-r border-gray-600">SEP</th>
+                        <th class="bg-black text-white text-sm py-2 border-r border-gray-600">OCT</th>
+                        <th class="bg-black text-white text-sm py-2 border-r border-gray-600">NOV</th>
+                        <th class="bg-black text-white text-sm py-2">DEC</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-600">
+                    <!-- Task 1 -->
+                    <tr>
+                        <td class="bg-[#26c6da] text-white p-3 border-b border-white font-medium shadow-[inset_-2px_0_4px_rgba(0,0,0,0.1)]">Requirements Planning</td>
+                        <td class="border border-gray-200 relative h-12">
+                            <div class="bg-[#8bc34a] arrow-bar text-gray-800 text-center text-sm py-1 absolute top-2 bottom-2 left-2 w-[180%] z-10 flex items-center justify-center shadow-md font-medium">RAD Phase 1</div>
+                        </td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                    </tr>
+                    
+                    <!-- Task 2 -->
+                    <tr>
+                        <td class="bg-[#4fc3f7] text-white p-3 border-b border-white font-medium shadow-[inset_-2px_0_4px_rgba(0,0,0,0.1)]">User Design (Figma)</td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200 relative h-12">
+                            <div class="bg-[#8bc34a] arrow-bar text-gray-800 text-center text-sm py-1 absolute top-2 bottom-2 left-0 w-[200%] z-10 flex items-center justify-center shadow-md font-medium">RAD Phase 2</div>
+                        </td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                    </tr>
+
+                    <!-- Task 3 -->
+                    <tr>
+                        <td class="bg-[#1565c0] text-white p-3 border-b border-white font-medium shadow-[inset_-2px_0_4px_rgba(0,0,0,0.1)]">System Architecture</td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200 relative h-12">
+                            <div class="bg-[#8bc34a] arrow-bar text-gray-800 text-center text-sm py-1 absolute top-2 bottom-2 left-0 w-[280%] z-10 flex items-center justify-center shadow-md font-medium">Infrastructure Setup</div>
+                        </td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200 relative">
+                            <!-- Milestone Flag -->
+                            <div class="flag-container left-[90%]">
+                                <div class="flag-pole"></div>
+                                <div class="red-flag" style="top: 0; left: 2px;"></div>
+                            </div>
+                        </td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                    </tr>
+
+                    <!-- Task 4 -->
+                    <tr>
+                        <td class="bg-[#4527a0] text-white p-3 border-b border-white font-medium shadow-[inset_-2px_0_4px_rgba(0,0,0,0.1)]">Database & Backend</td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200 relative h-12">
+                            <div class="bg-[#8bc34a] arrow-bar text-gray-800 text-center text-sm py-1 absolute top-2 bottom-2 left-[50%] w-[350%] z-10 flex items-center justify-center shadow-md font-medium">Supabase & Flask API</div>
+                        </td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                    </tr>
+
+                    <!-- Task 5 -->
+                    <tr>
+                        <td class="bg-[#c62828] text-white p-3 border-b border-white font-medium shadow-[inset_-2px_0_4px_rgba(0,0,0,0.1)]">Frontend & Map Dev</td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200 relative h-12">
+                            <div class="bg-[#8bc34a] arrow-bar text-gray-800 text-center text-sm py-1 absolute top-2 bottom-2 left-0 w-[400%] z-10 flex items-center justify-center shadow-md font-medium">Next.js & Mapbox GL</div>
+                        </td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200 relative">
+                             <!-- Milestone Flag -->
+                             <div class="flag-container left-[10%]">
+                                <div class="flag-pole"></div>
+                                <div class="red-flag" style="top: 0; left: 2px;"></div>
+                            </div>
+                        </td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                    </tr>
+
+                    <!-- Task 6 -->
+                    <tr>
+                        <td class="bg-[#f4511e] text-white p-3 border-b border-white font-medium shadow-[inset_-2px_0_4px_rgba(0,0,0,0.1)]">System Testing (UAT)</td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200 relative h-12">
+                            <div class="bg-[#8bc34a] arrow-bar text-gray-800 text-center text-sm py-1 absolute top-2 bottom-2 left-[20%] w-[380%] z-10 flex items-center justify-center shadow-md font-medium">RAD Iterative Testing</div>
+                        </td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                    </tr>
+
+                    <!-- Task 7 -->
+                    <tr>
+                        <td class="bg-[#6a1b9a] text-white p-3 border-b border-white font-medium shadow-[inset_-2px_0_4px_rgba(0,0,0,0.1)]">Cutover & Launch</td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200 relative h-12">
+                             <!-- Milestone Flag -->
+                             <div class="flag-container left-[-15px]">
+                                <div class="flag-pole"></div>
+                                <div class="red-flag" style="top: 0; left: 2px;"></div>
+                            </div>
+                            <div class="bg-[#8bc34a] arrow-bar text-gray-800 text-center text-sm py-1 absolute top-2 bottom-2 left-0 w-[280%] z-10 flex items-center justify-center shadow-md font-medium">Deployment</div>
+                        </td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                    </tr>
+
+                    <!-- Task 8 -->
+                    <tr>
+                        <td class="bg-[#1a237e] text-white p-3 font-medium shadow-[inset_-2px_0_4px_rgba(0,0,0,0.1)]">Documentation</td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200 relative h-12">
+                            <div class="bg-[#8bc34a] arrow-bar text-gray-800 text-center text-sm py-1 absolute top-2 bottom-2 left-0 w-[200%] z-10 flex items-center justify-center shadow-md font-medium">User Manuals</div>
+                        </td>
+                        <td class="border border-gray-200"></td>
+                        <td class="border border-gray-200"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</body>
+</html>

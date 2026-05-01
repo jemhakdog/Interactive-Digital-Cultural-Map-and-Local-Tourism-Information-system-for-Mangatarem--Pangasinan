@@ -20,7 +20,7 @@
     <section class="container mx-auto px-6 pb-32">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {% for slug, config in heritage_types.items() %}
-            <a href="{{ url_for('public.heritage_list', heritage_type=slug) }}" 
+            <a href="{{ url_for('heritage.type_list', heritage_type=slug) }}" 
                class="group relative overflow-hidden rounded-3xl bg-white border border-emerald-900/5 shadow-2xl shadow-emerald-900/5 hover:shadow-emerald-900/10 transition-all duration-700 reveal"
                data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
                 

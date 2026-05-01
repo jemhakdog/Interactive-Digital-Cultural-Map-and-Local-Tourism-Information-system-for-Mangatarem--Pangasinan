@@ -17,7 +17,9 @@ from utils.template_filters import register_filters
 from dotenv import load_dotenv
 
 # Load environment variables early
-load_dotenv()
+from pathlib import Path
+env_path = Path(__file__).parent / '.env'
+load_dotenv(dotenv_path=env_path)
 
 # Configure root logger so all info/debug messages print to console
 logging.basicConfig(
@@ -189,7 +191,7 @@ def _register_context_processors(app: Flask) -> None:
     def inject_config():
         return dict(
             config=app.config,
-            mapbox_token=os.environ.get("mapbox_token", "")
+            mapbox_token=os.environ.get("mapbox_token") or os.environ.get("MAPBOX_TOKEN", "")
         )
 
 
@@ -223,20 +225,22 @@ def _register_request_hooks(app: Flask) -> None:
         # === Security Headers ===
 
         # Content Security Policy - Prevents XSS by restricting resource sources
-        response.headers["Content-Security-Policy"] = (
-            "default-src 'self';"
-            "script-src 'self' https://fonts.googleapis.com https://maps.mapbox.com https://api.mapbox.com https://accounts.google.com https://unpkg.com 'unsafe-inline';"
-            "style-src 'self' https://fonts.googleapis.com https://api.mapbox.com https://unpkg.com 'unsafe-inline';"
-            "img-src 'self' data: https: blob:;"
-            "font-src 'self' https://fonts.gstatic.com data:;"
-            "connect-src 'self' https://api.mapbox.com https://events.mapbox.com https://*.supabase.co https://*.upstash.io https://accounts.google.com;"
-            "worker-src 'self' blob:;"
-            "frame-ancestors 'none';"
-            "base-uri 'self';"
-            "form-action 'self';"
-            "object-src 'none';"
-            "upgrade-insecure-requests;"
-        )
+        csp_policies = {
+            "default-src": "'self'",
+            "script-src": "'self' https://fonts.googleapis.com https://maps.mapbox.com https://api.mapbox.com https://accounts.google.com https://unpkg.com 'unsafe-inline' 'unsafe-eval'",
+            "style-src": "'self' https://fonts.googleapis.com https://api.mapbox.com https://unpkg.com 'unsafe-inline'",
+            "img-src": "'self' data: https: blob:",
+            "font-src": "'self' https://fonts.gstatic.com data:",
+            "connect-src": "'self' https://fonts.googleapis.com https://fonts.gstatic.com https://placehold.co https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com https://*.supabase.co https://*.upstash.io https://accounts.google.com",
+            "worker-src": "'self' blob:",
+            "frame-ancestors": "'none'",
+            "base-uri": "'self'",
+            "form-action": "'self'",
+            "object-src": "'none'",
+            "upgrade-insecure-requests": ""
+        }
+        csp_string = "; ".join([f"{k} {v}".strip() for k, v in csp_policies.items()])
+        response.headers["Content-Security-Policy"] = csp_string
 
         # Prevent MIME type sniffing
         response.headers["X-Content-Type-Options"] = "nosniff"

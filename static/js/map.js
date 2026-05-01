@@ -13,11 +13,31 @@ document.addEventListener('DOMContentLoaded', function () {
     // 2. DEFINE CUSTOM ICONS (Color-Coded by Category)
     // ========================================
     const iconConfig = {
-        Nature: { color: '#10b981', emoji: '🌿' },      // Green
+        // Core Categories
+        Nature: { color: '#10b981', emoji: '🌿' },      // Emerald Green
         Historical: { color: '#f59e0b', emoji: '🏛️' },  // Amber
-        Religious: { color: '#8b5cf6', emoji: '⛪' },   // Purple
-        Food: { color: '#ef4444', emoji: '🍴' },        // Red
-        default: { color: '#6b7280', emoji: '📍' }      // Gray
+        Religious: { color: '#6366f1', emoji: '⛪' },   // Indigo
+        
+        // Establishments & Services
+        Food: { color: '#f43f5e', emoji: '🍽️' },        // Rose Red
+        Restaurant: { color: '#f43f5e', emoji: '🍽️' }, 
+        Cafe: { color: '#f43f5e', emoji: '☕' },
+        Fastfood: { color: '#f43f5e', emoji: '🍔' },
+        Lodging: { color: '#0ea5e9', emoji: '🏨' },     // Sky Blue
+        Inn: { color: '#0ea5e9', emoji: '🏨' },
+        
+        // Heritage & Culture
+        Built: { color: '#f59e0b', emoji: '🏛️' },
+        Movable: { color: '#8b5cf6', emoji: '🏺' },
+        Intangible: { color: '#ec4899', emoji: '🎭' },
+        Personality: { color: '#64748b', emoji: '👤' },
+        Institution: { color: '#06b6d4', emoji: '🏫' },
+        
+        // Events
+        Events: { color: '#eab308', emoji: '📅' },      // Yellow
+        Civic: { color: '#3b82f6', emoji: '🏛️' },       // Blue
+        
+        default: { color: '#94a3b8', emoji: '📍' }      // Slate Gray
     };
 
     function getCustomIcon(category) {
@@ -194,7 +214,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Note: search is handled client-side for now, but could be moved to server
             }
 
-            const response = await fetch(`/api/attractions?${params}`);
+            const response = await fetch(`/attractions/api?${params}`);
             const result = await response.json();
 
             if (reset) {

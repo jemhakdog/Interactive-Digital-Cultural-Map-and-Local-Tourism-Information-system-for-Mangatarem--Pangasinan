@@ -5,7 +5,7 @@
     <!-- Breadcrumbs & Header -->
     <div class="pt-32 pb-16 container mx-auto px-6">
         <nav class="flex text-[10px] uppercase tracking-[0.3em] text-emerald-600/60 font-bold mb-6 reveal" data-aos="fade-up">
-            <a href="{{ url_for('public.heritage_index') }}" class="hover:text-emerald-500 transition">Heritage Registry</a>
+            <a href="{{ url_for('heritage.index') }}" class="hover:text-emerald-500 transition">Heritage Registry</a>
             <span class="mx-3 text-emerald-950/20">/</span>
             <span class="text-emerald-950">{{ config.label_plural }}</span>
         </nav>
@@ -33,7 +33,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
             {% for item in items %}
             <div class="group reveal" data-aos="fade-up" data-aos-delay="{{ loop.index % 3 * 100 }}">
-                <a href="{{ url_for('public.heritage_detail', heritage_type=heritage_type, item_id=item.id) }}">
+                <a href="{{ url_for('heritage.detail', heritage_type=heritage_type, item_id=item.id) }}">
                     <div class="aspect-[4/5] overflow-hidden rounded-2xl mb-6 relative">
                         <img src="{{ item.photo_url or url_for('static', filename='img/placeholder.jpg') }}" 
                              alt="{{ item.name }}"

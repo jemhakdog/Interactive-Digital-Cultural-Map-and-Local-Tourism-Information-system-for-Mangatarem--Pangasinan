@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function () {
             button.disabled = true;
             button.innerHTML = '<span class="animate-pulse">Subscribing...</span>';
 
-            const response = await fetch('/subscribe', {
+            const response = await fetch('/notifications/subscribe', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',

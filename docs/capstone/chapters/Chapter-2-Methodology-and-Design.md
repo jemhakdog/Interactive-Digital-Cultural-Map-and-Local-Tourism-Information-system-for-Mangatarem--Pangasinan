@@ -100,7 +100,28 @@ The successful deployment of the Interactive Digital Cultural Map and Local Tour
 
 The development schedule is organized around the four phases of the RAD methodology, with key milestones and expected completion dates for each phase.
 
-<put the image here>
+```mermaid
+gantt
+    title Project Timeline - Mangatarem Tourism System (RAD)
+    dateFormat  YYYY-MM-DD
+    axisFormat  Wk %W
+
+    section Requirements Planning
+    Interviews & Observation          :done,    req1, 2024-01-08, 14d
+
+    section User Design
+    UI/UX Prototyping (Figma)         :done,    des1, 2024-01-22, 14d
+    Prototype Approval (Week 4)       :milestone, m1, 2024-02-05, 0d
+
+    section Construction
+    Backend & DB Setup (Supabase)     :active,  con1, 2024-02-05, 21d
+    Frontend & Map Coding (Vercel)    :active,  con2, 2024-02-12, 35d
+    Feature-Complete Build (Week 10)  :milestone, m2, 2024-03-18, 0d
+
+    section Cutover
+    Testing (Pilot & UAT)             :         cut1, 2024-03-18, 14d
+    Deployment & Handover (Week 13)   :milestone, m3, 2024-04-08, 0d
+```
 
 *(Figure 6: Gantt Chart — Project Timeline. Critical milestones include prototype approval at Week 4, feature-complete build at Week 10, and deployment at Week 13.)*
 

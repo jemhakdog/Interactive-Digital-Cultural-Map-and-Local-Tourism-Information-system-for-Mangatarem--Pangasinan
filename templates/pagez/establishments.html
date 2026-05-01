@@ -14,7 +14,7 @@
 
         <!-- Filters -->
         <div class="glass-panel rounded-2xl p-6 mb-10">
-            <form method="GET" action="{{ url_for('public.establishments') }}" class="flex flex-wrap gap-4 items-end">
+            <form method="GET" action="{{ url_for('business.index') }}" class="flex flex-wrap gap-4 items-end">
                 <div class="flex-1 min-w-[200px]">
                     <label class="block text-xs font-bold text-emerald-300 mb-2 uppercase tracking-wider">Search</label>
                     <input type="text" name="q" value="{{ request.args.get('q', '') }}" placeholder="Search by name..."
@@ -59,23 +59,23 @@
 
         <!-- Type Tabs -->
         <div class="flex gap-3 mb-8 overflow-x-auto pb-2">
-            <a href="{{ url_for('public.establishments') }}"
+            <a href="{{ url_for('business.index') }}"
                 class="whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ 'bg-emerald-600 text-white' if not request.args.get('type') else 'bg-emerald-900/30 text-emerald-300 border border-white/10 hover:bg-emerald-800/30' }}">
                 All
             </a>
-            <a href="{{ url_for('public.establishments', type='inn') }}"
+            <a href="{{ url_for('business.index', type='inn') }}"
                 class="whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ 'bg-emerald-600 text-white' if request.args.get('type') == 'inn' else 'bg-emerald-900/30 text-emerald-300 border border-white/10 hover:bg-emerald-800/30' }}">
                 🏨 Inns & Lodges
             </a>
-            <a href="{{ url_for('public.establishments', type='restaurant') }}"
+            <a href="{{ url_for('business.index', type='restaurant') }}"
                 class="whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ 'bg-emerald-600 text-white' if request.args.get('type') == 'restaurant' else 'bg-emerald-900/30 text-emerald-300 border border-white/10 hover:bg-emerald-800/30' }}">
                 🍽️ Restaurants
             </a>
-            <a href="{{ url_for('public.establishments', type='cafe') }}"
+            <a href="{{ url_for('business.index', type='cafe') }}"
                 class="whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ 'bg-emerald-600 text-white' if request.args.get('type') == 'cafe' else 'bg-emerald-900/30 text-emerald-300 border border-white/10 hover:bg-emerald-800/30' }}">
                 ☕ Cafés
             </a>
-            <a href="{{ url_for('public.establishments', type='fastfood') }}"
+            <a href="{{ url_for('business.index', type='fastfood') }}"
                 class="whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ 'bg-emerald-600 text-white' if request.args.get('type') == 'fastfood' else 'bg-emerald-900/30 text-emerald-300 border border-white/10 hover:bg-emerald-800/30' }}">
                 🍔 Fast Food
             </a>
@@ -95,7 +95,7 @@
                     <p class="text-emerald-100/60 text-xs">Showing only <strong>{{ owner_type|title }}{{ 's' if not owner_type.endswith('s') }}</strong> based on your business profile.</p>
                 </div>
             </div>
-            <a href="{{ url_for('public.establishments', show_all='true') }}" 
+            <a href="{{ url_for('business.index', show_all='true') }}" 
                 class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold py-2 px-4 rounded-lg transition-all">
                 Show All Types
             </a>
@@ -109,7 +109,7 @@
         {% if establishments %}
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {% for est in establishments %}
-            <a href="{{ url_for('public.establishment_detail', id=est.id) }}"
+            <a href="{{ url_for('business.detail', id=est.id) }}"
                 class="bg-emerald-900/20 border border-white/10 rounded-2xl overflow-hidden backdrop-blur-md group hover:border-emerald-500/30 transition-all duration-300 hover:shadow-xl hover:shadow-emerald-900/20 hover:-translate-y-1">
                 <!-- Image -->
                 <div class="h-48 bg-emerald-900/40 relative img-skeleton">

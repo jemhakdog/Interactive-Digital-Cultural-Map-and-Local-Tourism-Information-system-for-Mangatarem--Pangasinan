@@ -2,15 +2,14 @@ def register_blueprints(app):
     """Register all application blueprints"""
     from .public import public_bp
     from .api import api_bp
-    from .auth import auth_bp
+    from modules.auth.routes import auth_bp
     from .admin import admin_bp
-    from .barangay import barangay_bp
+    from modules.barangay.routes import barangay_bp
     from .user import user_bp
     from .update import update_bp
     from .map_routes import map_bp
 
     from .admin.newsletter import newsletter_admin_bp
-    from .business import business_bp
 
     app.register_blueprint(public_bp)
     app.register_blueprint(api_bp)
@@ -21,5 +20,16 @@ def register_blueprints(app):
     app.register_blueprint(update_bp)
     app.register_blueprint(map_bp)
     app.register_blueprint(newsletter_admin_bp)
+    from modules.attractions.routes import attractions_bp
+    from modules.events.routes import events_bp
+    from modules.business.routes import business_bp
+    from modules.heritage.routes import heritage_bp
+    from modules.gallery.routes import gallery_bp
+    from modules.notifications.routes import notifications_bp
+    app.register_blueprint(attractions_bp)
+    app.register_blueprint(events_bp)
     app.register_blueprint(business_bp)
+    app.register_blueprint(heritage_bp)
+    app.register_blueprint(gallery_bp)
+    app.register_blueprint(notifications_bp)
 

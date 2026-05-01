@@ -11,7 +11,7 @@
         <div class="absolute inset-0 bg-gradient-to-t from-emerald-950 via-emerald-950/50 to-transparent"></div>
         <div class="absolute bottom-0 left-0 right-0 px-4 pb-8">
             <div class="container mx-auto max-w-5xl">
-                <a href="{{ url_for('public.establishments') }}" class="text-emerald-400 hover:text-emerald-300 text-sm font-medium inline-flex items-center gap-1 mb-4">← Back to Directory</a>
+                <a href="{{ url_for('business.index') }}" class="text-emerald-400 hover:text-emerald-300 text-sm font-medium inline-flex items-center gap-1 mb-4">← Back to Directory</a>
                 <div class="flex items-end gap-4">
                     {% if establishment.logo_url %}
                     <img src="{{ establishment.logo_url }}" alt="{{ establishment.name }} logo"
@@ -169,7 +169,7 @@
                     {% if current_user.is_authenticated and current_user.role == 'user' %}
                     <div class="bg-emerald-900/20 border border-white/10 rounded-2xl p-6 backdrop-blur-md mt-6">
                         <h3 class="text-white font-bold mb-4">Leave a Review</h3>
-                        <form method="POST" action="{{ url_for('public.submit_establishment_review', id=establishment.id) }}" class="space-y-4">
+                        <form method="POST" action="{{ url_for('business.submit_review', id=establishment.id) }}" class="space-y-4">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div>
                                 <label class="block text-sm font-bold text-emerald-300/80 mb-2">Rating</label>

@@ -230,7 +230,7 @@
                         <h2 class="text-2xl font-bold mb-3 text-gray-800 group-hover:text-green-700 transition">{{
                             attraction.name }}</h2>
                         <p class="text-gray-600 text-sm line-clamp-3 mb-6 max-w-prose">{{ attraction.description }}</p>
-                        <a href="{{ url_for('public.attraction_detail', id=attraction.id) }}"
+                        <a href="{{ url_for('attractions.detail', id=attraction.id) }}"
                             class="inline-flex items-center gap-2 text-green-700 font-bold hover:gap-3 transition-all min-h-[44px]">
                             Discover More
                             <span>→</span>

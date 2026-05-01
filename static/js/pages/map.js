@@ -57,17 +57,42 @@ document.addEventListener('DOMContentLoaded', function () {
     // Force resize calculation for mobile layout
     map.on('load', () => {
         setTimeout(() => map.resize(), 500);
+        setTimeout(() => map.resize(), 1500); // Second pass after other elements settle
+    });
+
+    window.addEventListener('resize', () => {
+        map.resize();
     });
 
     // ========================================
     // 2. CATEGORY ICON CONFIGURATION
     // ========================================
     const iconConfig = {
-        Nature: { color: '#10b981', emoji: '🌿' },      // Green
+        // Core Categories
+        Nature: { color: '#10b981', emoji: '🌿' },      // Emerald Green
         Historical: { color: '#f59e0b', emoji: '🏛️' },  // Amber
-        Religious: { color: '#8b5cf6', emoji: '⛪' },   // Purple
-        Food: { color: '#ef4444', emoji: '🍴' },        // Red
-        default: { color: '#6b7280', emoji: '📍' }      // Gray
+        Religious: { color: '#6366f1', emoji: '⛪' },   // Indigo
+        
+        // Establishments & Services
+        Food: { color: '#f43f5e', emoji: '🍽️' },        // Rose Red
+        Restaurant: { color: '#f43f5e', emoji: '🍽️' }, 
+        Cafe: { color: '#f43f5e', emoji: '☕' },
+        Fastfood: { color: '#f43f5e', emoji: '🍔' },
+        Lodging: { color: '#0ea5e9', emoji: '🏨' },     // Sky Blue
+        Inn: { color: '#0ea5e9', emoji: '🏨' },
+        
+        // Heritage & Culture
+        Built: { color: '#f59e0b', emoji: '🏛️' },
+        Movable: { color: '#8b5cf6', emoji: '🏺' },
+        Intangible: { color: '#ec4899', emoji: '🎭' },
+        Personality: { color: '#64748b', emoji: '👤' },
+        Institution: { color: '#06b6d4', emoji: '🏫' },
+        
+        // Events
+        Events: { color: '#eab308', emoji: '📅' },      // Yellow
+        Civic: { color: '#3b82f6', emoji: '🏛️' },       // Blue
+        
+        default: { color: '#94a3b8', emoji: '📍' }      // Slate Gray
     };
 
     // ========================================
@@ -163,9 +188,21 @@ document.addEventListener('DOMContentLoaded', function () {
                         ['get', 'category'],
                         'Nature', '#10b981',
                         'Historical', '#f59e0b',
-                        'Religious', '#8b5cf6',
-                        'Food', '#ef4444',
-                        '#6b7280' // default
+                        'Religious', '#6366f1',
+                        'Food', '#f43f5e',
+                        'Restaurant', '#f43f5e',
+                        'Cafe', '#f43f5e',
+                        'Fastfood', '#f43f5e',
+                        'Lodging', '#0ea5e9',
+                        'Inn', '#0ea5e9',
+                        'Built', '#f59e0b',
+                        'Movable', '#8b5cf6',
+                        'Intangible', '#ec4899',
+                        'Personality', '#64748b',
+                        'Institution', '#06b6d4',
+                        'Events', '#eab308',
+                        'Civic', '#3b82f6',
+                        '#94a3b8' // default
                     ],
                     'circle-stroke-width': 2,
                     'circle-stroke-color': '#ffffff',
@@ -276,35 +313,139 @@ document.addEventListener('DOMContentLoaded', function () {
     // 4. TAB SYSTEM
     // ========================================
     const tabPlaces = document.getElementById('tab-places');
+    const tabRecommended = document.getElementById('tab-recommended');
     const tabRoutes = document.getElementById('tab-routes');
     const placesContent = document.getElementById('places-content');
     const routesContent = document.getElementById('routes-content');
 
     function switchTab(tab) {
+        // Reset all tabs
+        [tabPlaces, tabRecommended, tabRoutes].forEach(btn => {
+            if (btn) {
+                btn.classList.remove('text-green-700', 'border-green-700', 'bg-green-50', 'font-semibold', 'border-b-2');
+                btn.classList.add('text-gray-500', 'font-medium');
+            }
+        });
+
+        // Hide all content
+        [placesContent, routesContent].forEach(content => content?.classList.add('hidden'));
+
         if (tab === 'places') {
-            tabPlaces.classList.add('text-green-700', 'border-green-700', 'bg-green-50', 'font-semibold');
-            tabPlaces.classList.remove('text-gray-500', 'font-medium');
-            tabRoutes.classList.remove('text-green-700', 'border-green-700', 'bg-green-50', 'font-semibold');
-            tabRoutes.classList.add('text-gray-500', 'font-medium');
-
+            tabPlaces.classList.add('text-green-700', 'border-green-700', 'bg-green-50', 'font-semibold', 'border-b-2');
             placesContent.classList.remove('hidden');
-            routesContent.classList.add('hidden');
-        } else {
-            tabRoutes.classList.add('text-green-700', 'border-green-700', 'bg-green-50', 'font-semibold');
-            tabRoutes.classList.remove('text-gray-500', 'font-medium');
-            tabPlaces.classList.remove('text-green-700', 'border-green-700', 'bg-green-50', 'font-semibold');
-            tabPlaces.classList.add('text-gray-500', 'font-medium');
-
+            fetchAttractions(1, true);
+        } else if (tab === 'recommended') {
+            tabRecommended.classList.add('text-green-700', 'border-green-700', 'bg-green-50', 'font-semibold', 'border-b-2');
+            placesContent.classList.remove('hidden'); // Use same container but different fetch
+            fetchRecommendations();
+        } else if (tab === 'routes') {
+            tabRoutes.classList.add('text-green-700', 'border-green-700', 'bg-green-50', 'font-semibold', 'border-b-2');
             routesContent.classList.remove('hidden');
-            placesContent.classList.add('hidden');
         }
     }
 
     tabPlaces.addEventListener('click', () => switchTab('places'));
+    tabRecommended.addEventListener('click', () => switchTab('recommended'));
     tabRoutes.addEventListener('click', () => switchTab('routes'));
 
+    async function fetchRecommendations() {
+        const listContainer = document.getElementById('places-content');
+        listContainer.innerHTML = '<div class="text-center text-gray-500 py-4">Finding the best spots for you...</div>';
+        
+        try {
+            // Fetch featured attractions
+            const response = await fetch('/attractions/api?is_featured=true&per_page=10');
+            const result = await response.json();
+            
+            // Fetch featured establishments
+            const estResponse = await fetch('/business/api?is_featured=true&per_page=10');
+            const estResult = await estResponse.json();
+            
+            // Combine and render
+            const combined = [...result.attractions, ...estResult.establishments];
+            
+            if (combined.length === 0) {
+                listContainer.innerHTML = '<div class="text-center text-gray-500 py-8"><div class="text-3xl mb-2">✨</div>No recommendations yet. Explore our Places!</div>';
+            } else {
+                // Mix them up or sort by rating
+                combined.sort((a, b) => (b.rating || b.rating_avg || 0) - (a.rating || a.rating_avg || 0));
+                
+                // Clear and render manually since they might be different types
+                listContainer.innerHTML = '';
+                combined.forEach(item => {
+                    if (item.category) { // It's an attraction
+                        renderSingleAttraction(item, listContainer);
+                    } else { // It's an establishment
+                        renderSingleEstablishment(item, listContainer);
+                    }
+                });
+            }
+        } catch (error) {
+            console.error('Error fetching recommendations:', error);
+            listContainer.innerHTML = '<div class="text-center text-red-500 py-4">Error loading recommendations.</div>';
+        }
+    }
+
+    // Helper to render a single attraction card
+    function renderSingleAttraction(attraction, container) {
+        const categoryConfig = iconConfig[attraction.category] || iconConfig.default;
+        const safeName = escapeHTML(attraction.name);
+        const safeDescription = escapeHTML(attraction.description);
+        const safeImage = attraction.image || PLACEHOLDER_IMG;
+
+        const card = document.createElement('div');
+        card.className = 'group bg-white rounded-xl shadow-sm border border-emerald-100 hover:shadow-md transition-all cursor-pointer overflow-hidden flex flex-row h-32 relative';
+        card.innerHTML = `
+            <div class="absolute -top-1 -left-1 bg-amber-400 text-white text-[8px] font-bold px-2 py-0.5 rounded-br-lg z-10 shadow-sm uppercase tracking-widest">Recommended</div>
+            <div class="w-1/3 h-full bg-gray-200 relative flex-shrink-0">
+                <img src="${safeImage}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="${safeName}">
+                <div class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold" style="color: ${categoryConfig.color}">${attraction.category.toUpperCase()}</div>
+            </div>
+            <div class="w-2/3 p-3 flex flex-col justify-between">
+                <div>
+                    <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-1">${safeName}</h3>
+                    <p class="text-xs text-gray-600 line-clamp-2 mt-1">${safeDescription}</p>
+                </div>
+                <div class="flex justify-between items-end mt-2">
+                    <div class="text-xs font-bold text-amber-500">★★★★★ <span class="text-gray-400 font-normal">(4.5)</span></div>
+                    <button class="text-[10px] px-2 py-1 bg-emerald-50 text-emerald-700 rounded transition font-semibold">View ➔</button>
+                </div>
+            </div>
+        `;
+        card.addEventListener('click', () => flyToLocation(attraction.id, attraction.latitude, attraction.longitude));
+        container.appendChild(card);
+    }
+
+    // Helper to render a single establishment card
+    function renderSingleEstablishment(est, container) {
+        const cfg = estTypeConfig[est.type] || { color: '#6b7280', emoji: '📍', label: est.type };
+        const safeName = escapeHTML(est.name);
+
+        const card = document.createElement('div');
+        card.className = 'group bg-white rounded-xl shadow-sm border border-orange-100 hover:shadow-md transition-all cursor-pointer overflow-hidden flex flex-row h-32 relative';
+        card.innerHTML = `
+            <div class="absolute -top-1 -left-1 bg-amber-400 text-white text-[8px] font-bold px-2 py-0.5 rounded-br-lg z-10 shadow-sm uppercase tracking-widest">Featured</div>
+            <div class="w-1/3 h-full bg-gray-200 relative flex-shrink-0">
+                <img src="${est.cover_image_url || PLACEHOLDER_IMG}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" alt="${safeName}">
+                <div class="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded text-[10px] font-bold" style="color: ${cfg.color}">${cfg.emoji} ${cfg.label.toUpperCase()}</div>
+            </div>
+            <div class="w-2/3 p-3 flex flex-col justify-between">
+                <div>
+                    <h3 class="font-bold text-sm leading-tight mb-1 line-clamp-1">${safeName}</h3>
+                    <p class="text-xs text-gray-600 line-clamp-2 mt-1">${escapeHTML(est.description)}</p>
+                </div>
+                <div class="flex justify-between items-end mt-2">
+                    <div class="text-[10px] font-bold text-gray-500">★ ${est.rating_avg.toFixed(1)} · ${est.barangay}</div>
+                    <button class="text-[10px] px-2 py-1 bg-orange-50 text-orange-700 rounded transition font-semibold">View ➔</button>
+                </div>
+            </div>
+        `;
+        card.addEventListener('click', () => flyToEstablishmentLocation(est));
+        container.appendChild(card);
+    }
+
     // ========================================
-    // 5. CACHING
+    // 2. CONFIGURATIONS
     // ========================================
     function getCacheKey(page, category, barangay) {
         return `attractions_${page}_${category || 'all'}_${barangay || 'all'}`;
@@ -377,7 +518,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 params.append('barangay', currentBarangay);
             }
 
-            const response = await fetch(`/api/attractions?${params}`);
+            const response = await fetch(`/attractions/api?${params}`);
             const result = await response.json();
 
             if (reset) {
@@ -850,7 +991,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 params.append('radius', 15);
             }
 
-            const response = await fetch(`/api/establishments?${params}`);
+            const response = await fetch(`/business/api?${params}`);
             const result = await response.json();
 
             if (reset) {
@@ -1077,6 +1218,65 @@ document.addEventListener('DOMContentLoaded', function () {
         geolocate.trigger();
         locateBtn.classList.add('animate-pulse');
     });
+
+    // Smart Find Nearest Logic
+    window.findNearest = async function(category, type = 'establishment') {
+        if (!navigator.geolocation) {
+            alert('Geolocation is not supported by your browser.');
+            return;
+        }
+
+        // Show loading state
+        const listContainer = document.getElementById('places-content');
+        listContainer.innerHTML = `<div class="text-center text-gray-500 py-4">Finding nearest ${category}...</div>`;
+        
+        navigator.geolocation.getCurrentPosition(async (position) => {
+            const { latitude, longitude } = position.coords;
+            estUserLat = latitude;
+            estUserLng = longitude;
+
+            try {
+                const endpoint = type === 'establishment' ? '/business/api' : '/attractions/api';
+                const params = new URLSearchParams({
+                    lat: latitude,
+                    lng: longitude,
+                    radius: 20, // 20km radius
+                    per_page: 5
+                });
+                
+                if (type === 'establishment') {
+                    params.append('type', category);
+                } else {
+                    params.append('category', category);
+                }
+
+                const response = await fetch(`${endpoint}?${params}`);
+                const result = await response.json();
+                const items = type === 'establishment' ? result.establishments : result.attractions;
+
+                if (items.length === 0) {
+                    listContainer.innerHTML = `<div class="text-center text-gray-500 py-4">No ${category} found within 20km.</div>`;
+                    return;
+                }
+
+                // Render and Focus
+                if (type === 'establishment') {
+                    renderEstablishments(items);
+                    addEstablishmentMarkers(items);
+                    flyToEstablishmentLocation(items[0]);
+                } else {
+                    renderAttractions(items);
+                    flyToLocation(items[0].id, items[0].latitude, items[0].longitude);
+                }
+
+            } catch (error) {
+                console.error('Error finding nearest:', error);
+                alert('Error finding nearest locations.');
+            }
+        }, (error) => {
+            alert('Unable to get your location.');
+        });
+    };
 
     // Handle Geolocation Events
     geolocate.on('geolocate', (position) => {

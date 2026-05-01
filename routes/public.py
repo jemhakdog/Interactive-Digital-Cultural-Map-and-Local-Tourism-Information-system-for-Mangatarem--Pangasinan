@@ -1,22 +1,14 @@
-from models import db, User, Attraction, Event, GalleryItem, BarangayInfo, AnalyticsPageView, NewsletterSubscriber, Establishment, EstablishmentRoom, EstablishmentMenuItem, EstablishmentReview
-from flask_login import current_user
+from models import db, User, Attraction, Event, BarangayInfo
+from modules.business.models import Establishment
 from extensions import limiter
-from datetime import datetime
-from flask import Blueprint, render_template, request, jsonify, flash, redirect, url_for
-from utils.logger_helper import (
-    log_entry,
-    log_query,
-    log_success,
-    log_render,
-    log_error,
-)
-from utils.security import validate_email_format, validate_string_input, sanitize_html_input
-from utils.validators import validate_form_data, validate_query_params, validate_json_input
+import os
+from flask import Blueprint, render_template, request, url_for, current_app, make_response
+from utils.logger_helper import log_entry, log_success
+from utils.validators import validate_query_params
+from modules.analytics.utils import record_view
 import logging
-import threading
 from sqlalchemy import func
 import json
-from flask import current_app
 
 public_bp = Blueprint("public", __name__)
 logger = logging.getLogger(__name__)
@@ -46,95 +38,59 @@ def test_supabase():
 @public_bp.route("/")
 def index():
     """
-    Render the home page with featured attractions.
+    Render the home page with featured content.
     Optimized to use SQL-side random sampling and Redis caching.
     """
     logger.info("Home page accessed")
-
-    # Record view
     record_view("page", page_name="home")
 
-    featured = []
-    cache_key = "home_featured_attractions"
+    featured_attractions = []
+    featured_establishments = []
     redis = current_app.redis_client
 
-    # Try to get from Cache first
+    # Try to get from Cache
     if redis:
         try:
-            cached_data = redis.get(cache_key)
-            if cached_data:
-                featured = json.loads(cached_data)
-                logger.info(f"Loaded {len(featured)} featured attractions from Redis cache (full objects)")
+            cached_attr = redis.get("home_featured_attractions_v2")
+            cached_est = redis.get("home_featured_establishments_v2")
+            if cached_attr:
+                featured_attractions = json.loads(cached_attr)
+            if cached_est:
+                featured_establishments = json.loads(cached_est)
         except Exception as e:
             logger.error(f"Redis cache error: {e}")
 
-    # Fallback/Refresh Cache if empty
-    if not featured:
-        # Optimized: Let the DB handle random sampling instead of .all()
+    # Fallback/Refresh
+    if not featured_attractions:
+        # Prioritize items marked with is_featured=True
         attractions = (
             Attraction.query.filter_by(status="approved")
-            .order_by(func.random())
-            .limit(5)
+            .order_by(Attraction.is_featured.desc(), func.random())
+            .limit(6)
             .all()
         )
-        featured = [a.to_dict() for a in attractions]
-        
-        # Store full objects in Redis for 10 minutes
-        if redis and featured:
-            try:
-                redis.set(cache_key, json.dumps(featured), ex=600)
-                logger.info("Refreshed home featured attractions cache in Redis with full objects")
-            except Exception as e:
-                logger.error(f"Failed to set Redis cache: {e}")
+        featured_attractions = [a.to_dict() for a in attractions]
+        if redis:
+            redis.set("home_featured_attractions_v2", json.dumps(featured_attractions), ex=3600)
 
-    logger.info(f"Home page rendered with {len(featured)} featured attractions")
-    return render_template("pagez/index.html", featured=featured)
+    if not featured_establishments:
+        establishments = (
+            Establishment.query.filter_by(status="approved")
+            .order_by(Establishment.is_featured.desc(), func.random())
+            .limit(6)
+            .all()
+        )
+        featured_establishments = [e.to_dict() for e in establishments]
+        if redis:
+            redis.set("home_featured_establishments_v2", json.dumps(featured_establishments), ex=3600)
+
+    return render_template(
+        "pagez/index.html", 
+        featured=featured_attractions,
+        featured_establishments=featured_establishments
+    )
 
 
-def record_view(view_type, item_id=None, page_name=None):
-    """
-    Record a page view in a background thread to avoid delaying the response.
-    Optimized for Serverless: Errors are logged but do not block the main thread.
-    """
-    # Don't track if the environment is explicitly production but without DB
-    if not current_app.config.get("SQLALCHEMY_DATABASE_URI"):
-        return
-
-    user_id = current_user.id if current_user.is_authenticated else None
-    app = current_app._get_current_object()
-
-    def _async_record():
-        # Vercel contexts might be limited, use a fresh session
-        with app.app_context():
-            try:
-                # Optimized for performance: 
-                # 1. Higher sampling rate but faster execution
-                # 2. Skip if current request context is already closing
-                from random import random as random_float
-                if random_float() > 0.5: # 50% sampling
-                    return
-
-                view = AnalyticsPageView(
-                    view_type=view_type,
-                    item_id=item_id,
-                    page_name=page_name,
-                    user_id=user_id,
-                    timestamp=datetime.utcnow(),
-                )
-                db.session.add(view)
-                db.session.commit()
-            except Exception as e:
-                print(f"Analytics Error (background): {e}")
-            finally:
-                # Crucial for SQLAlchemy in background threads: clear the session
-                db.session.remove()
-
-    # On Vercel, threads are risky. Only start if not in a massive load.
-    try:
-        t = threading.Thread(target=_async_record, daemon=True)
-        t.start()
-    except Exception:
-        pass # Silently fail for analytics to prevent blocking users
 
 
 @public_bp.route("/map")
@@ -167,171 +123,13 @@ def map_view():
         "Map page loaded with attractions and barangays"
     )
     return render_template(
-        "pagez/map.html", barangays=barangay_list, attractions_count=attractions_count
+        "pagez/map.html", 
+        barangays=barangay_list, 
+        attractions_count=attractions_count,
+        mapbox_token=os.environ.get("mapbox_token", "")
     )
 
 
-@public_bp.route("/attraction/<int:id>")
-def attraction_detail(id):
-    """
-    Display detailed information about a specific attraction.
-
-    Args:
-        id: The ID of the attraction to display.
-
-    Returns:
-        Rendered detail template with attraction information.
-    """
-    log_entry("public", "attraction_detail", id=id)
-    logger.info("Attraction detail page accessed")
-
-    log_query("public", "attraction_detail", f"Fetching attraction ID {id}")
-    attraction = Attraction.query.get_or_404(id)
-    # Record view
-    record_view("attraction", item_id=id)
-
-    # Fetch nearby attractions (same barangay, approved, limit 3, excluding current)
-    nearby = (
-        Attraction.query.filter(
-            Attraction.barangay_id == attraction.barangay_id,
-            Attraction.status == "approved",
-            Attraction.id != attraction.id,
-        )
-        .limit(3)
-        .all()
-    )
-
-    # Fetch related gallery items (if any, matching by barangay since we don't have direct link in GalleryItem)
-    # Note: GalleryItem joins with User to check for barangay
-    related_gallery = (
-        GalleryItem.query.join(User, GalleryItem.user_id == User.id)
-        .filter(User.barangay_id == attraction.barangay_id, GalleryItem.status == "approved")
-        .limit(6)
-        .all()
-    )
-
-    log_success(
-        "public",
-        "attraction_detail",
-        f"Displaying attraction '{attraction.name}', Found {len(nearby)} nearby places"
-    )
-    logger.info("Showing attraction detail")
-
-    # Fetch nearby establishments (within ~5km radius)
-    nearby_stay = []
-    nearby_eat = []
-    if attraction.latitude and attraction.longitude:
-        from utils.geo import haversine_distance
-        all_establishments = Establishment.query.filter_by(status="approved").all()
-        for est in all_establishments:
-            dist = haversine_distance(
-                attraction.latitude, attraction.longitude,
-                est.latitude, est.longitude
-            )
-            if dist <= 5.0:  # 5km radius
-                est._distance = round(dist, 1)
-                if est.type == "inn":
-                    nearby_stay.append(est)
-                else:
-                    nearby_eat.append(est)
-        nearby_stay.sort(key=lambda x: x._distance)
-        nearby_eat.sort(key=lambda x: x._distance)
-        nearby_stay = nearby_stay[:3]
-        nearby_eat = nearby_eat[:3]
-
-    log_render("public", "attraction_detail", "detail.html")
-    return render_template(
-        "pagez/detail.html",
-        attraction=attraction,
-        nearby=nearby,
-        related_gallery=related_gallery,
-        nearby_stay=nearby_stay,
-        nearby_eat=nearby_eat,
-    )
-
-
-@public_bp.route("/events")
-def events():
-    """
-    Display all approved events in chronological order.
-
-    Shows upcoming and ongoing cultural events and festivals
-    across all barangays.
-
-    Returns:
-        Rendered events template with list of events.
-    """
-    log_entry("public", "events")
-    logger.info("Events page accessed")
-
-    page = request.args.get('page', 1, type=int)
-    per_page = 12
-
-    log_query("public", "events", "Fetching approved events with pagination")
-    paginated = Event.query.filter_by(status="approved").order_by(Event.date.asc()).paginate(
-        page=page, per_page=per_page, error_out=False
-    )
-    events = paginated.items
-
-    log_success("public", "events", f"Displaying {len(events)} approved events (Page {page})")
-    logger.info("Events page loaded")
-
-    log_render("public", "events", "events.html")
-    return render_template("pagez/events.html", events=events, pagination=paginated)
-
-
-@public_bp.route("/gallery")
-def gallery():
-    """
-    Display the photo and video gallery.
-
-    Shows all approved gallery items (photos and videos) from
-    barangay contributors, sorted by upload date (newest first).
-
-    Returns:
-        Rendered gallery template with approved media items.
-    """
-    log_entry("public", "gallery")
-    logger.info("Gallery page accessed")
-
-    # Record view
-    record_view("page", page_name="gallery")
-
-    page = request.args.get('page', 1, type=int)
-    per_page = 12
-
-    log_query("public", "gallery", "Fetching approved gallery items with pagination")
-    paginated = (
-        GalleryItem.query.filter_by(status="approved")
-        .order_by(GalleryItem.created_at.desc())
-        .paginate(page=page, per_page=per_page, error_out=False)
-    )
-    items = paginated.items
-
-    # Get list of unique barangays from approved gallery items for the filter
-    log_query("public", "gallery", "Fetching unique barangays for gallery")
-    barangays = (
-        db.session.query(User.barangay_id)
-        .join(GalleryItem, User.id == GalleryItem.user_id)
-        .filter(GalleryItem.status == "approved", User.barangay_id.is_not(None))
-        .distinct()
-        .order_by(User.barangay_id)
-        .all()
-    )
-
-    barangay_list = [b[0] for b in barangays]
-
-    log_success(
-        "public",
-        "gallery",
-        f"Gallery loaded with {len(items)} items from {len(barangay_list)} barangays"
-    )
-    logger.info("Gallery page loaded")
-
-    log_render("public", "gallery", "gallery.html")
-    return render_template(
-        "pagez/gallery.html", gallery_items=items, barangays=barangay_list, pagination=paginated
-    )
 
 
 @public_bp.route("/search")
@@ -462,378 +260,11 @@ def routes():
     return render_template("pagez/routes.html")
 
 
-@public_bp.route("/barangays")
-def barangays():
-    """
-    Display directory of all barangays with active contributors.
-    Optimized with Redis caching for categorical counts and centroids.
-    """
-    logger.info("Barangays directory page accessed")
-
-    # Record view
-    record_view("page", page_name="barangays_list")
-
-    cache_key = "public_barangays_list"
-    redis = current_app.redis_client
-
-    if redis:
-        try:
-            cached_data = redis.get(cache_key)
-            if cached_data:
-                logger.info("Serving barangay directory from Redis cache")
-                return render_template("pagez/barangays.html", barangays=json.loads(cached_data))
-        except Exception as e:
-            logger.error(f"Redis cache fetch error: {e}")
-
-    # Get list of barangays that have active contributors
-    barangay_ids_query = (
-        db.session.query(User.barangay_id)
-        .filter(
-            User.role == "contributor", User.is_approved, User.barangay_id.is_not(None)
-        )
-        .distinct()
-        .all()
-    )
-    barangay_ids = [b[0] for b in barangay_ids_query]
-
-    if not barangay_ids:
-        return render_template("pagez/barangays.html", barangays=[])
-
-    # Optimize: Fetch only necessary columns
-    all_attractions = (
-        db.session.query(
-            Attraction.barangay_id, 
-            Attraction.name, 
-            Attraction.category, 
-            Attraction.image_url, 
-            Attraction.latitude, 
-            Attraction.longitude
-        )
-        .filter(
-            Attraction.barangay_id.in_(barangay_ids), 
-            Attraction.status == "approved"
-        )
-        .all()
-    )
-
-    # Group attractions by barangay
-    from collections import defaultdict
-    from models import BarangayInfo
-
-    barangay_data = defaultdict(list)
-    for a in all_attractions:
-        barangay_data[a.barangay_id].append(a)
-
-    # Fetch names for these barangays
-    barangay_infos = (
-        db.session.query(BarangayInfo.id, BarangayInfo.name)
-        .filter(BarangayInfo.id.in_(barangay_ids))
-        .all()
-    )
-    barangay_map = {b.id: b.name for b in barangay_infos}
-
-    barangay_list = []
-    for brgy_id in barangay_ids:
-        attractions = barangay_data.get(brgy_id, [])
-        name = barangay_map.get(brgy_id, "Unknown")
-
-        # Find a representative image
-        image_url = next((a.image_url for a in attractions if a.image_url), None)
-
-        # Calculate center coordinates (centroid)
-        latitude, longitude = 15.9949, 120.4869  # Default
-        if attractions:
-            latitude = sum(a.latitude for a in attractions) / len(attractions)
-            longitude = sum(a.longitude for a in attractions) / len(attractions)
-
-        # Collect unique categories as tags
-        tags = sorted(list(set(a.category for a in attractions if a.category)))
-
-        barangay_list.append(
-            {
-                "name": name,
-                "image_url": image_url,
-                "latitude": latitude,
-                "longitude": longitude,
-                "tags": tags,
-                "attraction_count": len(attractions),
-            }
-        )
-
-    # Sort by name
-    barangay_list.sort(key=lambda x: x["name"])
-
-    # Cache for 1 hour as this is a heavy calculation but rarely changes
-    if redis:
-        try:
-            redis.set(cache_key, json.dumps(barangay_list), ex=3600)
-            logger.info("Barangay directory cached in Redis")
-        except Exception as e:
-            logger.error(f"Redis cache set error: {e}")
-
-    logger.info(f"Barangays directory page loaded with {len(barangay_list)} barangays")
-    return render_template("pagez/barangays.html", barangays=barangay_list)
-
-
-@public_bp.route("/barangay/<name>")
-def barangay_profile(name):
-    """
-    Display a barangay's cultural and tourism profile page.
-
-    Shows all approved attractions, events, gallery items, and
-    cultural information for a specific barangay.
-
-    Args:
-        name: The name of the barangay.
-
-    Returns:
-        Rendered barangay profile template with all content for the barangay.
-    """
-    log_entry("public", "barangay_profile", name=name)
-    logger.info(f"Barangay profile page accessed for barangay '{name}'")
-
-    # Record view
-    record_view(
-        "page", page_name="barangay_profile", item_id=None
-    )  # We could count specific barangays if we had IDs
-
-    # Get barangay info (cultural assets, traditions, etc.)
-    barangay_info = BarangayInfo.query.filter_by(name=name).first()
-    barangay_id = barangay_info.id if barangay_info else None
-
-    # Get all approved content for this barangay using ID-based filtering
-    log_query(
-        "public",
-        "barangay_profile",
-        f"Fetching assets for barangay ID {barangay_id} ('{name}')"
-    )
-    
-    attractions = []
-    events = []
-    gallery_items = []
-
-    if barangay_id:
-        attractions = Attraction.query.filter_by(barangay_id=barangay_id, status="approved").all()
-        events = (
-            Event.query.filter_by(barangay_id=barangay_id, status="approved")
-            .order_by(Event.date.asc())
-            .all()
-        )
-        gallery_items = (
-            GalleryItem.query.join(User, GalleryItem.user_id == User.id)
-            .filter(User.barangay_id == barangay_id, GalleryItem.status == "approved")
-            .order_by(GalleryItem.created_at.desc())
-            .all()
-        )
-
-    # Calculate center coordinates for map (average of all assets with coordinates)
-    # Default: Mangatarem coordinates
-    center_latitude, center_longitude = 15.7890, 120.2856 
-    
-    # Collect all map-able assets
-    map_assets = []
-    coords_list = []
-
-    for a in attractions:
-        map_assets.append({
-            "id": a.id,
-            "name": a.name,
-            "type": "attraction",
-            "category": a.category,
-            "description": a.description,
-            "latitude": a.latitude,
-            "longitude": a.longitude,
-            "image_url": a.image_url,
-            "url": url_for('public.attraction_detail', id=a.id)
-        })
-        coords_list.append((a.latitude, a.longitude))
-
-    for e in events:
-        if e.latitude and e.longitude:
-            map_assets.append({
-                "id": e.id,
-                "name": e.name,
-                "type": "event",
-                "category": e.category,
-                "description": e.description,
-                "latitude": e.latitude,
-                "longitude": e.longitude,
-                "image_url": e.image_url,
-                "date": e.date.strftime('%B %d, %Y'),
-                "url": "#" # Events might not have a detail page yet, but could in future
-            })
-            coords_list.append((e.latitude, e.longitude))
-
-    if coords_list:
-        center_latitude = sum(c[0] for c in coords_list) / len(coords_list)
-        center_longitude = sum(c[1] for c in coords_list) / len(coords_list)
-
-    # Convert attractions to dictionaries for JSON serialization
-    attractions_json = []
-    for a in attractions:
-        attractions_json.append(
-            {
-                "id": a.id,
-                "name": a.name,
-                "category": a.category,
-                "barangay": a.barangay,
-                "description": a.description,
-                "latitude": a.latitude,
-                "longitude": a.longitude,
-                "image_url": a.image_url,
-            }
-        )
-
-    log_success(
-        "public",
-        "barangay_profile",
-        f"Profile for '{name}' loaded ({len(attractions)} attractions, {len(events)} events)"
-    )
-    logger.info(
-        f"Barangay profile for '{name}': {len(attractions)} attractions, {len(events)} events, {len(gallery_items)} gallery items"
-    )
-
-    logger.info("Rendering barangay_profile.html")
-    return render_template(
-        "pagez/barangay_profile.html",
-        barangay_name=name,
-        attractions=attractions,
-        map_assets=map_assets,
-        events=events,
-        gallery_items=gallery_items,
-        barangay_info=barangay_info,
-        center_latitude=center_latitude,
-        center_longitude=center_longitude,
-    )
 
 
 
-# === Heritage Public Pages ===
-
-@public_bp.route("/heritage")
-def heritage_index():
-    """
-    Heritage catalog landing page.
-
-    Shows overview of all heritage types with approved item counts,
-    linking to type-specific lists.
-    """
-    from utils.heritage_registry import get_all_types
-
-    log_entry("public", "heritage_index")
-    logger.info("Heritage catalog page accessed")
-    record_view("page", page_name="heritage")
-
-    type_stats = []
-    for slug, config in get_all_types():
-        model = config["model"]
-        count = model.query.filter_by(status="approved").count()
-        # Get a representative photo from the first approved item
-        sample = model.query.filter_by(status="approved").first()
-        photo = None
-        if sample:
-            photo = (
-                getattr(sample, "photo_url", None)
-                or getattr(sample, "facade_photo_url", None)
-                or getattr(sample, "logo_url", None)
-            )
-
-        type_stats.append({
-            "slug": slug,
-            "label": config["label"],
-            "label_plural": config["label_plural"],
-            "form": config["form"],
-            "has_coords": config["has_coords"],
-            "count": count,
-            "photo": photo,
-        })
-
-    log_success("public", "heritage_index", f"Heritage catalog loaded with {len(type_stats)} types")
-    return render_template("pagez/heritage_index.html", type_stats=type_stats)
 
 
-@public_bp.route("/heritage/<heritage_type>")
-def heritage_type_list(heritage_type):
-    """
-    Browse approved heritage items by type.
-
-    Supports pagination and search filtering.
-    """
-    from utils.heritage_registry import get_heritage_config
-
-    config = get_heritage_config(heritage_type)
-    if not config:
-        from flask import abort
-        abort(404)
-
-    log_entry("public", "heritage_type_list", heritage_type=heritage_type)
-    logger.info(f"Heritage list page accessed for type '{heritage_type}'")
-    record_view("page", page_name=f"heritage_{heritage_type}")
-
-    model = config["model"]
-    page = request.args.get("page", 1, type=int)
-    per_page = 12
-    raw_search = request.args.get("search", "").strip()
-    
-    # Validate search input
-    is_valid, _ = validate_string_input(raw_search, max_length=200, block_sql_injection=True)
-    search_term = raw_search[:200] if is_valid else ""
-
-    query = model.query.filter_by(status="approved")
-    if search_term:
-        name_field = config["name_field"]
-        query = query.filter(
-            getattr(model, name_field).ilike(f"%{search_term}%")
-        )
-
-    paginated = query.order_by(model.created_at.desc()).paginate(
-        page=page, per_page=per_page, error_out=False
-    )
-
-    log_success(
-        "public", "heritage_type_list",
-        f"Loaded {paginated.total} '{config['label']}' items (page {page})"
-    )
-    return render_template(
-        "pagez/heritage_list.html",
-        items=paginated.items,
-        pagination=paginated,
-        heritage_type=heritage_type,
-        config=config,
-        search_term=search_term,
-    )
-
-
-@public_bp.route("/heritage/<heritage_type>/<int:item_id>")
-def heritage_detail(heritage_type, item_id):
-    """Display detailed view of a single approved heritage item."""
-    from utils.heritage_registry import get_heritage_config, get_display_name
-
-    config = get_heritage_config(heritage_type)
-    if not config:
-        from flask import abort
-        abort(404)
-
-    model = config["model"]
-    item = model.query.get_or_404(item_id)
-
-    if item.status != "approved":
-        from flask import abort
-        abort(404)
-
-    display_name = get_display_name(item, heritage_type)
-    log_entry("public", "heritage_detail", heritage_type=heritage_type, id=item_id)
-    logger.info(f"Heritage detail page for '{display_name}' (type: {heritage_type}, id: {item_id})")
-    record_view("heritage", item_id=item_id, page_name=f"heritage_{heritage_type}")
-
-    log_render("public", "heritage_detail", "heritage_detail.html")
-    return render_template(
-        "pagez/heritage_detail.html",
-        item=item,
-        heritage_type=heritage_type,
-        config=config,
-        display_name=display_name,
-    )
 
 
 @public_bp.route("/sitemap.xml")
@@ -846,7 +277,6 @@ def sitemap():
     Returns:
         XML response containing the sitemap.
     """
-    from flask import make_response
     from datetime import datetime
 
     # host_url = "/".join(host_components[:3])  # e.g., http://localhost:5000
@@ -894,10 +324,11 @@ def sitemap():
     static_urls = [
         "public.index",
         "public.map_view",
-        "public.events",
-        "public.gallery",
+        "events.index",
+        "gallery.index",
         "public.routes",
-        "public.barangays",
+        "barangay.index",
+        "heritage.index",
     ]
 
     for url in static_urls:
@@ -916,7 +347,7 @@ def sitemap():
         pages.append(
             {
                 "loc": url_for(
-                    "public.attraction_detail", id=attraction.id, _external=True
+                    "attractions.detail", id=attraction.id, _external=True
                 ),
                 "lastmod": attraction.created_at.date().isoformat()
                 if attraction.created_at
@@ -940,7 +371,7 @@ def sitemap():
     for b in barangay_names:
         pages.append(
             {
-                "loc": url_for("public.barangay_profile", name=b[0], _external=True),
+                "loc": url_for("barangay.profile", name=b[0], _external=True),
                 "lastmod": last_update,  # Ideally fetch latest update for barangay
                 "changefreq": "weekly",
                 "priority": "0.7",
@@ -961,66 +392,17 @@ def sitemap():
 def verify_site():
     """
     Serve Google Search Console verification file.
-
-    This route provides the verification file required by Google Search Console
-    to verify ownership of the website. This is necessary for accessing
-    Google Search Console features and improving site visibility in search results.
-
-    Returns:
-        Rendered verification template file.
     """
     log_entry("public", "verify_site")
     logger.info("Google Search Console verification file accessed")
     return render_template("google364b8336ce52ae86.html")
 
 
-
-@public_bp.route("/subscribe", methods=["POST"])
-@validate_form_data({
-    'email': {'type': 'email', 'required': True}
-})
-def subscribe():
+@public_bp.route("/robots.txt")
+def robots():
     """
-    Handle newsletter subscription requests.
+    Serve robots.txt file.
     """
-    email = request.validated_data['email']
-    
-    # Check if already subscribed
-    existing = NewsletterSubscriber.query.filter_by(email=email).first()
-    if existing:
-        if not existing.is_active:
-            existing.is_active = True
-            db.session.commit()
-            if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-                return jsonify({"status": "success", "message": "Welcome back! You've been resubscribed."})
-            flash("Welcome back! You've been resubscribed.", "success")
-            return redirect(url_for("public.index"))
-        
-        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return jsonify({"status": "info", "message": "You are already subscribed!"})
-        flash("You are already subscribed!", "info")
-        return redirect(url_for("public.index"))
-
-    # Create new subscriber
-    try:
-        new_subscriber = NewsletterSubscriber(email=email)
-        db.session.add(new_subscriber)
-        db.session.commit()
-        
-        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return jsonify({"status": "success", "message": "Thank you for subscribing to our newsletter!"})
-        flash("Thank you for subscribing to our newsletter!", "success")
-        return redirect(url_for("public.index"))
-    except Exception as e:
-        db.session.rollback()
-        logger.error(f"Subscription error: {e}")
-        if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-            return jsonify({"status": "error", "message": "An error occurred. Please try again later."}), 500
-        flash("An error occurred. Please try again later.", "error")
-        return redirect(url_for("public.index"))
-
-    from flask import make_response
-
     sitemap_url = url_for("public.sitemap", _external=True)
 
     robots_txt = f"""User-agent: *
@@ -1038,117 +420,3 @@ Sitemap: {sitemap_url}
     return response
 
 
-# === Establishment Routes ===
-
-@public_bp.route("/establishments")
-def establishments():
-    """Public establishment directory with filters."""
-    log_entry("public", "establishments", method=request.method)
-    logger.info("Establishments directory accessed")
-
-    query = Establishment.query.filter_by(status="approved")
-
-    # Smart Filters for Business Owners
-    type_filter = request.args.get("type")
-    is_auto_filtered = False
-    owner_type = None
-    show_all = request.args.get("show_all") == "true"
-
-    if not type_filter and not show_all and current_user.is_authenticated and current_user.role == "business_owner":
-        owner_establishment = Establishment.query.filter_by(owner_id=current_user.id).first()
-        if owner_establishment:
-            type_filter = owner_establishment.type
-            owner_type = owner_establishment.type
-            is_auto_filtered = True
-
-    if type_filter:
-        query = query.filter_by(type=type_filter)
-
-    price_filter = request.args.get("price_range")
-    if price_filter:
-        query = query.filter_by(price_range=price_filter)
-
-    barangay_filter = request.args.get("barangay")
-    if barangay_filter:
-        query = query.join(BarangayInfo).filter(BarangayInfo.name == barangay_filter)
-
-    search = request.args.get("q")
-    if search:
-        query = query.filter(Establishment.name.ilike(f"%{search}%"))
-
-    establishments_list = query.order_by(Establishment.is_featured.desc(), Establishment.rating_avg.desc()).all()
-    barangays = BarangayInfo.query.order_by(BarangayInfo.name).all()
-
-    return render_template(
-        "pagez/establishments.html",
-        establishments=establishments_list,
-        barangays=barangays,
-        is_auto_filtered=is_auto_filtered,
-        owner_type=owner_type,
-    )
-
-
-@public_bp.route("/establishment/<int:id>")
-def establishment_detail(id):
-    """Public establishment detail page."""
-    establishment = Establishment.query.get_or_404(id)
-
-    if establishment.status != "approved":
-        flash("This establishment is not yet published.", "warning")
-        return redirect(url_for("public.establishments"))
-
-    rooms = []
-    menu_items = []
-
-    if establishment.type == "inn":
-        rooms = EstablishmentRoom.query.filter_by(
-            establishment_id=establishment.id, is_available=True
-        ).all()
-    else:
-        menu_items = EstablishmentMenuItem.query.filter_by(
-            establishment_id=establishment.id, is_available=True
-        ).order_by(EstablishmentMenuItem.category, EstablishmentMenuItem.name).all()
-
-    reviews = EstablishmentReview.query.filter_by(
-        establishment_id=establishment.id, status="approved"
-    ).order_by(EstablishmentReview.created_at.desc()).all()
-
-    return render_template(
-        "pagez/establishment_detail.html",
-        establishment=establishment,
-        rooms=rooms,
-        menu_items=menu_items,
-        reviews=reviews,
-    )
-
-
-@public_bp.route("/establishment/<int:id>/review", methods=["POST"])
-@validate_form_data({
-    'rating': {'type': 'int', 'min': 1, 'max': 5, 'required': True},
-    'comment': {'type': 'string', 'max_length': 2000, 'required': True}
-})
-def submit_establishment_review(id):
-    """Submit a review for an establishment."""
-    if not current_user.is_authenticated:
-        flash("Please login to leave a review.", "warning")
-        return redirect(url_for("auth.login"))
-
-    establishment = Establishment.query.get_or_404(id)
-    rating = int(request.form.get("rating"))
-    comment = request.form.get("comment", "")
-    
-    # Sanitize HTML but allow basic formatting
-    sanitized_comment = sanitize_html_input(comment)
-
-    review = EstablishmentReview(
-        user_id=current_user.id,
-        establishment_id=establishment.id,
-        rating=rating,
-        comment=sanitized_comment,
-        status="pending",
-    )
-    db.session.add(review)
-    db.session.commit()
-
-    flash("Your review has been submitted and is pending approval.", "success")
-    return redirect(url_for("public.establishment_detail", id=id))

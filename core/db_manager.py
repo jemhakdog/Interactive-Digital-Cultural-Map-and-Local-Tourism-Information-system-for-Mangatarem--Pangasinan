@@ -1,0 +1,295 @@
+"""
+Database manager with clean function design.
+
+Extracts provider-specific logic into focused functions.
+Separates concerns: detection, construction, optimization.
+"""
+
+import os
+import logging
+import re
+from urllib.parse import quote_plus
+from sqlalchemy.pool import NullPool
+from supabase import create_client, Client
+
+logger = logging.getLogger(__name__)
+
+
+def _encode_password_in_url(db_url: str) -> str:
+    """
+    URL-encode password in database connection URL.
+    
+    Args:
+        db_url: Connection string with unencoded password
+        
+    Returns:
+        Connection string with encoded password
+    """
+    pattern = r"^(postgresql(?:\+psycopg2)?|postgres|mysql(?:\+pymysql)?)://([^:]+):(.+)@(.+)$"
+    match = re.match(pattern, db_url)
+    
+    if match:
+        scheme = match.group(1)
+        user = match.group(2)
+        password = match.group(3)
+        host_and_db = match.group(4)
+        
+        encoded_password = quote_plus(password)
+        return f"{scheme}://{user}:{encoded_password}@{host_and_db}"
+    
+    return db_url
+
+
+def _extract_supabase_project_id(supabase_url: str) -> str:
+    """
+    Extract project ID from Supabase URL.
+    
+    Args:
+        supabase_url: Format https://[project_id].supabase.co
+        
+    Returns:
+        Project ID or empty string
+    """
+    if supabase_url and "supabase.co" in supabase_url:
+        match = re.search(r"https?://([^.]+)\.supabase\.co", supabase_url)
+        if match:
+            return match.group(1)
+    return ""
+
+
+def _apply_vercel_pooler_optimization(db_url: str, port: str, host: str) -> str:
+    """
+    Switch to Supabase transaction pooler for Vercel deployments.
+    
+    Args:
+        db_url: Database connection URL
+        port: Current port (usually 5432)
+        host: Database host
+        
+    Returns:
+        Optimized URL with port 6543 for pooler
+    """
+    if os.getenv("VERCEL") and ":5432" in db_url and "supabase.co" in db_url:
+        logger.info("Updating DATABASE_URL to use Supabase Transaction Pooler (Port 6543)")
+        return db_url.replace(":5432", ":6543")
+    return db_url
+
+
+def _get_supabase_uri() -> str:
+    """
+    Construct PostgreSQL URI for Supabase provider.
+    
+    Returns:
+        Connection string for Supabase/PostgreSQL
+        
+    Raises:
+        ValueError: If required credentials missing
+    """
+    user = os.getenv("user", "").strip()
+    password = os.getenv("password", "").strip()
+    host = os.getenv("host", "").strip()
+    port = os.getenv("port", "5432").strip()
+    dbname = os.getenv("dbname", "").strip()
+    supabase_url = os.getenv("SUPABASE_URL", "")
+    
+    project_id = _extract_supabase_project_id(supabase_url)
+    
+    # Auto-switch to Transaction Pooler on Vercel
+    if os.getenv("VERCEL") and host and "supabase.co" in host and port == "5432":
+        logger.info("Auto-switching to Supabase Transaction Pooler (Port 6543) for Vercel")
+        port = "6543"
+    
+    if all([user, host, dbname]):
+        # Fix user format for Supabase pooler
+        if project_id and user == "postgres":
+            user = f"postgres.{project_id}"
+            logger.info(f"Fixed Supabase user format: {user}")
+        
+        logger.info(f"Targeting Supabase host: {host}")
+        if password:
+            password = quote_plus(password)
+        
+        db_url = f"postgresql+psycopg2://{user}:{password if password else ''}@{host}:{port}/{dbname}?sslmode=require"
+        logger.info(f"Constructed URI from components (Host: {host}, Port: {port})")
+        return db_url
+    
+    # Fallback to DATABASE_URL env var
+    db_url = os.getenv("DATABASE_URL")
+    if not db_url:
+        raise ValueError(
+            "DATABASE_URL or individual DB vars (user, host, dbname) are required."
+        )
+    
+    # Standardize URL format
+    if db_url.startswith("postgres://"):
+        db_url = db_url.replace("postgres://", "postgresql://", 1)
+    if "postgresql://" in db_url and "+psycopg2" not in db_url:
+        db_url = db_url.replace("postgresql://", "postgresql+psycopg2://", 1)
+    
+    db_url = _apply_vercel_pooler_optimization(db_url, port, host)
+    return _encode_password_in_url(db_url)
+
+
+def _get_mysql_uri() -> str:
+    """
+    Construct MySQL connection URI.
+    
+    Returns:
+        Connection string for MySQL
+        
+    Raises:
+        ValueError: If required credentials missing
+    """
+    user = os.getenv("DB_USER")
+    password = os.getenv("DB_PASS")
+    host = os.getenv("DB_HOST", "localhost")
+    port = os.getenv("DB_PORT", "3306")
+    db_name = os.getenv("DB_NAME")
+    
+    if not all([user, host, db_name]):
+        raise ValueError("DB_USER, DB_HOST, and DB_NAME are required for MySQL")
+    
+    return f"mysql+pymysql://{user}:{password if password else ''}@{host}:{port}/{db_name}"
+
+
+def _get_xampp_uri() -> str:
+    """
+    Construct URI for XAMPP/Laragon local MySQL.
+    
+    Returns:
+        Connection string with XAMPP defaults
+    """
+    user = os.getenv("DB_USER", "root")
+    password = os.getenv("DB_PASS", "")
+    host = os.getenv("DB_HOST", "localhost")
+    port = os.getenv("DB_PORT", "3306")
+    db_name = os.getenv("DB_NAME", "mangatarem")
+    
+    return f"mysql+pymysql://{user}:{password}@{host}:{port}/{db_name}"
+
+
+def _get_sqlite_uri() -> str:
+    """
+    Construct SQLite URI for local development.
+    
+    Returns:
+        Connection string for SQLite
+        
+    Raises:
+        ValueError: If running on Vercel (read-only filesystem)
+    """
+    is_vercel = os.getenv("VERCEL") or os.getenv("IS_VERCEL")
+    
+    if is_vercel:
+        raise ValueError(
+            "SQLite is not supported on Vercel (read-only filesystem). "
+            "Please set DATABASE_URL environment variable with a PostgreSQL/Supabase connection string, "
+            "and optionally set DB_PROVIDER=supabase"
+        )
+    
+    base_dir = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+    instance_path = os.path.join(base_dir, "instance")
+    if not os.path.exists(instance_path):
+        os.makedirs(instance_path)
+    
+    db_path = os.path.join(instance_path, "mangatarem.db")
+    return f"sqlite:///{db_path}"
+
+
+def get_database_uri() -> str:
+    """
+    Return appropriate SQLAlchemy database URI based on provider.
+    
+    Router function that delegates to provider-specific builders.
+    
+    Returns:
+        Connection string for configured database
+        
+    Raises:
+        ValueError: If provider misconfigured or credentials missing
+    """
+    provider = os.getenv("DB_PROVIDER", "sqlite").lower()
+    
+    # Auto-detect Vercel + DATABASE_URL
+    if os.getenv("VERCEL") and os.getenv("DATABASE_URL") and provider == "sqlite":
+        provider = "supabase"
+    
+    logger.info(f"Configuring database for provider: {provider}")
+    
+    # Console output for visibility
+    print("\n--- DATABASE CONFIGURATION ---")
+    print(f"   Provider: {provider.upper()}")
+    print(f"   Status: {'READY' if provider != 'sqlite' else 'LOCAL (SQLite)'}")
+    print("-" * 30 + "\n")
+    
+    if provider in ["supabase", "postgres", "postgresql"]:
+        return _get_supabase_uri()
+    elif provider == "mysql":
+        return _get_mysql_uri()
+    elif provider in ["xampp", "laragon"]:
+        return _get_xampp_uri()
+    else:
+        return _get_sqlite_uri()
+
+
+def get_db_config(app) -> None:
+    """
+    Apply database-specific configuration to Flask app.
+    
+    Args:
+        app: Flask application instance
+    """
+    provider = os.getenv("DB_PROVIDER", "sqlite").lower()
+    
+    # Auto-detect Vercel
+    if os.getenv("VERCEL") and os.getenv("DATABASE_URL") and provider == "sqlite":
+        provider = "supabase"
+    
+    # Common config
+    app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
+    
+    if provider in ["supabase", "postgres", "mysql", "xampp", "laragon"]:
+        is_serverless = os.getenv("VERCEL") or os.getenv("IS_VERCEL")
+        
+        if is_serverless:
+            # Serverless: NullPool for stateless requests
+            app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+                "poolclass": NullPool,
+                "connect_args": {
+                    "connect_timeout": 10,
+                },
+            }
+        else:
+            # Traditional pooling for long-running processes
+            app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+                "pool_pre_ping": True,
+                "pool_recycle": 1800,
+                "pool_size": 15,
+                "max_overflow": 25,
+            }
+    else:
+        # SQLite: minimal overhead
+        app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {}
+
+
+def get_supabase_client() -> Client:
+    """
+    Initialize and return Supabase Python SDK client.
+    
+    Returns:
+        Supabase client or None if credentials missing
+    """
+    url = os.getenv("SUPABASE_URL")
+    key = os.getenv("SUPABASE_KEY")
+    
+    if not url or not key:
+        logger.warning("SUPABASE_URL or SUPABASE_KEY not found in environment.")
+        return None
+    
+    try:
+        client = create_client(url, key)
+        logger.info(f"Supabase client initialized for: {url}")
+        return client
+    except Exception as e:
+        logger.error(f"Failed to initialize Supabase client: {e}")
+        return None
