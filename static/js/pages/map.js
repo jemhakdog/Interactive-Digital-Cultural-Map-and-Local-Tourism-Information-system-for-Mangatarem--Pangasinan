@@ -703,7 +703,7 @@ document.addEventListener('DOMContentLoaded', function () {
         // Validate coordinates
         if (!lat || !lng || isNaN(lat) || isNaN(lng)) {
             console.warn('Invalid coordinates for attraction:', id, { lat, lng });
-            alert('This location does not have valid coordinates.');
+            Swal.fire('Error', 'This location does not have valid coordinates.', 'error');
             return;
         }
 
@@ -725,7 +725,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function flyToEstablishmentLocation(est) {
         if (!est.latitude || !est.longitude || isNaN(est.latitude) || isNaN(est.longitude)) {
             console.warn('Invalid coordinates for establishment:', est.id, { lat: est.latitude, lng: est.longitude });
-            alert('This location does not have valid coordinates.');
+            Swal.fire('Error', 'This location does not have valid coordinates.', 'error');
             return;
         }
 
@@ -953,13 +953,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     (error) => {
                         estNearMeBtn.classList.remove('animate-pulse');
-                        alert('Unable to get your location. Please check your browser settings.');
+                        Swal.fire('Location Error', 'Unable to get your location. Please check your browser settings.', 'error');
                     },
                     { enableHighAccuracy: true, timeout: 10000 }
                 );
             } else {
                 estNearMeBtn.classList.remove('animate-pulse');
-                alert('Geolocation is not supported by your browser.');
+                Swal.fire('Not Supported', 'Geolocation is not supported by your browser.', 'error');
             }
         });
     }
@@ -1222,7 +1222,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // Smart Find Nearest Logic
     window.findNearest = async function(category, type = 'establishment') {
         if (!navigator.geolocation) {
-            alert('Geolocation is not supported by your browser.');
+            Swal.fire('Not Supported', 'Geolocation is not supported by your browser.', 'error');
             return;
         }
 
@@ -1271,10 +1271,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             } catch (error) {
                 console.error('Error finding nearest:', error);
-                alert('Error finding nearest locations.');
+                Swal.fire('Error', 'Error finding nearest locations.', 'error');
             }
         }, (error) => {
-            alert('Unable to get your location.');
+            Swal.fire('Location Error', 'Unable to get your location.', 'error');
         });
     };
 
@@ -1345,7 +1345,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     geolocate.on('error', (error) => {
         locateBtn.classList.remove('animate-pulse');
-        alert('Location access denied or unavailable. Please enable GPS.');
+        Swal.fire('Location Access', 'Location access denied or unavailable. Please enable GPS.', 'warning');
         console.error('Geolocation error:', error);
     });
 

@@ -13,8 +13,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let state = {
         currentCategory: 'all',
-        searchTerm: '',
+        selectedPlace: null,
         userLocation: null,
+        pendingDirections: null, // To store destination if waiting for location
         isNearMeMode: false,
         allPlaces: [],
         markers: [],
@@ -51,10 +52,10 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             trackUserLocation: true,
             showUserHeading: true
-        }), 'top-right');
+        }), 'bottom-left');
 
         // Add standard navigation controls
-        map.addControl(new mapboxgl.NavigationControl(), 'top-right');
+        map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
 
         // Initial Fetch
         fetchData();
@@ -250,10 +251,27 @@ document.addEventListener('DOMContentLoaded', function () {
         
         if (directionsBtn) {
             directionsBtn.onclick = () => {
+                console.log("🔗 [Modal] Directions clicked. User location:", state.userLocation);
                 if (!state.userLocation) {
-                    const locateBtn = document.getElementById('locate-me-btn');
-                    if (locateBtn) locateBtn.click();
-                    alert('Getting your location... Please wait a moment.');
+                    console.log("⏳ [Modal] Location missing. Setting pending directions for:", place.name);
+                    state.pendingDirections = place;
+                    
+                    // Try to find the search locate button which we know exists
+                    const locateBtn = document.getElementById('search-locate-btn') || document.getElementById('locate-me-btn');
+                    console.log("🔍 [Modal] Searching for locate button:", locateBtn ? "Found" : "NOT Found");
+                    if (locateBtn) {
+                        console.log("🖱️ [Modal] Triggering click on locate button");
+                        locateBtn.click();
+                    }
+                    Swal.fire({
+                        title: 'Locating...',
+                        text: 'Please wait a moment.',
+                        allowOutsideClick: true,
+                        showConfirmButton: false,
+                        didOpen: () => {
+                            Swal.showLoading()
+                        }
+                    });
                     return;
                 }
                 overlay.classList.remove('active');
@@ -343,15 +361,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     const nearMeBtn = document.getElementById('locate-me-btn');
                     if (nearMeBtn) {
                         nearMeBtn.click();
-                        alert('Getting your location... Please try again in a few seconds.');
+                        Swal.fire({
+                            title: 'Locating...',
+                            text: 'Please wait a moment.',
+                            allowOutsideClick: true,
+                            showConfirmButton: false,
+                            didOpen: () => {
+                                Swal.showLoading()
+                            }
+                        });
                     } else {
-                        alert('Please enable location services.');
+                        Swal.fire('Error', 'Please enable location services.', 'error');
                     }
                     return;
                 }
                 
                 if (!state.selectedPlace) {
-                    alert('Please select a place first.');
+                    Swal.fire('Selection Required', 'Please select a place first.', 'info');
                     return;
                 }
                 
@@ -365,23 +391,35 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     async function getRoute(origin, destination, mode = 'driving') {
+        console.log("🛣️ [Routing] Calculating route:", { origin, destination, mode });
+        
+        if (!origin || !destination || isNaN(origin.lat) || isNaN(origin.lng) || isNaN(destination.lat) || isNaN(destination.lng)) {
+            console.error("❌ [Routing] Invalid coordinates provided:", { origin, destination });
+            throw new Error("Invalid coordinates for routing");
+        }
+
         try {
             state.currentNavMode = mode;
             state.isNavigating = true;
             
             const profile = mode === 'driving' ? 'driving' : mode === 'walking' ? 'walking' : 'cycling';
-            const query = await fetch(
-                `https://api.mapbox.com/directions/v5/mapbox/${profile}/${origin.lng},${origin.lat};${destination.lng},${destination.lat}?steps=true&geometries=geojson&access_token=${mapboxgl.accessToken}`,
-                { method: 'GET' }
-            );
+            const url = `https://api.mapbox.com/directions/v5/mapbox/${profile}/${origin.lng},${origin.lat};${destination.lng},${destination.lat}?steps=true&geometries=geojson&access_token=${mapboxgl.accessToken}`;
+            console.log("🌐 [Routing] Fetching from Mapbox:", url.split('access_token=')[0] + 'access_token=...');
+            
+            const query = await fetch(url, { method: 'GET' });
             const json = await query.json();
             if (!json.routes || json.routes.length === 0) {
-                alert('No route found for this destination.');
+                Swal.fire('Route Not Found', 'No route found for this destination.', 'warning');
                 return;
             }
 
             const data = json.routes[0];
             const route = data.geometry.coordinates;
+            console.log("🗺️ [Routing] Route data received. Points:", route.length);
+            
+            if (!route || route.length === 0) {
+                throw new Error("Route geometry is empty");
+            }
             
             // Show Panel
             const navPanel = document.getElementById('nav-panel');
@@ -464,7 +502,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
         } catch (error) {
             console.error('Routing error:', error);
-            alert('Could not calculate route. Please try again.');
+            Swal.fire('Error', 'Could not calculate route. Please try again.', 'error');
         }
     }
 
@@ -546,16 +584,20 @@ document.addEventListener('DOMContentLoaded', function () {
         const searchLocateBtn = document.getElementById('search-locate-btn');
         
         const handleLocation = () => {
+            console.log("🚀 [NearMe] handleLocation triggered");
             if (!navigator.geolocation) {
-                alert('Geolocation is not supported by your browser.');
+                Swal.fire('Not Supported', 'Geolocation is not supported by your browser.', 'error');
                 return;
             }
 
+            console.log("📍 [Geolocation] Requesting current position...");
             const btns = [locateMeBtn, searchLocateBtn].filter(Boolean);
             btns.forEach(btn => btn.classList.add('animate-pulse'));
             
             navigator.geolocation.getCurrentPosition(
                 (pos) => {
+                    console.log("✅ [Geolocation] Position found:", pos.coords.latitude, pos.coords.longitude);
+                    Swal.close();
                     const coords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
                     state.userLocation = coords;
                     state.isNearMeMode = true;
@@ -567,6 +609,23 @@ document.addEventListener('DOMContentLoaded', function () {
                             btn.style.backgroundColor = '#1F1D2B';
                         }
                     });
+                    
+                    // Handle pending directions from modal
+                    if (state.pendingDirections) {
+                        const dest = state.pendingDirections;
+                        console.log("🎯 [Geolocation] Auto-triggering route for:", dest.name);
+                        
+                        // Close modal and start route
+                        const overlay = document.getElementById('details-modal-overlay');
+                        if (overlay) overlay.classList.remove('active');
+                        
+                        getRoute(state.userLocation, { 
+                            lat: dest.latitude || dest.lat, 
+                            lng: dest.longitude || dest.lng 
+                        });
+                        
+                        state.pendingDirections = null;
+                    }
                     
                     // Update or create user marker
                     if (window.userMarker) {
@@ -600,6 +659,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (!window.positionWatcher) {
                         window.positionWatcher = navigator.geolocation.watchPosition(
                             (p) => {
+                                console.log("🔄 [Geolocation] Position updated:", p.coords.latitude, p.coords.longitude);
                                 state.userLocation = { lat: p.coords.latitude, lng: p.coords.longitude };
                                 if (window.userMarker) {
                                     window.userMarker.setLngLat([p.coords.longitude, p.coords.latitude]);
@@ -615,16 +675,26 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 },
                 (err) => {
-                    console.error(err);
+                    console.error("❌ [Geolocation] Error:", err.code, err.message);
+                    let errorMsg = 'Could not get your location.';
+                    if (err.code === 1) errorMsg = 'Permission denied. Please allow location access.';
+                    if (err.code === 2) errorMsg = 'Position unavailable. Check your GPS/network.';
+                    if (err.code === 3) errorMsg = 'Location request timed out. Please try again.';
+
                     btns.forEach(btn => btn.classList.remove('animate-pulse'));
-                    alert('Could not get your location. Please check permissions.');
+                    Swal.fire('Location Error', errorMsg, 'error');
                 },
-                { enableHighAccuracy: true }
+                { enableHighAccuracy: true, timeout: 10000, maximumAge: 60000 }
             );
         };
 
         if (locateMeBtn) locateMeBtn.onclick = handleLocation;
         if (searchLocateBtn) searchLocateBtn.onclick = handleLocation;
+        
+        // Also bind to any element with .locate-trigger class
+        document.querySelectorAll('.locate-trigger').forEach(el => {
+            el.onclick = handleLocation;
+        });
     }
 
     // ========================================

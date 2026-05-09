@@ -331,8 +331,8 @@
     </footer>
     {% endblock %}
 
+    <script src="{{ url_for('static', filename='vendor/sweetalert2/sweetalert2.all.min.js') }}"></script>
     {% block scripts %}{% endblock %}
-    <script src="{{ url_for('static', filename='vendor/sweetalert2/sweetalert2.all.min.js') }}" defer></script>
     
     <!-- Flash Messages Data -->
     <script type="application/json" id="flash-messages-data">

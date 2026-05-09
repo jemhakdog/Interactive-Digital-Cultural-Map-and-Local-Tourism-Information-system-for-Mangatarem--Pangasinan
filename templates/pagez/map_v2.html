@@ -171,12 +171,12 @@
         }
         .floating-filters {
             left: 440px !important; /* Sidebar 400px + 40px margin */
-            top: 120px !important;
+            top: 80px !important;
             padding: 0 !important;
         }
         .floating-header {
             left: 440px !important;
-            top: 30px;
+            top: 20px;
             justify-content: flex-end; /* Push title and button to right */
         }
         .floating-header > button:first-child {
@@ -264,7 +264,7 @@
     /* Position adjustments for floating elements */
     .floating-header {
         position: absolute;
-        top: 20px;
+        top: 16px;
         left: 0;
         right: 0;
         z-index: 110;
@@ -274,11 +274,12 @@
 
     .floating-filters {
         position: absolute;
-        top: 120px;
+        top: 90px;
         left: 0;
         right: 0;
         z-index: 105;
         padding: 10px 0;
+        padding-right: 60px; /* Space for controls if they stick to top */
         overflow-x: auto;
         pointer-events: none; /* Pass through clicks to sheet handle */
     }
@@ -549,6 +550,16 @@
         </div>
     </div>
 
+    <!-- Floating Map Controls -->
+    <div class="absolute right-6 bottom-32 z-[45] flex flex-col gap-3 pointer-events-none">
+        <button id="locate-me-btn" class="w-12 h-12 bg-white rounded-2xl shadow-premium flex items-center justify-center text-gray-700 hover:text-[#00ED64] transition-all pointer-events-auto group">
+            <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+        </button>
+    </div>
+
     <!-- Map -->
     <div id="map"></div>
 
@@ -658,5 +669,5 @@
 <script>
     window.MAPBOX_TOKEN = "{{ mapbox_token }}";
 </script>
-<script src="{{ url_for('static', filename='js/pages/map_v2.js') }}"></script>
+<script src="{{ url_for('static', filename='js/pages/map_v2.js') }}?v=1.1.6"></script>
 {% endblock %}
