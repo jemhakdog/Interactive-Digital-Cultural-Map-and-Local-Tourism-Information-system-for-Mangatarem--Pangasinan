@@ -719,6 +719,7 @@ def api_list():
     user_lat = request.args.get("lat", type=float)
     user_lng = request.args.get("lng", type=float)
     radius = request.args.get("radius", 10, type=float)
+    is_featured = request.args.get("is_featured")
 
     query = Establishment.query.filter(Establishment.status == "approved")
 
@@ -728,6 +729,8 @@ def api_list():
         query = query.filter(Establishment.price_range == price_range)
     if barangay and barangay != "all":
         query = query.join(BarangayInfo).filter(BarangayInfo.name == barangay)
+    if is_featured:
+        query = query.filter(Establishment.is_featured == (is_featured.lower() == 'true'))
 
     paginated_establishments = query.paginate(page=page, per_page=per_page, error_out=False)
 

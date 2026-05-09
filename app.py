@@ -322,6 +322,7 @@ def _seed_database(app):
         if os.path.exists(data_path):
             with open(data_path, "r") as f:
                 data = json.load(f)
+                i = 0
                 for item in data:
                     # Handle barangay relationship
                     barangay_name = item.get("barangay")
@@ -338,8 +339,10 @@ def _seed_database(app):
                         barangay=brgy, description=item["description"],
                         latitude=item["lat"], longitude=item["lng"], 
                         image_url=item["image"],
-                        status="approved"
+                        status="approved",
+                        is_featured=(i < 3) # Feature first 3
                     ))
+                i += 1
             db.session.commit()
             logger.info("Database seeded with sample attractions.")
 
@@ -383,6 +386,7 @@ def _seed_database(app):
         if os.path.exists(est_path):
             with open(est_path, "r", encoding="utf-8") as f:
                 est_data = json.load(f)
+            i = 0
             for item in est_data:
                 # Assign to correct specialized owner
                 current_owner_id = hospitality_owner.id if item["type"] == "inn" else dining_owner.id
@@ -400,8 +404,10 @@ def _seed_database(app):
                     amenities=item.get("amenities", []),
                     operating_hours=item.get("operating_hours", {}),
                     status="approved",
+                    is_featured=(i < 2) # Feature first 2
                 )
                 db.session.add(est)
+                i += 1
                 db.session.flush()
 
                 for room in item.get("rooms", []):

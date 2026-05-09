@@ -130,6 +130,26 @@ def map_view():
     )
 
 
+@public_bp.route("/v1/map")
+def map_v2_view():
+    """
+    Display the version 2 interactive map with modern aesthetics.
+    """
+    logger.info("Interactive map v2 accessed")
+    
+    # Record view
+    record_view("page", page_name="map_v2")
+    
+    # Get initial data
+    attractions_count = Attraction.query.filter_by(status="approved").count()
+    
+    return render_template(
+        "pagez/map_v2.html", 
+        attractions_count=attractions_count,
+        mapbox_token=os.environ.get("mapbox_token", "")
+    )
+
+
 
 
 @public_bp.route("/search")

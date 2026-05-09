@@ -834,12 +834,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     filterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            filterBtns.forEach(b => {
-                b.classList.remove('bg-green-600', 'text-white');
-                b.classList.add('bg-white', 'border', 'border-gray-200', 'text-gray-600');
-            });
-            btn.classList.remove('bg-white', 'border', 'border-gray-200', 'text-gray-600');
-            btn.classList.add('bg-green-600', 'text-white');
+            // Reset all buttons
+            filterBtns.forEach(b => b.classList.remove('active'));
+            
+            // Set current as active
+            btn.classList.add('active');
 
             currentCategory = btn.dataset.category;
             currentPage = 1;
@@ -897,25 +896,26 @@ document.addEventListener('DOMContentLoaded', function () {
 
     estFilterBtns.forEach(btn => {
         btn.addEventListener('click', () => {
-            const isActive = btn.classList.contains('bg-orange-600') || btn.classList.contains('bg-amber-600') || btn.classList.contains('bg-red-600') || btn.classList.contains('bg-blue-600');
+            const isActive = btn.classList.contains('active');
 
             // Toggle active state
             if (isActive) {
-                btn.classList.remove('bg-orange-600', 'text-white', 'bg-amber-600', 'text-white', 'bg-red-600', 'text-white', 'bg-blue-600', 'text-white');
-                btn.classList.add('bg-white/80', 'border', 'border-gray-200', 'text-gray-600');
+                btn.classList.remove('active');
+                btn.style.backgroundColor = '';
+                btn.style.borderColor = '';
                 currentEstType = null;
             } else {
                 // Clear other active states
                 estFilterBtns.forEach(b => {
-                    b.classList.remove('bg-orange-600', 'text-white', 'bg-amber-600', 'text-white', 'bg-red-600', 'text-white', 'bg-blue-600', 'text-white');
-                    b.classList.add('bg-white/80', 'border', 'border-gray-200', 'text-gray-600');
+                    b.classList.remove('active');
+                    b.style.backgroundColor = '';
+                    b.style.borderColor = '';
                 });
 
                 // Set active
                 const type = btn.dataset.estType;
                 const cfg = estTypeConfig[type];
-                btn.classList.remove('bg-white/80', 'border', 'border-gray-200', 'text-gray-600');
-                btn.classList.add('text-white');
+                btn.classList.add('active');
                 btn.style.backgroundColor = cfg.color;
                 btn.style.borderColor = cfg.color;
 
@@ -1374,73 +1374,113 @@ document.addEventListener('DOMContentLoaded', function () {
     // ========================================
     const sidebar = document.getElementById('attractions-sidebar');
     const dragHandle = document.getElementById('drag-handle');
+    // contentArea is already declared at line 860
 
     if (sidebar && dragHandle) {
+        let isDragging = false;
         let startY = 0;
         let initialTranslateY = 0;
-        const headerHeight = 140;
-        const sheetHeight = sidebar.offsetHeight;
-        let isDragging = false;
+        
+        // Define Snap Points (as % of viewport height)
+        const SNAP_POINTS = {
+            FULL: 0,      // Top
+            HALF: 50,     // Middle
+            PEEK: 88      // Bottom (only header visible)
+        };
 
         const getTransformY = () => {
             const style = window.getComputedStyle(sidebar);
+            const transform = style.transform;
+            if (!transform || transform === 'none') return 0;
+            
             try {
-                if (window.DOMMatrix) {
-                    return new DOMMatrix(style.transform).m42;
-                }
-                return new WebKitCSSMatrix(style.transform).m42;
+                const matrix = transform.includes('matrix3d') 
+                    ? new DOMMatrix(transform) 
+                    : new DOMMatrix(transform);
+                return matrix.m42;
             } catch (e) {
+                // Fallback: manually parse translateY(X%) or translateY(Xpx)
+                const match = transform.match(/translateY\(([-\d.]+)%\)/);
+                if (match) {
+                    return (parseFloat(match[1]) / 100) * window.innerHeight;
+                }
                 return 0;
             }
         };
 
+        const setPosition = (percentage) => {
+            sidebar.style.transform = `translateY(${percentage}%)`;
+            sidebar.dataset.currentPos = percentage;
+        };
+
+        // Initialize at Peek
+        if (window.innerWidth < 768) {
+            setPosition(SNAP_POINTS.PEEK);
+        }
+
         dragHandle.addEventListener('touchstart', (e) => {
+            if (sidebar.classList.contains('layout-popup')) return;
             isDragging = true;
             startY = e.touches[0].clientY;
             initialTranslateY = getTransformY();
             sidebar.classList.add('is-dragging');
+            sidebar.style.transition = 'none';
         }, { passive: false });
 
         document.addEventListener('touchmove', (e) => {
             if (!isDragging) return;
             e.preventDefault();
-
-            const deltaY = e.touches[0].clientY - startY;
+            
+            const currentY = e.touches[0].clientY;
+            const deltaY = currentY - startY;
+            const height = window.innerHeight;
             const newY = initialTranslateY + deltaY;
-            const maxDown = sheetHeight - headerHeight;
-
-            if (newY >= 0 && newY <= maxDown) {
-                sidebar.style.transform = `translateY(${newY}px)`;
-            }
+            const percentage = (newY / height) * 100;
+            
+            // Clamp between Full and bit past Peek
+            const clamped = Math.max(0, Math.min(percentage, 95));
+            sidebar.style.transform = `translateY(${clamped}%)`;
         }, { passive: false });
 
         document.addEventListener('touchend', () => {
             if (!isDragging) return;
             isDragging = false;
             sidebar.classList.remove('is-dragging');
+            
+            const currentY = getTransformY();
+            const height = window.innerHeight;
+            const percentage = (currentY / height) * 100;
 
-            const currentTransform = getTransformY();
-            const maxDown = sheetHeight - headerHeight;
-            const threshold = maxDown / 2;
-
-            if (currentTransform < threshold) {
-                sidebar.style.transform = 'translateY(0)';
-                sidebar.classList.add('is-open');
-                contentArea.style.overflowY = 'auto';
+            // Snap to closest point with better thresholds
+            let closest = SNAP_POINTS.PEEK;
+            if (percentage < 30) {
+                closest = SNAP_POINTS.FULL;
+            } else if (percentage < 70) {
+                closest = SNAP_POINTS.HALF;
             } else {
-                sidebar.style.transform = `translateY(calc(100% - ${headerHeight}px))`;
-                sidebar.classList.remove('is-open');
-                contentArea.style.overflowY = 'hidden';
+                closest = SNAP_POINTS.PEEK;
+            }
+            
+            sidebar.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.1)'; // Slight bounce
+            setPosition(closest);
+            
+            if (contentArea) {
+                contentArea.style.overflowY = (closest === SNAP_POINTS.FULL) ? 'auto' : 'hidden';
             }
         });
+        
+        window.minimizeFilters = () => {
+            if (window.innerWidth < 768 && !sidebar.classList.contains('layout-popup')) {
+                sidebar.style.transition = 'transform 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+                setPosition(SNAP_POINTS.PEEK);
+            }
+        };
 
         window.addEventListener('resize', () => {
             if (window.innerWidth > 768) {
-                if (sidebar.style.transform) {
-                    sidebar.style.transform = '';
-                    sidebar.classList.remove('is-open', 'is-dragging');
-                    contentArea.style.overflowY = '';
-                }
+                sidebar.style.transform = '';
+                sidebar.style.transition = '';
+                if (contentArea) contentArea.style.overflowY = '';
             }
         });
     }
@@ -1658,5 +1698,88 @@ document.addEventListener('DOMContentLoaded', function () {
         coordinates.push(coordinates[0]);
         return coordinates;
     }
+
+    // ========================================
+    // 17. LAYOUT MANAGEMENT
+    // ========================================
+    function initLayoutSystem() {
+        const toggles = document.querySelectorAll('.layout-toggle-btn');
+        const sidebar = document.getElementById('attractions-sidebar');
+        const closeSidebarBtn = document.getElementById('close-sidebar');
+        
+        if (toggles.length === 0 || !sidebar) return;
+        
+        const updateToggleButtons = (isPopup) => {
+            toggles.forEach(btn => {
+                const isHeaderBtn = btn.parentElement.classList.contains('flex-items-center'); // Simplified check
+                const iconSize = "w-5 h-5"; 
+                
+                if (isPopup) {
+                    btn.title = "Switch to Sidebar/Swipe Layout";
+                    btn.innerHTML = `
+                        <svg class="${iconSize} text-emerald-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path>
+                        </svg>
+                    `;
+                } else {
+                    btn.title = "Switch to Floating Popup Layout";
+                    btn.innerHTML = `
+                        <svg class="${iconSize} text-emerald-600 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
+                        </svg>
+                    `;
+                }
+            });
+        };
+
+        // Load preference
+        const savedLayout = localStorage.getItem('map_layout') || 'sidebar';
+        if (savedLayout === 'popup') {
+            sidebar.classList.add('layout-popup');
+            updateToggleButtons(true);
+        } else {
+            updateToggleButtons(false);
+        }
+        
+        // Handle Close Button
+        if (closeSidebarBtn) {
+            closeSidebarBtn.addEventListener('click', () => {
+                sidebar.classList.add('is-hidden');
+                setTimeout(() => map.resize(), 600);
+            });
+        }
+        
+        toggles.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                // If sidebar is hidden, show it first
+                if (sidebar.classList.contains('is-hidden')) {
+                    sidebar.classList.remove('is-hidden');
+                } else {
+                    // Otherwise toggle the layout mode
+                    const isPopup = sidebar.classList.toggle('layout-popup');
+                    localStorage.setItem('map_layout', isPopup ? 'popup' : 'sidebar');
+                    updateToggleButtons(isPopup);
+
+                    // If switching back to Swipe mode on mobile, force Peek state
+                    if (!isPopup && window.innerWidth < 768) {
+                        if (typeof setPosition === 'function') {
+                            setPosition(88); // SNAP_POINTS.PEEK
+                        } else {
+                            sidebar.style.transform = 'translateY(88%)';
+                        }
+                    }
+                }
+                
+                setTimeout(() => {
+                    map.resize();
+                }, 600);
+            });
+        });
+    }
+
+    initLayoutSystem();
 
 });

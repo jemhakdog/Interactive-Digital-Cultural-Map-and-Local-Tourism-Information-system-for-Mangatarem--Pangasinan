@@ -1,0 +1,662 @@
+{% extends 'base.html' %}
+
+{% block title %}Interactive Map v2 - GoMangatarem{% endblock %}
+
+{% block body_height %}h-screen overflow-hidden{% endblock %}
+
+{% block navbar %}
+<!-- We override the navbar block if we want a custom one, or just keep it and adjust padding -->
+{{ super() }}
+{% endblock %}
+
+{% block footer %}{% endblock %}
+
+{% block head %}
+<!-- Mapbox GL JS CSS -->
+<link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
+<style>
+    :root {
+        --primary-green: #00ED64;
+        --soft-green: #E6FFF0;
+        --text-dark: #1F1D2B;
+        --text-gray: #929292;
+    }
+
+    body {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        background: white;
+    }
+
+    .map-v2-container {
+        height: calc(100vh - 64px); /* Default navbar height */
+        position: relative;
+        overflow: hidden;
+        z-index: 1; 
+        background: transparent;
+    }
+    
+    @media (max-width: 768px) {
+        .map-v2-container {
+            height: calc(100vh - 56px); /* Mobile navbar height */
+        }
+    }
+
+    .glass-header {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .category-chip {
+        padding: 8px 18px;
+        border-radius: 12px;
+        font-size: 13px;
+        font-weight: 600;
+        white-space: nowrap;
+        transition: all 0.2s;
+        background: white;
+        color: var(--text-gray);
+        border: 1.5px solid #F0F0F0;
+        cursor: pointer;
+    }
+
+    .category-chip.active {
+        background: var(--primary-green);
+        color: #1F1D2B; /* Dark text for better contrast on neon green */
+        border-color: var(--primary-green);
+        box-shadow: 0 4px 12px rgba(0, 237, 100, 0.2);
+    }
+
+    #map {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+    }
+
+    .bottom-sheet {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: white;
+        border-radius: 32px 32px 0 0;
+        padding: 24px;
+        z-index: 40; /* Stay below navbar (50) */
+        transform: translateY(calc(100% - 100px));
+        transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+        height: calc(100vh - 140px); /* Consistent height for snapping */
+        max-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        box-shadow: 0 -10px 40px rgba(0,0,0,0.1);
+        overscroll-behavior: contain;
+        pointer-events: auto !important;
+        will-change: transform;
+        touch-action: pan-y;
+    }
+
+    #results-section {
+        flex: 1;
+        overflow-y: auto;
+        overscroll-behavior: contain;
+        -webkit-overflow-scrolling: touch;
+        padding-bottom: 20px;
+    }
+
+    /* Snapping states managed by JS */
+    .bottom-sheet.is-peek {
+        transform: translateY(calc(100% - 100px));
+    }
+    .bottom-sheet.is-full {
+        transform: translateY(0);
+        border-radius: 24px 24px 0 0;
+        max-height: calc(100vh - 140px); /* Leave more room for header */
+    }
+
+    @media (min-width: 768px) {
+        .bottom-sheet.is-peek,
+        .bottom-sheet.is-mid,
+        .bottom-sheet.is-full {
+            transform: translateY(0) !important;
+        }
+        .bottom-sheet {
+            left: 24px;
+            right: auto;
+            width: 400px;
+            top: 32px;
+            bottom: 24px;
+            height: auto;
+            border-radius: 32px;
+            max-height: calc(100vh - 44px);
+        }
+        .sheet-handle {
+            display: none;
+        }
+        /* Navigation Panel */
+        #nav-panel {
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .nav-mode-btn {
+            flex: 1;
+            padding: 0.75rem 0;
+            border-radius: 0.75rem;
+            border: 1px solid #f3f4f6;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .nav-mode-btn.active {
+            background: #1F1D2B;
+            color: white;
+            border-color: #1F1D2B;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .instruction-step {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-radius: 0.75rem;
+            transition: background 0.2s;
+            border-bottom: 1px solid #f9fafb;
+        }
+        .instruction-step:hover {
+            background: #f9fafb;
+        }
+        .instruction-step:last-child {
+            border-bottom: none;
+        }
+        .floating-filters {
+            left: 440px !important; /* Sidebar 400px + 40px margin */
+            top: 120px !important;
+            padding: 0 !important;
+        }
+        .floating-header {
+            left: 440px !important;
+            top: 30px;
+            justify-content: flex-end; /* Push title and button to right */
+        }
+        .floating-header > button:first-child {
+            display: none; /* Hide back button in floating header on desktop since sidebar is permanent */
+        }
+        .floating-header div {
+            display: none; /* Hide floating title, sidebar has its own context */
+        }
+    }
+
+    #sheet-handle {
+        width: 40px;
+        height: 5px;
+        background: #E5E7EB;
+        border-radius: 10px;
+        margin: -8px auto 20px auto;
+        cursor: grab;
+        flex-shrink: 0;
+        transition: background 0.2s;
+        position: relative; /* For touch target expansion */
+    }
+    
+    /* Expanded touch target */
+    #sheet-handle::after {
+        content: '';
+        position: absolute;
+        top: -20px;
+        bottom: -20px;
+        left: -40px;
+        right: -40px;
+    }
+    
+    #sheet-handle:active {
+        cursor: grabbing;
+        background: #D1D5DB;
+    }
+
+    .search-input-container {
+        display: flex;
+        align-items: center;
+        background: white;
+        border-radius: 20px;
+        padding: 12px 20px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+    }
+
+    .search-input-container input {
+        border: none;
+        outline: none;
+        flex: 1;
+        margin-left: 12px;
+        font-size: 14px;
+        color: var(--text-dark);
+    }
+
+    .shadow-premium {
+        box-shadow: 0 10px 40px rgba(0, 237, 100, 0.1);
+    }
+
+    .place-card-v2 {
+        background: white;
+        border-radius: 20px;
+        padding: 12px;
+        display: flex;
+        gap: 12px;
+        margin-bottom: 12px;
+        border: 1px solid #F5F5F5;
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    .place-card-v2:hover {
+        border-color: var(--primary-green);
+        box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+    }
+
+    .place-img {
+        width: 80px;
+        height: 80px;
+        border-radius: 14px;
+        object-fit: cover;
+        background: var(--soft-green);
+    }
+
+    /* Position adjustments for floating elements */
+    .floating-header {
+        position: absolute;
+        top: 20px;
+        left: 0;
+        right: 0;
+        z-index: 110;
+        padding: 0 24px;
+        pointer-events: none;
+    }
+
+    .floating-filters {
+        position: absolute;
+        top: 120px;
+        left: 0;
+        right: 0;
+        z-index: 105;
+        padding: 10px 0;
+        overflow-x: auto;
+        pointer-events: none; /* Pass through clicks to sheet handle */
+    }
+
+    .floating-filters > div {
+        pointer-events: auto; /* Re-enable for chips */
+    }
+
+    /* Custom Scrollbar */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    /* Premium Modal Styling */
+    .modal-overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.4);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        z-index: 200;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        opacity: 0;
+        pointer-events: none;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-overlay.active {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .premium-modal {
+        background: white;
+        width: 100%;
+        max-width: 450px;
+        border-radius: 32px;
+        overflow: hidden;
+        box-shadow: 0 30px 60px rgba(0,0,0,0.3);
+        transform: translateY(20px) scale(0.95);
+        transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .modal-overlay.active .premium-modal {
+        transform: translateY(0) scale(1);
+    }
+    .modal-img-container {
+        width: 100%;
+        height: 240px;
+        position: relative;
+    }
+    .modal-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .modal-close-btn {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        width: 40px;
+        height: 40px;
+        background: rgba(0,0,0,0.3);
+        backdrop-filter: blur(10px);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        border: 1px solid rgba(255,255,255,0.2);
+        cursor: pointer;
+        transition: all 0.2s;
+        z-index: 10;
+    }
+    .modal-close-btn:hover {
+        background: rgba(0,0,0,0.5);
+        transform: scale(1.1);
+    }
+    .modal-content {
+        padding: 32px;
+    }
+    .modal-category {
+        display: inline-block;
+        background: var(--soft-green);
+        color: #008F3C; /* Darker green for text readability */
+        padding: 6px 14px;
+        border-radius: 12px;
+        font-size: 11px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 16px;
+    }
+    .modal-title {
+        font-size: 28px;
+        font-weight: 800;
+        color: var(--text-dark);
+        margin-bottom: 8px;
+        line-height: 1.2;
+    }
+    .modal-location {
+        font-size: 14px;
+        color: var(--text-gray);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 24px;
+    }
+    .modal-description {
+        font-size: 15px;
+        color: #4B5563;
+        line-height: 1.6;
+        margin-bottom: 32px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .modal-actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+    }
+    .btn-secondary-v2 {
+        background: #F3F4F6;
+        color: #374151;
+        padding: 16px;
+        border-radius: 18px;
+        font-weight: 700;
+        text-align: center;
+        transition: all 0.2s;
+    }
+    .btn-secondary-v2:hover {
+        background: #E5E7EB;
+    }
+
+    .start-btn {
+        background: var(--primary-green);
+        color: #1F1D2B; /* Dark text for contrast */
+        width: 100%;
+        padding: 16px;
+        border-radius: 16px;
+        font-weight: 700;
+        margin-top: 0; /* Adjusted for modal grid */
+        box-shadow: 0 8px 24px rgba(0, 237, 100, 0.3);
+        transition: all 0.2s;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="map-v2-container">
+    <!-- Header -->
+    <div class="floating-header flex justify-between items-center">
+        <button onclick="window.history.back()" class="w-12 h-12 flex items-center justify-center bg-white rounded-2xl shadow-xl pointer-events-auto border border-gray-100 active:scale-95 transition-transform">
+            <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path>
+            </svg>
+        </button>
+        <div class="bg-white/90 backdrop-blur-md px-6 py-2.5 rounded-2xl shadow-lg border border-gray-100 pointer-events-none">
+            <h1 class="text-sm font-bold text-gray-900 tracking-tight">Explore Map v2</h1>
+        </div>
+        <div class="w-12"></div> <!-- Spacer to keep title centered -->
+    </div>
+
+    <!-- Floating Action Buttons (Above Sheet) -->
+    </div>
+
+    <!-- Navigation Panel Overlay -->
+    <div id="nav-panel" class="fixed top-24 left-6 z-[60] w-80 bg-white/95 backdrop-blur-md rounded-[32px] shadow-2xl p-6 border border-white/20 hidden">
+        <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-[#00ED64]/10 rounded-2xl flex items-center justify-center">
+                    <svg class="w-5 h-5 text-[#00ED64]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    </svg>
+                </div>
+                <div>
+                    <h3 class="text-sm font-bold text-gray-900">Directions</h3>
+                    <p class="text-[10px] text-gray-400 font-medium">In-app Navigation</p>
+                </div>
+            </div>
+            <button id="close-nav" class="w-8 h-8 flex items-center justify-center hover:bg-gray-100 rounded-xl transition-colors">
+                <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Mode Selector -->
+        <div class="flex gap-2 mb-6">
+            <button class="nav-mode-btn active" data-mode="driving">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                </svg>
+            </button>
+            <button class="nav-mode-btn" data-mode="walking">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                </svg>
+            </button>
+            <button class="nav-mode-btn" data-mode="cycling">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Stop Points -->
+        <div class="space-y-4 mb-6 relative">
+            <div class="absolute left-[19px] top-5 bottom-5 w-0.5 border-dashed border-l-2 border-gray-100"></div>
+            <div class="flex items-center gap-4 relative">
+                <div class="w-10 h-10 rounded-2xl border-2 border-[#00ED64] bg-white flex items-center justify-center shrink-0 z-10 shadow-sm">
+                    <div class="w-2.5 h-2.5 bg-[#00ED64] rounded-full"></div>
+                </div>
+                <div class="flex-1">
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Origin</p>
+                    <input id="nav-origin-input" type="text" value="Your Location" readonly class="w-full bg-gray-50 border-none rounded-xl py-2 px-0 text-xs font-bold text-gray-900 focus:ring-0">
+                </div>
+            </div>
+            <div class="flex items-center gap-4 relative">
+                <div class="w-10 h-10 rounded-2xl border-2 border-red-400 bg-white flex items-center justify-center shrink-0 z-10 shadow-sm">
+                    <svg class="w-4 h-4 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Destination</p>
+                    <input id="nav-dest-input" type="text" placeholder="Select a place" readonly class="w-full bg-gray-50 border-none rounded-xl py-2 px-0 text-xs font-bold text-gray-900 focus:ring-0 truncate">
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions -->
+        <div class="pt-6 border-t border-gray-100">
+            <div class="flex items-center justify-between mb-4">
+                <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Route Steps</h4>
+                <span id="route-summary" class="text-[10px] font-bold text-[#008F3C]"></span>
+            </div>
+            <div id="nav-instructions" class="max-h-[250px] overflow-y-auto space-y-1 pr-2 no-scrollbar">
+                <div class="text-center py-10">
+                    <div class="w-12 h-12 bg-gray-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
+                        <svg class="w-6 h-6 text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                        </svg>
+                    </div>
+                    <p class="text-[11px] text-gray-300 font-medium">Instructions will appear here</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Filters (Floating) -->
+    <div class="floating-filters no-scrollbar">
+        <div class="flex gap-3 px-6" id="category-filters">
+            <div class="category-chip active" data-category="all">All</div>
+            <div class="category-chip" data-category="Nature">Nature</div>
+            <div class="category-chip" data-category="Heritage">Heritage</div>
+            <div class="category-chip" data-category="Religious">Religious</div>
+            <div class="category-chip" data-category="restaurant">Food</div>
+            <div class="category-chip" data-category="cafe">Coffee</div>
+            <div class="category-chip" data-category="inn">Inns</div>
+        </div>
+    </div>
+
+    <!-- Map -->
+    <div id="map"></div>
+
+    <!-- Floating UI Layer (Above Map, Below Navbar) -->
+    <div class="absolute inset-0 pointer-events-none z-[45] flex flex-col justify-end">
+        <!-- Bottom UI Card -->
+        <div id="bottom-sheet" class="bottom-sheet pointer-events-auto bg-white rounded-[32px] p-6 shadow-premium transition-all flex flex-col">
+            <!-- Handle -->
+            <div id="sheet-handle"></div>
+
+            <!-- Search Bar -->
+            <div class="search-input-container mb-6 bg-gray-50 border border-gray-100 group focus-within:border-[#00ED64]/30 transition-all">
+                <svg class="w-5 h-5 text-gray-400 group-focus-within:text-[#00ED64] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                </svg>
+                <input type="text" id="route-search" placeholder="Search places or barangays..." class="bg-transparent">
+                <button id="search-locate-btn" class="p-2 -mr-2 text-gray-400 hover:text-[#00ED64] transition-colors" title="Use my current location">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Results Section / Places Near You -->
+            <div id="results-section" class="flex-1 overflow-y-auto no-scrollbar">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 id="section-title" class="text-base font-bold text-gray-900">Recommended for You</h2>
+                    <span id="results-count" class="text-xs font-semibold text-[#008F3C] bg-[#E6FFF0] px-2 py-1 rounded-lg">0 spots</span>
+                </div>
+                
+                <div id="places-list" class="space-y-1">
+                    <!-- Dynamic places go here -->
+                    <div class="text-center py-8 text-gray-400 text-sm">
+                        Loading awesome spots...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Stats (Visible when a route/place is selected) -->
+            <div id="place-stats" class="hidden pt-4 border-t border-gray-100 mt-4">
+                <div class="flex items-center justify-between gap-4">
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 bg-[#E6FFF0] rounded-xl flex items-center justify-center text-[#00ED64]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p id="stat-distance" class="text-xs font-bold text-gray-900">-- KM</p>
+                            <p class="text-[9px] font-medium text-gray-400 uppercase tracking-wider">Distance</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 bg-[#E6FFF0] rounded-xl flex items-center justify-center text-[#00ED64]">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <p id="stat-time" class="text-xs font-bold text-gray-900">-- Min</p>
+                            <p class="text-[9px] font-medium text-gray-400 uppercase tracking-wider">Time</p>
+                        </div>
+                    </div>
+                </div>
+                <button id="start-navigation" class="start-btn py-4 mt-4">Start Navigation</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Details Modal -->
+    <div id="details-modal-overlay" class="modal-overlay">
+        <div class="premium-modal">
+            <div class="modal-img-container">
+                <img id="modal-img" src="" class="modal-img" alt="">
+                <div id="modal-category" class="popup-badge !bottom-5 !left-5 !text-[12px] !px-4 !py-2">CATEGORY</div>
+                <button id="modal-close" class="modal-close-btn">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+            <div class="modal-content">
+                <h2 id="modal-title" class="modal-title">Place Name</h2>
+                <div class="modal-location">
+                    <svg class="w-4 h-4 text-[#00ED64]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    <span id="modal-location-text">Poblacion, Mangatarem</span>
+                </div>
+                <p id="modal-description" class="modal-description">
+                    Loading description...
+                </p>
+                <div class="modal-actions">
+                    <button id="modal-directions" class="btn-secondary-v2">Get Directions</button>
+                    <a id="modal-view-details" href="#" class="start-btn flex items-center justify-center">View Full Info</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+<script>
+    window.MAPBOX_TOKEN = "{{ mapbox_token }}";
+</script>
+<script src="{{ url_for('static', filename='js/pages/map_v2.js') }}"></script>
+{% endblock %}

@@ -103,40 +103,7 @@
     scrollbar-width: none;
 }
 
-/* Mobile bottom sheet enhancement */
-/* Mobile bottom sheet enhancement */
-@media (max-width: 768px) {
-    #attractions-sidebar {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        width: 100%;
-        height: 60vh;
-        /* Default height */
-        max-height: 90vh;
-        z-index: 500;
-        border-top-left-radius: 20px;
-        border-top-right-radius: 20px;
-        box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-        transform: translateY(calc(100% - 140px));
-        /* Initial collapsed state showing just the header */
-        transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
-    }
-
-    #attractions-sidebar.is-open {
-        transform: translateY(0);
-    }
-
-    #attractions-sidebar.is-dragging {
-        transition: none;
-    }
-
-    #content-area {
-        height: calc(100% - 140px);
-        /* Ensure content area takes up remaining space */
-    }
-}
+/* Mobile bottom sheet enhancement - Handled by JS & Dynamic Overrides */
 
 /* Smooth transitions for cards */
 .group {
@@ -216,10 +183,17 @@
 }
 
 /* Filter button active state */
+/* Filter button active state */
 .filter-btn.active {
-    background-color: #10b981 !important;
+    background-color: #059669 !important; /* emerald-600 */
     color: white !important;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+    border-color: #059669 !important;
+    box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+}
+
+.est-filter-btn.active {
+    color: white !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Custom Scrollbar */
@@ -238,4 +212,226 @@
 
 #content-area::-webkit-scrollbar-thumb:hover {
     background: rgba(156, 163, 175, 0.7);
+}
+
+/* ========================================
+   DYNAMIC LAYOUT MODES
+   ======================================== */
+
+/* Unified Floating Control Panel */
+.absolute.top-4.left-4.z-\[400\] {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 1rem;
+    padding: 0.25rem;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.absolute.top-4.left-4.z-\[400\] button {
+    background: transparent !important;
+    box-shadow: none !important;
+    border-radius: 0.75rem !important;
+    border: none !important;
+}
+
+.absolute.top-4.left-4.z-\[400\] button:hover {
+    background: rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Morphing Sidebar Transition */
+#attractions-sidebar {
+    transition: 
+        transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        top 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        right 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity 0.4s ease,
+        box-shadow 0.5s ease;
+    will-change: transform, width, top, right, border-radius;
+}
+
+@media (max-width: 768px) {
+    #attractions-sidebar:not(.layout-popup) {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        height: 90vh !important; /* Fixed height for consistent snapping */
+        top: auto !important;
+        border-top-left-radius: 1.5rem !important;
+        border-top-right-radius: 1.5rem !important;
+        z-index: 500 !important;
+        transform: translateY(88%); /* Default to peek */
+    }
+}
+
+/* Popup Mode Enhancement */
+#attractions-sidebar.layout-popup {
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.95),
+        rgba(255, 255, 255, 0.85)
+    ) !important;
+}
+
+/* Category Pill Styling - Horizontal Scroll Layout */
+@media (max-width: 768px) {
+    .flex.flex-wrap.gap-2.mb-4 {
+        padding: 0.25rem 0.25rem 0.75rem 0.25rem !important;
+        margin-left: -0.25rem !important;
+        margin-right: -0.25rem !important;
+        mask-image: linear-gradient(to right, black 85%, transparent 100%);
+        -webkit-mask-image: linear-gradient(to right, black 85%, transparent 100%);
+    }
+    
+    .flex.flex-wrap.gap-2.mb-4 > * {
+        flex-shrink: 0 !important;
+    }
+}
+
+/* Mobile Quick Find Pills - Compact & Stylish */
+.quick-find-pill {
+    padding: 0.35rem 0.85rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 2rem !important;
+    font-weight: 600 !important;
+    transition: all 0.2s ease !important;
+}
+
+#attractions-sidebar.layout-popup #close-sidebar {
+    display: block !important;
+}
+
+#attractions-sidebar.is-hidden {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    transform: translateX(100%) !important;
+}
+
+/* Mobile Floating Controls Optimization */
+@media (max-width: 768px) {
+    .absolute.top-4.left-4.z-\[400\] {
+        top: 0.5rem !important;
+        left: 0.5rem !important;
+        gap: 0.25rem !important;
+    }
+
+    .layout-toggle-btn, 
+    #locate-btn, 
+    #route-btn,
+    .bg-white.rounded-lg.shadow-md {
+        padding: 0.4rem !important;
+    }
+
+    .layout-toggle-btn svg, 
+    #locate-btn svg, 
+    #route-btn svg {
+        width: 1.25rem !important;
+        height: 1.25rem !important;
+    }
+}
+
+/* Sidebar Mobile Header Compaction */
+@media (max-width: 768px) {
+    #attractions-sidebar .p-5.border-b {
+        padding: 0.75rem 1rem !important;
+    }
+
+    #attractions-sidebar .map-card-title {
+        font-size: 1.25rem !important;
+        line-height: 1.75rem !important;
+    }
+
+    #attractions-sidebar .map-card-subtitle {
+        display: none; /* Hide subtitle on mobile to save space */
+    }
+
+    #attractions-sidebar .relative.mt-5 {
+        margin-top: 0.5rem !important;
+    }
+
+    #search-input {
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+        font-size: 0.875rem !important;
+    }
+
+    /* Tabs compaction */
+    .flex.border-b.bg-gray-50\/50 button {
+        padding: 0.5rem !important;
+        font-size: 0.8rem !important;
+    }
+
+    /* Category list scroll instead of wrap */
+    .flex.flex-wrap.gap-2.mb-4 {
+        flex-wrap: nowrap !important;
+        overflow-x: auto !important;
+        padding-bottom: 0.5rem !important;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+    }
+    .flex.flex-wrap.gap-2.mb-4::-webkit-scrollbar {
+        display: none;
+    }
+
+    /* Quick find section compaction */
+    .mb-6.mt-2 {
+        margin-bottom: 0.5rem !important;
+        margin-top: 0.25rem !important;
+    }
+}
+
+/* Sidebar hidden transition */
+#attractions-sidebar {
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Glassmorphism headers within popup */
+#attractions-sidebar.layout-popup .p-5.border-b {
+    background: transparent !important;
+    border-bottom-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+/* Adjust scroll area for rounded corners */
+#attractions-sidebar.layout-popup #content-area {
+    border-bottom-left-radius: 1.5rem;
+    border-bottom-right-radius: 1.5rem;
+}
+
+@media (max-width: 768px) {
+    #attractions-sidebar.layout-popup {
+        width: calc(100% - 2rem) !important;
+        left: 1rem !important;
+        right: 1rem !important;
+        top: 1rem !important;
+        bottom: auto !important;
+        height: auto !important;
+        max-height: 80vh !important;
+        transform: translateY(0) !important;
+        border-radius: 1.5rem !important;
+    }
+    
+    #attractions-sidebar.layout-popup #drag-handle {
+        display: none !important; /* Hide drag handle in popup mode */
+    }
+
+    #drag-handle {
+        height: 40px !important; /* Larger hit area */
+        background: linear-gradient(to bottom, rgba(255,255,255,0.9), transparent);
+        border-top-left-radius: 1.5rem;
+        border-top-right-radius: 1.5rem;
+    }
+
+    #drag-handle div {
+        background-color: #d1d5db !important;
+        width: 48px !important;
+        height: 5px !important;
+        opacity: 0.8;
+    }
 }
