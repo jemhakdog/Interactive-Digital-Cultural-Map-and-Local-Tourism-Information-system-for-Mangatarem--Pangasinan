@@ -229,7 +229,7 @@ def _register_request_hooks(app: Flask) -> None:
             "default-src": "'self'",
             "script-src": "'self' https://fonts.googleapis.com https://maps.mapbox.com https://api.mapbox.com https://accounts.google.com https://unpkg.com https://vercel.live https://*.vercel.live 'unsafe-inline' 'unsafe-eval'",
             "style-src": "'self' https://fonts.googleapis.com https://api.mapbox.com https://unpkg.com https://vercel.live 'unsafe-inline'",
-            "img-src": "'self' data: https: blob:",
+            "img-src": "'self' data: https: blob: https://vercel.com https://*.vercel.com",
             "font-src": "'self' https://fonts.gstatic.com data:",
             "connect-src": "'self' https://fonts.googleapis.com https://fonts.gstatic.com https://placehold.co https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com https://*.supabase.co https://*.upstash.io https://accounts.google.com https://vercel.live https://*.vercel.live wss://*.vercel.live",
             "worker-src": "'self' blob:",
@@ -304,6 +304,7 @@ def _register_utility_routes(app: Flask) -> None:
     def serve_sw():
         return send_from_directory(app.static_folder, 'sw.js', mimetype='application/javascript')
 
+    @csrf.exempt
     @app.route('/manifest.json')
     def serve_manifest():
         return send_from_directory(app.static_folder, 'manifest.json', mimetype='application/json')

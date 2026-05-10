@@ -6,14 +6,16 @@ const STATIC_ASSETS = [
     '/static/css/style.css',
     '/static/css/pages/map.css',
     '/static/js/pages/map.js',
-    '/static/manifest.json'
+    '/manifest.json'
 ];
 
 // Install Event: Cache static assets
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(STATIC_ASSETS);
+            // Use Promise.allSettled to ensure installation doesn't fail 
+            // if a single asset (like the manifest) fails on protected deployments
+            return Promise.allSettled(STATIC_ASSETS.map(url => cache.add(url)));
         })
     );
 });
