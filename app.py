@@ -227,11 +227,11 @@ def _register_request_hooks(app: Flask) -> None:
         # Content Security Policy - Prevents XSS by restricting resource sources
         csp_policies = {
             "default-src": "'self'",
-            "script-src": "'self' https://fonts.googleapis.com https://maps.mapbox.com https://api.mapbox.com https://accounts.google.com https://unpkg.com 'unsafe-inline' 'unsafe-eval'",
-            "style-src": "'self' https://fonts.googleapis.com https://api.mapbox.com https://unpkg.com 'unsafe-inline'",
+            "script-src": "'self' https://fonts.googleapis.com https://maps.mapbox.com https://api.mapbox.com https://accounts.google.com https://unpkg.com https://vercel.live https://*.vercel.live 'unsafe-inline' 'unsafe-eval'",
+            "style-src": "'self' https://fonts.googleapis.com https://api.mapbox.com https://unpkg.com https://vercel.live 'unsafe-inline'",
             "img-src": "'self' data: https: blob:",
             "font-src": "'self' https://fonts.gstatic.com data:",
-            "connect-src": "'self' https://fonts.googleapis.com https://fonts.gstatic.com https://placehold.co https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com https://*.supabase.co https://*.upstash.io https://accounts.google.com",
+            "connect-src": "'self' https://fonts.googleapis.com https://fonts.gstatic.com https://placehold.co https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com https://*.supabase.co https://*.upstash.io https://accounts.google.com https://vercel.live https://*.vercel.live wss://*.vercel.live",
             "worker-src": "'self' blob:",
             "frame-ancestors": "'none'",
             "base-uri": "'self'",
