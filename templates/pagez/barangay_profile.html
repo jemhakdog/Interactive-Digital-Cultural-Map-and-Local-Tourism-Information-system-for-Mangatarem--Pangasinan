@@ -42,7 +42,7 @@
 
 {% block content %}
 <!-- Premium Aurora Hero Section -->
-<div class="aurora-bg min-h-[50vh] flex items-center justify-center relative pt-16">
+<div class="aurora-bg min-h-[60vh] flex items-center justify-center relative pt-16">
     <div class="container mx-auto px-6 relative z-10 text-center">
         <div class="mb-4 reveal">
             <span class="glass-badge px-4 py-2 rounded-full text-white text-sm font-semibold tracking-widest uppercase">
@@ -71,10 +71,10 @@
     <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-[#FDFBF7] to-transparent"></div>
 </div>
 
-<div class="container mx-auto px-6 -mt-16 relative z-20 pb-32" x-data="{ activeTab: 'cultural' }">
+<div class="container mx-auto px-6 -mt-12 relative z-20 pb-32" x-data="{ activeTab: 'cultural' }">
     <!-- Redesigned Modern Tabs -->
     <div
-        class="glass-card-light rounded-3xl p-3 mb-24 max-w-4xl mx-auto flex overflow-x-auto no-scrollbar gap-3 shadow-2xl">
+        class="glass-card-light rounded-3xl p-3 mb-12 max-w-4xl mx-auto flex overflow-x-auto no-scrollbar gap-3 shadow-2xl">
         <button @click="activeTab = 'cultural'"
             :class="{ 'bg-green-600 text-white shadow-lg': activeTab === 'cultural', 'text-gray-600 hover:bg-white/50': activeTab !== 'cultural' }"
             class="flex-1 py-4 px-8 rounded-2xl font-bold text-sm transition-all duration-300 whitespace-nowrap flex items-center justify-center gap-2">
@@ -98,7 +98,7 @@
     </div>
 
     <!-- Tab Contents with Smooth Transitions -->
-    <div class="min-h-[400px] mt-32">
+    <div class="min-h-[400px] mt-12">
 
         <!-- Cultural Profile Section (Bento Style) -->
         <div id="cultural-section" x-show="activeTab === 'cultural'"
@@ -108,13 +108,13 @@
             {% if barangay_info %}
             <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
                 <!-- Mission Card -->
-                <div class="bg-gradient-to-br from-green-800 to-green-950 rounded-3xl shadow-xl p-8 text-white relative overflow-hidden group">
-                    <div class="absolute -right-4 -top-4 text-7xl opacity-10 rotate-12 transition-transform group-hover:scale-110">🎯</div>
-                    <h2 class="text-2xl font-bold mb-4 flex items-center gap-3">
-                        <span class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-xl">🎯</span>
+                <div class="bg-white rounded-3xl shadow-xl p-8 border border-green-100 relative overflow-hidden group">
+                    <div class="absolute -right-4 -top-4 text-7xl opacity-5 rotate-12 transition-transform group-hover:scale-110">🎯</div>
+                    <h2 class="text-2xl font-bold text-green-900 mb-4 flex items-center gap-3">
+                        <span class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center text-xl text-green-700">🎯</span>
                         Our Mission
                     </h2>
-                    <p class="text-green-50/90 leading-relaxed italic">
+                    <p class="text-gray-600 leading-relaxed italic">
                         {{ barangay_info.mission or "To preserve and promote our local cultural identity while fostering community growth and sustainable tourism." }}
                     </p>
                 </div>

@@ -1,0 +1,208 @@
+{% extends "base.html" %}
+
+{% block head %}
+<!-- AOS Library for Scroll Animations -->
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/aos/aos.css') }}" />
+<!-- Mobile Specific Styles -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/pages/barangays_mobile.css') }}">
+<style>
+    /* Desktop Sidebar & Layout Adjustments */
+    @media (min-width: 768px) {
+        .mobile-app-layout {
+            background-color: #F8F9FB;
+            padding-bottom: 0;
+            min-height: 100vh;
+        }
+        .layout-wrapper {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: white;
+            box-shadow: 0 0 100px rgba(0,0,0,0.03);
+        }
+        .desktop-sidebar {
+            width: 320px;
+            background: white;
+            border-right: 1px solid #F1F5F9;
+            padding: 3rem 2rem;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+        .main-content-area {
+            flex: 1;
+            padding: 3rem;
+            background: #F8F9FB;
+            min-width: 0;
+            overflow-y: auto;
+        }
+        .mobile-header {
+            padding: 0 0 2rem 0;
+        }
+        .mobile-search-container {
+            padding: 0 0 2rem 0;
+        }
+        .horizontal-scroll-section {
+            padding: 0 0 3rem 0;
+        }
+        .discovery-section {
+            padding: 0;
+        }
+        /* Hide mobile-only components on desktop */
+        .filter-btn, .bottom-sheet, .bottom-sheet-overlay {
+            display: none !important;
+        }
+        .popular-card {
+            flex: 0 0 300px; /* Slightly larger cards on desktop */
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mobile-app-layout">
+    <div class="layout-wrapper">
+        
+        <!-- Desktop Sidebar (Visible only on md+) -->
+        <aside class="desktop-sidebar hidden md:flex">
+            <div class="mb-12">
+                <div class="flex items-center gap-3 mb-2">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold" style="background-color: #00E25F;">M</div>
+                    <span class="text-xs font-bold uppercase tracking-[0.2em]" style="color: #00E25F;">Discovery</span>
+                </div>
+                <h2 class="text-3xl font-bold text-gray-900 font-serif">Mangatarem</h2>
+            </div>
+
+            <nav class="flex-1 space-y-12">
+                <div>
+                    <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-[0.3em] mb-6">Experience Type</h3>
+                    <div class="flex flex-col gap-3">
+                        <div class="filter-chip active w-full justify-start !px-5 !py-3 !rounded-xl" data-category="all">
+                            <span class="mr-3">🌍</span> All Experiences
+                        </div>
+                        <div class="filter-chip w-full justify-start !px-5 !py-3 !rounded-xl" data-category="Nature">
+                            <span class="mr-3">🌿</span> Nature & Springs
+                        </div>
+                        <div class="filter-chip w-full justify-start !px-5 !py-3 !rounded-xl" data-category="History">
+                            <span class="mr-3">🏛️</span> Heritage & History
+                        </div>
+                        <div class="filter-chip w-full justify-start !px-5 !py-3 !rounded-xl" data-category="Food">
+                            <span class="mr-3">🥘</span> Local Flavors
+                        </div>
+                        <div class="filter-chip w-full justify-start !px-5 !py-3 !rounded-xl" data-category="Festivals">
+                            <span class="mr-3">🎭</span> Festivals & Art
+                        </div>
+                    </div>
+            </nav>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content-area">
+            
+            <!-- Mobile Header (Hidden on desktop sidebar) -->
+            <header class="mobile-header md:hidden">
+                <div class="flex justify-between items-start">
+                    <div class="location-indicator">
+                        <span class="location-label">
+                            <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                            </svg>
+                            Location
+                        </span>
+                        <span class="location-name">Mangatarem, Pangasinan</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Search Section -->
+            <section class="mobile-search-container">
+                <div class="search-pill !max-w-xl">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                    </svg>
+                    <input type="text" id="mobileBarangaySearch" placeholder="Search Barangays...">
+                    <button id="mobileFilterBtn" class="filter-btn md:hidden">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4h13M3 8h9m-9 4h6m4 0l4-4m0 0l4 4m-4-4v12"></path>
+                        </svg>
+                    </button>
+                </div>
+            </section>
+
+            <!-- Popular Barangays (Horizontal Scroll) -->
+            <section class="horizontal-scroll-section">
+                <div class="scroll-header">
+                    <h2 class="scroll-title text-2xl font-bold">Popular Barangays</h2>
+                    <a href="#" class="view-all-link">See all</a>
+                </div>
+                <div class="horizontal-scroller" id="popularBarangays">
+                    {% set popular = barangays|sort(attribute='attraction_count', reverse=True) %}
+                    {% for b in popular[:5] %}
+                    <a href="{{ url_for('barangay.profile', name=b.name) }}" class="popular-card">
+                        <img src="{{ b.image_url or 'https://placehold.co/400x300?text=' + b.name }}" class="popular-card-img" alt="{{ b.name }}">
+                        <span class="popular-card-tag">{{ b.tags[0] if b.tags else 'Discovery' }}</span>
+                        <div class="popular-card-info">
+                            <h3 class="font-bold text-gray-800">{{ b.name }}</h3>
+                            <p class="text-xs text-gray-500 mt-1">🏰 {{ b.attraction_count }} Attractions</p>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <!-- Discovery Section (List View) -->
+            <section class="discovery-section">
+                <div class="scroll-header mb-6">
+                    <h2 class="scroll-title text-2xl font-bold">Discovery</h2>
+                </div>
+                <div id="discoveryList" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Populated by JS -->
+                    {% for b in barangays %}
+                    <a href="{{ url_for('barangay.profile', name=b.name) }}" class="discovery-card !mb-0">
+                        <img src="{{ b.image_url or 'https://placehold.co/100x100?text=' + b.name }}" class="discovery-card-img" alt="{{ b.name }}">
+                        <div class="discovery-card-content">
+                            <h4>{{ b.name }}</h4>
+                            <div class="discovery-card-meta">
+                                <span>📍 Mangatarem</span>
+                                <span>🏰 {{ b.attraction_count }} Spots</span>
+                            </div>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Mobile Filter Bottom Sheet -->
+    <div id="sheetOverlay" class="bottom-sheet-overlay"></div>
+    <div id="filterBottomSheet" class="bottom-sheet">
+        <div class="sheet-handle"></div>
+        <h3 class="filter-group-title">Experience Type</h3>
+        <div class="filter-options">
+            <div class="filter-chip active" data-category="all">All Experiences</div>
+            <div class="filter-chip" data-category="Nature">Nature & Springs</div>
+            <div class="filter-chip" data-category="History">Heritage & History</div>
+            <div class="filter-chip" data-category="Food">Local Flavors</div>
+            <div class="filter-chip" data-category="Festivals">Festivals & Art</div>
+        </div>
+
+        <div class="sheet-actions">
+            <button id="resetFiltersBtn" class="btn-reset">Reset</button>
+            <button id="applyFiltersBtn" class="btn-apply">Apply Filters</button>
+        </div>
+    </div>
+
+</div>
+
+<!-- Data Store for JavaScript -->
+<div id="barangays-data-store" data-barangays='{{ barangays | tojson | safe }}' class="hidden"></div>
+
+<!-- Scripts -->
+<script src="{{ url_for('static', filename='js/pages/barangays_mobile.js') }}" defer></script>
+{% endblock %}

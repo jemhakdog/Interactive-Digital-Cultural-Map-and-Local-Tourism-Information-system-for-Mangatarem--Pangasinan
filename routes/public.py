@@ -150,6 +150,100 @@ def map_v2_view():
     )
 
 
+@public_bp.route("/v1/events")
+def events_v2_view():
+    """
+    Display the version 2 events listing with premium mobile-first aesthetics.
+    """
+    logger.info("Events v2 listing accessed")
+    
+    # Record view
+    record_view("page", page_name="events_v2")
+    
+    # Fetch approved events in chronological order
+    events = Event.query.filter_by(status="approved").order_by(Event.date.asc()).all()
+    
+    return render_template(
+        "pagez/events_v2.html", 
+        events=events
+    )
+
+
+@public_bp.route("/v1/barangay")
+def barangays_v1_view():
+    """
+    Display the version 1 mobile-optimized barangay directory.
+    Uses aggregated data from contributors and attractions.
+    """
+    logger.info("Barangay v1 listing accessed")
+    record_view("page", page_name="barangays_v1")
+    
+    # Get all barangay IDs that have approved contributors
+    barangay_ids_query = (
+        db.session.query(User.barangay_id)
+        .filter(
+            User.role == "contributor", User.is_approved, User.barangay_id.is_not(None)
+        )
+        .distinct()
+        .all()
+    )
+    barangay_ids = [b[0] for b in barangay_ids_query]
+
+    if not barangay_ids:
+        return render_template("pagez/barangays_v1.html", barangays=[])
+
+    # Fetch approved attractions for these barangays to derive images and tags
+    all_attractions = (
+        db.session.query(
+            Attraction.barangay_id, 
+            Attraction.name, 
+            Attraction.category, 
+            Attraction.image_url
+        )
+        .filter(
+            Attraction.barangay_id.in_(barangay_ids), 
+            Attraction.status == "approved"
+        )
+        .all()
+    )
+
+    from collections import defaultdict
+    barangay_data_map = defaultdict(list)
+    for a in all_attractions:
+        barangay_data_map[a.barangay_id].append(a)
+
+    barangay_infos = (
+        db.session.query(BarangayInfo.id, BarangayInfo.name, BarangayInfo.image_url if hasattr(BarangayInfo, 'image_url') else db.literal(None).label('image_url'))
+        .filter(BarangayInfo.id.in_(barangay_ids))
+        .all()
+    )
+    
+    barangay_list = []
+    for brgy in barangay_infos:
+        attractions = barangay_data_map.get(brgy.id, [])
+        
+        # Determine representative image: Use BarangayInfo image if exists, else first attraction image
+        image_url = getattr(brgy, 'image_url', None)
+        if not image_url and attractions:
+            image_url = next((a.image_url for a in attractions if a.image_url), None)
+
+        tags = sorted(list(set(a.category for a in attractions if a.category)))
+
+        barangay_list.append({
+            "name": brgy.name,
+            "image_url": image_url,
+            "tags": tags,
+            "attraction_count": len(attractions),
+        })
+
+    barangay_list.sort(key=lambda x: x["name"])
+        
+    return render_template(
+        "pagez/barangays_v1.html", 
+        barangays=barangay_list
+    )
+
+
 
 
 @public_bp.route("/search")
