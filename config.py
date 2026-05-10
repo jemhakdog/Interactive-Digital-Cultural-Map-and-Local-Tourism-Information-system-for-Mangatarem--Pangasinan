@@ -1,6 +1,11 @@
 import os
 import sys
 from datetime import timedelta
+from dotenv import load_dotenv
+
+# Load environment variables as early as possible
+load_dotenv()
+
 from utils.db_manager import get_database_uri
 
 class Config:

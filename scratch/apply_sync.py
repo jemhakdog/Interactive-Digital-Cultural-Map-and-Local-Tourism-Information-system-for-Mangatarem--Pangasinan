@@ -1,8 +1,8 @@
 import os
 import sys
-import psycopg2
+from sqlalchemy import create_engine, text
 from dotenv import load_dotenv
-from urllib.parse import quote_plus, urlparse
+from urllib.parse import quote_plus
 
 # Add the project root to sys.path
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -13,24 +13,25 @@ env_path = Path(__file__).parent.parent / '.env'
 load_dotenv(dotenv_path=env_path)
 
 def apply_sync():
-    # Use components from .env for robustness
+    # Use components from .env
     user = os.getenv("user")
     password = os.getenv("password")
     host = os.getenv("host")
     port = os.getenv("port", "5432")
     dbname = os.getenv("dbname")
     
-    # Supabase usually uses port 5432 for direct and 6543 for pooler. 
-    # For DDL (Data Definition Language) like CREATE/ALTER, direct connection (5432) is often preferred.
+    if not all([user, password, host, dbname]):
+        print("ERROR: Missing database credentials in .env")
+        return
+
+    # Construct SQLAlchemy URI
+    encoded_password = quote_plus(password)
+    db_url = f"postgresql://{user}:{encoded_password}@{host}:{port}/{dbname}"
     
-    conn_str = f"postgresql://{user}:{password}@{host}:{port}/{dbname}"
-    
-    print(f"Connecting to Supabase (DDL Sync) at: {host}")
+    print(f"Connecting to Supabase (SQLAlchemy Sync) at: {host}")
     
     try:
-        conn = psycopg2.connect(conn_str)
-        conn.autocommit = True
-        cur = conn.cursor()
+        engine = create_engine(db_url)
         
         # Read the SQL script
         script_path = os.path.join(os.path.dirname(__file__), 'sync_schema.sql')
@@ -38,17 +39,20 @@ def apply_sync():
             sql_script = f.read()
         
         print("Executing sync script...")
-        cur.execute(sql_script)
+        with engine.connect() as conn:
+            # SQLAlchemy 2.0 requires text() and commit() if not in transaction
+            # Using raw execution for multiple statements
+            from sqlalchemy import text
+            
+            # Split script into individual statements to handle DO blocks and CREATE TABLE
+            # However, for simplicity and since it's a migration, we can wrap in a transaction
+            with conn.begin():
+                conn.execute(text(sql_script))
         
         print("SUCCESS: Supabase schema updated successfully!")
         
-        cur.close()
-        conn.close()
-        
     except Exception as e:
         print(f"ERROR: Failed to apply sync: {e}")
-        if 'conn' in locals() and conn:
-            conn.close()
 
 if __name__ == "__main__":
     apply_sync()
