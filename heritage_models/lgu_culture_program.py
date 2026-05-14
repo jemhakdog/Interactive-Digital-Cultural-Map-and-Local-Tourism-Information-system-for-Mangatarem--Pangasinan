@@ -22,6 +22,7 @@ class LGUCultureProgram(db.Model):
     starting_year = db.Column(db.Integer, nullable=True)
     description = db.Column(db.Text, nullable=True)
     culture_projects = db.Column(db.JSON, nullable=True)
+    meta_data = db.Column(db.JSON, nullable=True) # For template-specific fields
     
     def __repr__(self):
         return f'<LGUCultureProgram Detail for Profile {self.heritage_profile_id}>'

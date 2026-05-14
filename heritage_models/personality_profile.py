@@ -22,6 +22,7 @@ class PersonalityProfile(db.Model):
     dates_of_birth_death = db.Column(db.String(100), nullable=True)
     place_of_birth = db.Column(db.String(200), nullable=True)
     major_achievements = db.Column(db.Text, nullable=True)
+    meta_data = db.Column(db.JSON, nullable=True) # For template-specific fields
     
     def __repr__(self):
         return f'<PersonalityProfile Detail for Profile {self.heritage_profile_id}>'

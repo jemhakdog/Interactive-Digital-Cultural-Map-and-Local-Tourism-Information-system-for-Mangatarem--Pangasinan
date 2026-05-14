@@ -8,7 +8,7 @@ import json
 import logging
 from datetime import date, datetime
 
-from flask import render_template, request, redirect, url_for, flash, abort, jsonify
+from flask import render_template, request, redirect, url_for, flash, abort, jsonify, send_file
 from flask_login import login_required, current_user
 from extensions import db, limiter
 from models import HeritageProfile
@@ -344,3 +344,105 @@ def admin_heritage_json(heritage_type):
         "pages": paginated.pages,
         "items": json_items,
     })
+
+# === Export to DOCX ===
+
+@admin_bp.route("/heritage/export/docx/<int:profile_id>")
+@login_required
+def admin_heritage_export_docx(profile_id):
+    """Export a heritage record by populating its official template."""
+    _require_admin()
+    
+    from models import HeritageProfile
+    from utils.heritage_registry import get_heritage_config
+    import os
+    from io import BytesIO
+    try:
+        from docx import Document
+    except ImportError:
+        flash("Export requires 'python-docx' library.")
+        return redirect(url_for('admin.admin_documents'))
+
+    profile = HeritageProfile.query.get_or_404(profile_id)
+    config = get_heritage_config(profile.asset_type)
+    detail = config["model"].query.get_or_404(profile_id)
+    
+    # Find template path
+    from routes.admin.documents import GATHERED_DIR, FORM_MAPPING
+    template_slug = profile.template_slug or profile.asset_type
+    meta = FORM_MAPPING.get(template_slug)
+    if not meta:
+        flash("No template mapping found for this record.")
+        return redirect(url_for('admin.admin_documents'))
+        
+    template_path = os.path.join(GATHERED_DIR, meta["file"])
+    if not os.path.exists(template_path):
+        flash(f"Template file not found: {meta['file']}")
+        return redirect(url_for('admin.admin_documents'))
+
+    try:
+        doc = Document(template_path)
+        
+        # Simple replacement strategy: Iterate through paragraphs and replace labels
+        # Heuristic: Find labels in paragraphs and append data
+        # We also look for specific tags if any were added
+        
+        def _get_val(key):
+            if hasattr(profile, key) and getattr(profile, key):
+                return str(getattr(profile, key))
+            if hasattr(detail, key) and getattr(detail, key):
+                return str(getattr(detail, key))
+            if detail.meta_data and key in detail.meta_data:
+                return str(detail.meta_data[key])
+            return ""
+
+        # Map labels to field keys
+        label_map = {
+            "NAME OF NATURAL HERITAGE": "name",
+            "NAME OF THE SITE": "name",
+            "NAME OF HERITAGE": "name",
+            "NAME OF OBJECT": "name",
+            "NAME OF THE HERITAGE": "name",
+            "B. LOCATION": "location",
+            "C. ADDRESS": "address",
+            "CONTROL NUMBER": "form_control_number",
+            "CATEGORY": "category"
+        }
+
+        for para in doc.paragraphs:
+            p_text = para.text.upper()
+            for label, key in label_map.items():
+                if label in p_text and ":" in p_text:
+                    val = _get_val(key)
+                    if val:
+                        # Append value to paragraph if it's empty after colon
+                        if para.text.strip().endswith(":"):
+                            para.add_run(f" {val}").bold = True
+                        elif label in para.text:
+                            # Try to find if it already has a value, if not append
+                            pass
+
+        # Handle tables (common for field grids)
+        for table in doc.tables:
+            for row in table.rows:
+                for cell in row.cells:
+                    c_text = cell.text.upper()
+                    for label, key in label_map.items():
+                        if label in c_text:
+                            val = _get_val(key)
+                            if val:
+                                # Append to cell or replace if needed
+                                cell.text = cell.text + f" {val}"
+        
+        memory_file = BytesIO()
+        doc.save(memory_file)
+        memory_file.seek(0)
+        
+        filename = f"{profile.name_of_asset or 'Export'}_{meta['file']}"
+        return send_file(memory_file, download_name=filename, as_attachment=True)
+        
+    except Exception as e:
+        import logging
+        logging.error(f"Error generating DOCX: {e}")
+        flash(f"Failed to generate export: {str(e)}")
+        return redirect(url_for('admin.admin_documents'))

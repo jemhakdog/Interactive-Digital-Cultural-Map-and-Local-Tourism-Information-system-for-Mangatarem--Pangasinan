@@ -40,7 +40,7 @@
                     <!-- Title -->
                     <div class="md:col-span-2">
                         <label
-                            class="block text-[10px] font-black text-emerald-900/50 uppercase tracking-widest mb-2 ml-1">Event
+                            class="block text-[10px] font-black text-emerald-900/70 uppercase tracking-widest mb-2 ml-1">Event
                             Title</label>
                         <input type="text" name="name" value="{{ event.name }}" required
                             class="w-full px-5 py-4 rounded-2xl form-input text-emerald-950 font-bold">
@@ -49,7 +49,7 @@
                     <!-- Date -->
                     <div>
                         <label
-                            class="block text-[10px] font-black text-emerald-900/50 uppercase tracking-widest mb-2 ml-1">Scheduled
+                            class="block text-[10px] font-black text-emerald-900/70 uppercase tracking-widest mb-2 ml-1">Scheduled
                             Date</label>
                         <input type="date" name="date" value="{{ event.date.strftime('%Y-%m-%d') }}" required
                             class="w-full px-5 py-4 rounded-2xl form-input text-emerald-950 font-bold">
@@ -58,7 +58,7 @@
                     <!-- Category -->
                     <div>
                         <label
-                            class="block text-[10px] font-black text-emerald-900/50 uppercase tracking-widest mb-2 ml-1">Archive
+                            class="block text-[10px] font-black text-emerald-900/70 uppercase tracking-widest mb-2 ml-1">Archive
                             Category</label>
                         <select name="category" required
                             class="w-full px-5 py-4 rounded-2xl form-input text-emerald-950 font-bold appearance-none cursor-pointer">
@@ -76,7 +76,7 @@
                     <!-- Location -->
                     <div class="md:col-span-2">
                         <label
-                            class="block text-[10px] font-black text-emerald-900/50 uppercase tracking-widest mb-2 ml-1">Venue
+                            class="block text-[10px] font-black text-emerald-900/70 uppercase tracking-widest mb-2 ml-1">Venue
                             / Physical Location</label>
                         <input type="text" name="location" value="{{ event.location }}" required
                             class="w-full px-5 py-4 rounded-2xl form-input text-emerald-950 font-bold">
@@ -85,7 +85,7 @@
                     <!-- Description -->
                     <div class="md:col-span-2">
                         <label
-                            class="block text-[10px] font-black text-emerald-900/50 uppercase tracking-widest mb-2 ml-1">Narrative
+                            class="block text-[10px] font-black text-emerald-900/70 uppercase tracking-widest mb-2 ml-1">Narrative
                             Description</label>
                         <textarea name="description" rows="5" required
                             class="w-full px-5 py-4 rounded-2xl form-input text-emerald-950 font-bold resize-none">{{ event.description }}</textarea>
@@ -94,7 +94,7 @@
                     <!-- Barangay -->
                     <div class="md:col-span-2">
                         <label
-                            class="block text-[10px] font-black text-emerald-900/50 uppercase tracking-widest mb-2 ml-1">Affected
+                            class="block text-[10px] font-black text-emerald-900/70 uppercase tracking-widest mb-2 ml-1">Affected
                             Barangay</label>
                         <select name="barangay_id" required
                             class="w-full px-5 py-4 rounded-2xl form-input text-emerald-950 font-bold appearance-none cursor-pointer">
@@ -127,7 +127,7 @@
 
                             <div>
                                 <label
-                                    class="block text-[10px] font-black text-emerald-900/50 uppercase tracking-widest mb-2 ml-1">New
+                                    class="block text-[10px] font-black text-emerald-900/70 uppercase tracking-widest mb-2 ml-1">New
                                     Media Upload</label>
                                 <input type="file" name="image" accept="image/*"
                                     class="w-full text-sm text-emerald-950 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer">
@@ -146,7 +146,7 @@
 
                             <div>
                                 <label
-                                    class="block text-[10px] font-black text-emerald-900/50 uppercase tracking-widest mb-2 ml-1">Remote
+                                    class="block text-[10px] font-black text-emerald-900/70 uppercase tracking-widest mb-2 ml-1">Remote
                                     Resource URL</label>
                                 <input type="url" name="image_url" value="{{ event.image_url }}"
                                     class="w-full px-5 py-4 rounded-2xl form-input text-emerald-950 font-bold">
@@ -157,7 +157,7 @@
 
                 <div class="flex flex-col sm:flex-row justify-end gap-4 pt-8">
                     <a href="{{ url_for('admin.admin_events') }}"
-                        class="px-8 py-4 rounded-2xl text-emerald-900/40 hover:text-emerald-900 text-sm font-black uppercase tracking-widest transition-all text-center">
+                        class="px-8 py-4 rounded-2xl text-emerald-900/70 hover:text-emerald-900 text-sm font-black uppercase tracking-widest transition-all text-center">
                         Cancel Edits
                     </a>
                     <button type="submit"

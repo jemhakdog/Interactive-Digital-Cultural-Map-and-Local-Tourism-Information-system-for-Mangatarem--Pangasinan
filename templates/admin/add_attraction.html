@@ -41,14 +41,14 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- Name -->
                     <div class="md:col-span-2">
-                        <label class="block text-[10px] font-black text-emerald-900/50 uppercase tracking-widest mb-2 ml-1">Attraction Name</label>
+                        <label class="block text-[10px] font-black text-emerald-900/70 uppercase tracking-widest mb-2 ml-1">Attraction Name</label>
                         <input type="text" name="name" required placeholder="e.g. Manleluag Spring Protected Landscape"
                             class="w-full px-5 py-4 rounded-2xl form-input text-emerald-950 font-bold placeholder-emerald-900/20">
                     </div>
 
                     <!-- Category -->
                     <div>
-                        <label class="block text-[10px] font-black text-emerald-900/50 uppercase tracking-widest mb-2 ml-1">Category</label>
+                        <label class="block text-[10px] font-black text-emerald-900/70 uppercase tracking-widest mb-2 ml-1">Category</label>
                         <select name="category" required
                             class="w-full px-5 py-4 rounded-2xl form-input text-emerald-950 font-bold appearance-none cursor-pointer">
                             <option value="Nature">Nature & Parks</option>
@@ -61,7 +61,7 @@
 
                     <!-- Barangay -->
                     <div>
-                        <label class="block text-[10px] font-black text-emerald-900/50 uppercase tracking-widest mb-2 ml-1">Barangay</label>
+                        <label class="block text-[10px] font-black text-emerald-900/70 uppercase tracking-widest mb-2 ml-1">Barangay</label>
                         <select name="barangay_id" required
                             class="w-full px-5 py-4 rounded-2xl form-input text-emerald-950 font-bold appearance-none cursor-pointer">
                             {% for brgy in barangays %}
@@ -72,7 +72,7 @@
 
                     <!-- Description -->
                     <div class="md:col-span-2">
-                        <label class="block text-[10px] font-black text-emerald-900/50 uppercase tracking-widest mb-2 ml-1">Description</label>
+                        <label class="block text-[10px] font-black text-emerald-900/70 uppercase tracking-widest mb-2 ml-1">Description</label>
                         <textarea name="description" rows="5" required
                             placeholder="Provide details about the attraction..."
                             class="w-full px-5 py-4 rounded-2xl form-input text-emerald-950 font-bold placeholder-emerald-900/20 resize-none"></textarea>
@@ -80,12 +80,12 @@
 
                     <!-- Latitude & Longitude -->
                     <div>
-                        <label class="block text-[10px] font-black text-emerald-900/50 uppercase tracking-widest mb-2 ml-1">Latitude</label>
+                        <label class="block text-[10px] font-black text-emerald-900/70 uppercase tracking-widest mb-2 ml-1">Latitude</label>
                         <input type="number" step="any" name="latitude" required placeholder="15.7890"
                             class="w-full px-5 py-4 rounded-2xl form-input text-emerald-950 font-bold">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-emerald-900/50 uppercase tracking-widest mb-2 ml-1">Longitude</label>
+                        <label class="block text-[10px] font-black text-emerald-900/70 uppercase tracking-widest mb-2 ml-1">Longitude</label>
                         <input type="number" step="any" name="longitude" required placeholder="120.2890"
                             class="w-full px-5 py-4 rounded-2xl form-input text-emerald-950 font-bold">
                     </div>
@@ -101,7 +101,7 @@
 
                         <div class="space-y-6">
                             <div>
-                                <label class="block text-[10px] font-black text-emerald-900/50 uppercase tracking-widest mb-2 ml-1">Direct Upload</label>
+                                <label class="block text-[10px] font-black text-emerald-900/70 uppercase tracking-widest mb-2 ml-1">Direct Upload</label>
                                 <input type="file" name="image" accept="image/*"
                                     class="w-full text-sm text-emerald-950 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:uppercase file:bg-emerald-600 file:text-white hover:file:bg-emerald-700 cursor-pointer">
                             </div>
@@ -116,7 +116,7 @@
                             </div>
 
                             <div>
-                                <label class="block text-[10px] font-black text-emerald-900/50 uppercase tracking-widest mb-2 ml-1">External Resource URL</label>
+                                <label class="block text-[10px] font-black text-emerald-900/70 uppercase tracking-widest mb-2 ml-1">External Resource URL</label>
                                 <input type="url" name="image_url" placeholder="https://images.unsplash.com/..."
                                     class="w-full px-5 py-4 rounded-2xl form-input text-emerald-950 font-bold placeholder-emerald-900/20">
                             </div>
@@ -126,7 +126,7 @@
 
                 <div class="flex flex-col sm:flex-row justify-end gap-4 pt-8">
                     <a href="{{ url_for('admin.admin_attractions') }}"
-                        class="px-8 py-4 rounded-2xl text-emerald-900/40 hover:text-emerald-900 text-sm font-black uppercase tracking-widest transition-all text-center">
+                        class="px-8 py-4 rounded-2xl text-emerald-900/70 hover:text-emerald-900 text-sm font-black uppercase tracking-widest transition-all text-center">
                         Discard
                     </a>
                     <button type="submit"

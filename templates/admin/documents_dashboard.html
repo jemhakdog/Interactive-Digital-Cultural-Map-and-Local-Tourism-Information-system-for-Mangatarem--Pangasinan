@@ -1,7 +1,7 @@
 {% extends "admin/dashboard.html" %}
 
 {% block admin_content %}
-<div class="animate-fade-in space-y-12 pb-20">
+<div class="animate-fade-in space-y-12 pb-20 pt-12">
     <!-- Breadcrumbs/Sub-header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
@@ -107,6 +107,55 @@
         </div>
     </div>
 
+    <!-- Rapid Entry Records Section (NEW) -->
+    <section>
+        <div class="flex items-center justify-between mb-8">
+            <h3 class="text-xl font-black text-emerald-950 flex items-center gap-3">
+                <span class="w-2 h-8 bg-amber-500 rounded-full"></span>
+                Structured Records
+            </h3>
+            <div class="flex items-center gap-2 text-amber-600/50 font-bold text-xs uppercase tracking-widest">
+                <span>{{ records|length }} Recent Records</span>
+            </div>
+        </div>
+        
+        {% if records %}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for record in records %}
+            <div class="glass-card-light p-6 rounded-[2rem] border border-amber-100/50 hover:shadow-xl transition-all group">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="p-3 bg-amber-50 rounded-2xl text-amber-600">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
+                        </svg>
+                    </div>
+                    <div class="text-right">
+                        <span class="block text-[8px] font-black text-amber-400 uppercase tracking-widest">{{ record.asset_type }}</span>
+                        <span class="block text-[10px] font-bold text-gray-400">{{ record.created_at.strftime('%b %d, %H:%M') }}</span>
+                    </div>
+                </div>
+                <h4 class="text-lg font-black text-emerald-950 mb-4 truncate">{{ record.name_of_asset or "Unnamed Asset" }}</h4>
+                <div class="flex gap-2">
+                    <a href="{{ url_for('admin.admin_document_record_edit', record_id=record.id) }}" 
+                       class="flex-1 text-center py-2 bg-emerald-50 text-emerald-600 text-[10px] font-black rounded-xl uppercase tracking-widest hover:bg-emerald-100 transition-all">
+                        Edit Record
+                    </a>
+                    <a href="{{ url_for('admin.admin_heritage_export_docx', profile_id=record.id) }}" 
+                       class="flex-1 text-center py-2 bg-amber-600 text-white text-[10px] font-black rounded-xl uppercase tracking-widest hover:bg-amber-700 transition-all">
+                        Export .docx
+                    </a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="bg-white/50 border border-dashed border-emerald-100 rounded-[2.5rem] p-12 text-center">
+            <p class="text-emerald-900/40 font-bold uppercase tracking-widest text-sm">No structured records found yet.</p>
+            <p class="text-gray-400 text-xs mt-2">Use the "Rapid Create" button in the asset overview below to start.</p>
+        </div>
+        {% endif %}
+    </section>
+
     <!-- All Files Section -->
     <section>
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
@@ -173,8 +222,12 @@
                             </td>
                             <td class="px-10 py-8">
                                 <div class="flex justify-end gap-3">
-                                    <a href="{{ url_for('admin.admin_document_edit', slug=form.slug) }}" 
+                                    <a href="{{ url_for('admin.admin_document_create', slug=form.slug) }}" 
                                        class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black rounded-xl uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/10">
+                                        Rapid Create
+                                    </a>
+                                    <a href="{{ url_for('admin.admin_document_edit', slug=form.slug) }}" 
+                                       class="px-5 py-2.5 bg-white border border-emerald-100 text-emerald-600 text-[10px] font-black rounded-xl uppercase tracking-widest hover:bg-emerald-50 transition-all shadow-sm">
                                         Edit Struct
                                     </a>
                                     <a href="{{ url_for('admin.admin_document_files', slug=form.slug) }}" 

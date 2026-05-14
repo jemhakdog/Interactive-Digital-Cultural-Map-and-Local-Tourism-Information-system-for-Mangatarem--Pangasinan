@@ -22,6 +22,7 @@ class NaturalHeritage(db.Model):
     area_size = db.Column(db.String(100), nullable=True)
     primary_features = db.Column(db.Text, nullable=True)
     biodiversity_significance = db.Column(db.Text, nullable=True)
+    meta_data = db.Column(db.JSON, nullable=True) # For template-specific fields
     
     def __repr__(self):
         return f'<NaturalHeritage Detail for Profile {self.heritage_profile_id}>'

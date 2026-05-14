@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+
+{% block head %}
+<!-- Mobile Specific Styles -->
+<style>
+    /* Mobile App Layout Basics */
+    .mobile-app-layout {
+        background-color: #F8F9FB;
+        padding-bottom: 5rem; /* Space for bottom nav or actions */
+        min-height: 100vh;
+    }
+
+    /* Desktop Adjustments */
+    @media (min-width: 768px) {
+        .mobile-app-layout {
+            padding-bottom: 0;
+        }
+        .layout-wrapper {
+            display: flex;
+            max-width: 1400px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: white;
+            box-shadow: 0 0 100px rgba(0,0,0,0.03);
+        }
+        .main-content-area {
+            flex: 1;
+            padding: 3rem;
+            background: #F8F9FB;
+            min-width: 0;
+            overflow-y: auto;
+        }
+    }
+
+    /* Mobile Header/Hero */
+    .hero-section {
+        position: relative;
+        height: 60vh;
+        min-height: 400px;
+        background-color: #E2E8F0;
+        border-radius: 0 0 2rem 2rem;
+        overflow: hidden;
+    }
+    .hero-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 50%, rgba(0,0,0,0.6) 100%);
+    }
+    .hero-content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 2rem 1.5rem;
+        color: white;
+    }
+    
+    .top-nav {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        z-index: 10;
+    }
+
+    .back-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.2);
+        backdrop-filter: blur(10px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        transition: all 0.3s ease;
+    }
+    .back-btn:hover {
+        background: rgba(255,255,255,0.3);
+    }
+
+    /* Content Cards */
+    .info-card {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        margin-top: -2rem;
+        position: relative;
+        z-index: 20;
+        box-shadow: 0 -10px 40px rgba(0,0,0,0.05);
+        margin-bottom: 1.5rem;
+    }
+
+    .detail-section {
+        background: white;
+        border-radius: 1.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.02);
+    }
+
+    /* Tags & Pills */
+    .category-pill {
+        display: inline-block;
+        padding: 0.5rem 1rem;
+        background: rgba(0, 226, 95, 0.1);
+        color: #00E25F;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        margin-bottom: 1rem;
+    }
+
+    /* Action Buttons */
+    .primary-btn {
+        background-color: #00E25F;
+        color: white;
+        font-weight: 700;
+        padding: 1rem;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+        box-shadow: 0 4px 15px rgba(0, 226, 95, 0.3);
+    }
+    .primary-btn:active {
+        transform: scale(0.98);
+    }
+
+    /* Horizontal Scroller (for nearby places) */
+    .horizontal-scroller {
+        display: flex;
+        overflow-x: auto;
+        gap: 1rem;
+        padding-bottom: 1rem;
+        scrollbar-width: none;
+    }
+    .horizontal-scroller::-webkit-scrollbar {
+        display: none;
+    }
+    .scroller-card {
+        flex: 0 0 200px;
+        border-radius: 1rem;
+        overflow: hidden;
+        background: white;
+        border: 1px solid #F1F5F9;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+    }
+    .scroller-card img {
+        width: 100%;
+        height: 120px;
+        object-fit: cover;
+    }
+    .scroller-card-info {
+        padding: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="mobile-app-layout">
+    <div class="layout-wrapper">
+        <main class="main-content-area !p-0 md:!p-6">
+            
+            <!-- Hero Section -->
+            <section class="hero-section md:rounded-3xl md:mt-4">
+                <img src="{{ attraction.image_url or 'https://placehold.co/800x600?text=' + attraction.name }}" alt="{{ attraction.name }}" class="hero-image">
+                <div class="hero-overlay"></div>
+                
+                <div class="top-nav">
+                    <button onclick="history.back()" class="back-btn">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                        </svg>
+                    </button>
+                    <div class="flex gap-2">
+                        <button class="back-btn">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="hero-content">
+                    <span class="category-pill">{{ attraction.category }}</span>
+                    <h1 class="text-3xl md:text-5xl font-bold font-serif mb-2">{{ attraction.name }}</h1>
+                    <div class="flex items-center gap-2 text-sm text-gray-200">
+                        <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"></path>
+                        </svg>
+                        <span>{{ attraction.barangay.name if attraction.barangay else 'Mangatarem' }}</span>
+                    </div>
+                </div>
+            </section>
+
+            <div class="px-4 md:px-0 max-w-4xl mx-auto">
+                <!-- Main Info Card -->
+                <div class="info-card">
+                    <div class="grid grid-cols-3 gap-4 mb-6 text-center border-b border-gray-100 pb-6">
+                        <div>
+                            <div class="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Authenticity</div>
+                            <div class="flex items-center justify-center gap-1 text-[#00E25F] font-bold">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                                </svg>
+                                <span>{{ attraction.rating or '4.8' }}</span>
+                            </div>
+                        </div>
+                        <div class="border-l border-r border-gray-100">
+                            <div class="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Status</div>
+                            <div class="text-gray-900 font-bold text-sm">Open Public</div>
+                        </div>
+                        <div>
+                            <div class="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Verified</div>
+                            <div class="text-blue-500 font-bold text-sm flex justify-center items-center gap-1">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                                </svg>
+                                Official
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ attraction.latitude }},{{ attraction.longitude }}" target="_blank" class="primary-btn w-full">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        Launch Navigation
+                    </a>
+                </div>
+
+                <!-- Story Section -->
+                <div class="detail-section">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 font-serif">Historical Significance</h3>
+                    <p class="text-gray-600 leading-relaxed text-sm">
+                        {{ attraction.description }}
+                    </p>
+                </div>
+
+                <!-- Visual Journey (Gallery) -->
+                {% if related_gallery %}
+                <div class="detail-section bg-transparent !px-0 !shadow-none">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 px-4 font-serif">Visual Journey</h3>
+                    <div class="horizontal-scroller px-4">
+                        {% for item in related_gallery %}
+                        <div class="scroller-card !flex-[0_0_150px]">
+                            <img src="{{ item.url }}" alt="{{ item.caption or 'Gallery view' }}" class="!h-[150px] object-cover rounded-xl" loading="lazy">
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Nearby Discovery -->
+                {% if nearby %}
+                <div class="detail-section bg-transparent !px-0 !shadow-none mb-8">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 px-4 font-serif">Nearby Discovery</h3>
+                    <div class="horizontal-scroller px-4">
+                        {% for place in nearby %}
+                        <a href="{{ url_for('public.attraction_detail_v1_view', id=place.id) }}" class="scroller-card block">
+                            <img src="{{ place.image_url or 'https://placehold.co/400x300?text=' + place.name }}" alt="{{ place.name }}">
+                            <div class="scroller-card-info">
+                                <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">{{ place.category }}</div>
+                                <h4 class="font-bold text-gray-800 text-sm truncate">{{ place.name }}</h4>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Nearby Accommodations -->
+                {% if nearby_stay %}
+                <div class="detail-section">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 font-serif">Where to Stay</h3>
+                    <div class="space-y-3">
+                        {% for est in nearby_stay %}
+                        <a href="{{ url_for('business.detail', id=est.id) }}" class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-xl transition-colors">
+                            {% if est.cover_image_url %}
+                            <img src="{{ est.cover_image_url }}" alt="{{ est.name }}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0">
+                            {% else %}
+                            <div class="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 text-2xl">🏨</div>
+                            {% endif %}
+                            <div class="min-w-0 flex-1">
+                                <h4 class="font-bold text-gray-900 text-sm truncate">{{ est.name }}</h4>
+                                <div class="flex items-center gap-2 mt-1 text-xs">
+                                    <span class="text-[#00E25F] font-bold">{{ est._distance }}km</span>
+                                    {% if est.rating_avg > 0 %}
+                                    <span class="text-amber-500 font-bold">★ {{ "%.1f"|format(est.rating_avg) }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Nearby Dining -->
+                {% if nearby_eat %}
+                <div class="detail-section mb-12">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 font-serif">Where to Eat</h3>
+                    <div class="space-y-3">
+                        {% for est in nearby_eat %}
+                        <a href="{{ url_for('business.detail', id=est.id) }}" class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded-xl transition-colors">
+                            {% if est.cover_image_url %}
+                            <img src="{{ est.cover_image_url }}" alt="{{ est.name }}" class="w-16 h-16 rounded-lg object-cover flex-shrink-0">
+                            {% else %}
+                            <div class="w-16 h-16 rounded-lg bg-gray-100 flex items-center justify-center flex-shrink-0 text-2xl">
+                                {% if est.type == 'restaurant' %}🍽️{% elif est.type == 'cafe' %}☕{% else %}🍔{% endif %}
+                            </div>
+                            {% endif %}
+                            <div class="min-w-0 flex-1">
+                                <h4 class="font-bold text-gray-900 text-sm truncate">{{ est.name }}</h4>
+                                <div class="flex items-center gap-2 mt-1 text-xs">
+                                    <span class="text-[#00E25F] font-bold">{{ est._distance }}km</span>
+                                    {% if est.rating_avg > 0 %}
+                                    <span class="text-amber-500 font-bold">★ {{ "%.1f"|format(est.rating_avg) }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

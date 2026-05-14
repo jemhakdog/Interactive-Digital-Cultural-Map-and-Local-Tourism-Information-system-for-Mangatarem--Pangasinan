@@ -17,6 +17,7 @@ class MovableHeritage(db.Model):
     dimensions = db.Column(db.String(100), nullable=True)
     current_location = db.Column(db.Text, nullable=True)
     state_of_conservation = db.Column(db.Text, nullable=True)
+    meta_data = db.Column(db.JSON, nullable=True) # For template-specific fields
     
     def __repr__(self):
         return f'<MovableHeritage Detail for Profile {self.heritage_profile_id}>'

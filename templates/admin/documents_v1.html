@@ -1,0 +1,347 @@
+{% extends "base.html" %}
+
+{% block title %}Documents Management - V1{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    body {
+        font-family: 'Inter', sans-serif;
+        background-color: #f8f9fa;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .progress-bar {
+        height: 8px;
+        border-radius: 4px;
+        background: #e9ecef;
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.6s ease;
+    }
+
+    .avatar-stack {
+        display: flex;
+        align-items: center;
+    }
+
+    .avatar-stack img, .avatar-stack .avatar-placeholder {
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        border: 2px solid white;
+        margin-left: -8px;
+        object-fit: cover;
+    }
+
+    .avatar-stack img:first-child, .avatar-stack .avatar-placeholder:first-child {
+        margin-left: 0;
+    }
+
+    .avatar-placeholder {
+        background: #dee2e6;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 10px;
+        font-weight: 600;
+        color: #495057;
+    }
+
+    .btn-action {
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #dee2e6;
+        background: white;
+        color: #212529;
+        transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+        background: #f1f3f5;
+        border-color: #ced4da;
+    }
+
+    .action-icon-btn {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        color: #6c757d;
+        transition: all 0.2s;
+    }
+
+    .action-icon-btn:hover {
+        background: #f1f3f5;
+        color: #212529;
+    }
+
+    .context-menu {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        width: 180px;
+        background: white;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        z-index: 50;
+        display: none;
+    }
+
+    .context-menu.show {
+        display: block;
+    }
+
+    .context-menu-item {
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        color: #495057;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+
+    .context-menu-item:hover {
+        background: #f8f9fa;
+    }
+
+    .context-menu-item.delete {
+        color: #dc3545;
+    }
+
+    .search-input {
+        background: #f1f3f5;
+        border: none;
+        border-radius: 8px;
+        padding: 10px 16px;
+        width: 100%;
+        outline: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-[1400px] mx-auto p-6 md:p-10">
+    <div class="flex flex-col lg:flex-row gap-8">
+        
+        <!-- Main Content Area -->
+        <div class="flex-1">
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-gray-900">Document Management</h1>
+                <p class="text-gray-500 text-sm">Manage heritage records and DOCX templates.</p>
+            </div>
+            <!-- Action Buttons Header -->
+            <div class="flex flex-wrap gap-4 mb-8">
+                <button class="btn-action shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    New Document
+                </button>
+                <button class="btn-action shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                    New Folder
+                </button>
+                <button class="btn-action shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M8 14s1.5 2 4 2 4-2 4-2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>
+                    New Organization
+                </button>
+
+                <div class="ml-auto flex items-center gap-4">
+                    <button class="action-icon-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    </button>
+                    <button class="action-icon-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Documents Table -->
+            <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-100">
+                            <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Modified</th>
+                            <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Access</th>
+                            <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        {% for doc in documents %}
+                        <tr class="hover:bg-gray-50 transition-colors group">
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2 rounded-lg bg-gray-100 text-gray-500">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-medium text-gray-900">{{ doc.name }}</div>
+                                        <div class="text-xs text-gray-400">{{ doc.modified }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-6 py-4">
+                                <div class="flex items-center gap-2">
+                                    {% if doc.access == "Only you" %}
+                                    <div class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                        Only you
+                                    </div>
+                                    {% else %}
+                                    <div class="avatar-stack">
+                                        {% for u in doc.users %}
+                                        <div class="avatar-placeholder">{{ u }}</div>
+                                        {% endfor %}
+                                        {% if doc.users|length > 2 %}
+                                        <div class="avatar-placeholder">+{{ doc.users|length - 2 }}</div>
+                                        {% endif %}
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 text-right">
+                                <div class="flex justify-end items-center gap-2 relative">
+                                    {% if doc.slug %}
+                                    <a href="{{ url_for('admin.admin_document_export', slug=doc.slug) }}" class="action-icon-btn opacity-40 group-hover:opacity-100" title="Download">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                    </a>
+                                    {% else %}
+                                    <a href="{{ url_for('v1_docs.v1_document_download', filename=doc.name) }}" class="action-icon-btn opacity-40 group-hover:opacity-100" title="Download Original">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                    </a>
+                                    {% endif %}
+                                    
+                                    <button class="action-icon-btn opacity-40 group-hover:opacity-100" onclick="copyDocName('{{ doc.name }}')" title="Share (Copy Filename)">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+                                    </button>
+                                    
+                                    <button class="action-icon-btn menu-trigger opacity-40 group-hover:opacity-100" onclick="toggleMenu(event, 'menu-{{ loop.index }}')" title="More Options">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+                                    </button>
+                                    
+                                    <!-- Popover Menu -->
+                                    <div id="menu-{{ loop.index }}" class="context-menu text-left shadow-xl border-gray-200">
+                                        {% if doc.slug %}
+                                        <a href="{{ url_for('admin.admin_document_view', slug=doc.slug) }}" class="context-menu-item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                                            File Details
+                                        </a>
+                                        <a href="{{ url_for('admin.admin_document_edit', slug=doc.slug) }}" class="context-menu-item">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                            Edit Structure
+                                        </a>
+                                        {% else %}
+                                        <div class="context-menu-item disabled opacity-50 cursor-not-allowed">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                                            No Metadata
+                                        </div>
+                                        {% endif %}
+                                        <div class="border-t border-gray-100 my-1"></div>
+                                        <div class="context-menu-item delete opacity-50 cursor-not-allowed">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
+                                            Delete (Locked)
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Right Sidebar (Stats) -->
+        <div class="w-full lg:w-[360px] flex flex-col gap-8">
+            <!-- Search Area -->
+            <form action="{{ url_for('v1_docs.v1_documents_view') }}" method="GET" class="relative">
+                <input type="text" name="q" value="{{ search_query or '' }}" class="search-input shadow-sm focus:ring-1 focus:ring-emerald-500 transition-all" placeholder="Search documents...">
+                <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-emerald-500 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                </button>
+            </form>
+
+            <!-- Folders Details -->
+            <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Folders Details</h3>
+                <div class="space-y-6">
+                    {% for folder in folders %}
+                    <div class="space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-xl bg-forest-black flex items-center justify-center text-white">
+                                    {% if folder.icon == "folder" %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+                                    {% elif folder.icon == "image" %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                                    {% else %}
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <div class="text-sm font-bold text-gray-900">{{ folder.name }}</div>
+                                </div>
+                            </div>
+                            <div class="avatar-stack">
+                                {% for user in folder.users %}
+                                <div class="avatar-placeholder text-[8px]">{{ user }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between text-xs font-medium">
+                            <span class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md">{{ folder.entries }} entries mapped</span>
+                            <span class="text-gray-400">{{ folder.count }} templates</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function copyDocName(name) {
+        navigator.clipboard.writeText(name).then(() => {
+            alert('Filename copied to clipboard: ' + name);
+        });
+    }
+
+    function toggleMenu(event, menuId) {
+        event.stopPropagation();
+        const allMenus = document.querySelectorAll('.context-menu');
+        const currentMenu = document.getElementById(menuId);
+        
+        allMenus.forEach(m => {
+            if (m !== currentMenu) m.classList.remove('show');
+        });
+        
+        if (currentMenu) {
+            currentMenu.classList.toggle('show');
+        }
+    }
+
+    document.addEventListener('click', () => {
+        document.querySelectorAll('.context-menu').forEach(m => m.classList.remove('show'));
+    });
+</script>
+{% endblock %}

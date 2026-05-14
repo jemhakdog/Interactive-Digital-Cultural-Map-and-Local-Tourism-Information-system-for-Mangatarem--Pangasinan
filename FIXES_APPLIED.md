@@ -8,6 +8,7 @@
 **Fix**: Updated `app.py` Content-Security-Policy header to include `https://unpkg.com` in:
 - `script-src` directive
 - `style-src` directive
+- `connect-src` directive
 
 **Location**: `app.py` lines ~226-227
 

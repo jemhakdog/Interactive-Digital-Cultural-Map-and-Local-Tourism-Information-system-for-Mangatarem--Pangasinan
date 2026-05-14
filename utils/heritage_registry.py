@@ -19,6 +19,7 @@ HERITAGE_TYPES = {
         "label": "Built Heritage",
         "label_plural": "Built Heritage Sites",
         "form": "02",
+        "template_file": "Form 02A Tangible Immovable - Govt and Commercial Buildings 2019 (1) - Mangatarem Tourism.docx",
         "has_coords": True,
         "name_field": "name",
         "fields": [
@@ -47,6 +48,7 @@ HERITAGE_TYPES = {
         "label": "Natural Heritage",
         "label_plural": "Natural Heritage Sites",
         "form": "01A",
+        "template_file": "Form 01A Natural Resources - Land formation 2019 - Mangatarem Tourism.docx",
         "has_coords": True,
         "name_field": "name",
         "fields": [
@@ -75,6 +77,7 @@ HERITAGE_TYPES = {
         "label": "Movable Heritage",
         "label_plural": "Movable Heritage Items",
         "form": "03",
+        "template_file": "Form 03A Tangible Movable - Archaeological 2019 - Mangatarem Tourism.docx",
         "has_coords": True,
         "name_field": "name",
         "fields": [
@@ -106,6 +109,7 @@ HERITAGE_TYPES = {
         "label": "Intangible Heritage",
         "label_plural": "Intangible Heritage Items",
         "form": "04A",
+        "template_file": "Form 04A Intangible Heritage - Oral Tradition and expressions 2019 - Mangatarem Tourism.docx",
         "has_coords": False,
         "name_field": "name",
         "fields": [
@@ -135,6 +139,7 @@ HERITAGE_TYPES = {
         "label": "Significant Personality",
         "label_plural": "Significant Personalities",
         "form": "05",
+        "template_file": "Form 05 Personalities 2017 - Mangatarem Tourism.docx",
         "has_coords": False,
         "name_field": "name",
         "fields": [
@@ -157,6 +162,7 @@ HERITAGE_TYPES = {
         "label": "Cultural Institution",
         "label_plural": "Cultural Institutions",
         "form": "06",
+        "template_file": "Form 06 Cultural Institutions 2019 - Mangatarem Tourism.docx",
         "has_coords": True,
         "name_field": "name",
         "fields": [
@@ -184,6 +190,7 @@ HERITAGE_TYPES = {
         "label": "LGU Culture Program",
         "label_plural": "LGU Culture Programs",
         "form": "07",
+        "template_file": "Form 07 LGU Programs projects for culture 2019 - Mangatarem Tourism.docx",
         "has_coords": False,
         "name_field": "program_name",
         "fields": [

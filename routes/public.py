@@ -169,6 +169,76 @@ def events_v2_view():
     )
 
 
+@public_bp.route("/v1/attractions/<int:id>")
+def attraction_detail_v1_view(id):
+    """
+    Display detailed information about a specific attraction (modernized mobile-first design).
+    """
+    log_entry("public", "attraction_detail_v1", id=id)
+    logger.info("Attraction detail v1 page accessed")
+
+    from modules.auth.models import User
+    from modules.gallery.models import GalleryItem
+    from modules.business.models import Establishment
+    from modules.analytics.models import AnalyticsPageView
+
+    logger.debug(f"Fetching attraction ID {id}")
+    attraction = Attraction.query.get_or_404(id)
+    
+    # Record view
+    record_view("attraction", item_id=id)
+
+    # Fetch nearby attractions (same barangay, approved, limit 3, excluding current)
+    nearby = (
+        Attraction.query.filter(
+            Attraction.barangay_id == attraction.barangay_id,
+            Attraction.status == "approved",
+            Attraction.id != attraction.id,
+        )
+        .limit(3)
+        .all()
+    )
+
+    # Fetch related gallery items
+    related_gallery = (
+        GalleryItem.query.join(User, GalleryItem.user_id == User.id)
+        .filter(User.barangay_id == attraction.barangay_id, GalleryItem.status == "approved")
+        .limit(6)
+        .all()
+    )
+
+    # Fetch nearby establishments
+    nearby_stay = []
+    nearby_eat = []
+    if attraction.latitude and attraction.longitude:
+        from core.geo import haversine_distance
+        all_establishments = Establishment.query.filter_by(status="approved").all()
+        for est in all_establishments:
+            dist = haversine_distance(
+                attraction.latitude, attraction.longitude,
+                est.latitude, est.longitude
+            )
+            if dist <= 5.0:  # 5km radius
+                est._distance = round(dist, 1)
+                if est.type == "inn":
+                    nearby_stay.append(est)
+                else:
+                    nearby_eat.append(est)
+        nearby_stay.sort(key=lambda x: x._distance)
+        nearby_eat.sort(key=lambda x: x._distance)
+        nearby_stay = nearby_stay[:3]
+        nearby_eat = nearby_eat[:3]
+
+    return render_template(
+        "pagez/detail_v1.html",
+        attraction=attraction,
+        nearby=nearby,
+        related_gallery=related_gallery,
+        nearby_stay=nearby_stay,
+        nearby_eat=nearby_eat,
+    )
+
+
 @public_bp.route("/v1/barangay")
 def barangays_v1_view():
     """

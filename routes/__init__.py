@@ -26,6 +26,8 @@ def register_blueprints(app):
     from modules.heritage.routes import heritage_bp
     from modules.gallery.routes import gallery_bp
     from modules.notifications.routes import notifications_bp
+    from .v1_documents import v1_docs_bp
+    app.register_blueprint(v1_docs_bp)
     app.register_blueprint(attractions_bp)
     app.register_blueprint(events_bp)
     app.register_blueprint(business_bp)

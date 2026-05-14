@@ -1,0 +1,159 @@
+{% extends "admin/dashboard.html" %}
+
+{% block admin_content %}
+<div class="px-6 pt-12 pb-8 animate-fade-in relative min-h-screen">
+    <!-- Header -->
+    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-8">
+        <div class="space-y-2">
+            <h1 class="text-4xl md:text-5xl font-black text-white tracking-tight">
+                Rapid Editor: <span class="bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">{{ meta.label }}</span>
+            </h1>
+            <p class="text-emerald-100/60 max-w-2xl text-lg font-medium">
+                {{ 'Edit existing record' if is_edit else 'Create new structured heritage record' }} using the official document template.
+            </p>
+        </div>
+        
+        <div class="hidden lg:flex gap-4">
+            <a href="{{ url_for('admin.admin_documents') }}" 
+               class="px-8 py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl transition-all duration-300 border border-white/20 backdrop-blur-md">
+                Exit Editor
+            </a>
+        </div>
+    </div>
+
+    <!-- Rapid Editor Canvas -->
+    <div class="flex justify-center bg-black/40 rounded-[3rem] p-16 mb-12 border border-white/5 overflow-x-auto shadow-inner">
+        <form id="rapid-form" method="POST" action="{{ url_for('admin.admin_document_record_edit', record_id=record.id) if is_edit else url_for('admin.admin_document_create', slug=slug) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <!-- Physical Document View -->
+            <div id="document-canvas" class="w-[816px] min-h-[1056px] bg-white text-gray-900 shadow-[0_40px_100px_rgba(0,0,0,0.5),0_0_100px_rgba(16,185,129,0.05)] p-[0.75in] pb-[1in] font-serif leading-relaxed text-[13px] relative">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500/20 via-emerald-500 to-emerald-500/20"></div>
+                
+                <!-- Branding Header -->
+                <div class="flex justify-between items-start mb-10 border-b border-gray-100 pb-6">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 bg-emerald-500 rounded-lg flex items-center justify-center text-white font-black">M</div>
+                        <div>
+                            <div class="font-sans font-bold text-gray-400 text-[10px] uppercase tracking-widest">Republic of the Philippines</div>
+                            <div class="font-sans font-black text-gray-900 text-sm uppercase">Municipality of Mangatarem</div>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <div class="font-sans font-black text-emerald-500 text-lg uppercase">{{ meta.category }}</div>
+                        <div class="font-sans font-bold text-gray-400 text-[9px] uppercase tracking-tighter">{{ meta.file }}</div>
+                    </div>
+                </div>
+
+                <!-- Template Content rendering -->
+                {% if template %}
+                    {% for para in template.paragraphs %}
+                        {% set p_text = para.text | trim %}
+                        {% if p_text %}
+                        <div class="mb-4 relative group">
+                            <!-- Detect labels and inject inputs -->
+                            {% set is_label = false %}
+                            {% set field_key = "" %}
+                            {% set field_label = "" %}
+                            
+                            <!-- Simple heuristic for mapping document text to form fields -->
+                            {% if "CONTROL NUMBER" in p_text.upper() %}
+                                {% set is_label = true %}{% set field_key = "form_control_number" %}{% set field_label = "Control Number" %}
+                            {% elif "NAME OF" in p_text.upper() or "NAME:" in p_text.upper() %}
+                                {% set is_label = true %}{% set field_key = config.name_field %}{% set field_label = "Name" %}
+                            {% elif "LOCATION" in p_text.upper() or "ADDRESS" in p_text.upper() %}
+                                {% set is_label = true %}{% set field_key = "address" if "address" in request.form else ("location" if "location" in request.form else "address") %}{% set field_label = "Location" %}
+                                {# Small fix for registry field names #}
+                                {% if config.fields | selectattr(0, 'equalto', 'location') | list %}{% set field_key = "location" %}{% endif %}
+                            {% elif "CATEGORY" in p_text.upper() %}
+                                {% set is_label = true %}{% set field_key = "category" %}{% set field_label = "Category" %}
+                            {% endif %}
+
+                            <p class="{{ 'font-bold text-emerald-800' if p_text.isupper() else 'text-gray-800' }}">
+                                {{ p_text }}
+                            </p>
+                            
+                            {% if is_label %}
+                            <div class="mt-2 bg-emerald-50/50 p-3 rounded-lg border border-emerald-100 flex items-center gap-3">
+                                <span class="text-[10px] font-sans font-black text-emerald-600 uppercase w-20">{{ field_label }}:</span>
+                                <input type="text" name="{{ field_key }}" 
+                                       value="{{ (record[field_key] if record else (detail[field_key] if detail else "")) }}"
+                                       placeholder="Enter {{ field_label }}..."
+                                       class="flex-1 bg-transparent border-none focus:ring-0 font-serif text-[14px] text-gray-900 border-b border-emerald-200 focus:border-emerald-500 py-1">
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+
+                    <!-- Catch-all for remaining fields in registry -->
+                    <div class="mt-12 pt-8 border-t-2 border-dashed border-gray-100">
+                        <h3 class="font-sans font-black text-gray-300 text-[10px] uppercase tracking-[0.3em] mb-6">Detailed Information Registry</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {% for f_key, f_label, f_type, f_req in config.fields %}
+                                {# Skip fields already handled above if they were detected #}
+                                <div class="space-y-1">
+                                    <label class="block font-sans font-bold text-[10px] text-gray-400 uppercase tracking-wider">{{ f_label }}{% if f_req %} <span class="text-red-400">*</span>{% endif %}</label>
+                                    
+                                    {% set val = "" %}
+                                    {% if record and hasattr(record, f_key) %}
+                                        {% set val = record[f_key] %}
+                                    {% elif detail and hasattr(detail, f_key) %}
+                                        {% set val = detail[f_key] %}
+                                    {% elif detail and detail.meta_data and f_key in detail.meta_data %}
+                                        {% set val = detail.meta_data[f_key] %}
+                                    {% endif %}
+
+                                    {% if f_type == 'textarea' %}
+                                        <textarea name="{{ f_key }}" rows="3" class="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 font-serif text-[12px] focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all">{{ val }}</textarea>
+                                    {% elif f_type == 'json' %}
+                                        <input type="text" name="{{ f_key }}" value="{{ val }}" class="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 font-serif text-[12px] focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all" placeholder="Comma separated values...">
+                                    {% else %}
+                                        <input type="{{ f_type }}" name="{{ f_key }}" value="{{ val }}" class="w-full bg-gray-50 border border-gray-100 rounded-xl p-3 font-serif text-[12px] focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition-all">
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="flex flex-col items-center justify-center py-20 text-gray-400 gap-4">
+                        <svg class="w-16 h-16 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <p class="font-sans font-bold uppercase tracking-widest text-[10px]">No template structure detected</p>
+                    </div>
+                {% endif %}
+
+                <div class="mt-20 border-t border-gray-100 pt-8 text-[10px] text-gray-300 font-sans uppercase tracking-[0.25em] text-center">
+                    Mangatarem Digital Cultural Map - Rapid Heritage Entry System
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Floating Action Bar (Sticky Bottom) -->
+    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-md px-6">
+        <div class="bg-emerald-950/90 backdrop-blur-xl border border-white/10 p-4 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center gap-4">
+            <a href="{{ url_for('admin.admin_documents') }}" 
+               class="flex-1 text-center py-4 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-black rounded-2xl uppercase tracking-widest transition-all">
+                Cancel
+            </a>
+            <button type="button" onclick="document.getElementById('rapid-form').submit()"
+                    class="flex-[2] py-4 bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-black rounded-2xl uppercase tracking-[0.2em] transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-3">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
+                </svg>
+                <span>{{ 'Update Record' if is_edit else 'Save Record' }}</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes fade-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in { animation: fade-in 0.5s ease-out forwards; }
+    #document-canvas input:focus, #document-canvas textarea:focus {
+        background-color: #ecfdf5 !important;
+    }
+</style>
+{% endblock %}

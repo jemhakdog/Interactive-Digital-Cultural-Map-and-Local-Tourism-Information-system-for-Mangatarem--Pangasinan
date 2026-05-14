@@ -22,6 +22,7 @@ class CulturalInstitution(db.Model):
     year_established = db.Column(db.Integer, nullable=True)
     head_of_institution = db.Column(db.String(200), nullable=True)
     activities_services = db.Column(db.Text, nullable=True)
+    meta_data = db.Column(db.JSON, nullable=True) # For template-specific fields
     
     def __repr__(self):
         return f'<CulturalInstitution Detail for Profile {self.heritage_profile_id}>'

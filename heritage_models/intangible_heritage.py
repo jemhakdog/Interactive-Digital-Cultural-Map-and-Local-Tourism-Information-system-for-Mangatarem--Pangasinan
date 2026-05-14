@@ -22,6 +22,7 @@ class IntangibleHeritage(db.Model):
     description = db.Column(db.Text, nullable=True)
     practitioners = db.Column(db.Text, nullable=True)
     transmission_mode = db.Column(db.Text, nullable=True)
+    meta_data = db.Column(db.JSON, nullable=True) # For template-specific fields
     
     def __repr__(self):
         return f'<IntangibleHeritage Detail for Profile {self.heritage_profile_id}>'

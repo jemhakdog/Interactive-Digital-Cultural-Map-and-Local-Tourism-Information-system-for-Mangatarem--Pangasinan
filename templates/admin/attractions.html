@@ -33,9 +33,9 @@
                 </div>
                 <div class="flex items-center gap-4">
                     <div class="glass-card px-6 py-3 rounded-2xl border-emerald-400/20 bg-emerald-900/10">
-                        <p class="text-[10px] uppercase font-black text-emerald-200/60 tracking-widest mb-1">Active
+                        <p class="text-[10px] uppercase font-black text-emerald-900/60 tracking-widest mb-1">Active
                             Assets</p>
-                        <p class="text-2xl font-black text-white leading-none">{{ pagination.total if pagination else all_attractions|length }}</p>
+                        <p class="text-2xl font-black text-emerald-950 leading-none">{{ pagination.total if pagination else all_attractions|length }}</p>
                     </div>
                 </div>
             </div>
@@ -57,7 +57,7 @@
                 </div>
                 <div>
                     <p class="text-2xl font-black text-emerald-950">{{ pagination.total if pagination else all_attractions|length }}</p>
-                    <p class="text-xs font-bold text-emerald-900/50 uppercase tracking-widest">Total Landmarks</p>
+                    <p class="text-[10px] font-bold text-emerald-900/60 uppercase tracking-widest">Total Landmarks</p>
                 </div>
             </div>
 
@@ -70,7 +70,7 @@
                 </div>
                 <div class="relative z-10">
                     <p class="text-2xl font-black text-orange-950">{{ pending_attractions|length }}</p>
-                    <p class="text-xs font-bold text-orange-900/50 uppercase tracking-widest">Pending Review</p>
+                    <p class="text-[10px] font-bold text-orange-900/60 uppercase tracking-widest">Pending Review</p>
                 </div>
                 {% if pending_attractions|length > 0 %}
                 <div class="absolute right-0 top-0 h-full w-1 bg-orange-500 animate-pulse"></div>
@@ -87,7 +87,7 @@
                 <div>
                     <p class="text-2xl font-black text-blue-950">{{
                         all_attractions|map(attribute='category')|unique|list|length }}</p>
-                    <p class="text-xs font-bold text-blue-900/50 uppercase tracking-widest">Categories</p>
+                    <p class="text-[10px] font-bold text-blue-900/60 uppercase tracking-widest">Categories</p>
                 </div>
             </div>
         </div>
@@ -150,8 +150,8 @@
                                 </div>
                                 <h3 class="text-lg font-black text-emerald-950 mb-1 leading-tight">{{ attraction.name }}
                                 </h3>
-                                <p class="text-xs text-gray-500 mb-4 line-clamp-2">{{ attraction.description }}</p>
-                                <div class="flex items-center gap-2 text-[10px] text-gray-400 font-bold mb-4">
+                                <p class="text-xs text-emerald-950/70 mb-4 line-clamp-2">{{ attraction.description }}</p>
+                                <div class="flex items-center gap-2 text-[10px] text-emerald-900/40 font-bold mb-4">
                                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
@@ -255,7 +255,7 @@
                             <td class="px-6 py-5">
                                 <p class="text-xs font-bold text-emerald-950">{{ attraction.user.username if
                                     attraction.user else 'System' }}</p>
-                                <p class="text-[10px] text-emerald-900/40 font-black uppercase tracking-tighter">Brgy.
+                                    <p class="text-[10px] text-emerald-900/60 font-black uppercase tracking-tighter">Brgy.
                                     {{ (attraction.barangay.name if attraction.barangay else (attraction.user.barangay.name if attraction.user and attraction.user.barangay else 'Global')) }}</p>
                             </td>
                             <td class="px-8 py-5 text-right">

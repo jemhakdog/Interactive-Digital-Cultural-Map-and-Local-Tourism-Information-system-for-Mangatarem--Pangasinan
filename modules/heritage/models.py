@@ -28,11 +28,13 @@ class HeritageProfile(db.Model):
     conservation_status = db.Column(db.Text, nullable=True)
     
     # Meta
+    template_slug = db.Column(db.String(100), nullable=True, index=True) # Tracks which form template was used
     mapper_name = db.Column(db.String(200), nullable=True)
     date_profiled = db.Column(db.Date, nullable=True)
     status = db.Column(db.String(20), default='pending', index=True)
     user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=True, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
     # Relationships
     barangay = db.relationship('BarangayInfo', backref='profiles')
