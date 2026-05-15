@@ -48,6 +48,11 @@ def approve_event(id):
     db.session.commit()
     
     log_success("admin", "approve_event", f"Event '{event.name}' approved")
+    
+    # Invalidate caches
+    from utils.cache_helpers import invalidate_event_cache
+    invalidate_event_cache(event_id=id, barangay_id=event.barangay_id)
+
     flash(f'Event "{event.name}" approved!')
     return redirect(url_for("admin.admin_events"))
 
@@ -70,6 +75,11 @@ def reject_event(id):
     db.session.commit()
     
     log_success("admin", "reject_event", f"Event '{title}' rejected")
+    
+    # Invalidate caches
+    from utils.cache_helpers import invalidate_event_cache
+    invalidate_event_cache(event_id=id, barangay_id=event.barangay_id)
+
     flash(f'Event "{title}" rejected and removed.')
     return redirect(url_for("admin.admin_events"))
 
@@ -153,6 +163,11 @@ def add_event():
         db.session.commit()
 
         log_success("admin", "add_event", f"New event '{event.name}' added")
+        
+        # Invalidate caches
+        from utils.cache_helpers import invalidate_event_cache
+        invalidate_event_cache(barangay_id=event.barangay_id)
+
         flash("Event added successfully!")
         return redirect(url_for("admin.admin_events"))
     
@@ -237,6 +252,11 @@ def edit_event(id):
 
         db.session.commit()
         log_success("admin", "edit_event", f"Event '{event.name}' updated")
+        
+        # Invalidate caches
+        from utils.cache_helpers import invalidate_event_cache
+        invalidate_event_cache(event_id=id, barangay_id=event.barangay_id)
+
         flash("Event updated successfully!")
         return redirect(url_for("admin.admin_events"))
     
@@ -262,5 +282,10 @@ def delete_event(id):
     db.session.commit()
     
     log_success("admin", "delete_event", f"Event '{title}' deleted")
+    
+    # Invalidate caches
+    from utils.cache_helpers import invalidate_event_cache
+    invalidate_event_cache(event_id=id, barangay_id=event.barangay_id)
+
     flash("Event deleted successfully!")
     return redirect(url_for("admin.admin_events"))

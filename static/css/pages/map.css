@@ -311,7 +311,32 @@
     opacity: 0 !important;
     visibility: hidden !important;
     pointer-events: none !important;
-    transform: translateX(100%) !important;
+    transform: translateX(-100%) !important; /* Slide out to the left on desktop */
+    width: 0 !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+@media (min-width: 769px) {
+    #attractions-sidebar.layout-popup {
+        position: absolute !important;
+        top: 1.5rem !important;
+        left: 1.5rem !important;
+        z-index: 500 !important;
+        height: calc(100% - 3rem) !important;
+        width: 400px !important;
+        border-radius: 1.5rem !important;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+    }
+}
+
+/* Fix mobile transform direction for hidden state */
+@media (max-width: 768px) {
+    #attractions-sidebar.is-hidden {
+        transform: translateY(100%) !important; /* Slide down on mobile */
+    }
 }
 
 /* Mobile Floating Controls Optimization */

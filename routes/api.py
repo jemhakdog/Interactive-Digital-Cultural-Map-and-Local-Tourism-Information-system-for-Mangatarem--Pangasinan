@@ -33,10 +33,19 @@ def api_attractions():
     """
     page = request.args.get("page", 1, type=int)
     per_page = min(request.args.get("per_page", 20, type=int), 100)
+    barangay = request.args.get("barangay", "all")
+    category = request.args.get("category", "all")
     
-    barangay = request.args.get("barangay")
-    category = request.args.get("category")
+    from utils.cache_helpers import cache_get, cache_set
+    cache_key = f"api_attractions:p{page}:pp{per_page}:b{barangay}:c{category}"
     
+    # Try cache
+    cached_data = cache_get(cache_key)
+    if cached_data:
+        response = jsonify(cached_data)
+        response.headers["X-Cache"] = "HIT"
+        return response
+        
     query = Attraction.query.filter_by(status="approved")
     
     if barangay and barangay != "all":
@@ -61,11 +70,18 @@ def api_attractions():
             "image_url": attr.image_url
         })
         
-    return jsonify({
+    payload = {
         "attractions": result,
         "pagination": {
             "page": page,
             "total": paginated.total,
             "pages": paginated.pages
         }
-    })
+    }
+    
+    # Store in cache for 5 minutes
+    cache_set(cache_key, payload, ttl=300)
+    
+    response = jsonify(payload)
+    response.headers["X-Cache"] = "MISS"
+    return response

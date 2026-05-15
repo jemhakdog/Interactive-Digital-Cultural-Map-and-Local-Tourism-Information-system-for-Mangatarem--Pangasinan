@@ -36,14 +36,18 @@ For production Supabase PostgreSQL, we use connection pooling on port **6543**.
 ### 2. Field Naming (ERD Aligned)
 The system uses `latitude` and `longitude` fields throughout. Avoid using `lat` or `lng` as these are deprecated and can cause schema mismatches during production migrations.
 
-### 3. Caching Strategy
-The system uses **Smart Cache Headers** applied globally in `app.py`:
+### 3. Smart Application Caching (Redis)
+The system now uses a multi-tier **Redis Caching Layer** (Upstash) to reduce database load and latency. For full technical details, see [REDIS_CACHING_SYSTEM.md](file:///d:/porjects/capstone_system/docs/REDIS_CACHING_SYSTEM.md).
 
-| Content Type | s-maxage | stale-while-revalidate |
+| Content Type | TTL | Storage |
 |--------------|----------|------------------------|
-| Public HTML | 300s (5m) | 600s (10m) |
-| Public API | 120s (2m) | 300s (5m) |
-| Static Assets | 1 Year | N/A (Immutable) |
+| Barangay Profiles | 30m | Redis (Persistent) |
+| Public API & Map Meta | 5-10m | Redis (Persistent) |
+| Search Results | 5m | Redis (Guard Protected) |
+| Attraction Details | 15m | Redis (Haversine Cached) |
+
+### 4. Persistent Rate Limiting
+Security is enforced via `flask-limiter` using Redis storage in production to ensure limits persist across serverless instances.
 
 ---
 

@@ -24,7 +24,7 @@ def detail(id):
     from modules.auth.models import User
     from modules.gallery.models import GalleryItem
     from modules.business.models import Establishment
-    from modules.analytics.models import AnalyticsPageView
+    from utils.cache_helpers import cache_get, cache_set
 
     log_query("attractions", "detail", f"Fetching attraction ID {id}")
     attraction = Attraction.query.get_or_404(id)
@@ -32,8 +32,22 @@ def detail(id):
     # Record view
     _record_view("attraction", item_id=id)
 
+    cache_key = f"attraction_detail_module:{id}"
+    cached_data = cache_get(cache_key)
+    
+    if cached_data:
+        return render_template(
+            "pagez/detail.html",
+            attraction=attraction,
+            nearby=cached_data['nearby'],
+            related_gallery=cached_data['related_gallery'],
+            nearby_stay=cached_data['nearby_stay'],
+            nearby_eat=cached_data['nearby_eat'],
+        )
+
+    # Cache MISS
     # Fetch nearby attractions (same barangay, approved, limit 3, excluding current)
-    nearby = (
+    nearby_objs = (
         Attraction.query.filter(
             Attraction.barangay_id == attraction.barangay_id,
             Attraction.status == "approved",
@@ -42,14 +56,16 @@ def detail(id):
         .limit(3)
         .all()
     )
+    nearby = [n.to_dict() if hasattr(n, 'to_dict') else {'id': n.id, 'name': n.name, 'image_url': n.image_url} for n in nearby_objs]
 
     # Fetch related gallery items
-    related_gallery = (
+    gallery_objs = (
         GalleryItem.query.join(User, GalleryItem.user_id == User.id)
         .filter(User.barangay_id == attraction.barangay_id, GalleryItem.status == "approved")
         .limit(6)
         .all()
     )
+    related_gallery = [g.to_dict() if hasattr(g, 'to_dict') else {'id': g.id, 'url': g.url, 'caption': g.caption} for g in gallery_objs]
 
     # Fetch nearby establishments
     nearby_stay = []
@@ -63,15 +79,26 @@ def detail(id):
                 est.latitude, est.longitude
             )
             if dist <= 5.0:  # 5km radius
-                est._distance = round(dist, 1)
+                est_data = est.to_dict() if hasattr(est, 'to_dict') else {'id': est.id, 'name': est.name, 'type': est.type, 'image_url': est.image_url}
+                est_data['_distance'] = round(dist, 1)
                 if est.type == "inn":
-                    nearby_stay.append(est)
+                    nearby_stay.append(est_data)
                 else:
-                    nearby_eat.append(est)
-        nearby_stay.sort(key=lambda x: x._distance)
-        nearby_eat.sort(key=lambda x: x._distance)
+                    nearby_eat.append(est_data)
+                    
+        nearby_stay.sort(key=lambda x: x.get('_distance', 999))
+        nearby_eat.sort(key=lambda x: x.get('_distance', 999))
         nearby_stay = nearby_stay[:3]
         nearby_eat = nearby_eat[:3]
+
+    # Store in cache
+    payload = {
+        'nearby': nearby,
+        'related_gallery': related_gallery,
+        'nearby_stay': nearby_stay,
+        'nearby_eat': nearby_eat
+    }
+    cache_set(cache_key, payload, ttl=900)
 
     log_render("attractions", "detail", "detail.html")
     return render_template(

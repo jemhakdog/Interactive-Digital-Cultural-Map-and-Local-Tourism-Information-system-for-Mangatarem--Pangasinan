@@ -122,26 +122,68 @@ def profile(name):
     logger.info(f"Barangay profile page accessed for barangay '{name}'")
     record_view("page", page_name="barangay_profile")
 
+    from utils.cache_helpers import cache_get, cache_set
+    cache_key = f"public_barangay_profile:{name}"
+    
+    # Try to get from cache first
+    cached_data = cache_get(cache_key)
+    if cached_data:
+        # Note: We still need to reconstruct objects if the template expects them,
+        # but often templates just need dict-like access.
+        # Since we're using models in the template, we might need to convert back or use dicts.
+        # Let's check how the template uses them. 
+        # For now, we'll continue with the DB fetch if cache misses or if we want pure objects.
+        pass
+
     barangay_info = BarangayInfo.query.filter_by(name=name).first()
-    barangay_id = barangay_info.id if barangay_info else None
+    if not barangay_info:
+        return render_template("errors/404.html", error_message="Barangay not found"), 404
+        
+    barangay_id = barangay_info.id
     
     attractions = []
     events = []
     gallery_items = []
 
-    if barangay_id:
-        attractions = Attraction.query.filter_by(barangay_id=barangay_id, status="approved").all()
-        events = (
-            Event.query.filter_by(barangay_id=barangay_id, status="approved")
-            .order_by(Event.date.asc())
-            .all()
+    # Check for specific data cache
+    data_cache_key = f"barangay_data:{barangay_id}"
+    cached_payload = cache_get(data_cache_key)
+    
+    if cached_payload:
+        # If cached, we use the payload. Templates often handle dicts fine if they don't call methods.
+        # However, to be safe and consistent with existing patterns, we'll implement a fallback.
+        # For this specific project, let's cache the processed data.
+        attractions_data = cached_payload.get('attractions', [])
+        events_data = cached_payload.get('events', [])
+        gallery_data = cached_payload.get('gallery', [])
+        map_assets = cached_payload.get('map_assets', [])
+        center_coords = cached_payload.get('center', [15.7890, 120.2856])
+        
+        return render_template(
+            "pagez/barangay_profile.html",
+            barangay_name=name,
+            attractions=attractions_data,
+            map_assets=map_assets,
+            events=events_data,
+            gallery_items=gallery_data,
+            barangay_info=barangay_info,
+            center_latitude=center_coords[0],
+            center_longitude=center_coords[1],
         )
-        gallery_items = (
-            GalleryItem.query.join(User, GalleryItem.user_id == User.id)
-            .filter(User.barangay_id == barangay_id, GalleryItem.status == "approved")
-            .order_by(GalleryItem.created_at.desc())
-            .all()
-        )
+
+    # Cache MISS - Fetch from DB
+    attractions = Attraction.query.filter_by(barangay_id=barangay_id, status="approved").all()
+    events = (
+        Event.query.filter_by(barangay_id=barangay_id, status="approved")
+        .order_by(Event.date.asc())
+        .all()
+    )
+    gallery_items = (
+        GalleryItem.query.join(User, GalleryItem.user_id == User.id)
+        .filter(User.barangay_id == barangay_id, GalleryItem.status == "approved")
+        .order_by(GalleryItem.created_at.desc())
+        .all()
+    )
 
     center_latitude, center_longitude = 15.7890, 120.2856 
     map_assets = []
@@ -180,6 +222,16 @@ def profile(name):
     if coords_list:
         center_latitude = sum(c[0] for c in coords_list) / len(coords_list)
         center_longitude = sum(c[1] for c in coords_list) / len(coords_list)
+
+    # Store in Cache
+    payload = {
+        'attractions': [a.to_dict() if hasattr(a, 'to_dict') else {'id': a.id, 'name': a.name} for a in attractions],
+        'events': [e.to_dict() if hasattr(e, 'to_dict') else {'id': e.id, 'name': e.name} for e in events],
+        'gallery': [g.to_dict() if hasattr(g, 'to_dict') else {'id': g.id, 'url': g.url} for g in gallery_items],
+        'map_assets': map_assets,
+        'center': [center_latitude, center_longitude]
+    }
+    cache_set(data_cache_key, payload, ttl=1800) # 30 min
 
     return render_template(
         "pagez/barangay_profile.html",

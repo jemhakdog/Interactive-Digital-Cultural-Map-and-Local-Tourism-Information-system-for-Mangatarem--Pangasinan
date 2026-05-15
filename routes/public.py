@@ -99,14 +99,24 @@ def map_view():
     Display the interactive map with all approved attractions.
     """
     logger.info("Interactive map page accessed")
+    record_view("page", page_name="map")
+
+    from utils.cache_helpers import cache_get, cache_set
+    cache_key = "map_page_meta"
+    
+    # Try cache
+    cached_meta = cache_get(cache_key)
+    if cached_meta:
+        return render_template(
+            "pagez/map.html", 
+            barangays=cached_meta["barangays"], 
+            attractions_count=cached_meta["count"],
+            mapbox_token=os.environ.get("mapbox_token", "")
+        )
 
     # Get count of approved attractions for initial display
     attractions_count = Attraction.query.filter_by(status="approved").count()
 
-    # Record view
-    record_view("page", page_name="map")
-
-    # Get list of unique barangays from approved attractions for the filter
     # Get unique barangays that have approved attractions
     barangays = (
         db.session.query(BarangayInfo.name)
@@ -118,10 +128,11 @@ def map_view():
     )
 
     barangay_list = [b[0] for b in barangays]
+    
+    # Store in cache for 10 minutes
+    cache_set(cache_key, {"barangays": barangay_list, "count": attractions_count}, ttl=600)
 
-    logger.info(
-        "Map page loaded with attractions and barangays"
-    )
+    logger.info("Map page loaded with attractions and barangays")
     return render_template(
         "pagez/map.html", 
         barangays=barangay_list, 
@@ -180,7 +191,7 @@ def attraction_detail_v1_view(id):
     from modules.auth.models import User
     from modules.gallery.models import GalleryItem
     from modules.business.models import Establishment
-    from modules.analytics.models import AnalyticsPageView
+    from utils.cache_helpers import cache_get, cache_set
 
     logger.debug(f"Fetching attraction ID {id}")
     attraction = Attraction.query.get_or_404(id)
@@ -188,8 +199,23 @@ def attraction_detail_v1_view(id):
     # Record view
     record_view("attraction", item_id=id)
 
+    cache_key = f"attraction_detail_v1:{id}"
+    cached_data = cache_get(cache_key)
+    
+    if cached_data:
+        # Template can handle dicts for nearby/gallery/establishments
+        return render_template(
+            "pagez/detail_v1.html",
+            attraction=attraction,
+            nearby=cached_data['nearby'],
+            related_gallery=cached_data['related_gallery'],
+            nearby_stay=cached_data['nearby_stay'],
+            nearby_eat=cached_data['nearby_eat'],
+        )
+
+    # Cache MISS - Fetch data
     # Fetch nearby attractions (same barangay, approved, limit 3, excluding current)
-    nearby = (
+    nearby_objs = (
         Attraction.query.filter(
             Attraction.barangay_id == attraction.barangay_id,
             Attraction.status == "approved",
@@ -198,14 +224,16 @@ def attraction_detail_v1_view(id):
         .limit(3)
         .all()
     )
+    nearby = [n.to_dict() if hasattr(n, 'to_dict') else {'id': n.id, 'name': n.name, 'image_url': n.image_url} for n in nearby_objs]
 
     # Fetch related gallery items
-    related_gallery = (
+    gallery_objs = (
         GalleryItem.query.join(User, GalleryItem.user_id == User.id)
         .filter(User.barangay_id == attraction.barangay_id, GalleryItem.status == "approved")
         .limit(6)
         .all()
     )
+    related_gallery = [g.to_dict() if hasattr(g, 'to_dict') else {'id': g.id, 'url': g.url, 'caption': g.caption} for g in gallery_objs]
 
     # Fetch nearby establishments
     nearby_stay = []
@@ -219,15 +247,26 @@ def attraction_detail_v1_view(id):
                 est.latitude, est.longitude
             )
             if dist <= 5.0:  # 5km radius
-                est._distance = round(dist, 1)
+                est_data = est.to_dict() if hasattr(est, 'to_dict') else {'id': est.id, 'name': est.name, 'type': est.type, 'image_url': est.image_url}
+                est_data['_distance'] = round(dist, 1)
                 if est.type == "inn":
-                    nearby_stay.append(est)
+                    nearby_stay.append(est_data)
                 else:
-                    nearby_eat.append(est)
-        nearby_stay.sort(key=lambda x: x._distance)
-        nearby_eat.sort(key=lambda x: x._distance)
+                    nearby_eat.append(est_data)
+                    
+        nearby_stay.sort(key=lambda x: x.get('_distance', 999))
+        nearby_eat.sort(key=lambda x: x.get('_distance', 999))
         nearby_stay = nearby_stay[:3]
         nearby_eat = nearby_eat[:3]
+
+    # Store in cache for 15 minutes
+    payload = {
+        'nearby': nearby,
+        'related_gallery': related_gallery,
+        'nearby_stay': nearby_stay,
+        'nearby_eat': nearby_eat
+    }
+    cache_set(cache_key, payload, ttl=900)
 
     return render_template(
         "pagez/detail_v1.html",
@@ -330,10 +369,26 @@ def search():
     """
     log_entry("public", "search", args=request.args)
     
-    query = request.args.get("q", "").strip()
-    category_filter = request.args.get("category", "")
-    barangay_filter = request.args.get("barangay", "")
+    query = request.args.get("q", "").strip().lower()
+    category_filter = request.args.get("category", "all")
+    barangay_filter = request.args.get("barangay", "all")
 
+    from utils.cache_helpers import cache_get, cache_set
+    
+    # Only cache reasonable queries
+    cache_key = None
+    if len(query) <= 100:
+        cache_key = f"search:{query}:{category_filter}:{barangay_filter}"
+        cached_results = cache_get(cache_key)
+        if cached_results:
+            response = make_response(render_template(
+                "pagez/search_results.html",
+                **cached_results
+            ))
+            response.headers["X-Cache"] = "HIT"
+            return response
+
+    # Cache MISS - Execute queries
     # Start with base queries
     attractions_query = Attraction.query.filter_by(status="approved")
     events_query = Event.query.filter_by(status="approved")
@@ -356,17 +411,12 @@ def search():
             BarangayInfo.name.ilike(search_terms)
         )
 
-    # Apply Category Filter (only for attractions and events)
+    # Apply Category Filter
     if category_filter and category_filter != "all":
         attractions_query = attractions_query.filter(
             Attraction.category == category_filter
         )
         events_query = events_query.filter(Event.category == category_filter)
-        # BarangayInfo doesn't have category, so we might hide/clear it when category filter is active
-        if query and not (
-            barangay_filter and barangay_filter != "all"
-        ):  # Only clear if not filtering by barangay too
-            pass
 
     # Apply Barangay Filter
     if barangay_filter and barangay_filter != "all":
@@ -389,14 +439,13 @@ def search():
         else []
     )
 
-    # Fetch unique options for the filter dropdowns
+    # Fetch unique options for dropdowns
     available_categories = (
         db.session.query(Attraction.category)
         .filter(Attraction.status == "approved")
         .distinct()
         .all()
     )
-    # Also add event categories if different
     event_categories = (
         db.session.query(Event.category)
         .filter(Event.status == "approved")
@@ -418,17 +467,38 @@ def search():
     )
     all_barangays = sorted([b[0] for b in available_barangays if b[0] is not None])
 
-    return render_template(
+    template_data = {
+        "query": query,
+        "attractions": attractions,
+        "events": events,
+        "barangays_info": barangays_info,
+        "categories": all_categories,
+        "barangays": all_barangays,
+        "selected_category": category_filter,
+        "selected_barangay": barangay_filter,
+    }
+
+    # Store in cache for 5 minutes if query is valid
+    if cache_key:
+        # Convert objects to dicts for caching
+        serializable_data = {
+            "query": query,
+            "attractions": [a.to_dict() if hasattr(a, 'to_dict') else {'id': a.id, 'name': a.name} for a in attractions],
+            "events": [e.to_dict() if hasattr(e, 'to_dict') else {'id': e.id, 'name': e.name} for e in events],
+            "barangays_info": [b.to_dict() if hasattr(b, 'to_dict') else {'id': b.id, 'name': b.name} for b in barangays_info],
+            "categories": all_categories,
+            "barangays": all_barangays,
+            "selected_category": category_filter,
+            "selected_barangay": barangay_filter,
+        }
+        cache_set(cache_key, serializable_data, ttl=300)
+
+    response = make_response(render_template(
         "pagez/search_results.html",
-        query=query,
-        attractions=attractions,
-        events=events,
-        barangays_info=barangays_info,
-        categories=all_categories,
-        barangays=all_barangays,
-        selected_category=category_filter,
-        selected_barangay=barangay_filter,
-    )
+        **template_data
+    ))
+    response.headers["X-Cache"] = "MISS"
+    return response
 
 
 @public_bp.route("/routes")

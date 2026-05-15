@@ -109,12 +109,9 @@ def add_attraction():
 
         log_success("admin", "add_attraction", f"New attraction '{attraction.name}' added")
         
-        # Clear home page cache to reflect new/updated items
-        if current_app.redis_client:
-            try:
-                current_app.redis_client.delete("home_featured_attractions")
-            except Exception:
-                pass
+        # Invalidate relevant caches
+        from utils.cache_helpers import invalidate_attraction_cache
+        invalidate_attraction_cache(barangay_id=attraction.barangay_id)
 
         flash("Attraction added successfully!")
         return redirect(url_for("admin.admin_attractions"))
@@ -141,13 +138,9 @@ def approve_attraction(id):
     
     log_success("admin", "approve_attraction", f"Attraction '{attraction.name}' approved")
     
-    # Clear home page cache to reflect approved items
-    from flask import current_app
-    if current_app.redis_client:
-        try:
-            current_app.redis_client.delete("home_featured_attractions")
-        except Exception:
-            pass
+    # Invalidate relevant caches
+    from utils.cache_helpers import invalidate_attraction_cache
+    invalidate_attraction_cache(attraction_id=id, barangay_id=attraction.barangay_id)
 
     flash(f'Attraction "{attraction.name}" approved!')
     return redirect(url_for("admin.admin_attractions"))
@@ -172,13 +165,9 @@ def delete_attraction(id):
     
     log_success("admin", "delete_attraction", f"Attraction '{attraction_name}' deleted")
 
-    # Clear home page cache to reflect deleted items
-    from flask import current_app
-    if current_app.redis_client:
-        try:
-            current_app.redis_client.delete("home_featured_attractions")
-        except Exception:
-            pass
+    # Invalidate relevant caches
+    from utils.cache_helpers import invalidate_attraction_cache
+    invalidate_attraction_cache(attraction_id=id, barangay_id=attraction.barangay_id)
 
     flash("Attraction deleted.")
     return redirect(url_for("admin.admin_attractions"))
@@ -262,13 +251,9 @@ def edit_attraction(id):
         db.session.commit()
         log_success("admin", "edit_attraction", f"Attraction '{attraction.name}' updated")
 
-        # Clear home page cache to reflect edited items
-        from flask import current_app
-        if current_app.redis_client:
-            try:
-                current_app.redis_client.delete("home_featured_attractions")
-            except Exception:
-                pass
+        # Invalidate relevant caches
+        from utils.cache_helpers import invalidate_attraction_cache
+        invalidate_attraction_cache(attraction_id=id, barangay_id=attraction.barangay_id)
 
         flash("Attraction updated.")
         return redirect(url_for("admin.admin_attractions"))

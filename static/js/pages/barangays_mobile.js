@@ -111,6 +111,20 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Smooth Scroll for "See all" link
+    document.querySelectorAll('.view-all-link').forEach(link => {
+        link.addEventListener('click', (e) => {
+            const targetId = link.getAttribute('href');
+            if (targetId.startsWith('#')) {
+                e.preventDefault();
+                const targetElement = document.querySelector(targetId);
+                if (targetElement) {
+                    targetElement.scrollIntoView({ behavior: 'smooth' });
+                }
+            }
+        });
+    });
+
     // Initial Render
     renderBarangays();
 });

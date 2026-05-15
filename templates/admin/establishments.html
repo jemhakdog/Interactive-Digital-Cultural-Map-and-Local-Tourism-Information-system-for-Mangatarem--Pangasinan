@@ -79,8 +79,40 @@
             {% endfor %}
         </div>
         {% else %}
-        <div class="text-center py-12 text-emerald-100/40">
-            <p>No establishments to show for this filter.</p>
+        <div class="flex flex-col items-center justify-center py-24 px-6 text-center">
+            <div class="w-20 h-20 rounded-3xl flex items-center justify-center mb-6 text-4xl
+                {% if current_status == 'pending' %}bg-amber-500/10 border border-amber-500/20
+                {% elif current_status == 'approved' %}bg-emerald-500/10 border border-emerald-500/20
+                {% elif current_status == 'rejected' %}bg-red-500/10 border border-red-500/20
+                {% else %}bg-emerald-900/30 border border-white/10{% endif %}">
+                {% if current_status == 'pending' %}⏳
+                {% elif current_status == 'approved' %}✅
+                {% elif current_status == 'rejected' %}❌
+                {% else %}🏪{% endif %}
+            </div>
+            <h3 class="text-white font-bold text-xl mb-2">
+                {% if current_status == 'pending' %}No Pending Approvals
+                {% elif current_status == 'approved' %}No Approved Establishments
+                {% elif current_status == 'rejected' %}No Rejected Establishments
+                {% else %}No Establishments Yet{% endif %}
+            </h3>
+            <p class="text-emerald-100/50 text-sm max-w-sm leading-relaxed">
+                {% if current_status == 'pending' %}
+                    You're all caught up — there are no establishments waiting for review right now.
+                {% elif current_status == 'approved' %}
+                    No establishments have been approved yet. Approve pending submissions to see them here.
+                {% elif current_status == 'rejected' %}
+                    No establishments have been rejected. Rejected entries will appear here.
+                {% else %}
+                    No business establishments have been registered in the system yet.
+                {% endif %}
+            </p>
+            {% if current_status != 'all' %}
+            <a href="{{ url_for('admin.manage_establishments', status='all') }}"
+               class="mt-6 px-5 py-2.5 bg-emerald-800/50 hover:bg-emerald-700/60 border border-white/10 text-emerald-200 text-sm font-bold rounded-xl transition-all">
+                View All Establishments
+            </a>
+            {% endif %}
         </div>
         {% endif %}
     </div>

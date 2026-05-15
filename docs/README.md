@@ -99,6 +99,7 @@ The application will be available at `http://127.0.0.1:5000`.
 - [Administrative Guide](admin_guide.md)
 - [Contributor Guide](contributor_guide.md)
 - [Performance Optimization](optimization.md)
+- [Redis Caching & Security](REDIS_CACHING_SYSTEM.md)
 
 ### Security Documentation
 - [Security Implementation Guide](SECURITY_IMPLEMENTATION.md) - Comprehensive security architecture and implementation details

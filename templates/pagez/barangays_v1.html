@@ -137,7 +137,7 @@
             <section class="horizontal-scroll-section">
                 <div class="scroll-header">
                     <h2 class="scroll-title text-2xl font-bold">Popular Barangays</h2>
-                    <a href="#" class="view-all-link">See all</a>
+                    <a href="#discovery-section" class="view-all-link">See all</a>
                 </div>
                 <div class="horizontal-scroller" id="popularBarangays">
                     {% set popular = barangays|sort(attribute='attraction_count', reverse=True) %}
@@ -155,7 +155,7 @@
             </section>
 
             <!-- Discovery Section (List View) -->
-            <section class="discovery-section">
+            <section id="discovery-section" class="discovery-section">
                 <div class="scroll-header mb-6">
                     <h2 class="scroll-title text-2xl font-bold">Discovery</h2>
                 </div>

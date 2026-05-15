@@ -14,9 +14,11 @@ login_manager.login_view = "auth.login"
 login_manager.login_message = "Please log in to access this page."
 login_manager.login_message_category = "error"
 
+import os
+
 limiter = Limiter(
     key_func=get_remote_address,
-    storage_uri="memory://",
+    storage_uri=os.environ.get("LIMITER_STORAGE_URI", "memory://"),
     default_limits=["100 per minute"],
 )
 
