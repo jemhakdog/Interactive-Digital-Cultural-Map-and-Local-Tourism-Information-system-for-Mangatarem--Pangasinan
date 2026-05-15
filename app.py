@@ -231,7 +231,7 @@ def _register_request_hooks(app: Flask) -> None:
             "style-src": "'self' https://fonts.googleapis.com https://api.mapbox.com https://unpkg.com https://vercel.live 'unsafe-inline'",
             "img-src": "'self' data: https: blob: https://vercel.com https://*.vercel.com",
             "font-src": "'self' https://fonts.gstatic.com data:",
-            "connect-src": "'self' https://unpkg.com https://fonts.googleapis.com https://fonts.gstatic.com https://placehold.co https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com https://*.supabase.co https://*.upstash.io https://accounts.google.com https://vercel.live https://*.vercel.live wss://*.vercel.live",
+            "connect-src": "'self' https://*.basemaps.cartocdn.com https://unpkg.com https://fonts.googleapis.com https://fonts.gstatic.com https://placehold.co https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com https://*.supabase.co https://*.upstash.io https://accounts.google.com https://vercel.live https://*.vercel.live wss://*.vercel.live",
             "worker-src": "'self' blob:",
             "frame-ancestors": "'none'",
             "base-uri": "'self'",

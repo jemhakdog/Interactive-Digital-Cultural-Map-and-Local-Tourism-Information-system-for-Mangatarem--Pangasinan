@@ -7,7 +7,14 @@ document.addEventListener('DOMContentLoaded', function () {
     // ========================================
     // 1. INITIALIZATION & STATE
     // ========================================
-    mapboxgl.accessToken = window.MAPBOX_TOKEN;
+    const hasMapboxToken = window.MAPBOX_TOKEN && window.MAPBOX_TOKEN !== 'None' && window.MAPBOX_TOKEN !== '';
+    const isLeafletMode = !hasMapboxToken;
+    
+    if (!isLeafletMode) {
+        mapboxgl.accessToken = window.MAPBOX_TOKEN;
+    } else {
+        console.warn("⚠️ Mapbox token missing. Switching to LeafletJS fallback.");
+    }
     
     const PLACEHOLDER_IMG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22200%22%20xmlns%3D%22http%3D%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22300%22%20height%3D%22200%22%20fill%3D%22%23eee%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20font-family%3D%22sans-serif%22%20font-size%3D%2216%22%20fill%3D%22%23aaa%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';
 
@@ -15,7 +22,7 @@ document.addEventListener('DOMContentLoaded', function () {
         currentCategory: 'all',
         selectedPlace: null,
         userLocation: null,
-        pendingDirections: null, // To store destination if waiting for location
+        pendingDirections: null, 
         isNearMeMode: false,
         allPlaces: [],
         markers: [],
@@ -23,21 +30,38 @@ document.addEventListener('DOMContentLoaded', function () {
         isNavigating: false
     };
 
-    const map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/light-v11',
-        center: [120.2986, 15.7889], // Mangatarem
-        zoom: 14.5,
-        pitch: 60,
-        bearing: -15,
-        antialias: true
-    });
+    let map;
+    if (!isLeafletMode) {
+        map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/light-v11',
+            center: [120.2986, 15.7889], // Mangatarem
+            zoom: 14.5,
+            pitch: 60,
+            bearing: -15,
+            antialias: true
+        });
+    } else {
+        // Initialize Leaflet
+        map = L.map('map', {
+            zoomControl: false // We'll add it manually or use custom controls
+        }).setView([15.7889, 120.2986], 15);
+        
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+        }).addTo(map);
+        
+        // Add zoom control to bottom left to match Mapbox layout
+        L.control.zoom({ position: 'bottomleft' }).addTo(map);
+    }
 
     // ========================================
     // 2. CORE MAP EVENTS
     // ========================================
-    map.on('load', () => {
-        add3DBuildings(map);
+    const onMapLoad = () => {
+        if (!isLeafletMode) {
+            add3DBuildings(map);
+        }
         initFilters();
         initSearch();
         initNearMe();
@@ -45,29 +69,32 @@ document.addEventListener('DOMContentLoaded', function () {
         initNavigation();
         initNavPanel();
         
-        // Add native Geolocate Control for real-time tracking
-        map.addControl(new mapboxgl.GeolocateControl({
-            positionOptions: {
-                enableHighAccuracy: true
-            },
-            trackUserLocation: true,
-            showUserHeading: true
-        }), 'bottom-left');
+        if (!isLeafletMode) {
+            // Add native Geolocate Control for real-time tracking
+            map.addControl(new mapboxgl.GeolocateControl({
+                positionOptions: {
+                    enableHighAccuracy: true
+                },
+                trackUserLocation: true,
+                showUserHeading: true
+            }), 'bottom-left');
 
-        // Add standard navigation controls
-        map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
+            // Add standard navigation controls
+            map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
+        }
 
         // Initial Fetch
         fetchData();
 
         // Smooth fly-in
-        map.flyTo({
-            center: [120.2986, 15.7889],
-            zoom: 15.5,
-            duration: 3000,
-            essential: true
-        });
-    });
+        flyToCoords([120.2986, 15.7889], 15.5);
+    };
+
+    if (!isLeafletMode) {
+        map.on('load', onMapLoad);
+    } else {
+        onMapLoad(); // Leaflet is ready immediately or after setView
+    }
 
     // ========================================
     // 3. DATA FETCHING & RENDERING
@@ -216,17 +243,35 @@ document.addEventListener('DOMContentLoaded', function () {
         el.style.boxShadow = '0 4px 12px rgba(0, 237, 100, 0.3)';
         el.style.cursor = 'pointer';
 
-        const marker = new mapboxgl.Marker(el)
-            .setLngLat([lng, lat])
-            .addTo(map);
-
         el.onclick = (e) => {
-            e.stopPropagation();
+            if (e.stopPropagation) e.stopPropagation();
             showModal(place);
             flyToPlace(place);
         };
 
-        state.markers.push(marker);
+        if (!isLeafletMode) {
+            const marker = new mapboxgl.Marker(el)
+                .setLngLat([lng, lat])
+                .addTo(map);
+            state.markers.push(marker);
+        } else {
+            const marker = L.marker([lat, lng], {
+                icon: L.divIcon({
+                    className: '',
+                    html: el.outerHTML,
+                    iconSize: [24, 24],
+                    iconAnchor: [12, 12]
+                })
+            }).addTo(map);
+            
+            // Re-bind click since Leaflet divIcon might clone the element
+            marker.on('click', (e) => {
+                showModal(place);
+                flyToPlace(place);
+            });
+            
+            state.markers.push(marker);
+        }
     }
 
     function showModal(place) {
@@ -300,7 +345,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function clearMarkers() {
-        state.markers.forEach(m => m.remove());
+        state.markers.forEach(m => {
+            if (!isLeafletMode) {
+                m.remove();
+            } else {
+                map.removeLayer(m);
+            }
+        });
         state.markers = [];
     }
 
@@ -309,15 +360,26 @@ document.addEventListener('DOMContentLoaded', function () {
         const lat = place.latitude || place.lat;
         const lng = place.longitude || place.lng;
         
-        map.flyTo({
-            center: [lng, lat],
-            zoom: 17,
-            pitch: 70,
-            duration: 1500,
-            essential: true
-        });
+        flyToCoords([lng, lat], 17, 70);
 
         updateStats(place);
+    }
+
+    function flyToCoords(coords, zoom, pitch = 0) {
+        if (!isLeafletMode) {
+            map.flyTo({
+                center: coords,
+                zoom: zoom,
+                pitch: pitch,
+                duration: 1500,
+                essential: true
+            });
+        } else {
+            map.flyTo([coords[1], coords[0]], zoom, {
+                animate: true,
+                duration: 1.5
+            });
+        }
     }
 
     function updateStats(place) {
@@ -393,6 +455,23 @@ document.addEventListener('DOMContentLoaded', function () {
     async function getRoute(origin, destination, mode = 'driving') {
         console.log("🛣️ [Routing] Calculating route:", { origin, destination, mode });
         
+        if (isLeafletMode) {
+            // Fallback for Leaflet: Just link to Google Maps for now or show warning
+            // Mapbox Directions API requires a token.
+            Swal.fire({
+                title: 'Directions',
+                text: 'Directions require a Mapbox API key. Opening in Google Maps instead.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Open Google Maps'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.open(`https://www.google.com/maps/dir/?api=1&origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&travelmode=${mode}`, '_blank');
+                }
+            });
+            return;
+        }
+
         if (!origin || !destination || isNaN(origin.lat) || isNaN(origin.lng) || isNaN(destination.lat) || isNaN(destination.lng)) {
             console.error("❌ [Routing] Invalid coordinates provided:", { origin, destination });
             throw new Error("Invalid coordinates for routing");
@@ -629,7 +708,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     // Update or create user marker
                     if (window.userMarker) {
-                        window.userMarker.setLngLat([coords.lng, coords.lat]);
+                        if (!isLeafletMode) {
+                            window.userMarker.setLngLat([coords.lng, coords.lat]);
+                        } else {
+                            window.userMarker.setLatLng([coords.lat, coords.lng]);
+                        }
                     } else {
                         const userEl = document.createElement('div');
                         userEl.className = 'user-marker';
@@ -641,9 +724,21 @@ document.addEventListener('DOMContentLoaded', function () {
                                 </div>
                             </div>
                         `;
-                        window.userMarker = new mapboxgl.Marker(userEl)
-                            .setLngLat([coords.lng, coords.lat])
-                            .addTo(map);
+                        
+                        if (!isLeafletMode) {
+                            window.userMarker = new mapboxgl.Marker(userEl)
+                                .setLngLat([coords.lng, coords.lat])
+                                .addTo(map);
+                        } else {
+                            window.userMarker = L.marker([coords.lat, coords.lng], {
+                                icon: L.divIcon({
+                                    className: '',
+                                    html: userEl.outerHTML,
+                                    iconSize: [20, 20],
+                                    iconAnchor: [10, 10]
+                                })
+                            }).addTo(map);
+                        }
                     }
 
                     applyFilters();
@@ -662,7 +757,11 @@ document.addEventListener('DOMContentLoaded', function () {
                                 console.log("🔄 [Geolocation] Position updated:", p.coords.latitude, p.coords.longitude);
                                 state.userLocation = { lat: p.coords.latitude, lng: p.coords.longitude };
                                 if (window.userMarker) {
-                                    window.userMarker.setLngLat([p.coords.longitude, p.coords.latitude]);
+                                    if (!isLeafletMode) {
+                                        window.userMarker.setLngLat([p.coords.longitude, p.coords.latitude]);
+                                    } else {
+                                        window.userMarker.setLatLng([p.coords.latitude, p.coords.longitude]);
+                                    }
                                 }
                                 // Update stats if a place is selected
                                 if (state.selectedPlace) {
@@ -722,7 +821,7 @@ document.addEventListener('DOMContentLoaded', function () {
         init() {
             // 1. Map Interference Prevention
             const uiSelectors = ['.floating-header', '.floating-filters', '.mapboxgl-ctrl-group'];
-            const mapCanvas = this.map.getCanvasContainer();
+            const mapCanvas = !isLeafletMode ? this.map.getCanvasContainer() : this.map.getContainer();
             
             // For static UI elements (filters, header), we can use a simple locker
             const lockMap = (e) => {
@@ -777,18 +876,36 @@ document.addEventListener('DOMContentLoaded', function () {
 
         disableMapInteractions() {
             if (!this.map) return;
-            const handlers = ['dragPan', 'scrollZoom', 'boxZoom', 'keyboard', 'doubleClickZoom', 'touchZoomRotate', 'touchPitch'];
-            handlers.forEach(h => {
-                if (this.map[h]) this.map[h].disable();
-            });
+            if (!isLeafletMode) {
+                const handlers = ['dragPan', 'scrollZoom', 'boxZoom', 'keyboard', 'doubleClickZoom', 'touchZoomRotate', 'touchPitch'];
+                handlers.forEach(h => {
+                    if (this.map[h]) this.map[h].disable();
+                });
+            } else {
+                this.map.dragging.disable();
+                this.map.touchZoom.disable();
+                this.map.doubleClickZoom.disable();
+                this.map.scrollWheelZoom.disable();
+                this.map.boxZoom.disable();
+                this.map.keyboard.disable();
+            }
         }
 
         enableMapInteractions() {
             if (!this.map || this.isDragging) return;
-            const handlers = ['dragPan', 'scrollZoom', 'boxZoom', 'keyboard', 'doubleClickZoom', 'touchZoomRotate', 'touchPitch'];
-            handlers.forEach(h => {
-                if (this.map[h]) this.map[h].enable();
-            });
+            if (!isLeafletMode) {
+                const handlers = ['dragPan', 'scrollZoom', 'boxZoom', 'keyboard', 'doubleClickZoom', 'touchZoomRotate', 'touchPitch'];
+                handlers.forEach(h => {
+                    if (this.map[h]) this.map[h].enable();
+                });
+            } else {
+                this.map.dragging.enable();
+                this.map.touchZoom.enable();
+                this.map.doubleClickZoom.enable();
+                this.map.scrollWheelZoom.enable();
+                this.map.boxZoom.enable();
+                this.map.keyboard.enable();
+            }
         }
 
         onDragStart(e) {
@@ -797,7 +914,8 @@ document.addEventListener('DOMContentLoaded', function () {
             this.startY = e.touches[0].clientY;
             
             this.disableMapInteractions();
-            this.map.getCanvasContainer().style.pointerEvents = 'none';
+            const mapCanvas = !isLeafletMode ? this.map.getCanvasContainer() : this.map.getContainer();
+            mapCanvas.style.pointerEvents = 'none';
             
             e.stopPropagation();
 
@@ -844,7 +962,8 @@ document.addEventListener('DOMContentLoaded', function () {
             this.isDragging = false;
             
             // Re-enable map
-            this.map.getCanvasContainer().style.pointerEvents = 'auto';
+            const mapCanvas = !isLeafletMode ? this.map.getCanvasContainer() : this.map.getContainer();
+            mapCanvas.style.pointerEvents = 'auto';
             this.enableMapInteractions();
 
             this.sheet.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1)';

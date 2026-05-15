@@ -136,7 +136,8 @@ def v1_documents_view():
         folders=folder_list,
         documents=doc_list,
         records=records,
-        search_query=search_query
+        search_query=search_query,
+        form_mapping=FORM_MAPPING
     )
 
 @v1_docs_bp.route("/v1/documents/download/<filename>")

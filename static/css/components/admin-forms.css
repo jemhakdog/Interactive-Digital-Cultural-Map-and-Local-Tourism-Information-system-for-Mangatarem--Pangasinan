@@ -7,17 +7,28 @@
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.05);
 }
 
-.form-input {
-    background: rgba(255, 255, 255, 0.5);
-    border: 1px solid rgba(5, 150, 105, 0.1);
+form .form-input,
+form select.form-input,
+form textarea.form-input,
+form input[type="text"].form-input,
+form input[type="number"].form-input,
+form input[type="date"].form-input,
+form input[type="url"].form-input {
+    background: #ffffff !important;
+    color: #022c22 !important;
+    border: 1px solid rgba(5, 150, 105, 0.2) !important;
     transition: all 0.3s ease;
 }
 
-.form-input:focus {
-    background: white;
-    border-color: #10b981;
-    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1);
+form .form-input:focus {
+    background: white !important;
+    border-color: #10b981 !important;
+    box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.1) !important;
     outline: none;
+}
+
+form .form-input::placeholder {
+    color: rgba(2, 44, 34, 0.4) !important;
 }
 
 .heritage-gradient {

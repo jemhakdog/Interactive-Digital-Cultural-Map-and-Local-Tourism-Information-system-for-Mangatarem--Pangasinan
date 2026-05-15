@@ -15,12 +15,14 @@
         <div class="container mx-auto">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
+                    {% block admin_header %}
                     <h1 class="text-4xl font-bold text-white font-heading tracking-tight">
                         {{ current_user.username }}'s Hub
                     </h1>
                     <p class="text-emerald-100/80 mt-2 font-medium">
                         Managing the digital soul of Mangatarem
                     </p>
+                    {% endblock %}
                 </div>
                 <div class="flex items-center gap-3">
                     <span

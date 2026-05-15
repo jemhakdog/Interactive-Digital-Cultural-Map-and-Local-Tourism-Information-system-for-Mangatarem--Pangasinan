@@ -1,16 +1,15 @@
 {% extends "admin/dashboard.html" %}
 
+{% block admin_header %}
+<h1 class="text-4xl font-bold text-white mb-2">Heritage Archive</h1>
+<p class="text-emerald-100/80 font-medium">Manage Mangatarem's natural and cultural heritage records.</p>
+{% endblock %}
+
 {% block admin_content %}
 <div class="px-6 py-8">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
-        <div>
-            <h1 class="text-4xl font-bold text-white mb-2 heritage-gradient bg-clip-text text-transparent">Heritage Archive</h1>
-            <p class="text-gray-400">Manage Mangatarem's natural and cultural heritage records.</p>
-        </div>
-    </div>
 
     <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 relative z-20 mt-4">
         {% for stat in type_stats %}
         <div class="glass-card p-6 border-l-4 border-emerald-500 hover:transform hover:translate-y-[-4px] transition-all duration-300">
             <div class="flex justify-between items-start mb-4">
@@ -38,15 +37,15 @@
             <div class="grid grid-cols-3 gap-2 mb-6">
                 <div class="text-center p-2 bg-emerald-900/5 rounded">
                     <span class="block text-xl font-bold text-emerald-950">{{ stat.total }}</span>
-                    <span class="text-[8px] uppercase text-emerald-900/40">Total</span>
+                    <span class="text-[8px] uppercase text-emerald-900/60">Total</span>
                 </div>
                 <div class="text-center p-2 bg-emerald-500/5 rounded border border-emerald-500/20">
                     <span class="block text-xl font-bold text-emerald-600">{{ stat.approved }}</span>
-                    <span class="text-[8px] uppercase text-emerald-600/70">Approved</span>
+                    <span class="text-[8px] uppercase text-emerald-600">Approved</span>
                 </div>
                 <div class="text-center p-2 bg-amber-500/5 rounded border border-amber-500/20">
                     <span class="block text-xl font-bold text-amber-600">{{ stat.pending }}</span>
-                    <span class="text-[8px] uppercase text-amber-600/70">Pending</span>
+                    <span class="text-[8px] uppercase text-amber-600">Pending</span>
                 </div>
             </div>
 
@@ -72,7 +71,7 @@
         <div class="overflow-x-auto">
             <table class="w-full text-left">
                 <thead>
-                    <tr class="text-emerald-900/40 text-xs uppercase tracking-widest border-b border-emerald-900/10">
+                    <tr class="text-emerald-900/60 text-xs uppercase tracking-widest border-b border-emerald-900/10">
                         <th class="pb-4">Registry Type</th>
                         <th class="pb-4">Form ID</th>
                         <th class="pb-4">Map Layer</th>
@@ -80,11 +79,11 @@
                         <th class="pb-4 text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="text-gray-300">
+                <tbody class="text-gray-600">
                     {% for slug, config in heritage_types.items() %}
                     <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
-                        <td class="py-4 font-bold text-white">{{ config.label }}</td>
-                        <td class="py-4"><span class="px-2 py-1 bg-white/5 rounded text-[10px]">{{ config.form }}</span></td>
+                        <td class="py-4 font-bold text-emerald-950">{{ config.label }}</td>
+                        <td class="py-4"><span class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded text-[10px]">{{ config.form }}</span></td>
                         <td class="py-4">
                             {% if config.has_coords %}
                             <span class="flex items-center gap-1 text-emerald-400 text-[10px] uppercase font-bold">
@@ -95,7 +94,7 @@
                             <span class="text-gray-500 text-[10px] uppercase font-bold italic">N/A</span>
                             {% endif %}
                         </td>
-                        <td class="py-4 text-xs font-mono text-emerald-300/70">{{ config.name_field }}</td>
+                        <td class="py-4 text-xs font-mono text-emerald-700">{{ config.name_field }}</td>
                         <td class="py-4 text-right">
                             <a href="{{ url_for('admin.admin_heritage_list', heritage_type=slug) }}" 
                                class="text-xs font-bold text-emerald-400 hover:text-emerald-300 transition-colors uppercase tracking-widest">

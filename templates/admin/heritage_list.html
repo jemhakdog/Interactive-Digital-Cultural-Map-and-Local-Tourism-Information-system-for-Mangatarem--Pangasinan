@@ -1,38 +1,45 @@
 {% extends "admin/dashboard.html" %}
 {% from "includes/pagination.html" import render_pagination %}
+ 
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/admin-forms.css') }}">
+{% endblock %}
+
+{% block admin_header %}
+<nav class="flex text-xs text-emerald-100/60 gap-2 mb-2 uppercase tracking-widest">
+    <a href="{{ url_for('admin.admin_heritage_dashboard') }}" class="hover:text-white transition-colors">Heritage Archive</a>
+    <span>/</span>
+    <span class="text-white font-bold">{{ config.label_plural }}</span>
+</nav>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+        <h1 class="text-4xl font-bold text-white mb-2">{{ config.label_plural }}</h1>
+        <p class="text-emerald-100/80 font-medium">Total of {{ pagination.total if pagination else items|length }} records found in the archive.</p>
+    </div>
+    <a href="{{ url_for('admin.admin_heritage_add', heritage_type=heritage_type) }}" 
+       class="flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full font-bold transition-all transform hover:scale-105 shadow-lg shadow-emerald-500/20 uppercase tracking-widest text-xs">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        Add New Entry
+    </a>
+</div>
+{% endblock %}
 
 {% block admin_content %}
 <div class="px-6 py-8">
-    <!-- Header -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
-        <div>
-            <nav class="flex text-xs text-gray-400 gap-2 mb-2 uppercase tracking-widest">
-                <a href="{{ url_for('admin.admin_heritage_dashboard') }}" class="hover:text-emerald-400 transition-colors">Heritage Archive</a>
-                <span>/</span>
-                <span class="text-white">{{ config.label_plural }}</span>
-            </nav>
-            <h1 class="text-4xl font-bold text-white mb-2 heritage-gradient bg-clip-text text-transparent">{{ config.label_plural }}</h1>
-            <p class="text-gray-400">Total of {{ pagination.total if pagination else items|length }} records found in the archive.</p>
-        </div>
-        <a href="{{ url_for('admin.admin_heritage_add', heritage_type=heritage_type) }}" 
-           class="flex items-center gap-2 px-6 py-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-full font-bold transition-all transform hover:scale-105 shadow-lg shadow-emerald-500/20 uppercase tracking-widest text-xs">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            Add New Entry
-        </a>
-    </div>
 
     <!-- Search & Filter -->
-    <div class="glass-card p-4 mb-8 flex flex-col md:flex-row gap-4">
+    <div class="glass-card p-4 mb-8 flex flex-col md:flex-row gap-4 relative z-20 mt-4">
         <div class="relative flex-1">
             <input type="text" id="heritageSearch" placeholder="Search {{ config.label_plural|lower }}..." 
-                   class="w-full bg-white/5 border border-white/10 rounded-lg py-3 px-10 text-white focus:outline-none focus:border-emerald-500 transition-colors">
+                   class="w-full bg-white border border-emerald-900/10 rounded-lg py-3 px-10 text-emerald-950 focus:outline-none focus:border-emerald-500 transition-colors placeholder-emerald-900/30 form-input">
             <svg class="absolute left-3 top-3.5 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
             </svg>
         </div>
-        <select id="statusFilter" class="bg-white/5 border border-white/10 rounded-lg py-3 px-4 text-white focus:outline-none focus:border-emerald-500 transition-colors">
+        <select id="statusFilter" class="bg-white border border-emerald-900/10 rounded-lg py-3 px-4 text-emerald-950 focus:outline-none focus:border-emerald-500 transition-colors form-input">
             <option value="all">All Status</option>
             <option value="approved">Approved</option>
             <option value="pending">Pending</option>
@@ -44,7 +51,7 @@
         <div class="overflow-x-auto">
             <table class="w-full text-left" id="heritageTable">
                 <thead>
-                    <tr class="text-gray-400 text-[10px] uppercase tracking-[0.2em] border-b border-white/10">
+                    <tr class="text-emerald-900/60 text-[10px] uppercase tracking-[0.2em] border-b border-emerald-900/10">
                         <th class="py-6 px-6">ID</th>
                         <th class="py-6 px-6">Name / Title</th>
                         {% if heritage_type == 'natural' %}
@@ -64,14 +71,14 @@
                         <th class="py-6 px-6 text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="text-gray-300">
+                <tbody class="text-gray-600">
                     {% for item in items %}
-                    <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group heritage-row" 
+                    <tr class="border-b border-emerald-900/5 hover:bg-emerald-50/50 transition-colors group heritage-row" 
                         data-name="{{ item.name or item.municipality or '' }}" 
                         data-status="{{ item.status }}">
                         <td class="py-4 px-6 font-mono text-xs">{{ item.id }}</td>
                         <td class="py-4 px-6">
-                            <span class="font-bold text-white block group-hover:text-emerald-400 transition-colors cursor-default">
+                            <span class="font-bold text-emerald-950 block group-hover:text-emerald-600 transition-colors cursor-default">
                                 {{ item.name or item.municipality }}
                             </span>
                         </td>
@@ -129,6 +136,7 @@
         {% endif %}
     </div>
 </div>
+{% endblock %}
 
 {% block dashboard_scripts %}
 <script src="{{ url_for('static', filename='js/pages/admin_heritage.js') }}" defer></script>

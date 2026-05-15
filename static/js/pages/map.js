@@ -22,46 +22,86 @@ document.addEventListener('DOMContentLoaded', function () {
     // ========================================
     // 1. MAP INITIALIZATION
     // ========================================
-    mapboxgl.accessToken = window.MAPBOX_TOKEN;
+    const hasMapboxToken = window.MAPBOX_TOKEN && window.MAPBOX_TOKEN !== 'None' && window.MAPBOX_TOKEN !== '';
+    const isLeafletMode = !hasMapboxToken;
 
-    const map = new mapboxgl.Map({
-        container: 'map',
-        style: 'mapbox://styles/mapbox/streets-v12',
-        center: [120.2986, 15.7889], // Mangatarem coordinates [lng, lat]
-        zoom: 13.5,
-        pitch: 65,      // Tilted view for 3D effect
-        bearing: -15,   // Rotated view
-        attributionControl: true,
-        antialias: true // Smoother 3D edges
-    });
+    if (!isLeafletMode) {
+        mapboxgl.accessToken = window.MAPBOX_TOKEN;
+    } else {
+        console.warn("⚠️ Mapbox token missing. Switching to LeafletJS fallback.");
+    }
+
+    let map;
+    if (!isLeafletMode) {
+        map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v12',
+            center: [120.2986, 15.7889], // Mangatarem coordinates [lng, lat]
+            zoom: 13.5,
+            pitch: 65,      // Tilted view for 3D effect
+            bearing: -15,   // Rotated view
+            attributionControl: true,
+            antialias: true // Smoother 3D edges
+        });
+    } else {
+        map = L.map('map', {
+            zoomControl: false
+        }).setView([15.7889, 120.2986], 14);
+        
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+        }).addTo(map);
+        
+        L.control.zoom({ position: 'topleft' }).addTo(map);
+    }
 
     // Add navigation controls
-    map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+    if (!isLeafletMode) {
+        map.addControl(new mapboxgl.NavigationControl(), 'top-left');
+    } else {
+        L.control.zoom({ position: 'topleft' }).addTo(map);
+    }
 
     // ========================================
     // 1.1 GEOLOCATION ENGINE INITIALIZATION
     // ========================================
     // Initialize standard GeolocateControl but hide its default button via CSS
     // We will trigger it using our custom #locate-me button
-    const geolocate = new mapboxgl.GeolocateControl({
-        positionOptions: {
-            enableHighAccuracy: true
-        },
-        trackUserLocation: true,
-        showUserHeading: true,
-        showAccuracyCircle: true
-    });
+    let geolocate;
+    if (!isLeafletMode) {
+        geolocate = new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            trackUserLocation: true,
+            showUserHeading: true,
+            showAccuracyCircle: true
+        });
 
-    map.addControl(geolocate);
+        map.addControl(geolocate);
+    }
 
     // Force resize calculation for mobile layout
-    map.on('load', () => {
-        setTimeout(() => map.resize(), 500);
-        setTimeout(() => map.resize(), 1500); // Second pass after other elements settle
-    });
+    const onMapLoad = () => {
+        setTimeout(() => {
+            if (!isLeafletMode) map.resize();
+            else map.invalidateSize();
+        }, 500);
+        setTimeout(() => {
+            if (!isLeafletMode) map.resize();
+            else map.invalidateSize();
+        }, 1500); 
+    };
+
+    if (!isLeafletMode) {
+        map.on('load', onMapLoad);
+    } else {
+        onMapLoad();
+    }
 
     window.addEventListener('resize', () => {
-        map.resize();
+        if (!isLeafletMode) map.resize();
+        else map.invalidateSize();
     });
 
     // ========================================
@@ -111,33 +151,40 @@ document.addEventListener('DOMContentLoaded', function () {
     const loadingIndicator = document.getElementById('loading-indicator');
 
     // Add MVT tile source when map loads
-    map.on('load', () => {
-        setupMVTSource();
-        setupMVTLayers();
-        init3DLayers();
-        fetchAttractions(1, true); // Fetch for sidebar list
-    });
+    if (!isLeafletMode) {
+        map.on('load', () => {
+            setupMVTSource();
+            setupMVTLayers();
+            init3DLayers();
+            fetchAttractions(1, true); // Fetch for sidebar list
+        });
+    } else {
+        // In Leaflet mode, we skip MVT and 3D
+        fetchAttractions(1, true);
+    }
 
     // Re-add layers when style changes
-    map.on('style.load', () => {
-        // Remove layers first (they depend on the source)
-        if (map.getLayer('mvt-points')) {
-            map.removeLayer('mvt-points');
-        }
-        if (map.getLayer('mvt-labels')) {
-            map.removeLayer('mvt-labels');
-        }
-        
-        // Then remove source
-        if (map.getSource('mvt-tiles')) {
-            map.removeSource('mvt-tiles');
-        }
-        
-        // Re-add everything
-        setupMVTSource();
-        setupMVTLayers();
-        init3DLayers();
-    });
+    if (!isLeafletMode) {
+        map.on('style.load', () => {
+            // Remove layers first (they depend on the source)
+            if (map.getLayer('mvt-points')) {
+                map.removeLayer('mvt-points');
+            }
+            if (map.getLayer('mvt-labels')) {
+                map.removeLayer('mvt-labels');
+            }
+            
+            // Then remove source
+            if (map.getSource('mvt-tiles')) {
+                map.removeSource('mvt-tiles');
+            }
+            
+            // Re-add everything
+            setupMVTSource();
+            setupMVTLayers();
+            init3DLayers();
+        });
+    }
 
     function setupMVTSource() {
         // Guard: Check if source already exists
@@ -555,6 +602,7 @@ document.addEventListener('DOMContentLoaded', function () {
     // 7. 3D LAYERS (Terrain, Buildings, Sky)
     // ========================================
     function init3DLayers() {
+        if (isLeafletMode) return;
         // 1. ADD 3D TERRAIN
         if (!map.getSource('mapbox-dem')) {
             map.addSource('mapbox-dem', {
@@ -626,8 +674,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Style Switcher Logic
     window.changeMapStyle = function(styleId) {
-        const styleUrl = `mapbox://styles/mapbox/${styleId}`;
-        map.setStyle(styleUrl);
+        if (!isLeafletMode) {
+            const styleUrl = `mapbox://styles/mapbox/${styleId}`;
+            map.setStyle(styleUrl);
+        } else {
+            // Leaflet Style Switching (simplified)
+            const tiles = {
+                'streets-v12': 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+                'satellite-streets-v12': 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+                'dark-v11': 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                'outdoors-v12': 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png'
+            };
+            
+            if (tiles[styleId]) {
+                map.eachLayer(layer => {
+                    if (layer._url) map.removeLayer(layer);
+                });
+                L.tileLayer(tiles[styleId], {
+                    attribution: '&copy; OpenStreetMap &copy; CARTO'
+                }).addTo(map);
+            }
+        }
 
         // Update active button UI
         document.querySelectorAll('.style-btn').forEach(btn => {
@@ -707,11 +774,22 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        map.flyTo({
-            center: [lng, lat],
-            zoom: 16,
-            duration: 1500
-        });
+        if (!isLeafletMode) {
+            map.flyTo({
+                center: [lng, lat],
+                zoom: 16,
+                duration: 1500
+            });
+        } else {
+            map.flyTo([lat, lng], 16, {
+                animate: true,
+                duration: 1.5
+            });
+            
+            // Add a temporary marker for Leaflet since MVT layers are missing
+            if (window.activeMarker) map.removeLayer(window.activeMarker);
+            window.activeMarker = L.marker([lat, lng]).addTo(map);
+        }
 
         const attraction = attractionsData.find(a => a.id === id);
 
@@ -729,11 +807,21 @@ document.addEventListener('DOMContentLoaded', function () {
             return;
         }
 
-        map.flyTo({
-            center: [est.longitude, est.latitude],
-            zoom: 16,
-            duration: 1500
-        });
+        if (!isLeafletMode) {
+            map.flyTo({
+                center: [est.longitude, est.latitude],
+                zoom: 16,
+                duration: 1500
+            });
+        } else {
+            map.flyTo([est.latitude, est.longitude], 16, {
+                animate: true,
+                duration: 1.5
+            });
+            
+            if (window.activeMarker) map.removeLayer(window.activeMarker);
+            window.activeMarker = L.marker([est.latitude, est.longitude]).addTo(map);
+        }
 
         setTimeout(() => {
             updateEstablishmentCard(est);
@@ -1072,7 +1160,29 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    let establishmentMarkersLayer = null;
+
     function addEstablishmentMarkers(establishments) {
+        if (isLeafletMode) {
+            if (establishmentMarkersLayer) map.removeLayer(establishmentMarkersLayer);
+            establishmentMarkersLayer = L.layerGroup().addTo(map);
+            
+            establishments.forEach(est => {
+                const cfg = estTypeConfig[est.type] || estTypeConfig.restaurant;
+                const marker = L.circleMarker([est.latitude, est.longitude], {
+                    radius: 8,
+                    fillColor: cfg.color,
+                    color: "#fff",
+                    weight: 2,
+                    opacity: 1,
+                    fillOpacity: 0.9
+                }).addTo(establishmentMarkersLayer);
+                
+                marker.bindPopup(`<strong>${est.name}</strong><br>${est.type}`);
+                marker.on('click', () => updateEstablishmentCard(est));
+            });
+            return;
+        }
         // Use GeoJSON source for establishment markers
         const sourceId = 'establishments-geojson';
 
@@ -1214,8 +1324,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Link custom button to Mapbox Geolocate engine
     locateBtn.addEventListener('click', () => {
-        // Toggle tracking
-        geolocate.trigger();
+        if (!isLeafletMode) {
+            // Toggle tracking
+            geolocate.trigger();
+        } else {
+            map.locate({ setView: true, maxZoom: 16 });
+        }
         locateBtn.classList.add('animate-pulse');
     });
 
@@ -1278,88 +1392,102 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     };
 
-    // Handle Geolocation Events
-    geolocate.on('geolocate', (position) => {
-        locateBtn.classList.remove('animate-pulse');
-        locateBtn.classList.add('bg-green-100'); // Indicate tracking is active
+    if (!isLeafletMode) {
+        geolocate.on('geolocate', (position) => {
+            locateBtn.classList.remove('animate-pulse');
+            locateBtn.classList.add('bg-green-100'); // Indicate tracking is active
 
-        const { latitude, longitude } = position.coords;
+            const { latitude, longitude } = position.coords;
 
-        // Store for establishment searches
-        estUserLat = latitude;
-        estUserLng = longitude;
+            // Store for establishment searches
+            estUserLat = latitude;
+            estUserLng = longitude;
 
-        // Update "Near Me" filters dynamically if currently viewing establishments
-        if (currentEstType) {
-            estPage = 1;
-            fetchEstablishments(estPage, true);
-        }
+            // Update "Near Me" filters dynamically if currently viewing establishments
+            if (currentEstType) {
+                estPage = 1;
+                fetchEstablishments(estPage, true);
+            }
 
-        // Custom radius visual (Optional: Enhanced for GoMangatarem "Search Area")
-        const radiusMeters = 5000;
-        const radiusSourceId = 'user-radius';
+            // Custom radius visual (Optional: Enhanced for GoMangatarem "Search Area")
+            const radiusMeters = 5000;
+            const radiusSourceId = 'user-radius';
 
-        if (!map.getSource(radiusSourceId)) {
-            map.addSource(radiusSourceId, {
-                type: 'geojson',
-                data: {
+            if (!map.getSource(radiusSourceId)) {
+                map.addSource(radiusSourceId, {
+                    type: 'geojson',
+                    data: {
+                        type: 'Feature',
+                        geometry: {
+                            type: 'Polygon',
+                            coordinates: [generateCircleCoordinates(longitude, latitude, radiusMeters)]
+                        }
+                    }
+                });
+
+                map.addLayer({
+                    id: 'user-radius-fill',
+                    type: 'fill',
+                    source: radiusSourceId,
+                    paint: {
+                        'fill-color': '#3b82f6',
+                        'fill-opacity': 0.05
+                    }
+                });
+
+                map.addLayer({
+                    id: 'user-radius-line',
+                    type: 'line',
+                    source: radiusSourceId,
+                    paint: {
+                        'line-color': '#3b82f6',
+                        'line-width': 1,
+                        'line-dasharray': [4, 4],
+                        'line-opacity': 0.3
+                    }
+                });
+            } else {
+                map.getSource(radiusSourceId).setData({
                     type: 'Feature',
                     geometry: {
                         type: 'Polygon',
                         coordinates: [generateCircleCoordinates(longitude, latitude, radiusMeters)]
                     }
-                }
-            });
+                });
+            }
+        });
 
-            map.addLayer({
-                id: 'user-radius-fill',
-                type: 'fill',
-                source: radiusSourceId,
-                paint: {
-                    'fill-color': '#3b82f6',
-                    'fill-opacity': 0.05
-                }
-            });
+        geolocate.on('error', (error) => {
+            locateBtn.classList.remove('animate-pulse');
+            Swal.fire('Location Access', 'Location access denied or unavailable. Please enable GPS.', 'warning');
+            console.error('Geolocation error:', error);
+        });
 
-            map.addLayer({
-                id: 'user-radius-line',
-                type: 'line',
-                source: radiusSourceId,
-                paint: {
-                    'line-color': '#3b82f6',
-                    'line-width': 1,
-                    'line-dasharray': [4, 4],
-                    'line-opacity': 0.3
-                }
-            });
-        } else {
-            map.getSource(radiusSourceId).setData({
-                type: 'Feature',
-                geometry: {
-                    type: 'Polygon',
-                    coordinates: [generateCircleCoordinates(longitude, latitude, radiusMeters)]
-                }
-            });
-        }
-    });
+        geolocate.on('trackuserlocationstart', () => {
+            console.log('Real-time tracking started');
+            locateBtn.title = "Tracking Mode: ON (Click to re-center)";
+            locateBtn.classList.add('tracking-active');
+        });
 
-    geolocate.on('error', (error) => {
-        locateBtn.classList.remove('animate-pulse');
-        Swal.fire('Location Access', 'Location access denied or unavailable. Please enable GPS.', 'warning');
-        console.error('Geolocation error:', error);
-    });
-
-    geolocate.on('trackuserlocationstart', () => {
-        console.log('Real-time tracking started');
-        locateBtn.title = "Tracking Mode: ON (Click to re-center)";
-        locateBtn.classList.add('tracking-active');
-    });
-
-    geolocate.on('trackuserlocationend', () => {
-        console.log('Real-time tracking paused/ended');
-        locateBtn.classList.remove('bg-green-100', 'tracking-active');
-        locateBtn.title = "Find my location";
-    });
+        geolocate.on('trackuserlocationend', () => {
+            console.log('Real-time tracking paused/ended');
+            locateBtn.classList.remove('bg-green-100', 'tracking-active');
+            locateBtn.title = "Find my location";
+        });
+    } else {
+        map.on('locationfound', (e) => {
+            locateBtn.classList.remove('animate-pulse');
+            locateBtn.classList.add('bg-green-100');
+            estUserLat = e.latlng.lat;
+            estUserLng = e.latlng.lng;
+            if (currentEstType) fetchEstablishments(1, true);
+        });
+        
+        map.on('locationerror', () => {
+            locateBtn.classList.remove('animate-pulse');
+            Swal.fire('Location Access', 'Enable GPS to find nearest spots.', 'warning');
+        });
+    }
 
     // ========================================
     // 13. ROUTES TOGGLE
@@ -1505,6 +1633,27 @@ document.addEventListener('DOMContentLoaded', function () {
     let currentRouteSource = null;
 
     window.drawRoute = function (type) {
+        if (isLeafletMode) {
+            // Remove existing route
+            if (window.currentLeafletRoute) map.removeLayer(window.currentLeafletRoute);
+            
+            const path = routeData[type];
+            if (!path) return;
+            
+            const latlngs = path.map(coord => [coord[1], coord[0]]);
+            const color = type === 'nature' ? '#10b981' : '#f59e0b';
+            
+            window.currentLeafletRoute = L.polyline(latlngs, {
+                color: color,
+                weight: 5,
+                opacity: 0.8,
+                dashArray: '5, 5'
+            }).addTo(map);
+            
+            map.fitBounds(window.currentLeafletRoute.getBounds());
+            return;
+        }
+
         // Remove existing route
         if (currentRouteLayer && map.getLayer(currentRouteLayer)) {
             map.removeLayer(currentRouteLayer);

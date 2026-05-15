@@ -39,33 +39,44 @@ def compose():
         subject = request.form.get("subject")
         content = request.form.get("content")
 
-        # Validate subject (max 200, no newlines to prevent email header injection)
+        # Validate and sanitize subject
         valid, err = validate_string_input(subject, min_length=1, max_length=200, block_sql_injection=True,
                                            allowed_pattern=r'^[^\r\n]+$')
         if not valid:
             flash(f"Subject: {err}", "error")
-            return render_template("admin/newsletter/compose.html")
+            return redirect(url_for('newsletter_admin.compose'))
 
         # Check for newlines explicitly (additional header injection protection)
         if '\n' in subject or '\r' in subject:
             flash("Subject must not contain line breaks.", "error")
-            return render_template("admin/newsletter/compose.html")
+            return redirect(url_for('newsletter_admin.compose'))
 
         # Validate and sanitize content
         valid, err = validate_string_input(content, max_length=5000, block_sql_injection=True)
         if not valid:
             flash(f"Content: {err}", "error")
-            return render_template("admin/newsletter/compose.html")
+            return redirect(url_for('newsletter_admin.compose'))
         content = sanitize_html_input(content)
 
         if not subject or not content:
             flash("Subject and content are required.", "error")
-            return render_template("admin/newsletter/compose.html")
+            return redirect(url_for('newsletter_admin.compose'))
 
-        subscribers = NewsletterSubscriber.query.filter_by(is_active=True).all()
+        recipient_ids = request.form.getlist("recipients")
+        if not recipient_ids:
+            flash("No recipients selected.", "error")
+            return redirect(url_for('newsletter_admin.compose'))
+
+        query = NewsletterSubscriber.query.filter_by(is_active=True)
+        
+        if "all" not in recipient_ids:
+            query = query.filter(NewsletterSubscriber.id.in_(recipient_ids))
+            
+        subscribers = query.all()
+        
         if not subscribers:
-            flash("No active subscribers found.", "warning")
-            return redirect(url_for("newsletter_admin.index"))
+            flash("No valid recipients found.", "warning")
+            return redirect(url_for("newsletter_admin.compose"))
 
         # Send emails
         success_count = 0
@@ -78,7 +89,8 @@ def compose():
         flash(f"Newsletter sent successfully to {success_count} subscribers.", "success")
         return redirect(url_for("newsletter_admin.index"))
 
-    return render_template("admin/newsletter/compose.html")
+    active_subscribers = NewsletterSubscriber.query.filter_by(is_active=True).order_by(NewsletterSubscriber.email).all()
+    return render_template("admin/newsletter/compose.html", subscribers=active_subscribers)
 
 @newsletter_admin_bp.route("/admin/newsletter/delete/<int:id>", methods=["POST"])
 @login_required

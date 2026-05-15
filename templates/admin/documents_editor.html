@@ -1,30 +1,30 @@
 {% extends "admin/dashboard.html" %}
 
 {% block admin_content %}
-<div class="px-6 pt-12 pb-8 animate-fade-in relative min-h-screen">
+<div class="px-6 pt-32 pb-8 animate-fade-in relative min-h-screen">
     <!-- Header -->
     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-8">
         <div class="space-y-2">
-            <h1 class="text-4xl md:text-5xl font-black text-white tracking-tight">
-                Editor: <span class="bg-gradient-to-r from-emerald-400 to-teal-500 bg-clip-text text-transparent">{{ meta.label }}</span>
+            <h1 class="text-4xl md:text-5xl font-black text-emerald-950 tracking-tight">
+                Editor: <span class="text-emerald-600">{{ meta.label }}</span>
             </h1>
-            <p class="text-emerald-100/60 max-w-2xl text-lg font-medium">
+            <p class="text-emerald-900/40 max-w-2xl text-lg font-bold uppercase tracking-wider">
                 Live document architecture tuning and structural modification.
             </p>
         </div>
         
         <div class="hidden lg:flex gap-4">
             <a href="{{ url_for('admin.admin_document_files', slug=slug) }}" 
-               class="px-8 py-3 bg-white/10 hover:bg-white/20 text-white font-bold rounded-2xl transition-all duration-300 border border-white/20 backdrop-blur-md">
+               class="px-8 py-3 bg-white border border-emerald-100 text-emerald-700 font-bold rounded-2xl transition-all duration-300 hover:bg-emerald-50 shadow-sm">
                 Exit Architecture
             </a>
         </div>
     </div>
 
     <!-- Document Canvas Container -->
-    <div class="flex justify-center bg-black/40 rounded-[3rem] p-16 mb-12 border border-white/5 overflow-x-auto shadow-inner">
+    <div class="flex justify-center bg-emerald-950/5 rounded-[3rem] p-16 mb-12 border border-emerald-100/50 overflow-x-auto shadow-inner">
         <!-- Physical Document View (A4 ish) -->
-        <div id="document-canvas" class="w-[816px] min-h-[1056px] bg-white text-gray-900 shadow-[0_40px_100px_rgba(0,0,0,0.5),0_0_100px_rgba(16,185,129,0.05)] p-[0.75in] pb-[1in] font-serif leading-relaxed text-[13px] relative">
+        <div id="document-canvas" class="w-[816px] min-h-[1056px] bg-white text-gray-900 shadow-[0_40px_100px_rgba(6,78,59,0.1),0_0_100px_rgba(16,185,129,0.05)] p-[0.75in] pb-[1in] font-serif leading-relaxed text-[13px] relative">
             <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500/20 via-emerald-500 to-emerald-500/20"></div>
             
             {% for para in data.paragraphs %}

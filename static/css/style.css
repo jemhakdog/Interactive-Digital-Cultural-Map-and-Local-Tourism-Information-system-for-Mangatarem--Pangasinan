@@ -312,6 +312,36 @@ form select option {
 }
 
 
+/* --- Document Editor & Heritage Registry Fixes --- */
+/* Overrides for document editor to ensure inputs are legible on light backgrounds */
+#document-canvas input,
+#document-canvas textarea,
+#document-canvas select,
+#detailed-registry input,
+#detailed-registry textarea,
+#detailed-registry select {
+    background-color: rgba(236, 253, 245, 0.5) !important; /* emerald-50/50 */
+    color: #064e3b !important; /* emerald-900 */
+    border: 1px solid rgba(16, 185, 129, 0.3) !important;
+}
+
+#document-canvas input:focus,
+#document-canvas textarea:focus,
+#detailed-registry input:focus,
+#detailed-registry textarea:focus {
+    background-color: #ffffff !important;
+    border-color: #10b981 !important; /* emerald-500 */
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.1) !important;
+}
+
+#document-canvas input::placeholder,
+#document-canvas textarea::placeholder,
+#detailed-registry input::placeholder,
+#detailed-registry textarea::placeholder {
+    color: rgba(6, 78, 59, 0.4) !important;
+}
+
+
 /* Business Dashboard Specific Robustness */
 .bg-emerald-900\/20, 
 .bg-emerald-900\/30,

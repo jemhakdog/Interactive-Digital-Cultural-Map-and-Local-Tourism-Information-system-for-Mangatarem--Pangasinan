@@ -18,6 +18,8 @@
 
 <!-- Mapbox GL JS CSS (Moved to head for better container sizing) -->
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
+<!-- Leaflet CSS Fallback -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/map.css') }}?v=20260419-1">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/utility-overrides.css') }}">
 {% endblock %}
@@ -428,6 +430,8 @@
 {% block scripts %}
 <!-- Mapbox GL JS -->
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
+<!-- Leaflet JS Fallback -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
 
 <!-- Pass Mapbox Token to JavaScript -->
 <script>

@@ -12,12 +12,12 @@ Edit Attraction - {% if current_user.role == 'admin' %}Admin{% else %}Barangay{%
 <div class="min-h-screen bg-[#f8fafc] pb-20">
     <!-- Header -->
     <div class="heritage-gradient pt-16 pb-32 px-6">
-        <div class="container mx-auto max-w-4xl">
+        <div class="container mx-auto max-w-4xl relative -mt-24 z-10">
             <div class="flex items-center gap-4 text-emerald-100/80 mb-4">
                 <a href="{{ url_for('admin.admin_attractions') }}"
                     class="hover:text-white transition-colors flex items-center gap-2 text-sm font-bold uppercase tracking-widest">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="21"
                             d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                     Back to Attractions
@@ -58,7 +58,7 @@ Edit Attraction - {% if current_user.role == 'admin' %}Admin{% else %}Barangay{%
                                         class="block text-xs font-bold text-emerald-900/70 uppercase tracking-widest mb-2">Attraction
                                         Name</label>
                                     <input type="text" name="name" value="{{ attraction.name }}" required
-                                        class="w-full bg-white/50 border border-emerald-900/10 rounded-2xl px-5 py-4 text-emerald-950 font-bold input-focus outline-none"
+                                        class="w-full !bg-white !text-emerald-950 border border-emerald-900/10 rounded-2xl px-5 py-4 font-bold input-focus outline-none form-input"
                                         placeholder="Enter attraction name">
                                 </div>
 
@@ -67,7 +67,7 @@ Edit Attraction - {% if current_user.role == 'admin' %}Admin{% else %}Barangay{%
                                         <label
                                             class="block text-xs font-bold text-emerald-900/70 uppercase tracking-widest mb-2">Category</label>
                                         <select name="category" required
-                                            class="w-full bg-white/50 border border-emerald-900/10 rounded-2xl px-5 py-4 text-emerald-950 font-bold input-focus outline-none appearance-none">
+                                            class="w-full !bg-white !text-emerald-950 border border-emerald-900/10 rounded-2xl px-5 py-4 font-bold input-focus outline-none appearance-none form-input">
                                             <option value="Nature" {% if attraction.category=='Nature' %}selected{%
                                                 endif %}>Nature</option>
                                             <option value="Historical" {% if attraction.category=='Historical'
@@ -84,7 +84,7 @@ Edit Attraction - {% if current_user.role == 'admin' %}Admin{% else %}Barangay{%
                                         <label
                                             class="block text-xs font-bold text-emerald-900/70 uppercase tracking-widest mb-2">Barangay</label>
                                         <select name="barangay_id" required
-                                            class="w-full bg-white/50 border border-emerald-900/10 rounded-2xl px-5 py-4 text-emerald-950 font-bold input-focus outline-none appearance-none">
+                                            class="w-full !bg-white !text-emerald-950 border border-emerald-900/10 rounded-2xl px-5 py-4 font-bold input-focus outline-none appearance-none form-input">
                                             {% for brgy in barangays %}
                                             <option value="{{ brgy.id }}" {% if attraction.barangay_id == brgy.id %}selected{% endif %}>{{ brgy.name }}</option>
                                             {% endfor %}
@@ -96,7 +96,7 @@ Edit Attraction - {% if current_user.role == 'admin' %}Admin{% else %}Barangay{%
                                     <label
                                         class="block text-xs font-bold text-emerald-900/70 uppercase tracking-widest mb-2">Description</label>
                                     <textarea name="description" rows="5" required
-                                        class="w-full bg-white/50 border border-emerald-900/10 rounded-2xl px-5 py-4 text-emerald-950 font-medium input-focus outline-none resize-none"
+                                        class="w-full !bg-white !text-emerald-950 border border-emerald-900/10 rounded-2xl px-5 py-4 font-medium input-focus outline-none resize-none form-input"
                                         placeholder="Describe this cultural landmark...">{{ attraction.description }}</textarea>
                                 </div>
                             </div>
@@ -121,13 +121,13 @@ Edit Attraction - {% if current_user.role == 'admin' %}Admin{% else %}Barangay{%
                                     <label
                                         class="block text-xs font-bold text-emerald-900/70 uppercase tracking-widest mb-2">Latitude</label>
                                     <input type="number" step="any" name="latitude" value="{{ attraction.latitude }}" required
-                                        class="w-full bg-white/50 border border-emerald-900/10 rounded-2xl px-5 py-4 text-emerald-950 font-bold input-focus outline-none">
+                                        class="w-full !bg-white !text-emerald-950 border border-emerald-900/10 rounded-2xl px-5 py-4 font-bold input-focus outline-none form-input">
                                 </div>
                                 <div>
                                     <label
                                         class="block text-xs font-bold text-emerald-900/70 uppercase tracking-widest mb-2">Longitude</label>
                                     <input type="number" step="any" name="longitude" value="{{ attraction.longitude }}" required
-                                        class="w-full bg-white/50 border border-emerald-900/10 rounded-2xl px-5 py-4 text-emerald-950 font-bold input-focus outline-none">
+                                        class="w-full !bg-white !text-emerald-950 border border-emerald-900/10 rounded-2xl px-5 py-4 font-bold input-focus outline-none form-input">
                                 </div>
                             </div>
                         </div>

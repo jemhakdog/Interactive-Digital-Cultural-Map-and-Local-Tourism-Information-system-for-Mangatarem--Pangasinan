@@ -65,6 +65,21 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 // Global functions
+window.toggleRapidCreate = function(event) {
+    event.stopPropagation();
+    const dropdown = document.getElementById('rapid-create-dropdown');
+    if (dropdown) {
+        dropdown.classList.toggle('hidden');
+    }
+};
+
+// Close dropdowns when clicking outside
+document.addEventListener('click', function() {
+    const rapidDropdown = document.getElementById('rapid-create-dropdown');
+    if (rapidDropdown) rapidDropdown.classList.add('hidden');
+});
+
+// Global functions
 window.updateFileName = function() {
     const input = document.getElementById('fileInput');
     const display = document.getElementById('fileName');
