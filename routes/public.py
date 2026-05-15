@@ -591,7 +591,7 @@ def sitemap():
                 "loc": url_for(url, _external=True),
                 "lastmod": last_update,
                 "changefreq": "weekly",
-                "priority": "0.8" if url == "pagez.index" else "0.5",
+                "priority": "0.8" if url == "public.index" else "0.5",
             }
         )
 

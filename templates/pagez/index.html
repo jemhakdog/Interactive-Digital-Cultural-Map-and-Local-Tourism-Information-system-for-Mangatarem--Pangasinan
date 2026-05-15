@@ -38,21 +38,23 @@
 <meta property="twitter:image" content="https://mangatarem.gov.ph/wp-content/uploads/2022/06/DJI_0218.jpg">
 
 <!-- Structured Data (JSON-LD) -->
+{% block json_ld %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
   "@type": "WebSite",
   "name": "GoMangatarem Information System",
   "url": "{{ request.url_root }}",
-  "description": "Interactive Digital Cultural Map and Local Tourism Information system for Mangatarem, Pangasinan",
+  "description": "Interactive Digital Cultural Map and Local Tourism Information system for Mangatarem, Pangasinan. Explore 82 barangays, heritage sites, and local events.",
   "potentialAction": {
     "@type": "SearchAction",
-    "target": "{{ request.url_root }}search?q={search_term_string}",
+    "target": "{{ url_for('public.search', q='{search_term_string}', _external=True) }}",
     "query-input": "required name=search_term_string"
   },
   "publisher": {
     "@type": "GovernmentOrganization",
-    "name": "Municipality of Mangatarem",
+    "name": "Local Government Unit of Mangatarem",
+    "url": "https://mangatarem.gov.ph",
     "logo": {
       "@type": "ImageObject",
       "url": "https://mangatarem.gov.ph/wp-content/uploads/2022/07/mangatarem-logo.png"
@@ -60,6 +62,33 @@
   }
 }
 </script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "itemListElement": [
+    {
+      "@type": "SiteNavigationElement",
+      "position": 1,
+      "name": "Interactive Map",
+      "url": "{{ url_for('public.map_view', _external=True) }}"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "position": 2,
+      "name": "Local Barangays",
+      "url": "{{ url_for('barangay.index', _external=True) }}"
+    },
+    {
+      "@type": "SiteNavigationElement",
+      "position": 3,
+      "name": "Cultural Heritage",
+      "url": "{{ url_for('heritage.index', _external=True) }}"
+    }
+  ]
+}
+</script>
+{% endblock %}
 
 <!-- AOS Library for Scroll Animations -->
 <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />

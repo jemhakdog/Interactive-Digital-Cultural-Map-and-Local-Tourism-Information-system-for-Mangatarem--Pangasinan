@@ -1,5 +1,38 @@
 {% extends "base.html" %}
 
+{% block title %}{{ attraction.name }} - Attractions in Mangatarem, Pangasinan{% endblock %}
+
+{% block meta_description %}
+<meta name="description" content="{{ attraction.description[:155] }}... Explore this cultural heritage site in Mangatarem, Pangasinan.">
+{% endblock %}
+
+{% block json_ld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TouristAttraction",
+  "name": "{{ attraction.name }}",
+  "description": "{{ attraction.description[:200] }}",
+  "image": "{{ attraction.image_url }}",
+  "location": {
+    "@type": "Place",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Mangatarem",
+      "addressRegion": "Pangasinan",
+      "addressCountry": "PH"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": {{ attraction.latitude }},
+      "longitude": {{ attraction.longitude }}
+    }
+  },
+  "url": "{{ request.url }}"
+}
+</script>
+{% endblock %}
+
 {% block head %}
 <!-- Mobile Specific Styles -->
 <style>

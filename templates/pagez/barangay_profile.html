@@ -9,17 +9,17 @@
 
 {% block head %}
 <!-- Open Graph for Barangay Profile -->
-<meta property="og:title" content="{{ barangay_name }} | GoMangatarem">
+<meta property="og:title" content="{{ barangay_name }} | Cultural Map of Mangatarem">
 <meta property="og:description"
-    content="Discover the cultural heritage, attractions, and events in {{ barangay_name }}, Mangatarem, Pangasinan.">
+    content="Explore the heritage, tourism spots, and community stories of Barangay {{ barangay_name }} in Mangatarem, Pangasinan.">
 
 <!-- JSON-LD Structured Data for Place -->
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Place",
+  "@type": "AdministrativeArea",
   "name": "{{ barangay_name }}",
-  "description": "Barangay {{ barangay_name }} in Mangatarem, Pangasinan, Philippines",
+  "description": "Barangay {{ barangay_name }} in Mangatarem, Pangasinan, Philippines. Part of the GoMangatarem Interactive Cultural Map.",
   "address": {
     "@type": "PostalAddress",
     "addressLocality": "Mangatarem",
@@ -28,12 +28,13 @@
   },
   "geo": {
     "@type": "GeoCoordinates",
-    "latitude": {{ center_lat }},
-    "longitude": {{ center_lng }}
+    "latitude": {{ center_latitude or 15.7890 }},
+    "longitude": {{ center_longitude or 120.2856 }}
   },
   "containedInPlace": {
-    "@type": "AdministrativeArea",
-    "name": "Mangatarem, Pangasinan"
+    "@type": "City",
+    "name": "Mangatarem",
+    "url": "{{ request.url_root }}"
   }
 }
 </script>
