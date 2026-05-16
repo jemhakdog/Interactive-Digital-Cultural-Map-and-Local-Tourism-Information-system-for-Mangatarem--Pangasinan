@@ -19,6 +19,7 @@ class Attraction(db.Model):
     
     status = db.Column(db.String(20), default="pending", index=True)
     is_featured = db.Column(db.Boolean, default=False)
+    # Linked to User (steward) who manages this attraction
     user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=True, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
 
@@ -44,12 +45,46 @@ class Attraction(db.Model):
 class AttractionReview(db.Model):
     __tablename__ = 'ATTRACTION_REVIEW'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=False)
-    attraction_id = db.Column(db.Integer, db.ForeignKey("ATTRACTION.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=False, index=True)
+    attraction_id = db.Column(db.Integer, db.ForeignKey("ATTRACTION.id"), nullable=False, index=True)
     rating = db.Column(db.Integer, nullable=False)
     comment = db.Column(db.Text, nullable=True)
-    status = db.Column(db.String(20), default="pending")
+    status = db.Column(db.String(20), default="pending", index=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('reviews', lazy='dynamic'))
+    attraction = db.relationship('Attraction', backref=db.backref('reviews', lazy='dynamic'))
+    photos = db.relationship('ReviewPhoto', backref='review', lazy='dynamic', cascade='all, delete-orphan')
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'user_id': self.user_id,
+            'username': self.user.username if self.user else 'Visitor',
+            'attraction_id': self.attraction_id,
+            'rating': self.rating,
+            'comment': self.comment,
+            'status': self.status,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'photos': [p.to_dict() for p in self.photos.all()],
+        }
+
+
+class ReviewPhoto(db.Model):
+    """Photos attached to a user review. No moderation — posted immediately."""
+    __tablename__ = 'REVIEW_PHOTO'
+    id = db.Column(db.Integer, primary_key=True)
+    review_id = db.Column(db.Integer, db.ForeignKey('ATTRACTION_REVIEW.id'), nullable=False, index=True)
+    url = db.Column(db.String(500), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'url': self.url,
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+        }
 
 
 class UserFavoriteAttraction(db.Model):

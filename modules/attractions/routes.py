@@ -4,8 +4,9 @@ Extracted from routes/public.py and routes/api.py.
 """
 
 from flask import Blueprint, render_template, request, jsonify, current_app
+from flask_login import login_required, current_user
 from extensions import db, limiter
-from .models import Attraction
+from .models import Attraction, AttractionReview, ReviewPhoto
 from core.logger import log_entry, log_query, log_render
 import logging
 from datetime import datetime
@@ -100,6 +101,14 @@ def detail(id):
     }
     cache_set(cache_key, payload, ttl=900)
 
+    # Check if favorited by current user
+    is_favorite = False
+    if current_user.is_authenticated:
+        from modules.attractions.models import UserFavoriteAttraction
+        is_favorite = UserFavoriteAttraction.query.filter_by(
+            user_id=current_user.id, attraction_id=id
+        ).first() is not None
+
     log_render("attractions", "detail", "detail.html")
     return render_template(
         "pagez/detail.html",
@@ -108,6 +117,7 @@ def detail(id):
         related_gallery=related_gallery,
         nearby_stay=nearby_stay,
         nearby_eat=nearby_eat,
+        is_favorite=is_favorite
     )
 
 @attractions_bp.route("/api")
@@ -216,3 +226,111 @@ def _record_view(view_type, item_id=None, page_name=None):
                 db.session.remove()
 
     threading.Thread(target=_async_record, daemon=True).start()
+
+
+# ─────────────────────────────────────────────
+# REVIEWS API
+# ─────────────────────────────────────────────
+
+@attractions_bp.route("/<int:id>/reviews", methods=["GET"])
+def get_reviews(id):
+    """Return paginated approved reviews + rating summary for an attraction."""
+    attraction = Attraction.query.get_or_404(id)
+    page = request.args.get("page", 1, type=int)
+    per_page = min(request.args.get("per_page", 6, type=int), 20)
+
+    pagination = (
+        AttractionReview.query
+        .filter_by(attraction_id=id, status="approved")
+        .order_by(AttractionReview.created_at.desc())
+        .paginate(page=page, per_page=per_page, error_out=False)
+    )
+
+    reviews_data = [r.to_dict() for r in pagination.items]
+
+    # Rating distribution (1–5)
+    all_approved = (
+        AttractionReview.query
+        .with_entities(AttractionReview.rating)
+        .filter_by(attraction_id=id, status="approved")
+        .all()
+    )
+    ratings = [r.rating for r in all_approved]
+    total = len(ratings)
+    avg = round(sum(ratings) / total, 1) if total > 0 else 0
+    distribution = {str(i): ratings.count(i) for i in range(1, 6)}
+
+    return jsonify({
+        "reviews": reviews_data,
+        "summary": {
+            "average": avg,
+            "total": total,
+            "distribution": distribution,
+        },
+        "pagination": {
+            "page": page,
+            "per_page": per_page,
+            "total": pagination.total,
+            "has_next": pagination.has_next,
+            "has_prev": pagination.has_prev,
+        },
+    })
+
+
+@attractions_bp.route("/<int:id>/reviews", methods=["POST"])
+@login_required
+@limiter.limit("10 per hour")
+def post_review(id):
+    """Submit a review (with optional photos) for an attraction.
+
+    Accepts multipart/form-data:
+        - rating  (int, 1-5, required)
+        - comment (str, optional)
+        - photos  (files, optional, max 5)
+    """
+    from utils.file_helpers import save_uploaded_file
+    from utils.cache_helpers import cache_delete
+
+    attraction = Attraction.query.get_or_404(id)
+
+    # Validate rating
+    rating = request.form.get("rating", type=int)
+    if not rating or not (1 <= rating <= 5):
+        return jsonify({"error": "Rating must be between 1 and 5."}), 400
+
+    comment = request.form.get("comment", "").strip() or None
+
+    # Create review record (pending — admin must approve the text)
+    review = AttractionReview(
+        user_id=current_user.id,
+        attraction_id=id,
+        rating=rating,
+        comment=comment,
+        status="pending",
+    )
+    db.session.add(review)
+    db.session.flush()  # get review.id before saving photos
+
+    # Save uploaded photos immediately (no moderation)
+    photo_files = request.files.getlist("photos")
+    saved_photos = 0
+    for photo in photo_files[:5]:  # max 5 photos
+        if not photo or not photo.filename:
+            continue
+        url = save_uploaded_file(photo)
+        if url:
+            db.session.add(ReviewPhoto(review_id=review.id, url=url))
+            saved_photos += 1
+
+    db.session.commit()
+
+    # Invalidate attraction detail cache
+    cache_delete(f"attraction_detail_module:{id}")
+
+    logger.info("Review %d posted for attraction %d by user %d", review.id, id, current_user.id)
+    return jsonify({
+        "success": True,
+        "review_id": review.id,
+        "photos_saved": saved_photos,
+        "message": "Your review has been submitted and is pending approval. Thank you!",
+    }), 201

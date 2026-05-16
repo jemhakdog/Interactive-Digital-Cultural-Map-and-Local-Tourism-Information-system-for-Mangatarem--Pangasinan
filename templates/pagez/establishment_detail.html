@@ -37,7 +37,7 @@
                 {% if establishment.description %}
                 <div class="bg-emerald-900/20 border border-white/10 rounded-2xl p-6 backdrop-blur-md">
                     <h2 class="text-lg font-bold text-emerald-300 mb-3">About</h2>
-                    <p class="text-emerald-100/70 leading-relaxed">{{ establishment.description }}</p>
+                    <p class="text-emerald-50 leading-relaxed">{{ establishment.description }}</p>
                 </div>
                 {% endif %}
 
@@ -64,13 +64,13 @@
                                         </span>
                                     </div>
                                     {% if room.description %}
-                                    <p class="text-emerald-100/50 text-sm mb-3">{{ room.description }}</p>
+                                    <p class="text-emerald-100/80 text-sm mb-3">{{ room.description }}</p>
                                     {% endif %}
                                     <div class="flex items-center gap-4 mb-3">
                                         {% if room.price_per_night %}
-                                        <span class="text-emerald-400 font-bold text-lg">₱{{ "%.0f"|format(room.price_per_night) }}<span class="text-sm font-normal text-emerald-100/40">/night</span></span>
+                                        <span class="text-emerald-400 font-bold text-lg">₱{{ "%.0f"|format(room.price_per_night) }}<span class="text-sm font-normal text-emerald-100/70">/night</span></span>
                                         {% endif %}
-                                        <span class="text-emerald-100/40 text-sm">👤 {{ room.capacity }} guest{{ 's' if room.capacity != 1 }}</span>
+                                        <span class="text-emerald-100/70 text-sm">👤 {{ room.capacity }} guest{{ 's' if room.capacity != 1 }}</span>
                                     </div>
                                     {% if room.amenities %}
                                     <div class="flex flex-wrap gap-1">
@@ -118,7 +118,7 @@
                                 {% endif %}
                             </div>
                             {% if item.description %}
-                            <p class="text-emerald-100/40 text-sm truncate">{{ item.description }}</p>
+                            <p class="text-emerald-100/70 text-sm truncate">{{ item.description }}</p>
                             {% endif %}
                         </div>
                     </div>
@@ -131,7 +131,7 @@
                     <h2 class="text-xl font-bold text-white mb-5">
                         Reviews
                         {% if establishment.review_count > 0 %}
-                        <span class="text-emerald-100/40 text-sm font-normal">({{ establishment.review_count }})</span>
+                        <span class="text-emerald-100/70 text-sm font-normal">({{ establishment.review_count }})</span>
                         {% endif %}
                     </h2>
 
@@ -146,7 +146,7 @@
                                     </div>
                                     <div>
                                         <p class="text-white text-sm font-medium">{{ review.user.username }}</p>
-                                        <p class="text-emerald-100/30 text-xs">{{ review.created_at.strftime('%b %d, %Y') }}</p>
+                                        <p class="text-emerald-100/60 text-xs">{{ review.created_at.strftime('%b %d, %Y') }}</p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-0.5">
@@ -156,7 +156,7 @@
                                 </div>
                             </div>
                             {% if review.comment %}
-                            <p class="text-emerald-100/60 text-sm leading-relaxed">{{ review.comment }}</p>
+                            <p class="text-emerald-50 text-sm leading-relaxed">{{ review.comment }}</p>
                             {% endif %}
                         </div>
                         {% endfor %}
@@ -198,6 +198,28 @@
 
             <!-- Sidebar -->
             <div class="space-y-6">
+                <!-- User Engagement Actions -->
+                {% if current_user.is_authenticated and current_user.role == 'user' %}
+                <div class="flex gap-4 mb-6">
+                    <button id="toggle-favorite" 
+                            data-id="{{ establishment.id }}" 
+                            data-type="establishment"
+                            class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border transition-all font-bold text-sm {{ 'bg-red-500/20 border-red-500/50 text-red-300' if is_favorite else 'bg-emerald-900/30 border-white/10 text-emerald-100/70 hover:border-red-500/30 hover:bg-red-500/10' }}">
+                        <svg class="w-4 h-4 {{ 'fill-current' if is_favorite else 'fill-none stroke-current' }}" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                        {{ 'Saved' if is_favorite else 'Favorite' }}
+                    </button>
+                    <button id="open-visit-modal" 
+                            class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border bg-emerald-900/30 border-white/10 text-emerald-100/70 hover:border-emerald-500/30 hover:bg-emerald-500/10 transition-all font-bold text-sm">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        Visited
+                    </button>
+                </div>
+                {% endif %}
+
                 <!-- Quick Info -->
                 <div class="bg-emerald-900/20 border border-white/10 rounded-2xl p-6 backdrop-blur-md">
                     <h2 class="text-lg font-bold text-white mb-4">Details</h2>
@@ -206,7 +228,7 @@
                         <div class="flex items-center gap-3">
                             <span class="text-amber-400">★</span>
                             <span class="text-white font-bold">{{ "%.1f"|format(establishment.rating_avg) }}</span>
-                            <span class="text-emerald-100/40">({{ establishment.review_count }} review{{ 's' if establishment.review_count != 1 }})</span>
+                            <span class="text-emerald-100/70">({{ establishment.review_count }} review{{ 's' if establishment.review_count != 1 }})</span>
                         </div>
                         {% endif %}
                         {% if establishment.price_range %}
@@ -267,7 +289,7 @@
                         {% set day_names = {'mon': 'Monday', 'tue': 'Tuesday', 'wed': 'Wednesday', 'thu': 'Thursday', 'fri': 'Friday', 'sat': 'Saturday', 'sun': 'Sunday'} %}
                         {% for day, hours in establishment.operating_hours.items() %}
                         <div class="flex justify-between">
-                            <span class="text-emerald-100/50">{{ day_names.get(day, day) }}</span>
+                            <span class="text-emerald-100/80">{{ day_names.get(day, day) }}</span>
                             <span class="text-emerald-100/70 font-medium">{{ hours }}</span>
                         </div>
                         {% endfor %}
@@ -292,6 +314,10 @@
             </div>
         </div>
     </div>
+
+    <!-- Include Visit Modal -->
+    {% include 'includes/user_actions_modal.html' %}
+    <script src="{{ url_for('static', filename='js/pages/user-actions.js') }}" defer></script>
 </section>
 {% endblock %}
 

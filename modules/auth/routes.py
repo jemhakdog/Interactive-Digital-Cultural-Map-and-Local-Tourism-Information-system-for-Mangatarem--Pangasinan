@@ -3,7 +3,7 @@ Authentication routes for the Auth module.
 Refactored from routes/auth.py into Modular Monolith structure.
 """
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
 from flask_login import login_user, logout_user, login_required, current_user
 from extensions import db, limiter
 from .models import User, PasswordResetToken
@@ -29,7 +29,7 @@ import logging
 import os
 from typing import Optional, Tuple
 
-auth_bp = Blueprint("auth", __name__, template_folder="templates")
+auth_bp = Blueprint("auth", __name__, template_folder="templates", url_prefix="/auth")
 logger = logging.getLogger(__name__)
 
 # Google OAuth Client ID – loaded from environment variable
@@ -491,3 +491,32 @@ def reset_password(token: str):
 def pending_approval():
     log_entry("auth", "pending_approval")
     return render_template("auth/pending_approval.html")
+
+
+@auth_bp.route("/api/users/search")
+@login_required
+def api_user_search():
+    """API for searching users to auto-fill visitor logs."""
+    query = request.args.get("q", "").strip()
+    if not query or len(query) < 2:
+        return jsonify([])
+
+    # Only search for approved 'user' role accounts
+    users = User.query.filter(
+        User.role == "user",
+        User.is_approved
+    ).filter(
+        (User.username.ilike(f"%{query}%")) | (User.email.ilike(f"%{query}%"))
+    ).limit(5).all()
+
+    results = []
+    for user in users:
+        results.append({
+            "id": user.id,
+            "username": user.username,
+            "email": user.email,
+            "barangay": user.barangay.name if user.barangay else "Unknown"
+        })
+
+    return jsonify(results)
+

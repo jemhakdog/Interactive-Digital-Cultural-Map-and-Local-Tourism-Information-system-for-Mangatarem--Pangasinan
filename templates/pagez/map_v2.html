@@ -15,7 +15,7 @@
 <!-- Mapbox GL JS CSS -->
 <link href="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.css" rel="stylesheet">
 <!-- Leaflet CSS Fallback -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.css') }}" />
 <style>
     :root {
         --primary-green: #00ED64;
@@ -434,12 +434,257 @@
         box-shadow: 0 8px 24px rgba(0, 237, 100, 0.3);
         transition: all 0.2s;
     }
+
+    /* Bookmark Toggle Styles */
+    .bookmark-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+        background: #F3F4F6;
+        color: #9CA3AF;
+        border: 1px solid #E5E7EB;
+    }
+    
+    .bookmark-btn:hover {
+        background: #E5E7EB;
+        transform: scale(1.05);
+    }
+    
+    .bookmark-btn.active {
+        background: #FFFBEB;
+        color: #F59E0B; /* Amber/Gold */
+        border-color: #FEF3C7;
+    }
+    
+    .bookmark-btn.active svg {
+        fill: currentColor;
+    }
+
+    .place-card-v2 {
+        position: relative;
+    }
+
+    .card-bookmark-btn {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        width: 32px;
+        height: 32px;
+        border-radius: 10px;
+        background: white;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+        color: #9CA3AF;
+        transition: all 0.2s;
+        border: 1px solid #F3F4F6;
+    }
+
+    .card-bookmark-btn.active {
+        color: #F59E0B;
+        background: #FFFBEB;
+        border-color: #FEF3C7;
+    }
+
+    .card-bookmark-btn.active svg {
+        fill: currentColor;
+    }
+    #map-controls-container {
+        position: absolute;
+        right: 24px;
+        bottom: 120px;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        pointer-events: none;
+    }
+    
+    .map-control-btn {
+        width: 52px;
+        height: 52px;
+        background: white;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #1F1D2B;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        cursor: pointer;
+        pointer-events: auto;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .map-control-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        color: #00ED64;
+    }
+
+    .map-control-btn:active {
+        transform: translateY(0) scale(0.95);
+    }
+
+    .map-control-btn svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    /* Map Service Switcher Styles */
+    .map-service-menu {
+        position: absolute;
+        right: 80px;
+        bottom: 32px;
+        background: rgba(255, 255, 255, 0.8);
+        backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
+        border-radius: 24px;
+        padding: 12px;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+        border: 1px solid rgba(255,255,255,0.4);
+        z-index: 120;
+        width: 220px;
+        opacity: 0;
+        transform: scale(0.9) translateY(10px);
+        pointer-events: none;
+        transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        transform-origin: bottom right;
+    }
+
+    .map-service-menu.active {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        pointer-events: auto;
+    }
+
+    .service-option {
+        padding: 12px 16px;
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-bottom: 4px;
+    }
+
+    .service-option:last-child {
+        margin-bottom: 0;
+    }
+
+    .service-option:hover {
+        background: rgba(0, 237, 100, 0.08);
+    }
+
+    .service-option.active {
+        background: var(--primary-green);
+        color: var(--text-dark);
+        box-shadow: 0 4px 12px rgba(0, 237, 100, 0.2);
+    }
+
+    .service-icon {
+        width: 32px;
+        height: 32px;
+        background: white;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+
+    .service-option.active .service-icon {
+        background: rgba(255,255,255,0.9);
+    }
+
+    .service-info h4 {
+        font-size: 13px;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .service-info p {
+        font-size: 10px;
+        font-weight: 500;
+        color: var(--text-gray);
+        margin: 0;
+    }
+
+    .service-option.active .service-info p {
+        color: rgba(0,0,0,0.5);
+    }
+
+    /* Map Style Switcher Styles */
+    .style-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+    }
+
+    .style-option {
+        padding: 8px;
+        border-radius: 16px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1.5px solid transparent;
+        background: rgba(0,0,0,0.03);
+    }
+
+    .style-option:hover {
+        background: rgba(0,0,0,0.06);
+        transform: translateY(-1px);
+    }
+
+    .style-option.active {
+        background: white;
+        border-color: var(--primary-green);
+        box-shadow: 0 4px 12px rgba(0, 237, 100, 0.15);
+    }
+
+    .style-preview {
+        width: 100%;
+        height: 36px;
+        border-radius: 10px;
+        background-size: cover;
+        background-position: center;
+        border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .style-option span {
+        font-size: 10px;
+        font-weight: 800;
+        color: var(--text-dark);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    /* Style Preview Colors/Images */
+    .style-preview.light { background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); }
+    .style-preview.dark { background: linear-gradient(135deg, #1a1c23 0%, #2d313d 100%); }
+    .style-preview.streets { background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); position: relative; }
+    .style-preview.streets::after { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(255,255,255,0.2) 10px, rgba(255,255,255,0.2) 11px); }
+    .style-preview.satellite { background: linear-gradient(135deg, #1b5e20 0%, #388e3c 100%); }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="map-v2-container">
-    <!-- Header -->
+    <!-- 1. The Map Foundation (Z-index: 1) -->
+    <div id="map"></div>
+
+    <!-- 2. Header (Top) -->
     <div class="floating-header flex justify-between items-center">
         <button onclick="window.history.back()" class="w-12 h-12 flex items-center justify-center bg-white rounded-2xl shadow-xl pointer-events-auto border border-gray-100 active:scale-95 transition-transform">
             <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -452,10 +697,94 @@
         <div class="w-12"></div> <!-- Spacer to keep title centered -->
     </div>
 
-    <!-- Floating Action Buttons (Above Sheet) -->
+    <!-- 3. Category Filters (Floating) -->
+    <div class="floating-filters no-scrollbar">
+        <div class="flex gap-3 px-6" id="category-filters">
+            <div class="category-chip active" data-category="all">All</div>
+            <div class="category-chip" data-category="Nature">Nature</div>
+            <div class="category-chip" data-category="Heritage">Heritage</div>
+            <div class="category-chip" data-category="Religious">Religious</div>
+            <div class="category-chip" data-category="restaurant">Food</div>
+            <div class="category-chip" data-category="cafe">Coffee</div>
+            <div class="category-chip" data-category="inn">Inns</div>
+        </div>
     </div>
 
-    <!-- Navigation Panel Overlay -->
+    <!-- 4. Floating Action Buttons (Above Map, Highest Z-index) -->
+    <div id="map-controls-container">
+        <!-- Map Service Switcher Button -->
+        <button id="map-service-btn" class="map-control-btn" title="Change Map Service">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+            </svg>
+        </button>
+
+        <!-- Locate Me Button -->
+        <button id="locate-me-btn" class="map-control-btn" title="Locate Me">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+            </svg>
+        </button>
+    </div>
+
+    <!-- 5. Map Service Menu -->
+    <div id="map-service-menu" class="map-service-menu">
+        <div class="mb-3 px-2">
+            <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Map Service</h3>
+        </div>
+        <div class="space-y-1">
+            <div class="service-option active" data-service="mapbox">
+                <div class="service-icon">
+                    <svg class="w-4 h-4 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                        <path d="M12 6c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4z"/>
+                    </svg>
+                </div>
+                <div class="service-info">
+                    <h4>Mapbox Premium</h4>
+                    <p>High Performance Vector</p>
+                </div>
+            </div>
+            <div class="service-option" data-service="leaflet">
+                <div class="service-icon">
+                    <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                    </svg>
+                </div>
+                <div class="service-info">
+                    <h4>OpenStreetMap</h4>
+                    <p>Standard Raster (Leaflet)</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-4 pt-4 border-t border-gray-100">
+            <div class="mb-3 px-2">
+                <h3 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Map Style</h3>
+            </div>
+            <div class="style-grid">
+                <div class="style-option active" data-style="light">
+                    <div class="style-preview light"></div>
+                    <span>Light</span>
+                </div>
+                <div class="style-option" data-style="dark">
+                    <div class="style-preview dark"></div>
+                    <span>Dark</span>
+                </div>
+                <div class="style-option" data-style="streets">
+                    <div class="style-preview streets"></div>
+                    <span>Streets</span>
+                </div>
+                <div class="style-option" data-style="satellite">
+                    <div class="style-preview satellite"></div>
+                    <span>Satellite</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 6. Navigation Panel Overlay -->
     <div id="nav-panel" class="fixed top-24 left-6 z-[60] w-80 bg-white/95 backdrop-blur-md rounded-[32px] shadow-2xl p-6 border border-white/20 hidden">
         <div class="flex justify-between items-center mb-6">
             <div class="flex items-center gap-3">
@@ -539,40 +868,10 @@
         </div>
     </div>
 
-    <!-- Category Filters (Floating) -->
-    <div class="floating-filters no-scrollbar">
-        <div class="flex gap-3 px-6" id="category-filters">
-            <div class="category-chip active" data-category="all">All</div>
-            <div class="category-chip" data-category="Nature">Nature</div>
-            <div class="category-chip" data-category="Heritage">Heritage</div>
-            <div class="category-chip" data-category="Religious">Religious</div>
-            <div class="category-chip" data-category="restaurant">Food</div>
-            <div class="category-chip" data-category="cafe">Coffee</div>
-            <div class="category-chip" data-category="inn">Inns</div>
-        </div>
-    </div>
-
-    <!-- Floating Map Controls -->
-    <div class="absolute right-6 bottom-32 z-[45] flex flex-col gap-3 pointer-events-none">
-        <button id="locate-me-btn" class="w-12 h-12 bg-white rounded-2xl shadow-premium flex items-center justify-center text-gray-700 hover:text-[#00ED64] transition-all pointer-events-auto group">
-            <svg class="w-6 h-6 group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-            </svg>
-        </button>
-    </div>
-
-    <!-- Map -->
-    <div id="map"></div>
-
-    <!-- Floating UI Layer (Above Map, Below Navbar) -->
+    <!-- 7. Bottom UI Layer (Places List) -->
     <div class="absolute inset-0 pointer-events-none z-[45] flex flex-col justify-end">
-        <!-- Bottom UI Card -->
         <div id="bottom-sheet" class="bottom-sheet pointer-events-auto bg-white rounded-[32px] p-6 shadow-premium transition-all flex flex-col">
-            <!-- Handle -->
             <div id="sheet-handle"></div>
-
-            <!-- Search Bar -->
             <div class="search-input-container mb-6 bg-gray-50 border border-gray-100 group focus-within:border-[#00ED64]/30 transition-all">
                 <svg class="w-5 h-5 text-gray-400 group-focus-within:text-[#00ED64] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -586,22 +885,16 @@
                 </button>
             </div>
 
-            <!-- Results Section / Places Near You -->
             <div id="results-section" class="flex-1 overflow-y-auto no-scrollbar">
                 <div class="flex items-center justify-between mb-4">
                     <h2 id="section-title" class="text-base font-bold text-gray-900">Recommended for You</h2>
                     <span id="results-count" class="text-xs font-semibold text-[#008F3C] bg-[#E6FFF0] px-2 py-1 rounded-lg">0 spots</span>
                 </div>
-                
                 <div id="places-list" class="space-y-1">
-                    <!-- Dynamic places go here -->
-                    <div class="text-center py-8 text-gray-400 text-sm">
-                        Loading awesome spots...
-                    </div>
+                    <div class="text-center py-8 text-gray-400 text-sm">Loading awesome spots...</div>
                 </div>
             </div>
 
-            <!-- Footer Stats (Visible when a route/place is selected) -->
             <div id="place-stats" class="hidden pt-4 border-t border-gray-100 mt-4">
                 <div class="flex items-center justify-between gap-4">
                     <div class="flex items-center gap-3">
@@ -632,7 +925,7 @@
         </div>
     </div>
 
-    <!-- Details Modal -->
+    <!-- 8. Details Modal Overlay -->
     <div id="details-modal-overlay" class="modal-overlay">
         <div class="premium-modal">
             <div class="modal-img-container">
@@ -645,7 +938,14 @@
                 </button>
             </div>
             <div class="modal-content">
-                <h2 id="modal-title" class="modal-title">Place Name</h2>
+                <div class="flex justify-between items-start mb-2">
+                    <h2 id="modal-title" class="modal-title !mb-0">Place Name</h2>
+                    <button id="modal-bookmark" class="bookmark-btn" title="Bookmark this place">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                        </svg>
+                    </button>
+                </div>
                 <div class="modal-location">
                     <svg class="w-4 h-4 text-[#00ED64]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -653,9 +953,7 @@
                     </svg>
                     <span id="modal-location-text">Poblacion, Mangatarem</span>
                 </div>
-                <p id="modal-description" class="modal-description">
-                    Loading description...
-                </p>
+                <p id="modal-description" class="modal-description">Loading description...</p>
                 <div class="modal-actions">
                     <button id="modal-directions" class="btn-secondary-v2">Get Directions</button>
                     <a id="modal-view-details" href="#" class="start-btn flex items-center justify-center">View Full Info</a>
@@ -669,9 +967,10 @@
 {% block scripts %}
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
 <!-- Leaflet JS Fallback -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script src="{{ url_for('static', filename='js/leaflet.js') }}" defer></script>
 <script>
     window.MAPBOX_TOKEN = "{{ mapbox_token }}";
+    window.USER_AUTH = {{ 'true' if current_user.is_authenticated else 'false' }};
 </script>
-<script src="{{ url_for('static', filename='js/pages/map_v2.js') }}?v=1.1.6"></script>
+<script src="{{ url_for('static', filename='js/pages/map_v2.js') }}?v=1.1.7"></script>
 {% endblock %}

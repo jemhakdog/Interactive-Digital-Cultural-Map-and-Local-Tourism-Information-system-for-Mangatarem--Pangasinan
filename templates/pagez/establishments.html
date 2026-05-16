@@ -9,19 +9,19 @@
         <!-- Header -->
         <div class="text-center mb-12">
             <h1 class="text-4xl md:text-5xl font-bold text-white font-heading tracking-tight">Stay & Eat</h1>
-            <p class="text-contrast-muted mt-3 max-w-2xl mx-auto">Discover the best accommodations and dining spots in Mangatarem, Pangasinan</p>
+            <p class="text-emerald-100/80 mt-3 max-w-2xl mx-auto">Discover the best accommodations and dining spots in Mangatarem, Pangasinan</p>
         </div>
 
         <!-- Filters -->
         <div class="glass-panel rounded-2xl p-6 mb-10">
             <form method="GET" action="{{ url_for('business.index') }}" class="flex flex-wrap gap-4 items-end">
                 <div class="flex-1 min-w-[200px]">
-                    <label class="block text-xs font-bold text-emerald-300 mb-2 uppercase tracking-wider">Search</label>
+                    <label class="block text-xs font-bold text-emerald-100 mb-2 uppercase tracking-wider opacity-90">Search</label>
                     <input type="text" name="q" value="{{ request.args.get('q', '') }}" placeholder="Search by name..."
-                        class="w-full input-heritage bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-emerald-500/40 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+                        class="w-full input-heritage bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-2.5 text-white placeholder-emerald-400/50 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-emerald-300 mb-2 uppercase tracking-wider">Type</label>
+                    <label class="block text-xs font-bold text-emerald-100 mb-2 uppercase tracking-wider opacity-90">Type</label>
                     <select name="type"
                         class="input-heritage bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
                         <option value="">All Types</option>
@@ -32,7 +32,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-emerald-300 mb-2 uppercase tracking-wider">Price</label>
+                    <label class="block text-xs font-bold text-emerald-100 mb-2 uppercase tracking-wider opacity-90">Price</label>
                     <select name="price_range"
                         class="input-heritage bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
                         <option value="">All Prices</option>
@@ -42,7 +42,7 @@
                     </select>
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-emerald-300 mb-2 uppercase tracking-wider">Barangay</label>
+                    <label class="block text-xs font-bold text-emerald-100 mb-2 uppercase tracking-wider opacity-90">Barangay</label>
                     <select name="barangay"
                         class="input-heritage bg-emerald-900/30 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
                         <option value="">All Barangays</option>
@@ -60,23 +60,23 @@
         <!-- Type Tabs -->
         <div class="flex gap-3 mb-8 overflow-x-auto pb-2">
             <a href="{{ url_for('business.index') }}"
-                class="whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ 'bg-emerald-600 text-white' if not request.args.get('type') else 'bg-emerald-900/30 text-emerald-300 border border-white/10 hover:bg-emerald-800/30' }}">
+                class="whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/40' if not request.args.get('type') else 'bg-emerald-900/40 text-emerald-100/90 border border-white/10 hover:bg-emerald-800/40' }}">
                 All
             </a>
             <a href="{{ url_for('business.index', type='inn') }}"
-                class="whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ 'bg-emerald-600 text-white' if request.args.get('type') == 'inn' else 'bg-emerald-900/30 text-emerald-300 border border-white/10 hover:bg-emerald-800/30' }}">
+                class="whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/40' if request.args.get('type') == 'inn' else 'bg-emerald-900/40 text-emerald-100/90 border border-white/10 hover:bg-emerald-800/40' }}">
                 🏨 Inns & Lodges
             </a>
             <a href="{{ url_for('business.index', type='restaurant') }}"
-                class="whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ 'bg-emerald-600 text-white' if request.args.get('type') == 'restaurant' else 'bg-emerald-900/30 text-emerald-300 border border-white/10 hover:bg-emerald-800/30' }}">
+                class="whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/40' if request.args.get('type') == 'restaurant' else 'bg-emerald-900/40 text-emerald-100/90 border border-white/10 hover:bg-emerald-800/40' }}">
                 🍽️ Restaurants
             </a>
             <a href="{{ url_for('business.index', type='cafe') }}"
-                class="whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ 'bg-emerald-600 text-white' if request.args.get('type') == 'cafe' else 'bg-emerald-900/30 text-emerald-300 border border-white/10 hover:bg-emerald-800/30' }}">
+                class="whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/40' if request.args.get('type') == 'cafe' else 'bg-emerald-900/40 text-emerald-100/90 border border-white/10 hover:bg-emerald-800/40' }}">
                 ☕ Cafés
             </a>
             <a href="{{ url_for('business.index', type='fastfood') }}"
-                class="whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ 'bg-emerald-600 text-white' if request.args.get('type') == 'fastfood' else 'bg-emerald-900/30 text-emerald-300 border border-white/10 hover:bg-emerald-800/30' }}">
+                class="whitespace-nowrap px-5 py-2.5 rounded-full text-sm font-bold transition-all {{ 'bg-emerald-600 text-white shadow-lg shadow-emerald-900/40' if request.args.get('type') == 'fastfood' else 'bg-emerald-900/40 text-emerald-100/90 border border-white/10 hover:bg-emerald-800/40' }}">
                 🍔 Fast Food
             </a>
         </div>
@@ -92,7 +92,7 @@
                 </div>
                 <div>
                     <h4 class="text-emerald-300 font-bold text-sm">Tailored View Active</h4>
-                    <p class="text-emerald-100/60 text-xs">Showing only <strong>{{ owner_type|title }}{{ 's' if not owner_type.endswith('s') }}</strong> based on your business profile.</p>
+                    <p class="text-emerald-100/80 text-xs">Showing only <strong>{{ owner_type|title }}{{ 's' if not owner_type.endswith('s') }}</strong> based on your business profile.</p>
                 </div>
             </div>
             <a href="{{ url_for('business.index', show_all='true') }}" 
@@ -103,7 +103,7 @@
         {% endif %}
 
         <!-- Results Count -->
-        <p class="text-emerald-100/40 text-sm mb-6">{{ establishments|length }} establishment{{ 's' if establishments|length != 1 }} found</p>
+        <p class="text-emerald-100/90 text-sm mb-6">{{ establishments|length }} establishment{{ 's' if establishments|length != 1 }} found</p>
 
         <!-- Establishment Cards -->
         {% if establishments %}
@@ -135,7 +135,7 @@
                     <h3 class="text-white font-bold text-lg group-hover:text-emerald-300 transition-colors">{{ est.name }}</h3>
 
                     {% if est.address %}
-                    <p class="text-emerald-100/40 text-sm mt-1 truncate">📍 {{ est.address }}</p>
+                    <p class="text-emerald-100/90 text-sm mt-1 truncate">📍 {{ est.address }}</p>
                     {% endif %}
 
                     <div class="flex items-center gap-3 mt-3">
@@ -160,7 +160,7 @@
                     {% if est.amenities %}
                     <div class="flex flex-wrap gap-1 mt-3">
                         {% for a in est.amenities[:4] %}
-                        <span class="text-xs bg-emerald-800/30 text-emerald-300/60 px-2 py-0.5 rounded-md">{{ a|replace('_', ' ')|title }}</span>
+                        <span class="text-xs bg-emerald-800/30 text-emerald-300/90 px-2 py-0.5 rounded-md">{{ a|replace('_', ' ')|title }}</span>
                         {% endfor %}
                         {% if est.amenities|length > 4 %}
                         <span class="text-xs text-emerald-500/50">+{{ est.amenities|length - 4 }} more</span>
@@ -179,14 +179,14 @@
                 </svg>
             </div>
             <h2 class="text-xl font-bold text-white mb-2">No establishments found</h2>
-            <p class="text-emerald-100/40 max-w-md mx-auto">Try adjusting your filters or search terms.</p>
+            <p class="text-emerald-100/90 max-w-md mx-auto">Try adjusting your filters or search terms.</p>
         </div>
         {% endif %}
 
         <!-- CTA for business owners -->
         <div class="mt-16 text-center bg-emerald-900/20 border border-white/10 rounded-3xl p-10 backdrop-blur-md">
             <h2 class="text-2xl font-bold text-white mb-3">Own a business in Mangatarem?</h2>
-            <p class="text-emerald-100/50 max-w-md mx-auto mb-6">List your inn, restaurant, or café and reach tourists exploring Mangatarem's cultural heritage.</p>
+            <p class="text-emerald-100/70 max-w-md mx-auto mb-6">List your inn, restaurant, or café and reach tourists exploring Mangatarem's cultural heritage.</p>
             <a href="{{ url_for('auth.register_business') }}"
                 class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 px-8 rounded-xl transition-all duration-300 shadow-lg inline-flex items-center gap-2 hover:scale-[1.02]">
                 Register Your Business

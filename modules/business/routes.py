@@ -121,6 +121,14 @@ def detail(id):
         establishment_id=establishment.id, status="approved"
     ).order_by(EstablishmentReview.created_at.desc()).all()
 
+    # Check if favorited by current user
+    is_favorite = False
+    if current_user.is_authenticated:
+        from modules.business.models import UserFavoriteEstablishment
+        is_favorite = UserFavoriteEstablishment.query.filter_by(
+            user_id=current_user.id, establishment_id=id
+        ).first() is not None
+
     log_render("business", "detail", "establishment_detail.html")
     return render_template(
         "pagez/establishment_detail.html",
@@ -128,6 +136,7 @@ def detail(id):
         rooms=rooms,
         menu_items=menu_items,
         reviews=reviews,
+        is_favorite=is_favorite
     )
 
 @business_bp.route("/<int:id>/review", methods=["POST"])

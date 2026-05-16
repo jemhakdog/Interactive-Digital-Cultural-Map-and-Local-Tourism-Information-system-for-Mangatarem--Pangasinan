@@ -8,17 +8,12 @@ document.addEventListener('DOMContentLoaded', function () {
     // 1. INITIALIZATION & STATE
     // ========================================
     const hasMapboxToken = window.MAPBOX_TOKEN && window.MAPBOX_TOKEN !== 'None' && window.MAPBOX_TOKEN !== '';
-    const isLeafletMode = !hasMapboxToken;
-    
-    if (!isLeafletMode) {
-        mapboxgl.accessToken = window.MAPBOX_TOKEN;
-    } else {
-        console.warn("⚠️ Mapbox token missing. Switching to LeafletJS fallback.");
-    }
     
     const PLACEHOLDER_IMG = 'data:image/svg+xml;charset=UTF-8,%3Csvg%20width%3D%22300%22%20height%3D%22200%22%20xmlns%3D%22http%3D%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Crect%20width%3D%22300%22%20height%3D%22200%22%20fill%3D%22%23eee%22%2F%3E%3Ctext%20x%3D%2250%25%22%20y%3D%2250%25%22%20font-family%3D%22sans-serif%22%20font-size%3D%2216%22%20fill%3D%22%23aaa%22%20text-anchor%3D%22middle%22%20dy%3D%22.3em%22%3ENo%20Image%3C%2Ftext%3E%3C%2Fsvg%3E';
 
     let state = {
+        mapService: localStorage.getItem('gomangatarem_map_service') || (hasMapboxToken ? 'mapbox' : 'leaflet'),
+        mapStyle: localStorage.getItem('gomangatarem_map_style') || 'light',
         currentCategory: 'all',
         selectedPlace: null,
         userLocation: null,
@@ -27,38 +22,35 @@ document.addEventListener('DOMContentLoaded', function () {
         allPlaces: [],
         markers: [],
         currentNavMode: 'driving',
-        isNavigating: false
+        isNavigating: false,
+        bookmarkedIds: {
+            attractions: [],
+            establishments: []
+        },
+        currentRouteLayer: null // Track Leaflet route layer
     };
 
-    let map;
-    if (!isLeafletMode) {
-        map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/light-v11',
-            center: [120.2986, 15.7889], // Mangatarem
-            zoom: 14.5,
-            pitch: 60,
-            bearing: -15,
-            antialias: true
-        });
-    } else {
-        // Initialize Leaflet
-        map = L.map('map', {
-            zoomControl: false // We'll add it manually or use custom controls
-        }).setView([15.7889, 120.2986], 15);
-        
-        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-            attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
-        }).addTo(map);
-        
-        // Add zoom control to bottom left to match Mapbox layout
-        L.control.zoom({ position: 'bottomleft' }).addTo(map);
-    }
+    const MAP_STYLES = {
+        mapbox: {
+            light: 'mapbox://styles/mapbox/light-v11',
+            dark: 'mapbox://styles/mapbox/dark-v11',
+            streets: 'mapbox://styles/mapbox/streets-v12',
+            satellite: 'mapbox://styles/mapbox/satellite-streets-v12'
+        },
+        leaflet: {
+            light: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+            dark: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+            streets: 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+            satellite: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+        }
+    };
 
     // ========================================
     // 2. CORE MAP EVENTS
     // ========================================
     const onMapLoad = () => {
+        console.log("🗺️ Map Engine Ready:", isLeafletMode ? "Leaflet" : "Mapbox");
+        
         if (!isLeafletMode) {
             add3DBuildings(map);
         }
@@ -68,6 +60,12 @@ document.addEventListener('DOMContentLoaded', function () {
         initModal();
         initNavigation();
         initNavPanel();
+        initMapServiceSwitcher();
+        
+        // Fetch bookmarks if logged in
+        if (window.USER_AUTH) {
+            fetchBookmarks();
+        }
         
         if (!isLeafletMode) {
             // Add native Geolocate Control for real-time tracking
@@ -83,6 +81,11 @@ document.addEventListener('DOMContentLoaded', function () {
             map.addControl(new mapboxgl.NavigationControl(), 'bottom-left');
         }
 
+        // Re-initialize SheetManager if service switched
+        if (window.sheetManager) {
+            window.sheetManager.map = map;
+        }
+
         // Initial Fetch
         fetchData();
 
@@ -90,11 +93,80 @@ document.addEventListener('DOMContentLoaded', function () {
         flyToCoords([120.2986, 15.7889], 15.5);
     };
 
-    if (!isLeafletMode) {
-        map.on('load', onMapLoad);
-    } else {
-        onMapLoad(); // Leaflet is ready immediately or after setView
+    let map;
+    let isLeafletMode = state.mapService === 'leaflet';
+
+    function initMapInstance() {
+        // Clear previous map if exists
+        if (map) {
+            if (isLeafletMode) {
+                map.remove();
+            } else {
+                map.remove();
+            }
+            const mapContainer = document.getElementById('map');
+            mapContainer.innerHTML = '';
+        }
+
+        isLeafletMode = state.mapService === 'leaflet';
+
+        if (!isLeafletMode && hasMapboxToken) {
+            mapboxgl.accessToken = window.MAPBOX_TOKEN;
+            map = new mapboxgl.Map({
+                container: 'map',
+                style: MAP_STYLES.mapbox[state.mapStyle] || MAP_STYLES.mapbox.light,
+                center: [120.2986, 15.7889], // Mangatarem
+                zoom: 14.5,
+                pitch: 60,
+                bearing: -15,
+                antialias: true
+            });
+            map.on('load', onMapLoad);
+        } else {
+            if (!hasMapboxToken && state.mapService === 'mapbox') {
+                console.warn("⚠️ Mapbox token missing but requested. Forcing Leaflet.");
+                state.mapService = 'leaflet';
+                isLeafletMode = true;
+            }
+
+            // Initialize Leaflet with safety check
+            if (typeof L === 'undefined') {
+                console.error("❌ Leaflet library (L) is not loaded. Check CSP or network.");
+                const mapContainer = document.getElementById('map');
+                if (mapContainer) {
+                    mapContainer.innerHTML = `
+                        <div class="flex flex-col items-center justify-center h-full p-8 text-center bg-gray-50">
+                            <div class="w-16 h-16 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center mb-4">
+                                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                            </div>
+                            <h3 class="text-lg font-bold text-gray-900 mb-2">Map Engine Blocked</h3>
+                            <p class="text-sm text-gray-500 mb-6">Your browser blocked the map library. This is usually due to a cached security policy.</p>
+                            <button onclick="location.reload(true)" class="px-6 py-2 bg-[#00ED64] text-gray-900 font-bold rounded-xl shadow-lg">Force Refresh</button>
+                        </div>
+                    `;
+                }
+                return;
+            }
+
+            map = L.map('map', {
+                zoomControl: false 
+            }).setView([15.7889, 120.2986], 15);
+            
+            const tileUrl = MAP_STYLES.leaflet[state.mapStyle] || MAP_STYLES.leaflet.light;
+            window.baseLayer = L.tileLayer(tileUrl, {
+                attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+            }).addTo(map);
+            
+            L.control.zoom({ position: 'bottomleft' }).addTo(map);
+            
+            onMapLoad(); 
+        }
     }
+
+    // Initial Map Load
+    initMapInstance();
 
     // ========================================
     // 3. DATA FETCHING & RENDERING
@@ -201,11 +273,14 @@ document.addEventListener('DOMContentLoaded', function () {
             const img = place.image || place.cover_image_url || PLACEHOLDER_IMG;
             const distLabel = place.dist ? `<span class="text-[10px] text-[#008F3C] font-bold">${place.dist.toFixed(2)} km away</span>` : '';
             
+            const isBookmarked = (place.type === 'attraction' && state.bookmarkedIds.attractions.includes(place.id)) ||
+                                 (place.type === 'establishment' && state.bookmarkedIds.establishments.includes(place.id));
+            
             card.innerHTML = `
                 <img src="${img}" class="place-img" alt="${place.name}" onerror="this.src='${PLACEHOLDER_IMG}'">
                 <div class="flex-1">
                     <div class="flex justify-between items-start">
-                        <h3 class="text-sm font-bold text-gray-900 line-clamp-1">${place.name}</h3>
+                        <h3 class="text-sm font-bold text-gray-900 line-clamp-1 pr-8">${place.name}</h3>
                         ${distLabel}
                     </div>
                     <p class="text-[11px] text-gray-400 font-medium mt-0.5">${place.category || 'Spot'} • ${place.barangay || 'Mangatarem'}</p>
@@ -214,7 +289,18 @@ document.addEventListener('DOMContentLoaded', function () {
                         <span class="text-[11px] font-bold text-gray-600">${(place.rating || place.rating_avg || 4.5).toFixed(1)}</span>
                     </div>
                 </div>
+                <button class="card-bookmark-btn ${isBookmarked ? 'active' : ''}" data-id="${place.id}" data-type="${place.type}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                    </svg>
+                </button>
             `;
+            
+            const bookmarkBtn = card.querySelector('.card-bookmark-btn');
+            bookmarkBtn.onclick = (e) => {
+                e.stopPropagation();
+                handleToggleBookmark(place.id, place.type, bookmarkBtn);
+            };
             
             card.onclick = () => {
                 flyToPlace(place);
@@ -283,6 +369,18 @@ document.addEventListener('DOMContentLoaded', function () {
         const description = document.getElementById('modal-description');
         const viewDetails = document.getElementById('modal-view-details');
         const directionsBtn = document.getElementById('modal-directions');
+        const bookmarkBtn = document.getElementById('modal-bookmark');
+
+        const isBookmarked = (place.type === 'attraction' && state.bookmarkedIds.attractions.includes(place.id)) ||
+                             (place.type === 'establishment' && state.bookmarkedIds.establishments.includes(place.id));
+        
+        if (bookmarkBtn) {
+            bookmarkBtn.classList.toggle('active', isBookmarked);
+            bookmarkBtn.onclick = (e) => {
+                e.stopPropagation();
+                handleToggleBookmark(place.id, place.type, bookmarkBtn);
+            };
+        }
 
         img.src = place.image || place.cover_image_url || PLACEHOLDER_IMG;
         title.textContent = place.name;
@@ -325,6 +423,114 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         overlay.classList.add('active');
+    }
+
+    async function fetchBookmarks() {
+        try {
+            const res = await fetch('/user/favorites/ids');
+            const data = await res.json();
+            if (data.success) {
+                state.bookmarkedIds = {
+                    attractions: data.attractions || [],
+                    establishments: data.establishments || []
+                };
+                applyFilters(); // Re-render to show bookmark state
+            }
+        } catch (error) {
+            console.error('Error fetching bookmarks:', error);
+        }
+    }
+
+    async function handleToggleBookmark(id, type, btnElement) {
+        if (!window.USER_AUTH) {
+            Swal.fire({
+                title: 'Login Required',
+                text: 'You need to be logged in to bookmark places.',
+                icon: 'info',
+                showCancelButton: true,
+                confirmButtonText: 'Log In',
+                confirmButtonColor: '#00ED64',
+                cancelButtonColor: '#9CA3AF'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = '/auth/login?next=' + encodeURIComponent(window.location.pathname);
+                }
+            });
+            return;
+        }
+
+        const isAdding = !btnElement.classList.contains('active');
+        
+        // Optimistic UI update
+        btnElement.classList.toggle('active');
+        
+        // Update all instances of this bookmark button (modal and sidebar)
+        const allBtns = document.querySelectorAll(`[data-id="${id}"][data-type="${type}"]`);
+        allBtns.forEach(btn => btn.classList.toggle('active', isAdding));
+        if (document.getElementById('modal-bookmark')) {
+            // Check if current modal matches this ID
+            if (state.selectedPlace && state.selectedPlace.id === id && state.selectedPlace.type === type) {
+                document.getElementById('modal-bookmark').classList.toggle('active', isAdding);
+            }
+        }
+
+        // Update state
+        const listName = type === 'attraction' ? 'attractions' : 'establishments';
+        if (isAdding) {
+            if (!state.bookmarkedIds[listName].includes(id)) {
+                state.bookmarkedIds[listName].push(id);
+            }
+        } else {
+            state.bookmarkedIds[listName] = state.bookmarkedIds[listName].filter(bid => bid !== id);
+        }
+
+        try {
+            const res = await fetch('/user/favorites/toggle', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken() // Need to ensure getCsrfToken exists or use standard way
+                },
+                body: JSON.stringify({
+                    target_type: type,
+                    target_id: id
+                })
+            });
+            const data = await res.json();
+            if (!data.success) {
+                throw new Error(data.error || 'Failed to toggle bookmark');
+            }
+            
+            // Success - show subtle toast
+            const action = isAdding ? 'Added to' : 'Removed from';
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 2000,
+                timerProgressBar: true
+            });
+            Toast.fire({
+                icon: 'success',
+                title: `${action} bookmarks`
+            });
+
+        } catch (error) {
+            console.error('Bookmark toggle error:', error);
+            // Revert on error
+            btnElement.classList.toggle('active');
+            allBtns.forEach(btn => btn.classList.toggle('active', !isAdding));
+            if (isAdding) {
+                state.bookmarkedIds[listName] = state.bookmarkedIds[listName].filter(bid => bid !== id);
+            } else {
+                state.bookmarkedIds[listName].push(id);
+            }
+            Swal.fire('Error', 'Could not update bookmark. Please try again.', 'error');
+        }
+    }
+
+    function getCsrfToken() {
+        return document.querySelector('meta[name="csrf-token"]')?.content || '';
     }
 
     function initModal() {
@@ -456,20 +662,54 @@ document.addEventListener('DOMContentLoaded', function () {
         console.log("🛣️ [Routing] Calculating route:", { origin, destination, mode });
         
         if (isLeafletMode) {
-            // Fallback for Leaflet: Just link to Google Maps for now or show warning
-            // Mapbox Directions API requires a token.
-            Swal.fire({
-                title: 'Directions',
-                text: 'Directions require a Mapbox API key. Opening in Google Maps instead.',
-                icon: 'info',
-                showCancelButton: true,
-                confirmButtonText: 'Open Google Maps'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    window.open(`https://www.google.com/maps/dir/?api=1&origin=${origin.lat},${origin.lng}&destination=${destination.lat},${destination.lng}&travelmode=${mode}`, '_blank');
+            try {
+                state.currentNavMode = mode;
+                state.isNavigating = true;
+
+                const profile = mode === 'driving' ? 'driving' : mode === 'walking' ? 'walking' : 'cycling';
+                // Using OSRM Public Demo Server
+                const url = `https://router.project-osrm.org/route/v1/${profile}/${origin.lng},${origin.lat};${destination.lng},${destination.lat}?overview=full&geometries=geojson&steps=true`;
+                console.log("🌐 [Routing] Fetching from OSRM:", url);
+
+                const response = await fetch(url);
+                const json = await response.json();
+
+                if (json.code !== 'Ok' || !json.routes || json.routes.length === 0) {
+                    Swal.fire('Route Not Found', 'No route found for this destination.', 'warning');
+                    return;
                 }
-            });
-            return;
+
+                const data = json.routes[0];
+                const routeCoords = data.geometry.coordinates; // OSRM GeoJSON is [lng, lat]
+                
+                // Remove existing route
+                if (state.currentRouteLayer) {
+                    map.removeLayer(state.currentRouteLayer);
+                }
+
+                // Convert [lng, lat] to [lat, lng] for Leaflet
+                const leafletCoords = routeCoords.map(coord => [coord[1], coord[0]]);
+                
+                state.currentRouteLayer = L.polyline(leafletCoords, {
+                    color: '#00ED64',
+                    weight: 6,
+                    opacity: 0.8,
+                    lineJoin: 'round'
+                }).addTo(map);
+
+                // Zoom to fit
+                map.fitBounds(state.currentRouteLayer.getBounds(), {
+                    padding: [50, 50]
+                });
+
+                // Update Side Panel
+                updateNavigationUI(data);
+                return;
+            } catch (error) {
+                console.error('OSRM Routing error:', error);
+                Swal.fire('Error', 'Could not calculate route via OSRM.', 'error');
+                return;
+            }
         }
 
         if (!origin || !destination || isNaN(origin.lat) || isNaN(origin.lng) || isNaN(destination.lat) || isNaN(destination.lng)) {
@@ -501,34 +741,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             
             // Show Panel
-            const navPanel = document.getElementById('nav-panel');
-            if (navPanel) {
-                navPanel.classList.remove('hidden');
-                document.getElementById('nav-dest-input').value = state.selectedPlace?.name || 'Destination';
-                document.getElementById('route-summary').textContent = `${(data.distance / 1000).toFixed(1)} km • ${Math.round(data.duration / 60)} min`;
-                
-                // Populate Instructions
-                const instructionsEl = document.getElementById('nav-instructions');
-                if (instructionsEl) {
-                    instructionsEl.innerHTML = data.legs[0].steps.map(step => {
-                        let icon = '●';
-                        if (step.maneuver.type.includes('turn')) {
-                            icon = step.maneuver.modifier.includes('right') ? '→' : '←';
-                        }
-                        return `
-                            <div class="instruction-step">
-                                <div class="w-6 h-6 flex items-center justify-center bg-[#00ED64]/10 rounded-lg shrink-0 text-[#00ED64] text-[10px] font-bold">
-                                    ${icon}
-                                </div>
-                                <div>
-                                    <p class="text-[11px] text-gray-800 font-bold leading-tight">${step.maneuver.instruction}</p>
-                                    <p class="text-[9px] text-gray-400 mt-0.5">${(step.distance / 1000).toFixed(2)} km</p>
-                                </div>
-                            </div>
-                        `;
-                    }).join('');
-                }
-            }
+            updateNavigationUI(data);
 
             const geojson = {
                 type: 'Feature',
@@ -595,8 +808,19 @@ document.addEventListener('DOMContentLoaded', function () {
         if (closeBtn) {
             closeBtn.onclick = () => {
                 navPanel.classList.add('hidden');
-                if (map.getLayer('route')) map.removeLayer('route');
-                if (map.getSource('route')) map.removeSource('route');
+                
+                // Clear Mapbox Route
+                if (!isLeafletMode) {
+                    if (map.getLayer('route')) map.removeLayer('route');
+                    if (map.getSource('route')) map.removeSource('route');
+                } 
+                
+                // Clear Leaflet Route
+                if (state.currentRouteLayer) {
+                    map.removeLayer(state.currentRouteLayer);
+                    state.currentRouteLayer = null;
+                }
+                
                 state.isNavigating = false;
             };
         }
@@ -615,6 +839,46 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             };
         });
+    }
+
+    // Helper to share UI update logic between engines - Moved to outer scope for accessibility
+    function updateNavigationUI(data) {
+        const navPanel = document.getElementById('nav-panel');
+        if (navPanel) {
+            navPanel.classList.remove('hidden');
+            document.getElementById('nav-dest-input').value = state.selectedPlace?.name || 'Destination';
+            document.getElementById('route-summary').textContent = `${(data.distance / 1000).toFixed(1)} km • ${Math.round(data.duration / 60)} min`;
+            
+            // Populate Instructions
+            const instructionsEl = document.getElementById('nav-instructions');
+            if (instructionsEl) {
+                instructionsEl.innerHTML = data.legs[0].steps.map(step => {
+                    let icon = '●';
+                    if (step.maneuver.type && step.maneuver.type.includes('turn')) {
+                        icon = (step.maneuver.modifier && step.maneuver.modifier.includes('right')) ? '→' : '←';
+                    }
+                    return `
+                        <div class="instruction-step">
+                            <div class="w-6 h-6 flex items-center justify-center bg-[#00ED64]/10 rounded-lg shrink-0 text-[#00ED64] text-[10px] font-bold">
+                                ${icon}
+                            </div>
+                            <div>
+                                <p class="text-[11px] text-gray-800 font-bold leading-tight">${step.maneuver.instruction}</p>
+                                <p class="text-[9px] text-gray-400 mt-0.5">${(step.distance / 1000).toFixed(2)} km</p>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        // Update stats in bottom sheet
+        const distEl = document.getElementById('stat-distance');
+        const timeEl = document.getElementById('stat-time');
+        if (distEl && timeEl) {
+            distEl.textContent = `${(data.distance / 1000).toFixed(1)} KM`;
+            timeEl.textContent = `${Math.round(data.duration / 60)} Min`;
+        }
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -656,6 +920,119 @@ document.addEventListener('DOMContentLoaded', function () {
         searchInput.onfocus = () => {
             if (window.sheetManager) window.sheetManager.snapTo('full');
         };
+    }
+
+    function initMapServiceSwitcher() {
+        const btn = document.getElementById('map-service-btn');
+        const menu = document.getElementById('map-service-menu');
+        const serviceOptions = document.querySelectorAll('.service-option');
+        const styleOptions = document.querySelectorAll('.style-option');
+
+        if (!btn || !menu) return;
+
+        // Set initial active states
+        serviceOptions.forEach(opt => {
+            opt.classList.toggle('active', opt.dataset.service === state.mapService);
+        });
+        styleOptions.forEach(opt => {
+            opt.classList.toggle('active', opt.dataset.style === state.mapStyle);
+        });
+
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            menu.classList.toggle('active');
+        };
+
+        serviceOptions.forEach(opt => {
+            opt.onclick = () => {
+                const newService = opt.dataset.service;
+                if (newService === state.mapService) return;
+
+                serviceOptions.forEach(o => o.classList.remove('active'));
+                opt.classList.add('active');
+                
+                menu.classList.remove('active');
+                switchMapService(newService);
+            };
+        });
+
+        styleOptions.forEach(opt => {
+            opt.onclick = () => {
+                const newStyle = opt.dataset.style;
+                if (newStyle === state.mapStyle) return;
+
+                styleOptions.forEach(o => o.classList.remove('active'));
+                opt.classList.add('active');
+                
+                switchMapStyle(newStyle);
+            };
+        });
+
+        // Close menu on click outside
+        document.addEventListener('click', (e) => {
+            if (!menu.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
+                menu.classList.remove('active');
+            }
+        });
+    }
+
+    function switchMapStyle(newStyle) {
+        console.log(`🎨 Switching map style to: ${newStyle}`);
+        state.mapStyle = newStyle;
+        localStorage.setItem('gomangatarem_map_style', newStyle);
+
+        if (!isLeafletMode) {
+            // Mapbox style switch
+            const styleUrl = MAP_STYLES.mapbox[newStyle];
+            if (styleUrl) {
+                map.setStyle(styleUrl);
+                // We need to re-add things like 3D buildings and custom layers when style changes
+                map.once('style.load', () => {
+                    add3DBuildings(map);
+                    // If directions was active, we might need to re-add the route source/layer
+                    if (state.isNavigating && state.userLocation && state.selectedPlace) {
+                        getRoute(state.userLocation, {
+                            lat: state.selectedPlace.latitude || state.selectedPlace.lat,
+                            lng: state.selectedPlace.longitude || state.selectedPlace.lng
+                        }, state.currentNavMode);
+                    }
+                });
+            }
+        } else {
+            // Leaflet style switch
+            const tileUrl = MAP_STYLES.leaflet[newStyle];
+            if (tileUrl && window.baseLayer) {
+                map.removeLayer(window.baseLayer);
+                window.baseLayer = L.tileLayer(tileUrl, {
+                    attribution: '&copy; OpenStreetMap contributors &copy; CARTO'
+                }).addTo(map);
+            }
+        }
+    }
+
+    function switchMapService(newService) {
+        console.log(`🔄 Switching map service to: ${newService}`);
+        
+        // Save to state and persistence
+        state.mapService = newService;
+        localStorage.setItem('gomangatarem_map_service', newService);
+
+        // Optional: Show loading state
+        Swal.fire({
+            title: 'Updating Map...',
+            text: 'Switching map engines.',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => {
+                Swal.showLoading()
+            },
+            timer: 1000
+        });
+
+        // Re-init map
+        setTimeout(() => {
+            initMapInstance();
+        }, 300);
     }
 
     function initNearMe() {
@@ -743,12 +1120,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                     applyFilters();
                     
-                    map.flyTo({
-                        center: [coords.lng, coords.lat],
-                        zoom: 15,
-                        pitch: 45,
-                        duration: 2000
-                    });
+                    flyToCoords([coords.lng, coords.lat], 15, 45);
 
                     // Start watching position for "navigation" feel
                     if (!window.positionWatcher) {
@@ -1018,27 +1390,37 @@ document.addEventListener('DOMContentLoaded', function () {
      * Adds 3D buildings with a clean white/gray look
      */
     function add3DBuildings(map) {
-        const layers = map.getStyle().layers;
-        const labelLayerId = layers.find(
-            (layer) => layer.type === 'symbol' && layer.layout['text-field']
-        ).id;
+        if (!map || isLeafletMode) return;
+        if (map.getLayer('3d-buildings')) return;
 
-        map.addLayer(
-            {
-                'id': '3d-buildings',
-                'source': 'composite',
-                'source-layer': 'building',
-                'filter': ['==', 'extrude', 'true'],
-                'type': 'fill-extrusion',
-                'minzoom': 15,
-                'paint': {
-                    'fill-extrusion-color': '#ffffff', 
-                    'fill-extrusion-height': ['get', 'height'],
-                    'fill-extrusion-base': ['get', 'min_height'],
-                    'fill-extrusion-opacity': 0.8
-                }
-            },
-            labelLayerId
+        const style = map.getStyle();
+        if (!style || !style.layers) return;
+
+        const labelLayer = style.layers.find(
+            (layer) => layer.type === 'symbol' && layer.layout && layer.layout['text-field']
         );
+        const labelLayerId = labelLayer ? labelLayer.id : undefined;
+
+        try {
+            map.addLayer(
+                {
+                    'id': '3d-buildings',
+                    'source': 'composite',
+                    'source-layer': 'building',
+                    'filter': ['==', 'extrude', 'true'],
+                    'type': 'fill-extrusion',
+                    'minzoom': 15,
+                    'paint': {
+                        'fill-extrusion-color': '#ffffff', 
+                        'fill-extrusion-height': ['get', 'height'],
+                        'fill-extrusion-base': ['get', 'min_height'],
+                        'fill-extrusion-opacity': 0.8
+                    }
+                },
+                labelLayerId
+            );
+        } catch (e) {
+            console.warn("⚠️ Could not add 3D buildings to this style:", e);
+        }
     }
 });

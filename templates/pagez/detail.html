@@ -8,6 +8,7 @@
 <script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js') }}"></script>
 
 <script src="{{ url_for('static', filename='js/pages/detail.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/pages/reviews.js') }}" defer></script>
 {% endblock %}
 
 {% block meta_description %}
@@ -108,6 +109,130 @@
                             </div>
                         </div>
                         {% endif %}
+
+                        {# ════════════════════════════════════════════
+                           COMMUNITY REVIEWS SECTION
+                        ════════════════════════════════════════════ #}
+                        <div class="mb-2" id="reviews-section" data-attraction-id="{{ attraction.id }}">
+                            <div class="flex items-center gap-4 mb-8">
+                                <span class="w-12 h-px bg-emerald-900/10"></span>
+                                <span class="text-xs font-bold text-emerald-600 uppercase tracking-[0.2em]">Community Reviews</span>
+                                <span class="w-12 h-px bg-emerald-900/10"></span>
+                            </div>
+
+                            {# Rating Summary Bar #}
+                            <div class="review-summary-bar bg-emerald-50 rounded-3xl p-8 mb-8 hidden" id="review-summary">
+                                <div class="flex items-center gap-8 flex-wrap">
+                                    <div class="text-center">
+                                        <div class="text-5xl font-black text-emerald-950" id="avg-rating">—</div>
+                                        <div class="flex justify-center gap-1 mt-2" id="avg-stars"></div>
+                                        <p class="text-[10px] font-bold text-emerald-900/50 uppercase tracking-widest mt-1" id="total-reviews"></p>
+                                    </div>
+                                    <div class="flex-1 min-w-[160px]" id="rating-distribution">
+                                        {# Filled by JS #}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {# Review Cards Feed #}
+                            <div class="space-y-6" id="reviews-feed">
+                                <div class="flex justify-center py-10" id="reviews-loading">
+                                    <div class="w-8 h-8 border-4 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
+                                </div>
+                            </div>
+
+                            {# Load More #}
+                            <div class="text-center mt-6 hidden" id="load-more-container">
+                                <button id="load-more-btn"
+                                    class="px-8 py-3 bg-white border border-emerald-900/10 text-emerald-800 font-bold text-sm rounded-2xl hover:bg-emerald-50 transition-all shadow-sm">
+                                    Load more reviews
+                                </button>
+                            </div>
+                        </div>
+
+                        {# ════════════════════════════════════════════
+                           SUBMIT A REVIEW
+                        ════════════════════════════════════════════ #}
+                        {% if current_user.is_authenticated %}
+                        <div class="mt-10 pt-10 border-t border-emerald-900/5" id="write-review">
+                            <div class="flex items-center gap-4 mb-8">
+                                <span class="w-12 h-px bg-emerald-900/10"></span>
+                                <span class="text-xs font-bold text-emerald-600 uppercase tracking-[0.2em]">Write a Review</span>
+                                <span class="w-12 h-px bg-emerald-900/10"></span>
+                            </div>
+
+                            <form id="review-form" enctype="multipart/form-data"
+                                  action="{{ url_for('attractions.post_review', id=attraction.id) }}">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                                {# Star Rating Selector #}
+                                <div class="mb-6">
+                                    <label class="block text-xs font-bold text-emerald-900/50 uppercase tracking-widest mb-3">Your Rating</label>
+                                    <div class="star-selector flex gap-2" id="star-selector" role="group" aria-label="Rating">
+                                        {% for i in range(1, 6) %}
+                                        <button type="button" class="star-btn text-4xl transition-all duration-150 text-emerald-900/15 hover:text-amber-400 hover:scale-110"
+                                                data-value="{{ i }}" aria-label="{{ i }} star{{ 's' if i != 1 }}"
+                                                title="{{ i }} star{{ 's' if i != 1 }}">
+                                            ★
+                                        </button>
+                                        {% endfor %}
+                                    </div>
+                                    <input type="hidden" name="rating" id="rating-input" required>
+                                    <p class="text-xs text-red-500 mt-1 hidden" id="rating-error">Please select a star rating.</p>
+                                </div>
+
+                                {# Comment Textarea #}
+                                <div class="mb-6">
+                                    <label for="review-comment" class="block text-xs font-bold text-emerald-900/50 uppercase tracking-widest mb-3">Your Experience <span class="normal-case font-medium opacity-60">(optional)</span></label>
+                                    <textarea id="review-comment" name="comment" rows="4"
+                                        class="w-full border border-emerald-900/10 rounded-2xl px-6 py-4 text-emerald-950 text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-emerald-400 transition-all resize-none bg-emerald-50/50"
+                                        placeholder="Share what you loved, tips for future visitors, best time to go..."></textarea>
+                                    <p class="text-right text-[10px] text-emerald-900/30 mt-1" id="char-count">0 / 1000</p>
+                                </div>
+
+                                {# Photo Upload Drop Zone #}
+                                <div class="mb-8">
+                                    <label class="block text-xs font-bold text-emerald-900/50 uppercase tracking-widest mb-3">Photos <span class="normal-case font-medium opacity-60">(up to 5, optional)</span></label>
+                                    <div id="drop-zone"
+                                        class="border-2 border-dashed border-emerald-900/15 rounded-3xl p-10 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50/50 transition-all group">
+                                        <div class="text-4xl mb-3">📷</div>
+                                        <p class="text-sm font-bold text-emerald-900/60">Drag & drop photos here</p>
+                                        <p class="text-[10px] text-emerald-900/30 mt-1">or click to browse · JPG, PNG, WebP · max 5MB each</p>
+                                        <input type="file" name="photos" id="photo-input"
+                                               accept="image/jpeg,image/png,image/webp"
+                                               multiple class="hidden">
+                                    </div>
+                                    <div class="flex flex-wrap gap-3 mt-4" id="photo-preview"></div>
+                                </div>
+
+                                {# Submit #}
+                                <div id="review-feedback" class="hidden mb-4"></div>
+                                <button type="submit" id="review-submit"
+                                    class="w-full bg-emerald-600 text-white font-bold py-5 px-8 rounded-3xl hover:bg-emerald-500 transition-all duration-300 shadow-lg shadow-emerald-600/20 flex items-center justify-center gap-3 group">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                                    </svg>
+                                    Submit Review
+                                </button>
+                            </form>
+                        </div>
+                        {% else %}
+                        {# CTA for non-logged-in visitors #}
+                        <div class="mt-10 pt-10 border-t border-emerald-900/5">
+                            <div class="bg-emerald-950 rounded-3xl p-10 text-center text-white relative overflow-hidden">
+                                <div class="absolute -top-10 -right-10 w-40 h-40 bg-emerald-500/10 rounded-full blur-3xl"></div>
+                                <div class="text-3xl mb-4">✍️</div>
+                                <h3 class="text-xl font-cultural font-bold mb-2">Share Your Experience</h3>
+                                <p class="text-emerald-200/80 text-sm mb-6">Have you visited this place? Sign in to leave a review and help other travelers.</p>
+                                <a href="{{ url_for('auth.login') }}?next={{ request.url | urlencode }}"
+                                   class="inline-flex items-center gap-2 bg-emerald-500 text-white font-bold py-3 px-8 rounded-2xl hover:bg-emerald-400 transition-all">
+                                    Sign In to Review
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+                                </a>
+                            </div>
+                        </div>
+                        {% endif %}
                     </div>
 
                     <div class="mt-12 pt-12 border-t border-emerald-900/5 grid grid-cols-2 md:grid-cols-4 gap-8">
@@ -184,6 +309,28 @@
                             </div>
                         </div>
 
+                        <!-- User Engagement Actions -->
+                        {% if current_user.is_authenticated and current_user.role == 'user' %}
+                        <div class="flex gap-4 mb-6">
+                            <button id="toggle-favorite" 
+                                    data-id="{{ attraction.id }}" 
+                                    data-type="attraction"
+                                    class="flex-1 flex items-center justify-center gap-2 py-4 rounded-3xl border-2 transition-all font-bold text-sm {{ 'bg-red-500 border-red-500 text-white' if is_favorite else 'bg-transparent border-white/20 text-white hover:border-red-500 hover:bg-red-500' }}">
+                                <svg class="w-5 h-5 {{ 'fill-current' if is_favorite else 'fill-none stroke-current' }}" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                                {{ 'Saved' if is_favorite else 'Favorite' }}
+                            </button>
+                            <button id="open-visit-modal" 
+                                    class="flex-1 flex items-center justify-center gap-2 py-4 rounded-3xl border-2 bg-transparent border-white/20 text-white hover:border-emerald-400 hover:bg-emerald-400/20 transition-all font-bold text-sm">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                                </svg>
+                                Visited
+                            </button>
+                        </div>
+                        {% endif %}
+
                         <a href="https://www.google.com/maps/search/?api=1&query={{ attraction.lat }},{{ attraction.lng }}"
                             target="_blank"
                             class="flex items-center justify-center gap-3 bg-emerald-500 text-white font-bold py-5 px-8 rounded-3xl hover:bg-emerald-400 transition-all duration-300 w-full group shadow-lg shadow-emerald-500/20">
@@ -196,6 +343,10 @@
                         </a>
                     </div>
                 </div>
+
+                <!-- Include Visit Modal -->
+                {% include 'includes/user_actions_modal.html' %}
+                <script src="{{ url_for('static', filename='js/pages/user-actions.js') }}" defer></script>
 
                 <!-- Related Explorations -->
                 {% if nearby %}

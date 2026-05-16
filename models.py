@@ -8,13 +8,13 @@ import secrets
 from modules.auth.models import User, PasswordResetToken
 
 # attractions models shim
-from modules.attractions.models import Attraction, AttractionReview, UserFavoriteAttraction
+from modules.attractions.models import Attraction, AttractionReview, ReviewPhoto, UserFavoriteAttraction
 
 # events models shim
 from modules.events.models import Event, UserEventInterest
 
 # business models shim
-from modules.business.models import Establishment, EstablishmentRoom, EstablishmentMenuItem, EstablishmentReview
+from modules.business.models import Establishment, EstablishmentRoom, EstablishmentMenuItem, EstablishmentReview, UserFavoriteEstablishment
 
 # barangay models shim
 from modules.barangay.models import BarangayInfo
@@ -26,7 +26,7 @@ from modules.heritage.models import HeritageProfile
 from modules.gallery.models import GalleryItem
 
 # analytics models shim
-from modules.analytics.models import AnalyticsPageView, DatabaseAuditLog
+from modules.analytics.models import AnalyticsPageView, DatabaseAuditLog, VisitorLog
 
 # notifications models shim
 from modules.notifications.models import NewsletterSubscriber

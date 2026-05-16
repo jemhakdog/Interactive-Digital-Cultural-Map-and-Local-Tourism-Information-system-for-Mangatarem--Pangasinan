@@ -108,3 +108,11 @@ class EstablishmentReview(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship('User', backref=db.backref('establishment_reviews', lazy=True))
+
+
+class UserFavoriteEstablishment(db.Model):
+    __tablename__ = 'USER_FAVORITE_ESTABLISHMENT'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=False)
+    establishment_id = db.Column(db.Integer, db.ForeignKey("ESTABLISHMENT.id"), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

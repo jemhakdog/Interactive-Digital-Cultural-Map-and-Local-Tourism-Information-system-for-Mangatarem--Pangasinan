@@ -188,10 +188,12 @@ def _register_error_handlers(app: Flask) -> None:
 def _register_context_processors(app: Flask) -> None:
     """Register variables available in all templates."""
     @app.context_processor
-    def inject_config():
+    def inject_utilities():
+        from datetime import datetime
         return dict(
             config=app.config,
-            mapbox_token=os.environ.get("mapbox_token") or os.environ.get("MAPBOX_TOKEN", "")
+            mapbox_token=os.environ.get("mapbox_token") or os.environ.get("MAPBOX_TOKEN", ""),
+            now=datetime.utcnow
         )
 
 
@@ -227,11 +229,11 @@ def _register_request_hooks(app: Flask) -> None:
         # Content Security Policy - Prevents XSS by restricting resource sources
         csp_policies = {
             "default-src": "'self'",
-            "script-src": "'self' https://fonts.googleapis.com https://maps.mapbox.com https://api.mapbox.com https://accounts.google.com https://unpkg.com https://vercel.live https://*.vercel.live 'unsafe-inline' 'unsafe-eval'",
-            "style-src": "'self' https://fonts.googleapis.com https://api.mapbox.com https://unpkg.com https://vercel.live 'unsafe-inline'",
-            "img-src": "'self' data: https: blob: https://vercel.com https://*.vercel.com",
+            "script-src": "'self' https://fonts.googleapis.com https://maps.mapbox.com https://api.mapbox.com https://accounts.google.com https://unpkg.com https://cdn.jsdelivr.net https://*.jsdelivr.net https://vercel.live https://*.vercel.live 'unsafe-inline' 'unsafe-eval'",
+            "style-src": "'self' https://fonts.googleapis.com https://api.mapbox.com https://unpkg.com https://cdn.jsdelivr.net https://*.jsdelivr.net https://vercel.live 'unsafe-inline'",
+            "img-src": "'self' data: https: blob: https://vercel.com https://*.vercel.com https://*.basemaps.cartocdn.com https://*.arcgisonline.com",
             "font-src": "'self' https://fonts.gstatic.com data:",
-            "connect-src": "'self' https://*.basemaps.cartocdn.com https://unpkg.com https://fonts.googleapis.com https://fonts.gstatic.com https://placehold.co https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com https://*.supabase.co https://*.upstash.io https://accounts.google.com https://vercel.live https://*.vercel.live wss://*.vercel.live",
+            "connect-src": "'self' https://router.project-osrm.org https://*.basemaps.cartocdn.com https://unpkg.com https://cdn.jsdelivr.net https://*.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://placehold.co https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com https://*.supabase.co https://*.upstash.io https://accounts.google.com https://vercel.live https://*.vercel.live wss://*.vercel.live https://*.arcgisonline.com",
             "worker-src": "'self' blob:",
             "frame-ancestors": "'none'",
             "base-uri": "'self'",
@@ -288,8 +290,8 @@ def _apply_cache_headers(response, path: str) -> None:
     if any(path.startswith(p) for p in no_cache_prefixes):
         response.headers["Cache-Control"] = "private, no-store"
     elif "text/html" in response.content_type:
-        # Long-term edge cache (5 mins) with stale-while-revalidate (10 mins)
-        response.headers["Cache-Control"] = "public, max-age=60, s-maxage=300, stale-while-revalidate=600"
+        # Disable cache for HTML temporarily to force CSP update
+        response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"
     elif any(path.endswith(ext) for ext in (".js", ".css", ".png", ".jpg", ".webp", ".woff2")):
         # Immutable assets (1 year)
         response.headers["Cache-Control"] = "public, max-age=31536000, immutable"

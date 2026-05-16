@@ -117,7 +117,16 @@
                                 </div>
                                 <div>
                                     {% if item.status == 'approved' %}
-                                        <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase rounded-full">Approved</span>
+                                        <div class="flex flex-col items-end gap-2">
+                                            <span class="px-3 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase rounded-full">Approved</span>
+                                            {% if item.type == 'Attraction' %}
+                                            <a href="{{ url_for('analytics_module.log_visitor', target_type='attraction', target_id=item.id) }}" 
+                                               class="text-[10px] font-black text-blue-600 uppercase hover:underline flex items-center gap-1">
+                                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
+                                                Log Visit
+                                            </a>
+                                            {% endif %}
+                                        </div>
                                     {% elif item.status == 'rejected' %}
                                         <span class="px-3 py-1 bg-rose-100 text-rose-700 text-[10px] font-black uppercase rounded-full">Rejected</span>
                                     {% else %}

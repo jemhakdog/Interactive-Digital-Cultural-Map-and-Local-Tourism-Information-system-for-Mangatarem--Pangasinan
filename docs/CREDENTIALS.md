@@ -12,6 +12,8 @@ This document lists the default credentials for testing and development in the *
 | **System Admin** | `admin` | `admin123` | Full control over users, heritage approvals, and site settings. |
 | **Dining Owner** | `dining_owner` | `dining123` | Can manage Restaurant/Cafe menus and reviews. |
 | **Hospitality Owner** | `hospitality_owner` | `hospitality123` | Can manage Inn/Hotel rooms and bookings. |
+| **Test Owner** | `test_owner` | `owner123` | Generic Business Owner account for testing visitor logging. |
+| **Tourist (Reviewer)** | `tourist` | `tourist123` | Standard user account — can browse the map and **write reviews**. |
 
 ---
 
@@ -25,12 +27,24 @@ This document lists the default credentials for testing and development in the *
 - **Role:** `contributor`
 - **Description:** Can create and edit heritage profiles, but requires Admin approval for publication.
 
-### 🎒 Tourist / Standard User
-*Used for viewing the map and leaving reviews.*
+### 🎒 Tourist / Standard User ✅ Active
+*Used for viewing the map and **writing reviews**.*
 - **Username:** `tourist`
-- **Password:** `tourist123` (Suggested)
-- **Role:** `user`
-- **Description:** Standard public access with ability to bookmark and review.
+- **Password:** `tourist123`
+- **Role:** `user`  
+- **Status:** ✅ Account exists in local DB (`is_approved = True`)
+- **Description:** Standard public access. Use this account to test the review and comment system.
+
+---
+
+## 🧪 Testing Reviews
+
+1. Log in as `tourist` / `tourist123` at `http://localhost:5002/auth/login`
+2. Visit any attraction: `http://localhost:5002/attractions/1`
+3. Scroll down → **Community Reviews** section → **Write a Review** form
+4. Select stars → add a comment → click **Submit Review**
+5. Log in as `admin` / `admin123` → go to `http://localhost:5002/admin/reviews`
+6. Click **Approve** → the review goes live on the attraction page
 
 ---
 
