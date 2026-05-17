@@ -223,3 +223,82 @@ def send_password_reset_email(recipient: str, reset_url: str) -> bool:
         body=plain_text,
         html_body=html_body,
     )
+
+
+def send_newsletter_thankyou_email(recipient: str) -> bool:
+    """
+    Send a premium HTML thank you email to new or reactivated newsletter subscribers.
+
+    Args:
+        recipient: Subscriber's email address
+
+    Returns:
+        True if sent successfully, False otherwise
+    """
+    plain_text = (
+        "Thank you for subscribing to the GoMangatarem Newsletter!\n\n"
+        "You are now part of our community of cultural stewards and explorers.\n"
+        "We're excited to share the rich heritage, local history, and natural beauty of Mangatarem's 82 barangays with you.\n\n"
+        "Explore the interactive map here: https://gomangatarem.vercel.app/\n\n"
+        "© 2026 GoMangatarem · Mangatarem, Pangasinan"
+    )
+
+    html_body = """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <style>
+            body { font-family: 'Segoe UI', Arial, sans-serif; background: #0a1a14; margin: 0; padding: 40px 20px; }
+            .container { max-width: 520px; margin: 0 auto; }
+            .card { background: linear-gradient(135deg, #0d2e1e 0%, #0a1f16 100%); border: 1px solid rgba(52,211,153,0.15); border-radius: 24px; overflow: hidden; box-shadow: 0 25px 60px rgba(0,0,0,0.5); }
+            .header { background: linear-gradient(135deg, #065f46 0%, #064e3b 100%); padding: 36px 40px; text-align: center; }
+            .icon { font-size: 48px; display: block; margin-bottom: 12px; }
+            .header h1 { color: #ecfdf5; font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.5px; }
+            .header p { color: rgba(167,243,208,0.7); font-size: 14px; margin: 6px 0 0; }
+            .body { padding: 36px 40px; }
+            .body p { color: rgba(209,250,229,0.75); font-size: 15px; line-height: 1.7; margin: 0 0 24px; }
+            .btn { display: inline-block; background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #ecfdf5 !important; text-decoration: none; text-align: center; padding: 14px 28px; border-radius: 12px; font-weight: 700; font-size: 15px; letter-spacing: 0.3px; margin: 0 0 24px; box-shadow: 0 8px 24px rgba(5,150,105,0.35); }
+            .footer { padding: 20px 40px; text-align: center; border-top: 1px solid rgba(52,211,153,0.08); }
+            .footer p { color: rgba(167,243,208,0.3); font-size: 12px; margin: 0; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="card">
+                <div class="header">
+                    <span class="icon">🌿</span>
+                    <h1>Thank You for Subscribing!</h1>
+                    <p>GoMangatarem Digital Heritage Portal</p>
+                </div>
+                <div class="body">
+                    <p>Hello,</p>
+                    <p>Thank you for joining the GoMangatarem Digital Archive! You are now part of our community of cultural stewards and explorers.</p>
+                    <p>With our newsletter, you will receive exclusive updates on:</p>
+                    <ul style="color: rgba(209,250,229,0.75); font-size: 15px; line-height: 1.7; margin: 0 0 24px; padding-left: 20px;">
+                        <li>🏛️ Local history and cultural heritage discoveries</li>
+                        <li>🌸 Festival schedules and community events</li>
+                        <li>🚶 Curated travel itineraries and tourist attractions</li>
+                        <li>🍽️ Secret culinary gems and hospitality recommendations</li>
+                    </ul>
+                    <p>We're excited to share the rich heritage and natural beauty of Mangatarem's 82 barangays with you.</p>
+                    <div style="text-align: center;">
+                        <a href="https://gomangatarem.vercel.app/" class="btn">Explore the Map</a>
+                    </div>
+                </div>
+                <div class="footer">
+                    <p>© 2026 GoMangatarem · Mangatarem, Pangasinan</p>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+
+    return send_email(
+        subject="Welcome to GoMangatarem Newsletter! 🌿",
+        recipient=recipient,
+        body=plain_text,
+        html_body=html_body,
+    )
+

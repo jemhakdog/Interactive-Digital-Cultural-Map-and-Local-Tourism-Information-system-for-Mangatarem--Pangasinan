@@ -3,8 +3,8 @@
 {% block content %}
 {% set is_dining = establishment and establishment.type in ['restaurant', 'cafe', 'fastfood'] %}
 <section class="min-h-screen pt-8 pb-16 px-4 transition-colors duration-700
-    {% if is_dining %}bg-dining-gradient bg-gradient-to-br from-orange-950 via-gray-950 to-amber-950
-    {% else %}bg-heritage-gradient bg-gradient-to-br from-emerald-950 via-gray-900 to-emerald-950{% endif %}">
+    {% if is_dining %}bg-dining-gradient
+    {% else %}bg-heritage-gradient{% endif %}">
     
     <div class="container mx-auto max-w-5xl">
         <div class="mb-8">

@@ -287,8 +287,8 @@ def _register_request_hooks(app: Flask) -> None:
 def _apply_cache_headers(response, path: str) -> None:
     """Applies Vercel Edge Cache headers based on path and type."""
     no_cache_prefixes = ("/admin", "/auth", "/user", "/barangay-admin")
-    if any(path.startswith(p) for p in no_cache_prefixes):
-        response.headers["Cache-Control"] = "private, no-store"
+    if path in ("/sw.js", "/manifest.json") or any(path.startswith(p) for p in no_cache_prefixes):
+        response.headers["Cache-Control"] = "private, no-store, no-cache, must-revalidate, max-age=0"
     elif "text/html" in response.content_type:
         # Disable cache for HTML temporarily to force CSP update
         response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0"

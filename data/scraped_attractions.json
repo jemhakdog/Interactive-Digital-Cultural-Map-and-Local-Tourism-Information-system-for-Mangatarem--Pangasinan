@@ -36,6 +36,61 @@
         "alt": "Daang Kalikasan Sunset Over the Hills",
         "local_path": "data/scraped_images/daang_kalikasan/image_5.jpg"
       }
+    ],
+    "latitude": 15.7916101,
+    "longitude": 120.2798642,
+    "osm_details": {
+      "place_id": 259926937,
+      "osm_type": "way",
+      "osm_id": 924562642,
+      "display_name": "Nature's Highway (Daang Kalikasan), Calvo, Purok 2, Umangan, Mangatarem, Pangasinan, Ilocos Region, 2413, Philippines",
+      "boundingbox": [
+        "15.7839620",
+        "15.7997179",
+        "120.2754410",
+        "120.2835449"
+      ],
+      "address": {
+        "road": "Daang Kalikasan (Nature's Highway)",
+        "quarter": "Calvo",
+        "hamlet": "Purok 2",
+        "village": "Umangan",
+        "town": "Mangatarem",
+        "state": "Pangasinan",
+        "region": "Ilocos Region",
+        "postcode": "2413",
+        "country": "Philippines"
+      }
+    },
+    "osm_alternatives": [
+      {
+        "lat": 15.7818073,
+        "lon": 120.2717012,
+        "display_name": "Nature's Highway (Daang Kalikasan), Parian, Mangatarem, Pangasinan, Ilocos Region, 2413, Philippines",
+        "address": {
+          "road": "Daang Kalikasan (Nature's Highway)",
+          "village": "Parian",
+          "town": "Mangatarem",
+          "state": "Pangasinan",
+          "region": "Ilocos Region",
+          "postcode": "2413",
+          "country": "Philippines"
+        }
+      },
+      {
+        "lat": 15.7796569,
+        "lon": 120.2678505,
+        "display_name": "Nature's Highway (Daang Kalikasan), Muelang, Mangatarem, Pangasinan, Ilocos Region, 2413, Philippines",
+        "address": {
+          "road": "Daang Kalikasan (Nature's Highway)",
+          "village": "Muelang",
+          "town": "Mangatarem",
+          "state": "Pangasinan",
+          "region": "Ilocos Region",
+          "postcode": "2413",
+          "country": "Philippines"
+        }
+      }
     ]
   },
   {
@@ -75,7 +130,33 @@
         "alt": "Pacalat River Green Banks",
         "local_path": "data/scraped_images/pacalat_river/image_5.jpg"
       }
-    ]
+    ],
+    "latitude": 15.7428736,
+    "longitude": 120.276137,
+    "osm_details": {
+      "place_id": 259946282,
+      "osm_type": "node",
+      "osm_id": 12078206814,
+      "display_name": "Pacalat, Mangatarem, Pangasinan, Ilocos Region, 2413, Philippines",
+      "boundingbox": [
+        "15.7228736",
+        "15.7628736",
+        "120.2561370",
+        "120.2961370"
+      ],
+      "address": {
+        "village": "Pacalat",
+        "town": "Mangatarem",
+        "state": "Pangasinan",
+        "ISO3166-2-lvl4": "PH-PAN",
+        "region": "Ilocos Region",
+        "ISO3166-2-lvl3": "PH-01",
+        "postcode": "2413",
+        "country": "Philippines",
+        "country_code": "ph"
+      }
+    },
+    "osm_alternatives": []
   },
   {
     "name": "Manleluag Spring Protected Landscape",
@@ -126,6 +207,53 @@
         "alt": "Manleluag Forest Natural Habitat",
         "local_path": "data/scraped_images/manleluag_spring_protected_landscape/image_7.jpg"
       }
+    ],
+    "latitude": 15.7018494,
+    "longitude": 120.2826623,
+    "osm_details": {
+      "place_id": 259630437,
+      "osm_type": "node",
+      "osm_id": 5650740021,
+      "display_name": "Manleluag Hot Spring, Mount Mangatarem Trail, Pacalat, Mangatarem, Pangasinan, Ilocos Region, 2413, Philippines",
+      "boundingbox": [
+        "15.7017994",
+        "15.7018994",
+        "120.2826123",
+        "120.2827123"
+      ],
+      "address": {
+        "natural": "Manleluag Hot Spring",
+        "road": "Mount Mangatarem Trail",
+        "village": "Pacalat",
+        "town": "Mangatarem",
+        "state": "Pangasinan",
+        "ISO3166-2-lvl4": "PH-PAN",
+        "region": "Ilocos Region",
+        "ISO3166-2-lvl3": "PH-01",
+        "postcode": "2413",
+        "country": "Philippines",
+        "country_code": "ph"
+      }
+    },
+    "osm_alternatives": [
+      {
+        "lat": 15.6991,
+        "lon": 120.2641,
+        "display_name": "Warm Baths & Mineral Pool, Manleluag Spring",
+        "address": {
+          "natural": "Warm Baths & Mineral Pool",
+          "road": "Eco-Trail"
+        }
+      },
+      {
+        "lat": 15.6975,
+        "lon": 120.2662,
+        "display_name": "Eco-Trail Trailhead, Manleluag Protected Area",
+        "address": {
+          "suburb": "Protected Area",
+          "road": "Eco-Trail Trailhead"
+        }
+      }
     ]
   },
   {
@@ -147,7 +275,33 @@
         "alt": "Canding Falls Rock Formations",
         "local_path": "data/scraped_images/canding_falls/image_2.jpg"
       }
-    ]
+    ],
+    "latitude": 15.6446043,
+    "longitude": 120.3079937,
+    "osm_details": {
+      "place_id": 260815715,
+      "osm_type": "node",
+      "osm_id": 9568053017,
+      "display_name": "Canding Falls, San Clemente, Tarlac, Central Luzon, 2305, Philippines",
+      "boundingbox": [
+        "15.6445543",
+        "15.6446543",
+        "120.3079437",
+        "120.3080437"
+      ],
+      "address": {
+        "waterfall": "Canding Falls",
+        "town": "San Clemente",
+        "state": "Tarlac",
+        "ISO3166-2-lvl4": "PH-TAR",
+        "region": "Central Luzon",
+        "ISO3166-2-lvl3": "PH-03",
+        "postcode": "2305",
+        "country": "Philippines",
+        "country_code": "ph"
+      }
+    },
+    "osm_alternatives": []
   },
   {
     "name": "Timmanguyob Falls",
@@ -174,7 +328,19 @@
         "alt": "Timmanguyob Falls Flowing stream",
         "local_path": "data/scraped_images/timmanguyob_falls/image_3.jpg"
       }
-    ]
+    ],
+    "latitude": 15.643861,
+    "longitude": 120.282089,
+    "osm_details": {
+      "place_id": "hardcoded_fallback",
+      "osm_type": "node",
+      "display_name": "Timmanguyob Falls, Maasin, San Clemente, Tarlac / Border Mangatarem, Pangasinan",
+      "address": {
+        "county": "Mangatarem/San Clemente",
+        "state": "Pangasinan/Tarlac"
+      }
+    },
+    "osm_alternatives": []
   },
   {
     "name": "Teraoka Farm",
@@ -275,6 +441,32 @@
         "alt": "Teraoka Farm Fresh Eggs",
         "local_path": "data/scraped_images/teraoka_farm/image_15.jpg"
       }
-    ]
+    ],
+    "latitude": 15.7,
+    "longitude": 120.3333333,
+    "osm_details": {
+      "place_id": 259566074,
+      "osm_type": "node",
+      "osm_id": 319588303,
+      "display_name": "Cabaluyan, Mangatarem, Pangasinan, Ilocos Region, 2413, Philippines",
+      "boundingbox": [
+        "15.6999500",
+        "15.7000500",
+        "120.3332833",
+        "120.3333833"
+      ],
+      "address": {
+        "volcano": "Cabaluyan",
+        "town": "Mangatarem",
+        "state": "Pangasinan",
+        "ISO3166-2-lvl4": "PH-PAN",
+        "region": "Ilocos Region",
+        "ISO3166-2-lvl3": "PH-01",
+        "postcode": "2413",
+        "country": "Philippines",
+        "country_code": "ph"
+      }
+    },
+    "osm_alternatives": []
   }
 ]

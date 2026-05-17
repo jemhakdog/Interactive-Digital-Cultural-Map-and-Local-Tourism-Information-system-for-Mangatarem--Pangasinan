@@ -3,11 +3,10 @@ Routes for the Attractions module.
 Extracted from routes/public.py and routes/api.py.
 """
 
-from flask import Blueprint, render_template, request, jsonify, current_app
+from flask import Blueprint, request, jsonify, redirect, url_for, current_app
 from flask_login import login_required, current_user
 from extensions import db, limiter
 from .models import Attraction, AttractionReview, ReviewPhoto
-from core.logger import log_entry, log_query, log_render
 import logging
 from datetime import datetime
 
@@ -16,109 +15,9 @@ logger = logging.getLogger(__name__)
 
 @attractions_bp.route("/<int:id>")
 def detail(id):
-    """
-    Display detailed information about a specific attraction.
-    """
-    log_entry("attractions", "detail", id=id)
-    logger.info("Attraction detail page accessed")
-
-    from modules.auth.models import User
-    from modules.gallery.models import GalleryItem
-    from modules.business.models import Establishment
-    from utils.cache_helpers import cache_get, cache_set
-
-    log_query("attractions", "detail", f"Fetching attraction ID {id}")
-    attraction = Attraction.query.get_or_404(id)
-    
-    # Record view
-    _record_view("attraction", item_id=id)
-
-    cache_key = f"attraction_detail_module:{id}"
-    cached_data = cache_get(cache_key)
-    
-    if cached_data:
-        return render_template(
-            "pagez/detail.html",
-            attraction=attraction,
-            nearby=cached_data['nearby'],
-            related_gallery=cached_data['related_gallery'],
-            nearby_stay=cached_data['nearby_stay'],
-            nearby_eat=cached_data['nearby_eat'],
-        )
-
-    # Cache MISS
-    # Fetch nearby attractions (same barangay, approved, limit 3, excluding current)
-    nearby_objs = (
-        Attraction.query.filter(
-            Attraction.barangay_id == attraction.barangay_id,
-            Attraction.status == "approved",
-            Attraction.id != attraction.id,
-        )
-        .limit(3)
-        .all()
-    )
-    nearby = [n.to_dict() if hasattr(n, 'to_dict') else {'id': n.id, 'name': n.name, 'image_url': n.image_url} for n in nearby_objs]
-
-    # Fetch related gallery items
-    gallery_objs = (
-        GalleryItem.query.join(User, GalleryItem.user_id == User.id)
-        .filter(User.barangay_id == attraction.barangay_id, GalleryItem.status == "approved")
-        .limit(6)
-        .all()
-    )
-    related_gallery = [g.to_dict() if hasattr(g, 'to_dict') else {'id': g.id, 'url': g.url, 'caption': g.caption} for g in gallery_objs]
-
-    # Fetch nearby establishments
-    nearby_stay = []
-    nearby_eat = []
-    if attraction.latitude and attraction.longitude:
-        from core.geo import haversine_distance
-        all_establishments = Establishment.query.filter_by(status="approved").all()
-        for est in all_establishments:
-            dist = haversine_distance(
-                attraction.latitude, attraction.longitude,
-                est.latitude, est.longitude
-            )
-            if dist <= 5.0:  # 5km radius
-                est_data = est.to_dict() if hasattr(est, 'to_dict') else {'id': est.id, 'name': est.name, 'type': est.type, 'image_url': est.image_url}
-                est_data['_distance'] = round(dist, 1)
-                if est.type == "inn":
-                    nearby_stay.append(est_data)
-                else:
-                    nearby_eat.append(est_data)
-                    
-        nearby_stay.sort(key=lambda x: x.get('_distance', 999))
-        nearby_eat.sort(key=lambda x: x.get('_distance', 999))
-        nearby_stay = nearby_stay[:3]
-        nearby_eat = nearby_eat[:3]
-
-    # Store in cache
-    payload = {
-        'nearby': nearby,
-        'related_gallery': related_gallery,
-        'nearby_stay': nearby_stay,
-        'nearby_eat': nearby_eat
-    }
-    cache_set(cache_key, payload, ttl=900)
-
-    # Check if favorited by current user
-    is_favorite = False
-    if current_user.is_authenticated:
-        from modules.attractions.models import UserFavoriteAttraction
-        is_favorite = UserFavoriteAttraction.query.filter_by(
-            user_id=current_user.id, attraction_id=id
-        ).first() is not None
-
-    log_render("attractions", "detail", "detail.html")
-    return render_template(
-        "pagez/detail.html",
-        attraction=attraction,
-        nearby=nearby,
-        related_gallery=related_gallery,
-        nearby_stay=nearby_stay,
-        nearby_eat=nearby_eat,
-        is_favorite=is_favorite
-    )
+    """Redirect legacy attraction detail view to modern v1 version."""
+    logger.info(f"Redirecting legacy /attractions/{id} to /v1/attractions/{id}")
+    return redirect(url_for("public_v1.attraction_detail_v1_view", id=id, **request.args), code=302)
 
 @attractions_bp.route("/api")
 @limiter.limit("20 per minute")

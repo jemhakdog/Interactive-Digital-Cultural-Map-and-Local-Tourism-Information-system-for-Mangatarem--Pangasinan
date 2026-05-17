@@ -33,6 +33,10 @@
 </script>
 {% endblock %}
 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/pages/reviews.js') }}" defer></script>
+{% endblock %}
+
 {% block head %}
 <!-- Mobile Specific Styles -->
 <style>
@@ -268,21 +272,148 @@
                         </div>
                     </div>
 
-                    <a href="https://www.google.com/maps/search/?api=1&query={{ attraction.latitude }},{{ attraction.longitude }}" target="_blank" class="primary-btn w-full">
+                    <a href="{{ url_for('public_v1.map_v2_view') }}?route_to={{ attraction.id }}" class="primary-btn w-full mb-3">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
                         </svg>
-                        Launch Navigation
+                        Route on Interactive Map
+                    </a>
+                    
+                    <a href="https://www.google.com/maps/search/?api=1&query={{ attraction.latitude }},{{ attraction.longitude }}" target="_blank" class="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-2xl text-xs font-bold text-gray-500 hover:bg-gray-50 transition-colors">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                        </svg>
+                        Open in Google Maps
                     </a>
                 </div>
-
+ 
                 <!-- Story Section -->
                 <div class="detail-section">
                     <h3 class="text-lg font-bold text-gray-900 mb-4 font-serif">Historical Significance</h3>
                     <p class="text-gray-600 leading-relaxed text-sm">
                         {{ attraction.description }}
                     </p>
+                </div>
+
+                <!-- Directions & Travel Guide Section -->
+                {% if attraction.directions %}
+                <div class="detail-section relative overflow-hidden bg-gradient-to-br from-emerald-50/30 to-teal-50/10 border border-emerald-900/5">
+                    <div class="absolute -right-16 -top-16 w-32 h-32 bg-emerald-500/5 rounded-full blur-2xl"></div>
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 font-serif flex items-center gap-2">
+                        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+                        </svg>
+                        Directions & Travel Guide
+                    </h3>
+                    <div class="text-gray-600 leading-relaxed text-sm whitespace-pre-line prose max-w-none">
+                        {{ attraction.directions | safe }}
+                    </div>
+                </div>
+                {% endif %}
+
+                {# ════════════════════════════════════════════
+                   COMMUNITY REVIEWS SECTION
+                ════════════════════════════════════════════ #}
+                <div class="detail-section mb-8" id="reviews-section" data-attraction-id="{{ attraction.id }}">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 font-serif">Community Reviews</h3>
+
+                    {# Rating Summary Bar #}
+                    <div class="bg-emerald-50 rounded-2xl p-6 mb-6 hidden" id="review-summary">
+                        <div class="flex flex-col md:flex-row items-center gap-6">
+                            <div class="text-center md:text-left">
+                                <div class="text-4xl font-black text-emerald-950" id="avg-rating">—</div>
+                                <div class="flex justify-center md:justify-start gap-1 mt-1 text-sm" id="avg-stars"></div>
+                                <p class="text-[10px] font-bold text-emerald-900/50 uppercase tracking-widest mt-1" id="total-reviews"></p>
+                            </div>
+                            <div class="flex-1 w-full" id="rating-distribution">
+                                {# Filled by JS #}
+                            </div>
+                        </div>
+                    </div>
+
+                    {# Review Cards Feed #}
+                    <div class="space-y-4" id="reviews-feed">
+                        <div class="flex justify-center py-6" id="reviews-loading">
+                            <div class="w-6 h-6 border-2 border-emerald-200 border-t-emerald-600 rounded-full animate-spin"></div>
+                        </div>
+                    </div>
+
+                    {# Load More #}
+                    <div class="text-center mt-4 hidden" id="load-more-container">
+                        <button id="load-more-btn"
+                            class="px-6 py-2 bg-white border border-gray-200 text-gray-600 font-bold text-xs rounded-xl hover:bg-gray-50 transition-all">
+                            Load more reviews
+                        </button>
+                    </div>
+                </div>
+
+                {# ════════════════════════════════════════════
+                   SUBMIT A REVIEW
+                ════════════════════════════════════════════ #}
+                <div class="detail-section mb-8" id="write-review">
+                    <h3 class="text-lg font-bold text-gray-900 mb-4 font-serif">Write a Review</h3>
+                    {% if current_user.is_authenticated %}
+                    <form id="review-form" enctype="multipart/form-data"
+                          action="{{ url_for('attractions.post_review', id=attraction.id) }}">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                        {# Star Rating Selector #}
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Your Rating</label>
+                            <div class="star-selector flex gap-1" id="star-selector" role="group" aria-label="Rating">
+                                {% for i in range(1, 6) %}
+                                <button type="button" class="star-btn text-3xl transition-all text-gray-300 hover:text-amber-400"
+                                        data-value="{{ i }}" aria-label="{{ i }} star{{ 's' if i != 1 }}"
+                                        title="{{ i }} star{{ 's' if i != 1 }}">
+                                    ★
+                                </button>
+                                {% endfor %}
+                            </div>
+                            <input type="hidden" name="rating" id="rating-input" required>
+                            <p class="text-[10px] text-red-500 mt-1 hidden" id="rating-error">Please select a star rating.</p>
+                        </div>
+
+                        {# Comment Textarea #}
+                        <div class="mb-4">
+                            <label for="review-comment" class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Your Experience <span class="normal-case font-medium opacity-60">(optional)</span></label>
+                            <textarea id="review-comment" name="comment" rows="3"
+                                class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all resize-none bg-gray-50"
+                                placeholder="Share what you loved..."></textarea>
+                            <p class="text-right text-[10px] text-gray-400 mt-1" id="char-count">0 / 1000</p>
+                        </div>
+
+                        {# Photo Upload Drop Zone #}
+                        <div class="mb-6">
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Photos <span class="normal-case font-medium opacity-60">(up to 5, optional)</span></label>
+                            <div id="drop-zone"
+                                class="border-2 border-dashed border-gray-200 rounded-xl p-6 text-center cursor-pointer hover:border-emerald-400 hover:bg-emerald-50 transition-all">
+                                <div class="text-2xl mb-2">📷</div>
+                                <p class="text-xs font-bold text-gray-600">Drag & drop photos here</p>
+                                <p class="text-[10px] text-gray-400 mt-1">or click to browse</p>
+                                <input type="file" name="photos" id="photo-input"
+                                       accept="image/jpeg,image/png,image/webp"
+                                       multiple class="hidden">
+                            </div>
+                            <div class="flex flex-wrap gap-2 mt-3" id="photo-preview"></div>
+                        </div>
+
+                        {# Submit #}
+                        <div id="review-feedback" class="hidden mb-3"></div>
+                        <button type="submit" id="review-submit"
+                            class="w-full bg-emerald-600 text-white font-bold py-3 rounded-xl hover:bg-emerald-500 transition-all flex items-center justify-center gap-2">
+                            Submit Review
+                        </button>
+                    </form>
+                    {% else %}
+                    <div class="bg-gray-50 rounded-xl p-6 text-center">
+                        <div class="text-2xl mb-2">✍️</div>
+                        <p class="text-sm text-gray-600 mb-4">Have you visited this place? Sign in to leave a review.</p>
+                        <a href="{{ url_for('auth.login') }}?next={{ request.url | urlencode }}"
+                           class="inline-flex items-center gap-2 bg-emerald-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-emerald-500 transition-all text-sm">
+                            Sign In to Review
+                        </a>
+                    </div>
+                    {% endif %}
                 </div>
 
                 <!-- Visual Journey (Gallery) -->
@@ -305,7 +436,7 @@
                     <h3 class="text-lg font-bold text-gray-900 mb-4 px-4 font-serif">Nearby Discovery</h3>
                     <div class="horizontal-scroller px-4">
                         {% for place in nearby %}
-                        <a href="{{ url_for('public.attraction_detail_v1_view', id=place.id) }}" class="scroller-card block">
+                        <a href="{{ url_for('public_v1.attraction_detail_v1_view', id=place.id) }}" class="scroller-card block">
                             <img src="{{ place.image_url or 'https://placehold.co/400x300?text=' + place.name }}" alt="{{ place.name }}">
                             <div class="scroller-card-info">
                                 <div class="text-[10px] text-gray-400 font-bold uppercase tracking-wider mb-1">{{ place.category }}</div>

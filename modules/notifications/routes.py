@@ -23,6 +23,13 @@ def subscribe():
         if not existing.is_active:
             existing.is_active = True
             db.session.commit()
+            
+            try:
+                from utils.email_sender import send_newsletter_thankyou_email
+                send_newsletter_thankyou_email(email)
+            except Exception as mail_err:
+                logger.error(f"Failed to send resubscribe email to {email}: {mail_err}")
+
             if request.headers.get("X-Requested-With") == "XMLHttpRequest":
                 return jsonify({"status": "success", "message": "Welcome back! You've been resubscribed."})
             flash("Welcome back! You've been resubscribed.", "success")
@@ -38,6 +45,12 @@ def subscribe():
         new_subscriber = NewsletterSubscriber(email=email)
         db.session.add(new_subscriber)
         db.session.commit()
+        
+        try:
+            from utils.email_sender import send_newsletter_thankyou_email
+            send_newsletter_thankyou_email(email)
+        except Exception as mail_err:
+            logger.error(f"Failed to send welcome email to {email}: {mail_err}")
         
         if request.headers.get("X-Requested-With") == "XMLHttpRequest":
             return jsonify({"status": "success", "message": "Thank you for subscribing to our newsletter!"})

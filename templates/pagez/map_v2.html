@@ -953,6 +953,27 @@
                     </svg>
                     <span id="modal-location-text">Poblacion, Mangatarem</span>
                 </div>
+                
+                <!-- Alternative Coordinates Selector -->
+                <div id="modal-alternatives-container" class="hidden mt-3 mb-4 p-3 bg-gray-50 border border-gray-100 rounded-2xl">
+                    <label for="modal-alternatives-select" class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-[#00ED64]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                        </svg>
+                        Select Coordinate Location
+                    </label>
+                    <div class="relative">
+                        <select id="modal-alternatives-select" class="w-full bg-white border border-gray-200 rounded-xl py-2.5 px-3 pr-8 text-xs font-bold text-gray-900 focus:border-[#00ED64]/50 focus:ring-0 focus:outline-none appearance-none cursor-pointer">
+                            <!-- Dynamic options injected by JS -->
+                        </select>
+                        <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-gray-500">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+                
                 <p id="modal-description" class="modal-description">Loading description...</p>
                 <div class="modal-actions">
                     <button id="modal-directions" class="btn-secondary-v2">Get Directions</button>
@@ -972,5 +993,5 @@
     window.MAPBOX_TOKEN = "{{ mapbox_token }}";
     window.USER_AUTH = {{ 'true' if current_user.is_authenticated else 'false' }};
 </script>
-<script src="{{ url_for('static', filename='js/pages/map_v2.js') }}?v=1.1.7"></script>
+<script src="{{ url_for('static', filename='js/pages/map_v2.js') }}?v=1.1.8"></script>
 {% endblock %}

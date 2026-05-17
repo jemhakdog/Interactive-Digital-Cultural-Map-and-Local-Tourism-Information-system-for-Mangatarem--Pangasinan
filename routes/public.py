@@ -1,8 +1,7 @@
 from models import db, User, Attraction, Event, BarangayInfo
 from modules.business.models import Establishment
 from extensions import limiter
-import os
-from flask import Blueprint, render_template, request, url_for, current_app, make_response
+from flask import Blueprint, render_template, request, url_for, current_app, make_response, redirect
 from utils.logger_helper import log_entry, log_success
 from utils.validators import validate_query_params
 from modules.analytics.utils import record_view
@@ -95,262 +94,9 @@ def index():
 
 @public_bp.route("/map")
 def map_view():
-    """
-    Display the interactive map with all approved attractions.
-    """
-    logger.info("Interactive map page accessed")
-    record_view("page", page_name="map")
-
-    from utils.cache_helpers import cache_get, cache_set
-    cache_key = "map_page_meta"
-    
-    # Try cache
-    cached_meta = cache_get(cache_key)
-    if cached_meta:
-        return render_template(
-            "pagez/map.html", 
-            barangays=cached_meta["barangays"], 
-            attractions_count=cached_meta["count"],
-            mapbox_token=os.environ.get("mapbox_token", "")
-        )
-
-    # Get count of approved attractions for initial display
-    attractions_count = Attraction.query.filter_by(status="approved").count()
-
-    # Get unique barangays that have approved attractions
-    barangays = (
-        db.session.query(BarangayInfo.name)
-        .join(Attraction, Attraction.barangay_id == BarangayInfo.id)
-        .filter(Attraction.status == "approved")
-        .distinct()
-        .order_by(BarangayInfo.name)
-        .all()
-    )
-
-    barangay_list = [b[0] for b in barangays]
-    
-    # Store in cache for 10 minutes
-    cache_set(cache_key, {"barangays": barangay_list, "count": attractions_count}, ttl=600)
-
-    logger.info("Map page loaded with attractions and barangays")
-    return render_template(
-        "pagez/map.html", 
-        barangays=barangay_list, 
-        attractions_count=attractions_count,
-        mapbox_token=os.environ.get("mapbox_token", "")
-    )
-
-
-@public_bp.route("/v1/map")
-def map_v2_view():
-    """
-    Display the version 2 interactive map with modern aesthetics.
-    """
-    logger.info("Interactive map v2 accessed")
-    
-    # Record view
-    record_view("page", page_name="map_v2")
-    
-    # Get initial data
-    attractions_count = Attraction.query.filter_by(status="approved").count()
-    
-    return render_template(
-        "pagez/map_v2.html", 
-        attractions_count=attractions_count,
-        mapbox_token=os.environ.get("mapbox_token", "")
-    )
-
-
-@public_bp.route("/v1/events")
-def events_v2_view():
-    """
-    Display the version 2 events listing with premium mobile-first aesthetics.
-    """
-    logger.info("Events v2 listing accessed")
-    
-    # Record view
-    record_view("page", page_name="events_v2")
-    
-    # Fetch approved events in chronological order
-    events = Event.query.filter_by(status="approved").order_by(Event.date.asc()).all()
-    
-    return render_template(
-        "pagez/events_v2.html", 
-        events=events
-    )
-
-
-@public_bp.route("/v1/attractions/<int:id>")
-def attraction_detail_v1_view(id):
-    """
-    Display detailed information about a specific attraction (modernized mobile-first design).
-    """
-    log_entry("public", "attraction_detail_v1", id=id)
-    logger.info("Attraction detail v1 page accessed")
-
-    from modules.auth.models import User
-    from modules.gallery.models import GalleryItem
-    from modules.business.models import Establishment
-    from utils.cache_helpers import cache_get, cache_set
-
-    logger.debug(f"Fetching attraction ID {id}")
-    attraction = Attraction.query.get_or_404(id)
-    
-    # Record view
-    record_view("attraction", item_id=id)
-
-    cache_key = f"attraction_detail_v1:{id}"
-    cached_data = cache_get(cache_key)
-    
-    if cached_data:
-        # Template can handle dicts for nearby/gallery/establishments
-        return render_template(
-            "pagez/detail_v1.html",
-            attraction=attraction,
-            nearby=cached_data['nearby'],
-            related_gallery=cached_data['related_gallery'],
-            nearby_stay=cached_data['nearby_stay'],
-            nearby_eat=cached_data['nearby_eat'],
-        )
-
-    # Cache MISS - Fetch data
-    # Fetch nearby attractions (same barangay, approved, limit 3, excluding current)
-    nearby_objs = (
-        Attraction.query.filter(
-            Attraction.barangay_id == attraction.barangay_id,
-            Attraction.status == "approved",
-            Attraction.id != attraction.id,
-        )
-        .limit(3)
-        .all()
-    )
-    nearby = [n.to_dict() if hasattr(n, 'to_dict') else {'id': n.id, 'name': n.name, 'image_url': n.image_url} for n in nearby_objs]
-
-    # Fetch related gallery items
-    gallery_objs = (
-        GalleryItem.query.join(User, GalleryItem.user_id == User.id)
-        .filter(User.barangay_id == attraction.barangay_id, GalleryItem.status == "approved")
-        .limit(6)
-        .all()
-    )
-    related_gallery = [g.to_dict() if hasattr(g, 'to_dict') else {'id': g.id, 'url': g.url, 'caption': g.caption} for g in gallery_objs]
-
-    # Fetch nearby establishments
-    nearby_stay = []
-    nearby_eat = []
-    if attraction.latitude and attraction.longitude:
-        from core.geo import haversine_distance
-        all_establishments = Establishment.query.filter_by(status="approved").all()
-        for est in all_establishments:
-            dist = haversine_distance(
-                attraction.latitude, attraction.longitude,
-                est.latitude, est.longitude
-            )
-            if dist <= 5.0:  # 5km radius
-                est_data = est.to_dict() if hasattr(est, 'to_dict') else {'id': est.id, 'name': est.name, 'type': est.type, 'image_url': est.image_url}
-                est_data['_distance'] = round(dist, 1)
-                if est.type == "inn":
-                    nearby_stay.append(est_data)
-                else:
-                    nearby_eat.append(est_data)
-                    
-        nearby_stay.sort(key=lambda x: x.get('_distance', 999))
-        nearby_eat.sort(key=lambda x: x.get('_distance', 999))
-        nearby_stay = nearby_stay[:3]
-        nearby_eat = nearby_eat[:3]
-
-    # Store in cache for 15 minutes
-    payload = {
-        'nearby': nearby,
-        'related_gallery': related_gallery,
-        'nearby_stay': nearby_stay,
-        'nearby_eat': nearby_eat
-    }
-    cache_set(cache_key, payload, ttl=900)
-
-    return render_template(
-        "pagez/detail_v1.html",
-        attraction=attraction,
-        nearby=nearby,
-        related_gallery=related_gallery,
-        nearby_stay=nearby_stay,
-        nearby_eat=nearby_eat,
-    )
-
-
-@public_bp.route("/v1/barangay")
-def barangays_v1_view():
-    """
-    Display the version 1 mobile-optimized barangay directory.
-    Uses aggregated data from contributors and attractions.
-    """
-    logger.info("Barangay v1 listing accessed")
-    record_view("page", page_name="barangays_v1")
-    
-    # Get all barangay IDs that have approved contributors
-    barangay_ids_query = (
-        db.session.query(User.barangay_id)
-        .filter(
-            User.role == "contributor", User.is_approved, User.barangay_id.is_not(None)
-        )
-        .distinct()
-        .all()
-    )
-    barangay_ids = [b[0] for b in barangay_ids_query]
-
-    if not barangay_ids:
-        return render_template("pagez/barangays_v1.html", barangays=[])
-
-    # Fetch approved attractions for these barangays to derive images and tags
-    all_attractions = (
-        db.session.query(
-            Attraction.barangay_id, 
-            Attraction.name, 
-            Attraction.category, 
-            Attraction.image_url
-        )
-        .filter(
-            Attraction.barangay_id.in_(barangay_ids), 
-            Attraction.status == "approved"
-        )
-        .all()
-    )
-
-    from collections import defaultdict
-    barangay_data_map = defaultdict(list)
-    for a in all_attractions:
-        barangay_data_map[a.barangay_id].append(a)
-
-    barangay_infos = (
-        db.session.query(BarangayInfo.id, BarangayInfo.name, BarangayInfo.image_url if hasattr(BarangayInfo, 'image_url') else db.literal(None).label('image_url'))
-        .filter(BarangayInfo.id.in_(barangay_ids))
-        .all()
-    )
-    
-    barangay_list = []
-    for brgy in barangay_infos:
-        attractions = barangay_data_map.get(brgy.id, [])
-        
-        # Determine representative image: Use BarangayInfo image if exists, else first attraction image
-        image_url = getattr(brgy, 'image_url', None)
-        if not image_url and attractions:
-            image_url = next((a.image_url for a in attractions if a.image_url), None)
-
-        tags = sorted(list(set(a.category for a in attractions if a.category)))
-
-        barangay_list.append({
-            "name": brgy.name,
-            "image_url": image_url,
-            "tags": tags,
-            "attraction_count": len(attractions),
-        })
-
-    barangay_list.sort(key=lambda x: x["name"])
-        
-    return render_template(
-        "pagez/barangays_v1.html", 
-        barangays=barangay_list
-    )
+    """Redirect to version 2 interactive map."""
+    logger.info("Redirecting legacy /map to /v1/map")
+    return redirect(url_for("public_v1.map_v2_view", **request.args), code=302)
 
 
 
@@ -672,5 +418,30 @@ Sitemap: {sitemap_url}
     response = make_response(robots_txt)
     response.headers["Content-Type"] = "text/plain"
     return response
+
+
+@public_bp.route("/logout")
+def logout_redirect():
+    """Redirect legacy /logout requests to modular /auth/logout."""
+    return redirect(url_for("auth.logout"))
+
+
+@public_bp.route("/login")
+def login_redirect():
+    """Redirect legacy /login requests to modular /auth/login."""
+    return redirect(url_for("auth.login"))
+
+
+@public_bp.route("/register")
+def register_redirect():
+    """Redirect legacy /register requests to modular /auth/register."""
+    return redirect(url_for("auth.register"))
+
+
+@public_bp.route("/forgot-password")
+def forgot_password_redirect():
+    """Redirect legacy /forgot-password requests to modular /auth/forgot-password."""
+    return redirect(url_for("auth.forgot_password"))
+
 
 

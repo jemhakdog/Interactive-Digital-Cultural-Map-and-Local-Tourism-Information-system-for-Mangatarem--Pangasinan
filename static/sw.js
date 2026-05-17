@@ -1,4 +1,4 @@
-const CACHE_NAME = 'gomangatarem-v5';
+const CACHE_NAME = 'gomangatarem-v6';
 const MAP_CACHE_NAME = 'mapbox-tiles';
 const STATIC_ASSETS = [
     '/static/css/main.css',

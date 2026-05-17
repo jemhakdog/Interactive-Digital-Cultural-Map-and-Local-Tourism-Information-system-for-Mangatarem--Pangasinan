@@ -59,30 +59,75 @@ document.addEventListener('DOMContentLoaded', function () {
             if (response.ok) {
                 // Success
                 button.innerHTML = 'Success!';
-                button.classList.remove('bg-emerald-600');
-                button.classList.add('bg-emerald-500');
                 
-                // Show a nice notification if you have a toast system, 
-                // otherwise alert is fine for now but alert is a bit jarring
-                alert(data.message);
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: 'Joined Successfully! 🌿',
+                        text: data.message,
+                        icon: 'success',
+                        background: '#0a1a14',
+                        color: '#ecfdf5',
+                        confirmButtonColor: '#059669',
+                        customClass: {
+                            popup: 'border border-emerald-500/20 rounded-[24px]',
+                            title: 'text-2xl font-bold font-display text-white',
+                            htmlContainer: 'text-emerald-100/70 text-base',
+                            confirmButton: 'px-8 py-3 rounded-full font-bold uppercase tracking-wider text-sm transition-all duration-300'
+                        }
+                    });
+                } else {
+                    alert(data.message);
+                }
                 form.reset();
             } else {
-                // Error from server
-                alert(data.error || 'Subscription failed.');
+                // Server responded with an error or info message
+                if (typeof Swal !== 'undefined') {
+                    Swal.fire({
+                        title: data.status === 'info' ? 'Already Subscribed' : 'Notice',
+                        text: data.message || 'Subscription failed.',
+                        icon: data.status === 'info' ? 'info' : 'warning',
+                        background: '#0a1a14',
+                        color: '#ecfdf5',
+                        confirmButtonColor: '#059669',
+                        customClass: {
+                            popup: 'border border-emerald-500/20 rounded-[24px]',
+                            title: 'text-2xl font-bold font-display text-white',
+                            htmlContainer: 'text-emerald-100/70 text-base',
+                            confirmButton: 'px-8 py-3 rounded-full font-bold uppercase tracking-wider text-sm transition-all duration-300'
+                        }
+                    });
+                } else {
+                    alert(data.message || 'Subscription failed.');
+                }
             }
         } catch (error) {
             console.error('Newsletter Error:', error);
-            alert('An error occurred. Please try again later.');
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'An error occurred. Please try again later.',
+                    icon: 'error',
+                    background: '#0a1a14',
+                    color: '#ecfdf5',
+                    confirmButtonColor: '#059669'
+                });
+            } else {
+                alert('An error occurred. Please try again later.');
+            }
         } finally {
             // Restore state after a short delay
             setTimeout(() => {
                 button.disabled = false;
                 button.innerHTML = originalButtonText;
-                button.classList.remove('bg-emerald-50');
-                button.classList.add('bg-emerald-600');
             }, 3000);
         }
         return false;
     };
+
+    // Bind newsletter submit
+    const newsletterForm = document.querySelector('form[data-action="newsletter-submit"]');
+    if (newsletterForm) {
+        newsletterForm.addEventListener('submit', window.handleNewsletterSubmit);
+    }
 
 });

@@ -60,8 +60,11 @@ def copy_image_assets():
         item_path = os.path.join(src_dir, item)
         if os.path.isdir(item_path):
             dest_item_path = os.path.join(dest_dir, item)
-            shutil.copytree(item_path, dest_item_path, dirs_exist_ok=True)
-            print(f"[INFO] Copied media folder '{item}' to static/img/attractions/")
+            try:
+                shutil.copytree(item_path, dest_item_path, dirs_exist_ok=True)
+                print(f"[INFO] Copied media folder '{item}' to static/img/attractions/")
+            except Exception as e:
+                print(f"[WARN] Failed to copy media folder '{item}' due to OS lock: {e}. Skipping copy.")
 
 def get_or_create_steward(barangay_name, barangay_id):
     clean_brgy = clean_name(barangay_name).replace(" ", "_")
@@ -112,7 +115,7 @@ def sync_dataset(dataset_path, default_category="Historical"):
 
         # Sanitize description: cannot be Null in DB model
         if not description:
-            description = f"A registered local cultural heritage site in Mangatarem, Pangasinan."
+            description = "A registered local cultural heritage site in Mangatarem, Pangasinan."
 
         # Fetch or create Barangay
         brgy = BarangayInfo.query.filter_by(name=barangay_name).first()
@@ -134,6 +137,15 @@ def sync_dataset(dataset_path, default_category="Historical"):
         all_db_attractions = Attraction.query.all()
         matched_attractions = [a for a in all_db_attractions if is_match(name, a.name)]
 
+        # Extract coordinates from JSON if available, falling back to mapping/defaults
+        json_lat = item.get("latitude")
+        json_lng = item.get("longitude")
+        osm_alternatives = item.get("osm_alternatives", [])
+        if json_lat is not None and json_lng is not None:
+            lat, lng = float(json_lat), float(json_lng)
+        else:
+            lat, lng = COORDINATES_MAPPING.get(name, (15.7900, 120.2910))
+
         attraction_record = None
         if matched_attractions:
             for existing in matched_attractions:
@@ -149,14 +161,14 @@ def sync_dataset(dataset_path, default_category="Historical"):
                     existing.image_url = primary_image_url
                 existing.status = "approved"  # Make sure it is approved so it renders on map v1
                 existing.user_id = steward.id
+                existing.osm_alternatives = osm_alternatives
                 
-                # Update coordinates if mapped
-                if name in COORDINATES_MAPPING:
-                    existing.latitude, existing.longitude = COORDINATES_MAPPING[name]
+                # Update coordinates
+                existing.latitude = lat
+                existing.longitude = lng
                 attraction_record = existing
         else:
             # Create new record
-            lat, lng = COORDINATES_MAPPING.get(name, (15.7900, 120.2910))
             new_attr = Attraction(
                 name=name,
                 description=description,
@@ -167,7 +179,8 @@ def sync_dataset(dataset_path, default_category="Historical"):
                 barangay_id=brgy.id,
                 user_id=steward.id,
                 status="approved",
-                is_featured=True
+                is_featured=True,
+                osm_alternatives=osm_alternatives
             )
             db.session.add(new_attr)
             print(f"[INFO] Created new approved attraction: {name} at ({lat}, {lng})")

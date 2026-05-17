@@ -99,6 +99,14 @@ Edit Attraction - {% if current_user.role == 'admin' %}Admin{% else %}Barangay{%
                                         class="w-full !bg-white !text-emerald-950 border border-emerald-900/10 rounded-2xl px-5 py-4 font-medium input-focus outline-none resize-none form-input"
                                         placeholder="Describe this cultural landmark...">{{ attraction.description }}</textarea>
                                 </div>
+
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-emerald-900/70 uppercase tracking-widest mb-2">Directions & Travel Guide (How to Get Here)</label>
+                                    <textarea name="directions" rows="4"
+                                        class="w-full !bg-white !text-emerald-950 border border-emerald-900/10 rounded-2xl px-5 py-4 font-medium input-focus outline-none resize-none form-input"
+                                        placeholder="Provide transit guides, road names, and instructions on how to reach this attraction from local landmarks...">{{ attraction.directions or '' }}</textarea>
+                                </div>
                             </div>
                         </div>
 

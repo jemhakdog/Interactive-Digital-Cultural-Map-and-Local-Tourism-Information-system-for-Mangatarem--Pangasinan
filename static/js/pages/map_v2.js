@@ -27,7 +27,8 @@ document.addEventListener('DOMContentLoaded', function () {
             attractions: [],
             establishments: []
         },
-        currentRouteLayer: null // Track Leaflet route layer
+        currentRouteLayer: null, // Track Leaflet route layer
+        selectedCoords: null // Track currently selected alternative/primary coordinates
     };
 
     const MAP_STYLES = {
@@ -171,6 +172,54 @@ document.addEventListener('DOMContentLoaded', function () {
     // ========================================
     // 3. DATA FETCHING & RENDERING
     // ========================================
+    function handleUrlParams() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const selectPlaceId = urlParams.get('select_place');
+        const routeToId = urlParams.get('route_to');
+
+        console.log("🔗 [URL Params] select_place:", selectPlaceId, "route_to:", routeToId);
+
+        if (selectPlaceId || routeToId) {
+            const targetId = parseInt(selectPlaceId || routeToId);
+            if (!isNaN(targetId)) {
+                let place = state.allPlaces.find(p => p.id === targetId && p.type === 'attraction');
+                if (!place) {
+                    place = state.allPlaces.find(p => p.id === targetId);
+                }
+
+                if (place) {
+                    console.log("🎯 [URL Params] Found target place:", place.name);
+                    
+                    setTimeout(() => {
+                        flyToPlace(place);
+                        showModal(place);
+                        
+                        if (routeToId) {
+                            console.log("🛣️ [URL Params] Auto-triggering routing for:", place.name);
+                            if (!state.userLocation) {
+                                console.log("⏳ [URL Params] User location missing. Setting pending directions.");
+                                state.pendingDirections = place;
+                                
+                                const locateBtn = document.getElementById('search-locate-btn') || document.getElementById('locate-me-btn');
+                                if (locateBtn) {
+                                    console.log("🖱️ [URL Params] Triggering location fetch via button click");
+                                    locateBtn.click();
+                                }
+                            } else {
+                                getRoute(state.userLocation, {
+                                    lat: place.latitude || place.lat,
+                                    lng: place.longitude || place.lng
+                                });
+                            }
+                        }
+                    }, 800);
+                } else {
+                    console.warn("⚠️ [URL Params] Place not found with ID:", targetId);
+                }
+            }
+        }
+    }
+
     async function fetchData() {
         const placesList = document.getElementById('places-list');
         const resultsCount = document.getElementById('results-count');
@@ -208,6 +257,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             console.log('Fetched places:', state.allPlaces.length);
             applyFilters();
+            
+            // Handle URL Parameters (select_place or route_to)
+            handleUrlParams();
         } catch (error) {
             console.error('Fetch error:', error);
             placesList.innerHTML = '<div class="text-center py-12 text-red-400 text-sm">Oops! Something went wrong while loading data.</div>';
@@ -361,6 +413,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function showModal(place) {
+        console.log("ℹ️ [Modal] Opening modal for:", place.name, place);
         const overlay = document.getElementById('details-modal-overlay');
         const img = document.getElementById('modal-img');
         const title = document.getElementById('modal-title');
@@ -370,6 +423,11 @@ document.addEventListener('DOMContentLoaded', function () {
         const viewDetails = document.getElementById('modal-view-details');
         const directionsBtn = document.getElementById('modal-directions');
         const bookmarkBtn = document.getElementById('modal-bookmark');
+        const alternativesContainer = document.getElementById('modal-alternatives-container');
+        const alternativesSelect = document.getElementById('modal-alternatives-select');
+
+        console.log("ℹ️ [Modal] alternativesContainer:", alternativesContainer, "alternativesSelect:", alternativesSelect);
+        console.log("ℹ️ [Modal] place.osm_alternatives:", place.osm_alternatives);
 
         const isBookmarked = (place.type === 'attraction' && state.bookmarkedIds.attractions.includes(place.id)) ||
                              (place.type === 'establishment' && state.bookmarkedIds.establishments.includes(place.id));
@@ -392,12 +450,88 @@ document.addEventListener('DOMContentLoaded', function () {
         
         viewDetails.href = place.type === 'attraction' ? `/attractions/${place.id}` : `/business/${place.id}`;
         
+        // Dynamic coordinates tracker
+        let currentTargetCoords = {
+            lat: place.latitude || place.lat,
+            lng: place.longitude || place.lng,
+            name: place.name
+        };
+        state.selectedCoords = currentTargetCoords;
+
+        // Handle alternatives dropdown
+        if (alternativesContainer && alternativesSelect) {
+            if (place.osm_alternatives && place.osm_alternatives.length > 0) {
+                // Populate options
+                alternativesSelect.innerHTML = '';
+                
+                // Add primary location option
+                const primaryOpt = document.createElement('option');
+                primaryOpt.value = JSON.stringify({
+                    lat: place.latitude || place.lat,
+                    lng: place.longitude || place.lng,
+                    name: place.name
+                });
+                primaryOpt.textContent = `Default: ${place.name} (Official Coords)`;
+                alternativesSelect.appendChild(primaryOpt);
+                
+                // Add alternative options
+                place.osm_alternatives.forEach((alt, idx) => {
+                    const altOpt = document.createElement('option');
+                    altOpt.value = JSON.stringify({
+                        lat: alt.lat,
+                        lng: alt.lon || alt.lng,
+                        name: alt.display_name
+                    });
+                    altOpt.textContent = `Alt ${idx + 1}: ${alt.display_name.split(',')[0]} (${alt.lat.toFixed(4)}, ${(alt.lon || alt.lng).toFixed(4)})`;
+                    alternativesSelect.appendChild(altOpt);
+                });
+                
+                // Reset select value to primary
+                alternativesSelect.value = primaryOpt.value;
+                
+                // Show dropdown
+                alternativesContainer.classList.remove('hidden');
+                
+                // When selection changes, update targeted coordinates and pan map
+                alternativesSelect.onchange = () => {
+                    try {
+                        const selectedVal = JSON.parse(alternativesSelect.value);
+                        console.log("📍 [Alternatives] Selection changed:", selectedVal);
+                        
+                        currentTargetCoords = selectedVal;
+                        state.selectedCoords = selectedVal;
+                        
+                        // Fly to the new coordinate
+                        flyToCoords([selectedVal.lng, selectedVal.lat], 17, 70);
+                        
+                        // Dynamically update the bottom sheet stats & routing listener
+                        if (state.userLocation) {
+                            const dist = calculateDistance(state.userLocation.lat, state.userLocation.lng, selectedVal.lat, selectedVal.lng);
+                            const distEl = document.getElementById('stat-distance');
+                            const timeEl = document.getElementById('stat-time');
+                            if (distEl) distEl.textContent = `${dist.toFixed(1)} KM`;
+                            if (timeEl) timeEl.textContent = `${Math.round(dist * 2.5)} Min`;
+                        }
+                    } catch (err) {
+                        console.error("Error updating targeted alternative coordinates:", err);
+                    }
+                };
+            } else {
+                alternativesContainer.classList.add('hidden');
+            }
+        }
+
         if (directionsBtn) {
             directionsBtn.onclick = () => {
-                console.log("🔗 [Modal] Directions clicked. User location:", state.userLocation);
+                console.log("🔗 [Modal] Directions clicked. Target coords:", currentTargetCoords, "User location:", state.userLocation);
                 if (!state.userLocation) {
-                    console.log("⏳ [Modal] Location missing. Setting pending directions for:", place.name);
-                    state.pendingDirections = place;
+                    console.log("⏳ [Modal] Location missing. Setting pending directions for:", currentTargetCoords.name);
+                    state.pendingDirections = {
+                        ...place,
+                        latitude: currentTargetCoords.lat,
+                        longitude: currentTargetCoords.lng,
+                        name: currentTargetCoords.name
+                    };
                     
                     // Try to find the search locate button which we know exists
                     const locateBtn = document.getElementById('search-locate-btn') || document.getElementById('locate-me-btn');
@@ -418,7 +552,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
                 overlay.classList.remove('active');
-                getRoute(state.userLocation, { lat: place.latitude || place.lat, lng: place.longitude || place.lng });
+                getRoute(state.userLocation, { lat: currentTargetCoords.lat, lng: currentTargetCoords.lng });
             };
         }
 
@@ -649,11 +783,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
                 
-                // Show route on map instead of Google Maps
-                getRoute(state.userLocation, { 
+                // Show route on map instead of Google Maps using selectedCoords override if available
+                const destination = state.selectedCoords || { 
                     lat: state.selectedPlace.latitude || state.selectedPlace.lat, 
                     lng: state.selectedPlace.longitude || state.selectedPlace.lng 
-                });
+                };
+                getRoute(state.userLocation, destination);
             };
         }
     }
@@ -832,10 +967,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 state.currentNavMode = btn.dataset.mode;
                 
                 if (state.userLocation && state.selectedPlace) {
-                    getRoute(state.userLocation, {
+                    const destination = state.selectedCoords || {
                         lat: state.selectedPlace.latitude || state.selectedPlace.lat,
                         lng: state.selectedPlace.longitude || state.selectedPlace.lng
-                    }, state.currentNavMode);
+                    };
+                    getRoute(state.userLocation, destination, state.currentNavMode);
                 }
             };
         });

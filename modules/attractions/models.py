@@ -11,6 +11,8 @@ class Attraction(db.Model):
     latitude = db.Column(db.Float, nullable=False)
     longitude = db.Column(db.Float, nullable=False)
     image_url = db.Column(db.String(500), nullable=True)
+    directions = db.Column(db.Text, nullable=True)
+    osm_alternatives = db.Column(db.JSON, nullable=True)
     
     barangay_id = db.Column(db.Integer, db.ForeignKey('BARANGAY_INFO.id'), nullable=True, index=True)
     heritage_profile_id = db.Column(db.Integer, db.ForeignKey("HERITAGE_PROFILE.id"), nullable=True)
@@ -35,10 +37,12 @@ class Attraction(db.Model):
             'latitude': self.latitude,
             'longitude': self.longitude,
             'image_url': self.image_url,
+            'directions': self.directions,
             'barangay_id': self.barangay_id,
             'barangay_name': self.barangay.name if self.barangay else None,
             'status': self.status,
-            'created_at': self.created_at.isoformat() if self.created_at else None
+            'created_at': self.created_at.isoformat() if self.created_at else None,
+            'osm_alternatives': self.osm_alternatives
         }
 
 

@@ -93,6 +93,14 @@ def add_attraction():
             if uploaded_url:
                 image_url = uploaded_url
 
+        directions = request.form.get("directions")
+        if directions:
+            valid, err = validate_string_input(directions, max_length=5000, block_sql_injection=True)
+            if not valid:
+                flash(f"Directions: {err}", "error")
+                return redirect(url_for("admin.add_attraction"))
+            directions = sanitize_html_input(directions)
+
         attraction = Attraction(
             name=name,
             category=category,
@@ -100,6 +108,7 @@ def add_attraction():
             latitude=lat_val,
             longitude=lng_val,
             image_url=image_url,
+            directions=directions,
             user_id=current_user.id,
             barangay_id=int(request.form.get("barangay_id", 1)),
             status="approved",
@@ -229,11 +238,20 @@ def edit_attraction(id):
                 return redirect(url_for("admin.edit_attraction", id=id))
             attraction.barangay_id = barangay_id
 
+        directions = request.form.get("directions")
+        if directions:
+            valid, err = validate_string_input(directions, max_length=5000, block_sql_injection=True)
+            if not valid:
+                flash(f"Directions: {err}", "error")
+                return redirect(url_for("admin.edit_attraction", id=id))
+            directions = sanitize_html_input(directions)
+
         attraction.name = name
         attraction.category = category
         attraction.description = description
         attraction.latitude = lat_val
         attraction.longitude = lng_val
+        attraction.directions = directions
 
         # Handle image upload
         if "image" in request.files:

@@ -335,8 +335,8 @@ def edit_establishment():
                 return redirect(url_for("business.edit_establishment"))
 
         price_range = request.form.get("price_range", "").strip()
-        if price_range and price_range not in ("$", "$$", "$$$"):
-            flash("Invalid price range: must be $, $$, or $$$", "error")
+        if price_range and price_range not in ("budget", "moderate", "premium"):
+            flash("Invalid price range: must be budget, moderate, or premium", "error")
             return redirect(url_for("business.edit_establishment"))
 
         barangay = BarangayInfo.query.filter_by(name=barangay_name).first()

@@ -1,5 +1,4 @@
 import logging
-import json
 from datetime import datetime
 from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
 from extensions import db, limiter
@@ -26,95 +25,9 @@ logger = logging.getLogger(__name__)
 
 @barangay_bp.route("/")
 def index():
-    """Display directory of all barangays with active contributors."""
-    logger.info("Barangays directory page accessed")
-    record_view("page", page_name="barangays_list")
-
-    cache_key = "public_barangays_list"
-    redis = current_app.redis_client
-
-    if redis:
-        try:
-            cached_data = redis.get(cache_key)
-            if cached_data:
-                return render_template("pagez/barangays.html", barangays=json.loads(cached_data))
-        except Exception as e:
-            logger.error(f"Redis cache fetch error: {e}")
-
-    barangay_ids_query = (
-        db.session.query(User.barangay_id)
-        .filter(
-            User.role == "contributor", User.is_approved, User.barangay_id.is_not(None)
-        )
-        .distinct()
-        .all()
-    )
-    barangay_ids = [b[0] for b in barangay_ids_query]
-
-    if not barangay_ids:
-        return render_template("pagez/barangays.html", barangays=[])
-
-    all_attractions = (
-        db.session.query(
-            Attraction.barangay_id, 
-            Attraction.name, 
-            Attraction.category, 
-            Attraction.image_url, 
-            Attraction.latitude, 
-            Attraction.longitude
-        )
-        .filter(
-            Attraction.barangay_id.in_(barangay_ids), 
-            Attraction.status == "approved"
-        )
-        .all()
-    )
-
-    from collections import defaultdict
-    barangay_data = defaultdict(list)
-    for a in all_attractions:
-        barangay_data[a.barangay_id].append(a)
-
-    barangay_infos = (
-        db.session.query(BarangayInfo.id, BarangayInfo.name)
-        .filter(BarangayInfo.id.in_(barangay_ids))
-        .all()
-    )
-    barangay_map = {b.id: b.name for b in barangay_infos}
-
-    barangay_list = []
-    for brgy_id in barangay_ids:
-        attractions = barangay_data.get(brgy_id, [])
-        name = barangay_map.get(brgy_id, "Unknown")
-        image_url = next((a.image_url for a in attractions if a.image_url), None)
-
-        latitude, longitude = 15.9949, 120.4869 
-        if attractions:
-            latitude = sum(a.latitude for a in attractions) / len(attractions)
-            longitude = sum(a.longitude for a in attractions) / len(attractions)
-
-        tags = sorted(list(set(a.category for a in attractions if a.category)))
-
-        barangay_list.append(
-            {
-                "name": name,
-                "image_url": image_url,
-                "latitude": latitude,
-                "longitude": longitude,
-                "tags": tags,
-                "attraction_count": len(attractions),
-            }
-        )
-
-    barangay_list.sort(key=lambda x: x["name"])
-
-    if redis:
-        try:
-            redis.set(cache_key, json.dumps(barangay_list), ex=3600)
-        except Exception as e:
-            logger.error(f"Redis cache set error: {e}")
-
-    return render_template("pagez/barangays.html", barangays=barangay_list)
+    """Redirect to modern v1 barangay directory."""
+    logger.info("Redirecting legacy /barangay/ to /v1/barangay")
+    return redirect(url_for("public_v1.barangays_v1_view", **request.args), code=302)
 
 @barangay_bp.route("/<name>")
 def profile(name):
@@ -358,6 +271,14 @@ def barangay_add_attraction():
             if uploaded_url:
                 image_url = uploaded_url
 
+        directions = request.form.get("directions", "")
+        if directions:
+            is_valid, err = validate_string_input(directions, max_length=5000)
+            if not is_valid:
+                flash(f"Invalid directions: {err}", "error")
+                return redirect(url_for("barangay.barangay_add_attraction"))
+            directions = sanitize_html_input(directions)
+
         attraction = Attraction(
             name=name,
             category=category,
@@ -365,6 +286,7 @@ def barangay_add_attraction():
             latitude=lat,
             longitude=lng,
             image_url=image_url,
+            directions=directions,
             barangay_id=current_user.barangay_id,
             user_id=current_user.id,
             status="pending",
@@ -416,12 +338,21 @@ def barangay_edit_attraction(id):
             if uploaded_url:
                 image_url = uploaded_url
 
+        directions = request.form.get("directions", "")
+        if directions:
+            is_valid, err = validate_string_input(directions, max_length=5000)
+            if not is_valid:
+                flash(f"Invalid directions: {err}", "error")
+                return redirect(url_for("barangay.barangay_edit_attraction", id=id))
+            directions = sanitize_html_input(directions)
+
         attraction.name = name
         attraction.category = category
         attraction.description = sanitize_html_input(description)
         attraction.latitude = lat
         attraction.longitude = lng
         attraction.image_url = image_url
+        attraction.directions = directions
         
         attraction.status = "pending"
         

@@ -212,7 +212,6 @@ h6,
 
 .bg-heritage-gradient {
     background: #022c22 !important;
-    background: linear-gradient(135deg, #022c22, #111827, #022c22) !important;
 }
 
 .text-contrast-muted {
@@ -292,23 +291,62 @@ h6,
 }
 
 
-/* Additional robustness for all search/filter forms */
+/* Premium clean input styling for standard forms/dashboards (Tailwind-compatible fallbacks) */
 form input[type='text'], 
 form input[type='email'], 
-form input[type='password'], 
-form select {
-    background-color: rgba(2, 44, 34, 0.85) !important;
-    color: white !important;
-    border: 1px solid rgba(16, 185, 129, 0.2) !important;
+form input[type='password'],
+form input[type='number'],
+form input[type='date'],
+form input[type='url'],
+form select,
+form textarea {
+    background-color: #ffffff;
+    color: #0f172a;
+    border: 1px solid #cbd5e1;
+    border-radius: 0.75rem;
+    padding: 0.625rem 1rem;
+    font-size: 0.875rem;
+    transition: all 0.2s ease-in-out;
 }
 
-form input::placeholder {
-    color: rgba(255, 255, 255, 0.4) !important;
+/* Glassmorphic/Translucent search input overrides to prevent being forced to solid white by global rules */
+nav input[name="q"],
+.glass-aura input[name="q"] {
+    background-color: rgba(255, 255, 255, 0.08) !important;
+    color: #ffffff !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+}
+
+nav input[name="q"]::placeholder,
+.glass-aura input[name="q"]::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
+}
+
+nav input[name="q"]:focus,
+.glass-aura input[name="q"]:focus {
+    background-color: rgba(255, 255, 255, 0.15) !important;
+    border-color: #10b981 !important; /* mongodb-green / emerald-500 */
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2) !important;
+}
+
+form input:focus, 
+form select:focus,
+form textarea:focus {
+    border-color: #10b981;
+    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.15);
+    outline: none;
+}
+
+form input::placeholder,
+form textarea::placeholder {
+    color: #94a3b8;
 }
 
 form select option {
-    background-color: #022c22 !important;
-    color: white !important;
+    background-color: #ffffff;
+    color: #0f172a;
 }
 
 
@@ -384,8 +422,6 @@ form select option {
 
 .bg-dining-gradient {
     background: #431407 !important;
-    background: linear-gradient(135deg, #431407 0%, #111827 50%, #451a03 100%) !important;
-    background-attachment: fixed !important;
 }
 
 .text-orange-contrast-muted {
@@ -553,5 +589,198 @@ form select option {
 .admin-breadcrumb-bar {
     animation: breadcrumb-enter 0.25s ease forwards;
 }
+
+/* ================================================
+   🎨 WHITE THEME OVERRIDES FOR BUSINESS/DINING PORTALS
+   ================================================ */
+
+body.bg-orange-950,
+body.bg-emerald-950 {
+    background-color: #ffffff !important;
+}
+
+.bg-heritage-gradient,
+.bg-dining-gradient {
+    background: #ffffff !important;
+}
+
+/* Headings and Main Titles */
+.bg-heritage-gradient h1, .bg-heritage-gradient h2, .bg-heritage-gradient h3, .bg-heritage-gradient h4,
+.bg-dining-gradient h1, .bg-dining-gradient h2, .bg-dining-gradient h3, .bg-dining-gradient h4 {
+    color: #0f172a !important; /* slate-900 */
+}
+
+/* Paragraphs & Small text */
+.bg-heritage-gradient p,
+.bg-dining-gradient p,
+.bg-heritage-gradient .text-emerald-100\/60,
+.bg-heritage-gradient .text-emerald-100\/50,
+.bg-dining-gradient .text-orange-100\/60,
+.bg-dining-gradient .text-orange-100\/50 {
+    color: #475569 !important; /* slate-600 */
+}
+
+/* Text highlights and color anchors */
+.bg-heritage-gradient .text-emerald-400 {
+    color: #059669 !important; /* emerald-600 */
+}
+.bg-heritage-gradient .text-emerald-400:hover {
+    color: #047857 !important; /* emerald-700 */
+}
+.bg-dining-gradient .text-orange-400 {
+    color: #ea580c !important; /* orange-600 */
+}
+.bg-dining-gradient .text-orange-400:hover {
+    color: #c2410c !important; /* orange-700 */
+}
+
+/* Cards & Panels Overrides (Replacing dark translucent layers with premium white cards) */
+.bg-heritage-gradient .bg-emerald-900\/40,
+.bg-heritage-gradient .bg-emerald-900\/20,
+.bg-heritage-gradient .bg-emerald-900\/30,
+.bg-heritage-gradient .bg-emerald-950\/30,
+.bg-heritage-gradient .bg-blue-900\/30,
+.bg-heritage-gradient .bg-white\/5,
+.bg-dining-gradient .bg-orange-950\/40,
+.bg-dining-gradient .bg-orange-900\/20,
+.bg-dining-gradient .bg-orange-900\/30,
+.bg-dining-gradient .bg-orange-950\/30,
+.bg-dining-gradient .bg-blue-900\/30,
+.bg-dining-gradient .bg-white\/5 {
+    background-color: #ffffff !important;
+    border-color: #e2e8f0 !important; /* slate-200 */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
+    backdrop-filter: none !important;
+}
+
+/* Stat numbers and text inside cards */
+.bg-heritage-gradient .text-white,
+.bg-dining-gradient .text-white {
+    color: #0f172a !important; /* slate-900 */
+}
+
+/* Quick Action card hover effects */
+.bg-heritage-gradient .hover\:bg-emerald-800\/30:hover,
+.bg-dining-gradient .hover\:bg-orange-800\/30:hover,
+.bg-heritage-gradient .hover\:bg-blue-800\/30:hover,
+.bg-dining-gradient .hover\:bg-blue-800\/30:hover,
+.bg-dining-gradient .hover\:bg-orange-900\/30:hover,
+.bg-heritage-gradient .hover\:bg-emerald-900\/30:hover {
+    background-color: #f8fafc !important; /* slate-50 */
+    border-color: #cbd5e1 !important; /* slate-300 */
+}
+
+/* Premium Icon circular/rounded background tags */
+.bg-heritage-gradient div[class*="bg-emerald-800\/50"],
+.bg-heritage-gradient div[class*="bg-blue-800\/50"],
+.bg-dining-gradient div[class*="bg-orange-800\/50"],
+.bg-dining-gradient div[class*="bg-blue-800\/50"] {
+    background-color: #f0fdf4 !important; /* emerald-50 */
+}
+.bg-dining-gradient div[class*="bg-orange-800\/50"] {
+    background-color: #fff7ed !important; /* orange-50 */
+}
+.bg-heritage-gradient div[class*="bg-blue-800\/50"],
+.bg-dining-gradient div[class*="bg-blue-800\/50"] {
+    background-color: #eff6ff !important; /* blue-50 */
+}
+
+/* SVGs (Icons) color adjustment for high-contrast visibility */
+.bg-heritage-gradient svg.text-emerald-400 {
+    color: #059669 !important; /* emerald-600 */
+}
+.bg-dining-gradient svg.text-orange-400 {
+    color: #ea580c !important; /* orange-600 */
+}
+.bg-heritage-gradient svg.text-blue-400,
+.bg-dining-gradient svg.text-blue-400 {
+    color: #2563eb !important; /* blue-600 */
+}
+
+/* Retain white text for solid action buttons */
+.bg-heritage-gradient .bg-emerald-600,
+.bg-heritage-gradient .bg-emerald-700,
+.bg-heritage-gradient button,
+.bg-heritage-gradient a.bg-emerald-600,
+.bg-dining-gradient .bg-orange-600,
+.bg-dining-gradient .bg-orange-700,
+.bg-dining-gradient button,
+.bg-dining-gradient a.bg-orange-600 {
+    color: #ffffff !important;
+}
+
+/* "Edit Details" secondary buttons */
+.bg-heritage-gradient a[class*="bg-emerald-700"],
+.bg-dining-gradient a[class*="bg-orange-700"] {
+    background-color: #059669 !important; /* emerald-600 */
+    color: #ffffff !important;
+}
+.bg-heritage-gradient a[class*="bg-emerald-700"]:hover,
+.bg-dining-gradient a[class*="bg-orange-700"]:hover {
+    background-color: #047857 !important; /* emerald-700 */
+}
+
+/* Inputs, Textareas and Dropdown controls */
+.bg-heritage-gradient input,
+.bg-heritage-gradient textarea,
+.bg-heritage-gradient select,
+.bg-dining-gradient input,
+.bg-dining-gradient textarea,
+.bg-dining-gradient select {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #0f172a !important;
+}
+.bg-heritage-gradient input::placeholder,
+.bg-heritage-gradient textarea::placeholder,
+.bg-dining-gradient input::placeholder,
+.bg-dining-gradient textarea::placeholder {
+    color: #94a3b8 !important;
+}
+.bg-heritage-gradient input:focus,
+.bg-heritage-gradient textarea:focus,
+.bg-heritage-gradient select:focus {
+    border-color: #059669 !important;
+    box-shadow: 0 0 0 2px rgba(5, 150, 105, 0.2) !important;
+}
+.bg-dining-gradient input:focus,
+.bg-dining-gradient textarea:focus,
+.bg-dining-gradient select:focus {
+    border-color: #ea580c !important;
+    box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.2) !important;
+}
+.bg-heritage-gradient option,
+.bg-dining-gradient option {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+}
+
+/* Checkboxes and form labels */
+.bg-heritage-gradient label,
+.bg-dining-gradient label {
+    color: #334155 !important;
+}
+.bg-heritage-gradient label.cursor-pointer,
+.bg-dining-gradient label.cursor-pointer {
+    background-color: #f8fafc !important;
+    border-color: #e2e8f0 !important;
+    color: #334155 !important;
+}
+.bg-heritage-gradient label.cursor-pointer:hover,
+.bg-dining-gradient label.cursor-pointer:hover {
+    background-color: #f1f5f9 !important;
+    border-color: #cbd5e1 !important;
+}
+
+/* Warning & Error banners text color overrides */
+.bg-heritage-gradient .text-amber-200,
+.bg-dining-gradient .text-amber-200 {
+    color: #78350f !important; /* amber-900 */
+}
+.bg-heritage-gradient .text-red-200,
+.bg-dining-gradient .text-red-200 {
+    color: #7f1d1d !important; /* red-900 */
+}
+
 
 

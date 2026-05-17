@@ -54,7 +54,8 @@ def seed_data():
                 'category': 'Nature',
                 'latitude': 15.7033,
                 'longitude': 120.2758,
-                'barangay': 'Malabobo'
+                'barangay': 'Malabobo',
+                'directions': 'From the Mangatarem town plaza, travel south along the Romulo Highway (National Road). Look for the Manleluag signpost on the right in Barangay Malabobo, then turn right and follow the winding paved scenic road for 7 kilometers up to the park gates.'
             },
             {
                 'name': 'St. Raymund of Peñafort Parish',
@@ -62,7 +63,8 @@ def seed_data():
                 'category': 'Religious',
                 'latitude': 15.7901,
                 'longitude': 120.2917,
-                'barangay': 'Poblacion'
+                'barangay': 'Poblacion',
+                'directions': 'Located at the heart of the town center (Poblacion). Walk east for 2 minutes from the Municipal Hall plaza, or look for the tall bell tower along the main national highway.'
             },
             {
                 'name': 'Mangatarem Heritage Museum',
@@ -70,7 +72,8 @@ def seed_data():
                 'category': 'Heritage',
                 'latitude': 15.7895,
                 'longitude': 120.2925,
-                'barangay': 'Poblacion'
+                'barangay': 'Poblacion',
+                'directions': 'Situated immediately adjacent to the St. Raymund of Peñafort Parish. From the church courtyard, simply walk north-east across the small cobblestone pathway for about 150 meters.'
             }
         ]
 
@@ -82,6 +85,7 @@ def seed_data():
                     category=attr['category'],
                     latitude=attr['latitude'],
                     longitude=attr['longitude'],
+                    directions=attr.get('directions'),
                     barangay_id=barangays[attr['barangay']].id,
                     user_id=admin.id,
                     status='approved',
@@ -145,12 +149,39 @@ def seed_data():
 
         # 5. Create Newsletter Subscribers
         subscribers_data = [
+            {'email': 'jemcarlo46@gmail.com', 'is_active': True},
             {'email': 'mangatarem.visitor@outlook.com', 'is_active': True},
             {'email': 'heritage.advocate@mangatarem.gov.ph', 'is_active': True},
             {'email': 'local.steward@poblacion.org', 'is_active': True},
             {'email': 'pangasinan.traveler@gmail.com', 'is_active': True},
             {'email': 'curious.explorer@yahoo.com', 'is_active': True},
-            {'email': 'unsubscribed.user@example.com', 'is_active': False}
+            {'email': 'unsubscribed.user@example.com', 'is_active': False},
+            # Realistic local Mangatarem/Pangasinan dummy subscribers
+            {'email': 'juan.delacruz.mangatarem@gmail.com', 'is_active': True},
+            {'email': 'maria.santos.pangasinan@yahoo.com', 'is_active': True},
+            {'email': 'b.quetegan.steward@mangatarem.gov.ph', 'is_active': True},
+            {'email': 'dorongan.rep@mangatarem.gov.ph', 'is_active': True},
+            {'email': 'steward.malabobo@mangatarem.gov.ph', 'is_active': True},
+            {'email': 'bogtong.heritage@gmail.com', 'is_active': True},
+            {'email': 'poblacion.tourism@gmail.com', 'is_active': True},
+            {'email': 'traveler.ph@outlook.com', 'is_active': True},
+            {'email': 'up.diliman.historian@up.edu.ph', 'is_active': True},
+            {'email': 'ust.heritage.center@ust.edu.ph', 'is_active': True},
+            {'email': 'philippine.explorer@hotmail.com', 'is_active': True},
+            {'email': 'adventurous.soul@gmail.com', 'is_active': True},
+            {'email': 'ecotourism.champion@yahoo.com', 'is_active': True},
+            {'email': 'local.business.owner@mangatarem.org', 'is_active': True},
+            {'email': 'nature.photographer@outlook.ph', 'is_active': True},
+            {'email': 'pangasinan.blogger@gmail.com', 'is_active': True},
+            {'email': 'retired.teacher.mangatarem@gmail.com', 'is_active': True},
+            {'email': 'inactive.user1@example.com', 'is_active': False},
+            {'email': 'inactive.user2@example.com', 'is_active': False},
+            {'email': 'inactive.user3@example.com', 'is_active': False},
+            {'email': 'cultural.heritage.advocate@gmail.com', 'is_active': True},
+            {'email': 'pila.liwanag@poblacion.org', 'is_active': True},
+            {'email': 'antonio.luna@heritage.gov.ph', 'is_active': True},
+            {'email': 'mangatarem.roots@yahoo.com', 'is_active': True},
+            {'email': 'paskong.mangatarem@outlook.com', 'is_active': True}
         ]
 
         for sub in subscribers_data:
