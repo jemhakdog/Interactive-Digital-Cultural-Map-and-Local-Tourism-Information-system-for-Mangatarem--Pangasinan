@@ -6,7 +6,7 @@ sys.path.append(os.getcwd())
 
 from app import create_app
 from extensions import db
-from models import User, BarangayInfo, Attraction, Establishment
+from models import User, BarangayInfo, Attraction, Establishment, NewsletterSubscriber
 
 def seed_data():
     app = create_app()
@@ -142,6 +142,25 @@ def seed_data():
                 )
                 db.session.add(e)
                 print(f"Establishment {est['name']} created.")
+
+        # 5. Create Newsletter Subscribers
+        subscribers_data = [
+            {'email': 'mangatarem.visitor@outlook.com', 'is_active': True},
+            {'email': 'heritage.advocate@mangatarem.gov.ph', 'is_active': True},
+            {'email': 'local.steward@poblacion.org', 'is_active': True},
+            {'email': 'pangasinan.traveler@gmail.com', 'is_active': True},
+            {'email': 'curious.explorer@yahoo.com', 'is_active': True},
+            {'email': 'unsubscribed.user@example.com', 'is_active': False}
+        ]
+
+        for sub in subscribers_data:
+            if not NewsletterSubscriber.query.filter_by(email=sub['email']).first():
+                ns = NewsletterSubscriber(
+                    email=sub['email'],
+                    is_active=sub['is_active']
+                )
+                db.session.add(ns)
+                print(f"Newsletter subscriber {sub['email']} created.")
 
         db.session.commit()
         print("Data seeding completed successfully!")
