@@ -4,12 +4,57 @@ This chapter provides a comprehensive exposition of the outcomes derived from th
 
 ## Proposed System Flowchart
 
-The operational workflow of the Interactive Digital Cultural Map is characterized by a centralized, role-based pipeline designed to ensure data integrity and administrative oversight. The process initiates at the grassroots level, where designated Barangay Representatives capture and input cultural heritage data—encompassing built, natural, and intangible assets—into the Contributor Portal. This submission triggers a conditional logic sequence within the backend architecture:
+The operational workflow of the Interactive Digital Cultural Map and Local Tourism Information System is formalized through a centralized, multi-role system flowchart. Within the context of the Rapid Application Development (RAD) methodology, this flowchart serves as a critical blueprint for aligning functional capabilities with stakeholder expectations during rapid iterations. By mapping the logical pathways of distinct actor groups, the flowchart visualizes the transition from fragmented, legacy manual processes to a synchronized, community-driven digital ecosystem (Community-Based Information System or CBIS).
 
-1.  **Data Ingestion:** The system captures metadata, geographic coordinates, and media submitted by users within the **Administrative and Stakeholder** category.
-2.  **Moderation Queue:** Submissions are held in a "Pending" state and routed to the central moderation dashboard.
-3.  **Administrative Review:** The **Administrative and Stakeholder** user (Tourism Office staff) performs a qualitative audit. Entries are approved or rejected based on verification standards.
-4.  **Public Publication:** Approved assets are dynamically rendered on the Mapbox GL JS interface, becoming accessible to **General Public and Academic Users** in real-time.
+The system flowchart is architecturally divided into three role-based user lanes (Swimlanes) and a unified database processing engine, isolating security boundaries and operational concerns. This design guarantees strict data governance, where grassroots data capture is verified through administrative oversight before public exposure.
+
+<put the image here>
+
+*(Figure 7: Proposed System Flowchart. The multi-lane flowchart outlines the role-based validation, submission, and public access workflows.)*
+
+### Operational Swimlanes and Actor Roles
+
+The workflow partitions responsibilities across four vertical channels to ensure security, usability, and data integrity:
+
+1.  **General Public and Academic Users (Visitor Lane):** Represents the high-concurrency consumer tier. Visitors navigate the interactive portal, perform spatial queries, extract academic research profiles, and submit community feedback (reviews, ratings, and media files).
+2.  **Barangay Representatives (Contributor Lane):** Represents the grassroots data stewardship tier. Contributor accounts are securely gated (restricted to a single verified representative per barangay). They digitize primary-source historical and cultural assets using standardized inventories.
+3.  **LGU Tourism Office Administrators (Admin Lane):** Represents the moderation and quality assurance tier. Administrators oversee global configurations, monitor analytical trends, manage accounts, and qualitative audits.
+4.  **Database and Mapping Engine (System Lane):** Serves as the central repository and transaction coordinator. It manages persistent storage, spatial processing, real-time caching, tile-generation rendering pipelines, and security audit logging.
+
+### Alphanumeric Step-by-Step Workflow Path Mapping
+
+The precise sequential interactions mapped across the proposed system flowchart are structured as follows:
+
+*   **General Visitor Workflow Path (V1–V5):**
+    *   **V1: Access Web Portal:** The visitor initiates a secure web session, loading the public portal containing the map atlas.
+    *   **V2: Search & Filter Categories:** The visitor applies dynamic taxonomic queries (e.g., natural heritage, built heritage, intangible cultural assets) or filters by barangay boundary.
+    *   **V3: Explore Interactive Map:** The map coordinates with the backend to render georeferenced visual pins dynamically on the Mapbox GL JS map canvas.
+    *   **V4: View Attraction/Establishment Details:** Clicking a pin fetches detailed profiles from the database, rendering historical narratives, operating statuses, business menus, and accommodation configurations.
+    *   **V5: Leave Review / Interactive Feedback:** Authenticated visitors submit community ratings, reviews, and validating media, pushing new interactive feedback to the database engine.
+*   **Barangay Contributor Workflow Path (C1–C5):**
+    *   **C1: Secure Login:** The contributor authenticates via a Flask-Login form utilizing secure cookie validation.
+    *   **C2: Access Barangay Dashboard:** The system redirects the user to their designated dashboard, exposing local stewardship progress metrics.
+    *   **C3: Digitally Fill Heritage Forms 01–07:** The contributor inputs structured primary-source data conforming to the national cultural heritage inventory protocols.
+    *   **C4: Upload Photos & Media Assets:** The contributor attaches high-resolution photography and documents to serve as evidentiary support for the heritage profile.
+    *   **C5: Submit Asset for Review:** Committing the form triggers a transactional save, marking the asset's state as `PENDING` and queuing it in the moderation queue.
+*   **Tourism Office Admin Workflow Path (A1–A6):**
+    *   **A1: Secure Login (Admin):** The administrator authenticates via a high-privilege credentials form.
+    *   **A2: Access Admin Dashboard:** The admin views active system metrics, active session logs, page views, establishment updates, and the pending moderation queue.
+    *   **A3: Review Pending Submissions:** The administrator retrieves queued entries from the moderation queue.
+    *   **A4: Decision Gate (Meets Standards?):** The administrator conducts a qualitative audit of the metadata, geo-coordinates, and media assets.
+    *   **A5: Approve & Publish (Yes Branch):** If the asset meets requirements, the admin approves it. The database updates the state to `APPROVED`, and the mapping engine immediately renders the pin to the general public.
+    *   **A6: Reject & Send Feedback (No Branch):** If the asset fails audits, the admin rejects it, logs detailed correction requests, and routes it back to the respective contributor dashboard in a `REJECTED` state for rectification.
+*   **Database and Mapping Engine System Path (DB1):**
+    *   **DB1: PostgreSQL & Mapbox Vector Tiles:** Implements strict validation constraints (e.g., preventing duplicate barangay representatives), logs transaction records to the `DATABASE_AUDIT_LOG`, updates caching via Upstash Redis, and serves optimized vector tiles via PostGIS `ST_AsMVT` to visitor interfaces.
+
+### Core Pipelines of the System Flow
+
+The operational workflow transitions through four critical pipelines designed to automate spatial rendering and prevent unauthorized data modifications:
+
+1.  **Data Ingestion Pipeline:** Coordinates how incoming data from forms (Jinja2 templates, Flask-WTF validation, and secure upload handlers) is accepted, parsed for geographic coordinates, and written to transitional tables.
+2.  **Moderation Queue Pipeline:** Restricts public database queries to only retrieve rows whose status is explicitly marked as `APPROVED`. New contributions from Barangay Representatives are locked in a `PENDING` state, isolated from the public atlas.
+3.  **Administrative Review Pipeline:** Empowers the LGU Tourism Office with a consolidated moderation portal. The system generates detailed comparison diffs, allowing admins to inspect submitted coordinates against physical boundaries before committing.
+4.  **Public Publication Pipeline:** Automates the transition of verified data to public visualization. Once approved, caching layers are invalidated, and the new georeferenced coordinates are fed into the Mapbox Vector Tile generation script, achieving real-time, low-latency pin rendering.
 
 ## System Features and User Interfaces
 
@@ -108,27 +153,27 @@ Success Rate = (3 / 3) × 100% = **100%**
 
 | Evaluation Criteria | Strongly Disagree (1) | Disagree (2) | Neutral (3) | Agree (4) | Strongly Agree (5) | Average Score |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| The system is easy to navigate | 0 | 0 | 2 | 8 | 10 | **4.4** |
-| The interface design is clear and visually appealing | 0 | 1 | 1 | 9 | 9 | **4.3** |
-| System instructions and labels are understandable | 0 | 0 | 3 | 7 | 10 | **4.35** |
-| The system is user-friendly and requires minimal effort to learn | 0 | 0 | 2 | 10 | 8 | **4.3** |
+| The system is easy to navigate | 0 | 0 | 1 | 4 | 5 | **4.4** |
+| The interface design is clear and visually appealing | 0 | 1 | 0 | 4 | 5 | **4.3** |
+| System instructions and labels are understandable | 0 | 0 | 1 | 4 | 5 | **4.4** |
+| The system is user-friendly and requires minimal effort to learn | 0 | 0 | 1 | 5 | 4 | **4.3** |
 
-**Overall Average Usability Rating: 4.34**
+**Overall Average Usability Rating: 4.35**
 
 ### User Acceptance Testing (UAT) Analysis
 
 | Evaluation Criteria | Strongly Disagree (1) | Disagree (2) | Neutral (3) | Agree (4) | Strongly Agree (5) | Average Score |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| System functionality works as expected | 0 | 0 | 1 | 10 | 9 | **4.4** |
-| The system is easy to navigate | 0 | 1 | 2 | 7 | 10 | **4.3** |
-| System performance is fast and responsive | 0 | 0 | 2 | 8 | 10 | **4.4** |
-| The system meets my needs and requirements | 0 | 0 | 1 | 9 | 10 | **4.45** |
+| System functionality works as expected | 0 | 0 | 1 | 4 | 5 | **4.4** |
+| The system is easy to navigate | 0 | 1 | 0 | 4 | 5 | **4.3** |
+| System performance is fast and responsive | 0 | 0 | 1 | 4 | 5 | **4.4** |
+| The system meets my needs and requirements | 0 | 0 | 0 | 5 | 5 | **4.5** |
 
-**Overall Average Acceptance Rating: 4.39**
+**Overall Average Acceptance Rating: 4.40**
 
 ## Discussion of Findings
 
-The empirical analysis presented in this chapter underscores the technical proficiency and practical viability of the Interactive Digital Cultural Map. The **100% success rate in Functional and Security Testing** validates the system’s readiness for production-level operations, ensuring data integrity for the Mangatarem LGU. The **Lighthouse Best Practices score of 100** reflects the system's adherence to modern web standards, while the **4.34 usability rating** confirms an intuitive experience for stakeholders.
+The empirical analysis presented in this chapter underscores the technical proficiency and practical viability of the Interactive Digital Cultural Map. The **100% success rate in Functional and Security Testing** validates the system’s readiness for production-level operations, ensuring data integrity for the Mangatarem LGU. The **Lighthouse Best Practices score of 100** reflects the system's adherence to modern web standards, while the **4.35 usability rating** confirms an intuitive experience for stakeholders.
 
 **Strengths:** The system’s primary strengths lie in its cloud-native architecture and real-time synchronization between the moderation portal and the public map.
 **Areas for Development:** Future iterations could incorporate offline-first capabilities for remote barangays and advanced visitor analytics for data-driven tourism planning.

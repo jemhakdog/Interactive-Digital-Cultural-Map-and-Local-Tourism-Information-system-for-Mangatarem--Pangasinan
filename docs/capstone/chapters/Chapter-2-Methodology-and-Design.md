@@ -84,13 +84,76 @@ The DFD details the interactions between the main external entities and the syst
 
 ### Entity-Relationship Diagram (ERD)
 
-An Entity-Relationship Diagram (ERD) visually represents the logical structure of a database by defining the entities (tables), their attributes (columns), and the relationships that connect them. ERDs are important in database design because they provide a clear, conceptual blueprint of how data is organized, ensuring data integrity, eliminating redundancy, and establishing the foundation for writing efficient database queries.
+#### 1. Definition, Importance, and Purpose of the ERD
+
+An Entity-Relationship Diagram (ERD) is a foundational database design tool that visually represents the logical and structural architecture of a relational database. It illustrates the system's data model by defining the key data objects (entities), the properties that characterize them (attributes), and the logical associations (relationships) that connect them.
+
+In database design, the ERD serves several critical functions:
+* **Conceptual Blueprint**: It acts as a clear visual mapping that bridges the gap between high-level business requirements and low-level physical database schemas, serving as a single source of truth for both developers and administrative stakeholders.
+* **Data Integrity and Normalization**: By defining primary keys and foreign keys, the ERD ensures that data integrity constraints are systematically planned, eliminating data redundancy and minimizing structural anomalies.
+* **Query Efficiency**: A well-structured ERD facilitates the writing of optimized SQL queries, as developers can easily trace foreign key paths and predict execution costs for multi-table joins.
+* **Scalability**: It establishes a clean, modular foundation that allows the system to scale smoothly, accommodating new features and entities without disrupting existing relationships.
+
+#### 2. ERD Illustration
 
 <put the image here>
 
 *(Figure 5: Entity-Relationship Diagram. The diagram reflects the integrated heritage and tourism ecosystem models.)*
 
-The ERD illustrates the comprehensive data structure of the system, which has evolved beyond simple tourism pins to a full heritage and business management ecosystem. The **USER** entity manages role-based access for Admins, Barangay Contributors, and Business Owners, linked to **BARANGAY_INFO** which serves as the geographic and administrative anchor for all content. The **HERITAGE_PROFILE** acts as a central repository for technical documentation (built, natural, and intangible assets), which can be optionally linked to a public **ATTRACTION** entry. The **EVENT** entity manages the municipality's cultural calendar. To support local commerce, the **ESTABLISHMENT** model manages dining and accommodation data, including child entities like **ESTABLISHMENT_ROOM** and **ESTABLISHMENT_MENU_ITEM**. Finally, the **DATABASE_AUDIT_LOG** ensures security and accountability by tracking all administrative actions. This relational structure ensures that cultural data is preserved with high integrity while providing a flexible foundation for tourism promotion.
+#### 3. Comprehensive Discussion of ERD Content
+
+The system's database schema consists of fifteen highly integrated tables. To understand the operational flow and data governance, these components are analyzed below through their **Entities**, **Attributes**, and **Relationships**:
+
+##### A. Entities (Uppercase, Singular Form)
+
+Each entity represents a distinct domain concept in the system. The 15 core entities are defined as follows:
+1. `USER`: A singular authenticated account representing system users across distinct roles (Admin, Barangay Contributor, Business Owner, Guard).
+2. `PASSWORD_RESET_TOKEN`: A short-lived, secure token used to facilitate self-service account recovery and security verification for a `USER`.
+3. `BARANGAY_INFO`: The geographic, spatial, and administrative anchor representing a specific barangay in Mangatarem, Pangasinan.
+4. `HERITAGE_PROFILE`: The official cultural heritage registry profile matching the national standards of documentation (Form 01-07) for tangible and intangible heritage.
+5. `ATTRACTION`: A visitor-facing profile of a local tourist destination or significant cultural asset.
+6. `EVENT`: A scheduled local cultural festival or calendar event.
+7. `ESTABLISHMENT`: A local business directory entry representing a hospitality or dining vendor (hotels, restaurants, etc.).
+8. `ESTABLISHMENT_ROOM`: A specific lodging unit or room type offered by an `ESTABLISHMENT`.
+9. `ESTABLISHMENT_MENU_ITEM`: A food or beverage offering provided by a dining-focused `ESTABLISHMENT`.
+10. `ESTABLISHMENT_REVIEW`: A customer-submitted rating and testimonial review for an `ESTABLISHMENT`.
+11. `REVIEW_PHOTO`: A multimedia upload (image/photo) linked to a specific `ESTABLISHMENT_REVIEW` to provide visual validation.
+12. `USER_FAVORITE_ESTABLISHMENT`: A joining entity managing the bookmarking/favoriting action of a `USER` for an `ESTABLISHMENT`.
+13. `VISITOR_LOG`: A physical check-in security entry representing an individual guest's entry and exit logs at local checkpoints (managed by the Guard role).
+14. `NEWSLETTER_SUBSCRIBER`: A visitor-submitted email subscription powering the public newsletter and tourism outreach system.
+15. `DATABASE_AUDIT_LOG`: A strict, immutable security log capturing chronological records of administrative modifications to ensure data stewardship accountability.
+
+##### B. Attributes (Characteristics, Primary Keys, and Foreign Keys)
+
+Attributes define the specific characteristics or columns of each entity:
+* **Characteristics of Entities**: Represented within the entity box, these characteristics represent the properties of the entities.
+* **Primary Keys (PK)**: The unique identifier for each record in the entity. In this database schema, the Primary Key is represented first in the attribute box and is underlined (e.g., `id` or `uuid` fields) to enforce entity integrity.
+* **Foreign Keys (FK)**: Attributes that reference the Primary Key of another entity, establishing referential integrity and linking the entities dynamically.
+
+For example:
+* In the `USER` entity, the primary key `id` is underlined and placed first in the attribute box. The attribute `barangay_id` acts as a Foreign Key (FK) referencing the `id` of the `BARANGAY_INFO` entity, establishing a direct connection between users and their administrative barangay jurisdiction.
+* In the `HERITAGE_PROFILE` entity, the attribute `id` is the primary key (underlined and placed first). The attribute `attraction_id` acts as a Foreign Key referencing the `id` of `ATTRACTION`, allowing a cultural registry file to optionally point to its public tourism profile.
+* In the `ESTABLISHMENT_ROOM` entity, the primary key `id` is underlined, and the attribute `establishment_id` acts as a Foreign Key linking the room back to its parent `ESTABLISHMENT`.
+
+##### C. Relationships (Cardinality, Optionability, and Labels)
+
+The connections between entities in this database are characterized primarily by **one-to-many (1:N)** relationships, which define how records in one table relate to multiple records in another. Each relationship has specific cardinality (mandatory or optional) and logical labels:
+1. **`USER` to `PASSWORD_RESET_TOKEN`**: A **1-to-many (1:N)** relationship where one `USER` can request multiple password resets. The relationship is *optional* for `USER` (as users may never request a reset) but *mandatory* for `PASSWORD_RESET_TOKEN` (every token must link back to a valid, existing user). **Label**: "requests".
+2. **`BARANGAY_INFO` to `USER`**: A **1-to-many (1:N)** relationship where one barangay can be associated with multiple administrative users. The relationship is *optional* (a barangay may not have a designated user registered yet). **Label**: "stewards".
+3. **`BARANGAY_INFO` to `HERITAGE_PROFILE`**: A **1-to-many (1:N)** relationship representing the geographic boundaries of cultural preservation. The relationship is *mandatory* for `HERITAGE_PROFILE` (every heritage profile must belong to a specific barangay). **Label**: "contains".
+4. **`BARANGAY_INFO` to `ESTABLISHMENT`**: A **1-to-many (1:N)** relationship where each local business must belong to a barangay. It is *mandatory* for `ESTABLISHMENT`. **Label**: "locates".
+5. **`BARANGAY_INFO` to `EVENT`**: A **1-to-many (1:N)** relationship where multiple festivals or events are anchored to a specific barangay. It is *mandatory* for `EVENT`. **Label**: "hosts".
+6. **`HERITAGE_PROFILE` to `ATTRACTION`**: A **1-to-1 or optional 1-to-many (1:N)** link. A registry profile can optionally associate with a public attraction entry. It is *optional* for `HERITAGE_PROFILE`. **Label**: "promotes".
+7. **`ESTABLISHMENT` to `ESTABLISHMENT_ROOM`**: A **1-to-many (1:N)** relationship where one establishment (hotel/lodge) can have multiple room listings. The relationship is *mandatory* for `ESTABLISHMENT_ROOM` (every room must map to a parent business). **Label**: "offers".
+8. **`ESTABLISHMENT` to `ESTABLISHMENT_MENU_ITEM`**: A **1-to-many (1:N)** relationship where a dining establishment features multiple dishes. It is *mandatory* for `ESTABLISHMENT_MENU_ITEM`. **Label**: "serves".
+9. **`ESTABLISHMENT` to `ESTABLISHMENT_REVIEW`**: A **1-to-many (1:N)** relationship where a business accumulates multiple guest testimonials. It is *mandatory* for `ESTABLISHMENT_REVIEW`. **Label**: "receives".
+10. **`ESTABLISHMENT_REVIEW` to `REVIEW_PHOTO`**: A **1-to-many (1:N)** relationship where a customer can upload multiple photos to validate their review. It is *optional* (a review doesn't require a photo) but *mandatory* for `REVIEW_PHOTO` to reference a valid review. **Label**: "includes".
+11. **`USER` to `USER_FAVORITE_ESTABLISHMENT`**: A **1-to-many (1:N)** relationship representing the bookmarking link. It is *mandatory* for the favorite join record to reference the `USER`. **Label**: "favorites".
+12. **`ESTABLISHMENT` to `USER_FAVORITE_ESTABLISHMENT`**: A **1-to-many (1:N)** relationship. It is *mandatory* for the favorite join record to point to a valid `ESTABLISHMENT`. **Label**: "is_favorited_by".
+13. **`USER` to `VISITOR_LOG`**: A **1-to-many (1:N)** relationship where a guard (represented by `USER`) records multiple tourist check-ins. It is *mandatory* for `VISITOR_LOG` (every check-in must be logged by an authorized user). **Label**: "logs".
+14. **`USER` to `DATABASE_AUDIT_LOG`**: A **1-to-many (1:N)** relationship where administrative actions taken by a `USER` are strictly audited. It is *mandatory* for `DATABASE_AUDIT_LOG` to link back to the responsible user. **Label**: "audits".
+
+This cohesive, normalized database structure ensures complete referential integrity, strong access controls, detailed security monitoring, and active tourist/commercial integration for the municipality of Mangatarem.
 
 ### Implementation Plan
 

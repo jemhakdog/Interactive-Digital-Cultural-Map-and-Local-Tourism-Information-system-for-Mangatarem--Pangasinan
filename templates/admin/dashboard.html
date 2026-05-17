@@ -247,7 +247,7 @@
                                         </td>
                                         <td class="px-6 py-4">
                                             <div class="flex text-orange-400">
-                                                {% for i in range(review.rating) %}★{% endfor %}
+                                                {% for i in range(review.rating or 0) %}★{% endfor %}
                                             </div>
                                         </td>
                                         <td class="px-6 py-4 text-right">

@@ -210,13 +210,76 @@ The DFD details the interactions between the main external entities and the syst
 
 ### Entity-Relationship Diagram (ERD)
 
-An Entity-Relationship Diagram (ERD) visually represents the logical structure of a database by defining the entities (tables), their attributes (columns), and the relationships that connect them. ERDs are important in database design because they provide a clear, conceptual blueprint of how data is organized, ensuring data integrity, eliminating redundancy, and establishing the foundation for writing efficient database queries.
+#### 1. Definition, Importance, and Purpose of the ERD
+
+An Entity-Relationship Diagram (ERD) is a foundational database design tool that visually represents the logical and structural architecture of a relational database. It illustrates the system's data model by defining the key data objects (entities), the properties that characterize them (attributes), and the logical associations (relationships) that connect them.
+
+In database design, the ERD serves several critical functions:
+* **Conceptual Blueprint**: It acts as a clear visual mapping that bridges the gap between high-level business requirements and low-level physical database schemas, serving as a single source of truth for both developers and administrative stakeholders.
+* **Data Integrity and Normalization**: By defining primary keys and foreign keys, the ERD ensures that data integrity constraints are systematically planned, eliminating data redundancy and minimizing structural anomalies.
+* **Query Efficiency**: A well-structured ERD facilitates the writing of optimized SQL queries, as developers can easily trace foreign key paths and predict execution costs for multi-table joins.
+* **Scalability**: It establishes a clean, modular foundation that allows the system to scale smoothly, accommodating new features and entities without disrupting existing relationships.
+
+#### 2. ERD Illustration
 
 ![][image3]
 
-The ERD illustrates the comprehensive data structure of the system, which has evolved beyond simple tourism pins to a full heritage and business management ecosystem. The **USER** entity manages role-based access for Admins, Barangay Contributors, and Business Owners, linked to **BARANGAY\_INFO** which serves as the geographic and administrative anchor for all content. The **HERITAGE\_PROFILE** acts as a central repository for technical documentation (built, natural, and intangible assets), which can be optionally linked to a public **ATTRACTION** entry. The **EVENT** entity manages the municipality's cultural calendar. To support local commerce, the
+*(Figure 5: Entity-Relationship Diagram. The diagram reflects the integrated heritage and tourism ecosystem models.)*
 
-**ESTABLISHMENT** model manages dining and accommodation data, including child entities like **ESTABLISHMENT\_ROOM** and **ESTABLISHMENT\_MENU\_ITEM**. Finally, the **DATABASE\_AUDIT\_LOG** ensures security and accountability by tracking all administrative actions. This relational structure ensures that cultural data is preserved with high integrity while providing a flexible foundation for tourism promotion.
+#### 3. Comprehensive Discussion of ERD Content
+
+The system's database schema consists of fifteen highly integrated tables. To understand the operational flow and data governance, these components are analyzed below through their **Entities**, **Attributes**, and **Relationships**:
+
+##### A. Entities (Uppercase, Singular Form)
+
+Each entity represents a distinct domain concept in the system. The 15 core entities are defined as follows:
+1. `USER`: A singular authenticated account representing system users across distinct roles (Admin, Barangay Contributor, Business Owner, Guard).
+2. `PASSWORD\_RESET\_TOKEN`: A short-lived, secure token used to facilitate self-service account recovery and security verification for a `USER`.
+3. `BARANGAY\_INFO`: The geographic, spatial, and administrative anchor representing a specific barangay in Mangatarem, Pangasinan.
+4. `HERITAGE\_PROFILE`: The official cultural heritage heritage registry profile matching the national standards of documentation (Form 01-07) for tangible and intangible heritage.
+5. `ATTRACTION`: A visitor-facing profile of a local tourist destination or significant cultural asset.
+6. `EVENT`: A scheduled local cultural festival or calendar event.
+7. `ESTABLISHMENT`: A local business directory entry representing a hospitality or dining vendor (hotels, restaurants, etc.).
+8. `ESTABLISHMENT\_ROOM`: A specific lodging unit or room type offered by an `ESTABLISHMENT`.
+9. `ESTABLISHMENT\_MENU\_ITEM`: A food or beverage offering provided by a dining-focused `ESTABLISHMENT`.
+10. `ESTABLISHMENT\_REVIEW`: A customer-submitted rating and testimonial review for an `ESTABLISHMENT`.
+11. `REVIEW\_PHOTO`: A multimedia upload (image/photo) linked to a specific `ESTABLISHMENT\_REVIEW` to provide visual validation.
+12. `USER\_FAVORITE\_ESTABLISHMENT`: A joining entity managing the bookmarking/favoriting action of a `USER` for an `ESTABLISHMENT`.
+13. `VISITOR\_LOG`: A physical check-in security entry representing an individual guest's entry and exit logs at local checkpoints (managed by the Guard role).
+14. `NEWSLETTER\_SUBSCRIBER`: A visitor-submitted email subscription powering the public newsletter and tourism outreach system.
+15. `DATABASE\_AUDIT\_LOG`: A strict, immutable security log capturing chronological records of administrative modifications to ensure data stewardship accountability.
+
+##### B. Attributes (Characteristics, Primary Keys, and Foreign Keys)
+
+Attributes define the specific characteristics or columns of each entity:
+* **Characteristics of Entities**: Represented within the entity box, these characteristics represent the properties of the entities.
+* **Primary Keys (PK)**: The unique identifier for each record in the entity. In this database schema, the Primary Key is represented first in the attribute box and is underlined (e.g., `id` or `uuid` fields) to enforce entity integrity.
+* **Foreign Keys (FK)**: Attributes that reference the Primary Key of another entity, establishing referential integrity and linking the entities dynamically.
+
+For example:
+* In the `USER` entity, the primary key `id` is underlined and placed first in the attribute box. The attribute `barangay\_id` acts as a Foreign Key (FK) referencing the `id` of the `BARANGAY\_INFO` entity, establishing a direct connection between users and their administrative barangay jurisdiction.
+* In the `HERITAGE\_PROFILE` entity, the attribute `id` is the primary key (underlined and placed first). The attribute `attraction\_id` acts as a Foreign Key referencing the `id` of `ATTRACTION`, allowing a cultural registry file to optionally point to its public tourism profile.
+* In the `ESTABLISHMENT\_ROOM` entity, the primary key `id` is underlined, and the attribute `establishment\_id` acts as a Foreign Key linking the room back to its parent `ESTABLISHMENT`.
+
+##### C. Relationships (Cardinality, Optionability, and Labels)
+
+The connections between entities in this database are characterized primarily by **one-to-many (1:N)** relationships, which define how records in one table relate to multiple records in another. Each relationship has specific cardinality (mandatory or optional) and logical labels:
+1. **`USER` to `PASSWORD\_RESET\_TOKEN`**: A **1-to-many (1:N)** relationship where one `USER` can request multiple password resets. The relationship is *optional* for `USER` (as users may never request a reset) but *mandatory* for `PASSWORD\_RESET\_TOKEN` (every token must link back to a valid, existing user). **Label**: "requests".
+2. **`BARANGAY\_INFO` to `USER`**: A **1-to-many (1:N)** relationship where one barangay can be associated with multiple administrative users. The relationship is *optional* (a barangay may not have a designated user registered yet). **Label**: "stewards".
+3. **`BARANGAY\_INFO` to `HERITAGE\_PROFILE`**: A **1-to-many (1:N)** relationship representing the geographic boundaries of cultural preservation. The relationship is *mandatory* for `HERITAGE\_PROFILE` (every heritage profile must belong to a specific barangay). **Label**: "contains".
+4. **`BARANGAY\_INFO` to `ESTABLISHMENT`**: A **1-to-many (1:N)** relationship where each local business must belong to a barangay. It is *mandatory* for `ESTABLISHMENT`. **Label**: "locates".
+5. **`BARANGAY\_INFO` to `EVENT`**: A **1-to-many (1:N)** relationship where multiple festivals or events are anchored to a specific barangay. It is *mandatory* for `EVENT`. **Label**: "hosts".
+6. **`HERITAGE\_PROFILE` to `ATTRACTION`**: A **1-to-1 or optional 1-to-many (1:N)** link. A registry profile can optionally associate with a public attraction entry. It is *optional* for `HERITAGE\_PROFILE`. **Label**: "promotes".
+7. **`ESTABLISHMENT` to `ESTABLISHMENT\_ROOM`**: A **1-to-many (1:N)** relationship where one establishment (hotel/lodge) can have multiple room listings. The relationship is *mandatory* for `ESTABLISHMENT\_ROOM` (every room must map to a parent business). **Label**: "offers".
+8. **`ESTABLISHMENT` to `ESTABLISHMENT\_MENU\_ITEM`**: A **1-to-many (1:N)** relationship where a dining establishment features multiple dishes. It is *mandatory* for `ESTABLISHMENT\_MENU\_ITEM`. **Label**: "serves".
+9. **`ESTABLISHMENT` to `ESTABLISHMENT\_REVIEW`**: A **1-to-many (1:N)** relationship where a business accumulates multiple guest testimonials. It is *mandatory* for `ESTABLISHMENT\_REVIEW`. **Label**: "receives".
+10. **`ESTABLISHMENT\_REVIEW` to `REVIEW\_PHOTO`**: A **1-to-many (1:N)** relationship where a customer can upload multiple photos to validate their review. It is *optional* (a review doesn't require a photo) but *mandatory* for `REVIEW\_PHOTO` to reference a valid review. **Label**: "includes".
+11. **`USER` to `USER\_FAVORITE\_ESTABLISHMENT`**: A **1-to-many (1:N)** relationship representing the bookmarking link. It is *mandatory* for the favorite join record to reference the `USER`. **Label**: "favorites".
+12. **`ESTABLISHMENT` to `USER\_FAVORITE\_ESTABLISHMENT`**: A **1-to-many (1:N)** relationship. It is *mandatory* for the favorite join record to point to a valid `ESTABLISHMENT`. **Label**: "is\_favorited\_by".
+13. **`USER` to `VISITOR\_LOG`**: A **1-to-many (1:N)** relationship where a guard (represented by `USER`) records multiple tourist check-ins. It is *mandatory* for `VISITOR\_LOG` (every check-in must be logged by an authorized user). **Label**: "logs".
+14. **`USER` to `DATABASE\_AUDIT\_LOG`**: A **1-to-many (1:N)** relationship where administrative actions taken by a `USER` are strictly audited. It is *mandatory* for `DATABASE\_AUDIT\_LOG` to link back to the responsible user. **Label**: "audits".
+
+This cohesive, normalized database structure ensures complete referential integrity, strong access controls, detailed security monitoring, and active tourist/commercial integration for the municipality of Mangatarem.
 
 ### Implementation Plan
 
@@ -270,12 +333,57 @@ This chapter provides a comprehensive exposition of the outcomes derived from th
 
 ## Proposed System Flowchart
 
-The operational workflow of the Interactive Digital Cultural Map is characterized by a centralized, role-based pipeline designed to ensure data integrity and administrative oversight. The process initiates at the grassroots level, where designated Barangay Representatives capture and input cultural heritage data—encompassing built, natural, and intangible assets—into the Contributor Portal. This submission triggers a conditional logic sequence within the backend architecture:
+The operational workflow of the Interactive Digital Cultural Map and Local Tourism Information System is formalized through a centralized, multi-role system flowchart. Within the context of the Rapid Application Development (RAD) methodology, this flowchart serves as a critical blueprint for aligning functional capabilities with stakeholder expectations during rapid iterations. By mapping the logical pathways of distinct actor groups, the flowchart visualizes the transition from fragmented, legacy manual processes to a synchronized, community-driven digital ecosystem (Community-Based Information System or CBIS).
 
-1. **Data Ingestion:** The system captures metadata, geographic coordinates, and media submitted by users within the **Administrative and Stakeholder** category.  
-2. **Moderation Queue:** Submissions are held in a "Pending" state and routed to the central moderation dashboard.  
-3. **Administrative Review:** The **Administrative and Stakeholder** user (Tourism Office staff) performs a qualitative audit. Entries are approved or rejected based on verification standards.  
-4. **Public Publication:** Approved assets are dynamically rendered on the Mapbox GL JS interface, becoming accessible to **General Public and Academic Users** in real-time.
+The system flowchart is architecturally divided into three role-based user lanes (Swimlanes) and a unified database processing engine, isolating security boundaries and operational concerns. This design guarantees strict data governance, where grassroots data capture is verified through administrative oversight before public exposure.
+
+<put the image here>
+
+*(Figure 7: Proposed System Flowchart. The multi-lane flowchart outlines the role-based validation, submission, and public access workflows.)*
+
+### Operational Swimlanes and Actor Roles
+
+The workflow partitions responsibilities across four vertical channels to ensure security, usability, and data integrity:
+
+1.  **General Public and Academic Users (Visitor Lane):** Represents the high-concurrency consumer tier. Visitors navigate the interactive portal, perform spatial queries, extract academic research profiles, and submit community feedback (reviews, ratings, and media files).
+2.  **Barangay Representatives (Contributor Lane):** Represents the grassroots data stewardship tier. Contributor accounts are securely gated (restricted to a single verified representative per barangay). They digitize primary-source historical and cultural assets using standardized inventories.
+3.  **LGU Tourism Office Administrators (Admin Lane):** Represents the moderation and quality assurance tier. Administrators oversee global configurations, monitor analytical trends, manage accounts, and qualitative audits.
+4.  **Database and Mapping Engine (System Lane):** Serves as the central repository and transaction coordinator. It manages persistent storage, spatial processing, real-time caching, tile-generation rendering pipelines, and security audit logging.
+
+### Alphanumeric Step-by-Step Workflow Path Mapping
+
+The precise sequential interactions mapped across the proposed system flowchart are structured as follows:
+
+*   **General Visitor Workflow Path (V1–V5):**
+    *   **V1: Access Web Portal:** The visitor initiates a secure web session, loading the public portal containing the map atlas.
+    *   **V2: Search & Filter Categories:** The visitor applies dynamic taxonomic queries (e.g., natural heritage, built heritage, intangible cultural assets) or filters by barangay boundary.
+    *   **V3: Explore Interactive Map:** The map coordinates with the backend to render georeferenced visual pins dynamically on the Mapbox GL JS map canvas.
+    *   **V4: View Attraction/Establishment Details:** Clicking a pin fetches detailed profiles from the database, rendering historical narratives, operating statuses, business menus, and accommodation configurations.
+    *   **V5: Leave Review / Interactive Feedback:** Authenticated visitors submit community ratings, reviews, and validating media, pushing new interactive feedback to the database engine.
+*   **Barangay Contributor Workflow Path (C1–C5):**
+    *   **C1: Secure Login:** The contributor authenticates via a Flask-Login form utilizing secure cookie validation.
+    *   **C2: Access Barangay Dashboard:** The system redirects the user to their designated dashboard, exposing local stewardship progress metrics.
+    *   **C3: Digitally Fill Heritage Forms 01–07:** The contributor inputs structured primary-source data conforming to the national cultural heritage inventory protocols.
+    *   **C4: Upload Photos & Media Assets:** The contributor attaches high-resolution photography and documents to serve as evidentiary support for the heritage profile.
+    *   **C5: Submit Asset for Review:** Committing the form triggers a transactional save, marking the asset's state as `PENDING` and queuing it in the moderation queue.
+*   **Tourism Office Admin Workflow Path (A1–A6):**
+    *   **A1: Secure Login (Admin):** The administrator authenticates via a high-privilege credentials form.
+    *   **A2: Access Admin Dashboard:** The admin views active system metrics, active session logs, page views, establishment updates, and the pending moderation queue.
+    *   **A3: Review Pending Submissions:** The administrator retrieves queued entries from the moderation queue.
+    *   **A4: Decision Gate (Meets Standards?):** The administrator conducts a qualitative audit of the metadata, geo-coordinates, and media assets.
+    *   **A5: Approve & Publish (Yes Branch):** If the asset meets requirements, the admin approves it. The database updates the state to `APPROVED`, and the mapping engine immediately renders the pin to the general public.
+    *   **A6: Reject & Send Feedback (No Branch):** If the asset fails audits, the admin rejects it, logs detailed correction requests, and routes it back to the respective contributor dashboard in a `REJECTED` state for rectification.
+*   **Database and Mapping Engine System Path (DB1):**
+    *   **DB1: PostgreSQL & Mapbox Vector Tiles:** Implements strict validation constraints (e.g., preventing duplicate barangay representatives), logs transaction records to the `DATABASE\_AUDIT\_LOG`, updates caching via Upstash Redis, and serves optimized vector tiles via PostGIS `ST\_AsMVT` to visitor interfaces.
+
+### Core Pipelines of the System Flow
+
+The operational workflow transitions through four critical pipelines designed to automate spatial rendering and prevent unauthorized data modifications:
+
+1.  **Data Ingestion Pipeline:** Coordinates how incoming data from forms (Jinja2 templates, Flask-WTF validation, and secure upload handlers) is accepted, parsed for geographic coordinates, and written to transitional tables.
+2.  **Moderation Queue Pipeline:** Restricts public database queries to only retrieve rows whose status is explicitly marked as `APPROVED`. New contributions from Barangay Representatives are locked in a `PENDING` state, isolated from the public atlas.
+3.  **Administrative Review Pipeline:** Empowers the LGU Tourism Office with a consolidated moderation portal. The system generates detailed comparison diffs, allowing admins to inspect submitted coordinates against physical boundaries before committing.
+4.  **Public Publication Pipeline:** Automates the transition of verified data to public visualization. Once approved, caching layers are invalidated, and the new georeferenced coordinates are fed into the Mapbox Vector Tile generation script, achieving real-time, low-latency pin rendering.
 
 ## System Features and User Interfaces
 
