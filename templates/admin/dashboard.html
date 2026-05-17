@@ -165,7 +165,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 01-9-3.812M13.712 11.288a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0z" />
                                 </svg>
-                                New Contributors
+                                Pending Members
                             </h4>
                         </div>
                         <div class="overflow-x-auto">
@@ -178,9 +178,19 @@
                                             <p class="text-emerald-900/40 text-xs">{{ user.email }}</p>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <span
-                                                class="bg-blue-50 text-blue-700 text-xs font-black uppercase px-2 py-1 rounded">Brgy.
-                                                {{ user.barangay }}</span>
+                                            {% if user.role == 'contributor' %}
+                                            <span class="bg-blue-50 text-blue-700 text-[10px] font-black uppercase px-2.5 py-1 rounded-full border border-blue-200">
+                                                Guardian: {{ user.barangay.name if user.barangay else 'General' }}
+                                            </span>
+                                            {% elif user.role == 'business_owner' %}
+                                            <span class="bg-amber-50 text-amber-700 text-[10px] font-black uppercase px-2.5 py-1 rounded-full border border-amber-200">
+                                                Business Owner
+                                            </span>
+                                            {% else %}
+                                            <span class="bg-gray-50 text-gray-700 text-[10px] font-black uppercase px-2.5 py-1 rounded-full border border-gray-200">
+                                                {{ user.role }}
+                                            </span>
+                                            {% endif %}
                                         </td>
                                         <td class="px-6 py-4 text-right">
                                             <div class="flex justify-end gap-2">

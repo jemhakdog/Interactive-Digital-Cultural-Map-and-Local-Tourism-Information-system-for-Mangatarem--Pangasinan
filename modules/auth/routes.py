@@ -57,10 +57,10 @@ def _authenticate_user(username: str, password: str) -> Optional[User]:
 
 def _check_approval_status(user: User) -> bool:
     """
-    Check if contributor user is approved.
+    Check if user is approved.
     """
-    if user.role == "contributor" and not user.is_approved:
-        log_logic("auth", "login", f"Contributor '{user.username}' pending approval")
+    if user.role in ["contributor", "business_owner"] and not user.is_approved:
+        log_logic("auth", "login", f"User '{user.username}' with role '{user.role}' pending approval")
         return False
     return True
 
@@ -121,8 +121,8 @@ def _create_user_from_form(username: str, email: str, password: str, role: str, 
     db.session.add(user)
     db.session.commit()
     
-    log_success("auth", "register", f"New user '{username}' registered for barangay ID '{barangay_id}'")
-    logger.info(f"New contributor user '{username}' registered for barangay ID '{barangay_id}', awaiting approval")
+    log_success("auth", "register", f"New user '{username}' registered with role '{role}'")
+    logger.info(f"New user '{username}' registered with role '{role}', awaiting approval={not user.is_approved}")
     
     return user
 
@@ -286,7 +286,7 @@ def register():
         # Create user
         _create_user_from_form(username, email, password, role, barangay_id)
 
-        if role == "contributor":
+        if role in ["contributor", "business_owner"]:
             return redirect(url_for("auth.pending_approval"))
         else:
             flash("Registration successful! You can now log in.", "success")

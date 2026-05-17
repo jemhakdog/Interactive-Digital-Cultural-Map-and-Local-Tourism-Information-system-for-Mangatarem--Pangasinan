@@ -376,6 +376,97 @@ def barangay_add_attraction():
 
     return render_template("barangay/add_attraction.html")
 
+@barangay_bp.route("/attractions/edit/<int:id>", methods=["GET", "POST"])
+@login_required
+@limiter.limit("10 per minute")
+def barangay_edit_attraction(id):
+    if current_user.role != "contributor":
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+
+    attraction = Attraction.query.get_or_404(id)
+    
+    if attraction.barangay_id != current_user.barangay_id:
+        flash("Access denied. You can only edit attractions in your assigned barangay.", "error")
+        return redirect(url_for("barangay.barangay_attractions"))
+
+    if request.method == "POST":
+        name = request.form.get("name", "")
+        description = request.form.get("description", "")
+        category = request.form.get("category", "")
+        lat_str = request.form.get("latitude", "")
+        lng_str = request.form.get("longitude", "")
+
+        is_valid, err = validate_string_input(name, max_length=200)
+        if not is_valid:
+            flash(f"Invalid name: {err}", "error")
+            return redirect(url_for("barangay.barangay_edit_attraction", id=id))
+
+        try:
+            lat, lng = float(lat_str), float(lng_str)
+            if not validate_coordinates(lat, lng):
+                raise ValueError
+        except (ValueError, TypeError):
+            flash("Invalid coordinates.", "error")
+            return redirect(url_for("barangay.barangay_edit_attraction", id=id))
+
+        image_url = request.form.get("image_url", attraction.image_url)
+        if "image" in request.files:
+            uploaded_url = save_uploaded_file(request.files["image"])
+            if uploaded_url:
+                image_url = uploaded_url
+
+        attraction.name = name
+        attraction.category = category
+        attraction.description = sanitize_html_input(description)
+        attraction.latitude = lat
+        attraction.longitude = lng
+        attraction.image_url = image_url
+        
+        attraction.status = "pending"
+        
+        db.session.commit()
+        
+        redis = current_app.redis_client
+        if redis:
+            try:
+                redis.delete("public_barangays_list")
+                redis.delete(f"barangay_data:{current_user.barangay_id}")
+            except Exception as e:
+                logger.error(f"Redis cache delete error: {e}")
+
+        flash("Attraction updated and submitted for review!")
+        return redirect(url_for("barangay.barangay_attractions"))
+
+    return render_template("barangay/edit_attraction.html", attraction=attraction)
+
+@barangay_bp.route("/attractions/delete/<int:id>")
+@login_required
+def barangay_delete_attraction(id):
+    if current_user.role != "contributor":
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+
+    attraction = Attraction.query.get_or_404(id)
+    
+    if attraction.barangay_id != current_user.barangay_id:
+        flash("Access denied. You can only delete attractions in your assigned barangay.", "error")
+        return redirect(url_for("barangay.barangay_attractions"))
+
+    db.session.delete(attraction)
+    db.session.commit()
+    
+    redis = current_app.redis_client
+    if redis:
+        try:
+            redis.delete("public_barangays_list")
+            redis.delete(f"barangay_data:{current_user.barangay_id}")
+        except Exception as e:
+            logger.error(f"Redis cache delete error: {e}")
+
+    flash("Attraction deleted successfully!")
+    return redirect(url_for("barangay.barangay_attractions"))
+
 # --- Contributor Event CRUD ---
 
 @barangay_bp.route("/events")
@@ -397,7 +488,7 @@ def barangay_add_event():
         return redirect(url_for("public.index"))
 
     if request.method == "POST":
-        title = request.form.get("title", "")
+        title = request.form.get("name") or request.form.get("title", "")
         description = request.form.get("description", "")
         location = request.form.get("location", "")
         category = request.form.get("category", "")
@@ -433,6 +524,107 @@ def barangay_add_event():
 
     return render_template("barangay/add_event.html")
 
+@barangay_bp.route("/events/edit/<int:id>", methods=["GET", "POST"])
+@login_required
+@limiter.limit("10 per minute")
+def barangay_edit_event(id):
+    if current_user.role != "contributor":
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+
+    event = Event.query.get_or_404(id)
+
+    if event.barangay_id != current_user.barangay_id:
+        flash("Access denied. You can only edit events in your assigned barangay.", "error")
+        return redirect(url_for("barangay.barangay_events"))
+
+    if request.method == "POST":
+        title = request.form.get("name") or request.form.get("title", "")
+        description = request.form.get("description", "")
+        location = request.form.get("location", "")
+        category = request.form.get("category", "")
+        date_str = request.form.get("date", "")
+        lat_str = request.form.get("latitude", "")
+        lng_str = request.form.get("longitude", "")
+
+        try:
+            event_date = datetime.strptime(date_str, "%Y-%m-%d").date()
+        except (ValueError, TypeError):
+            flash("Invalid date format.", "error")
+            return redirect(url_for("barangay.barangay_edit_event", id=id))
+
+        is_valid, err = validate_string_input(title, max_length=200)
+        if not is_valid:
+            flash(f"Invalid title: {err}", "error")
+            return redirect(url_for("barangay.barangay_edit_event", id=id))
+
+        lat, lng = None, None
+        if lat_str or lng_str:
+            try:
+                lat, lng = float(lat_str), float(lng_str)
+                if not validate_coordinates(lat, lng):
+                    raise ValueError
+            except (ValueError, TypeError):
+                flash("Invalid coordinates.", "error")
+                return redirect(url_for("barangay.barangay_edit_event", id=id))
+
+        image_url = request.form.get("image_url", event.image_url)
+        if "image" in request.files:
+            uploaded_url = save_uploaded_file(request.files["image"])
+            if uploaded_url:
+                image_url = uploaded_url
+
+        event.name = title
+        event.date = event_date
+        event.location = location
+        event.category = category
+        event.description = sanitize_html_input(description)
+        event.latitude = lat
+        event.longitude = lng
+        event.image_url = image_url
+        
+        event.status = "pending"
+
+        db.session.commit()
+        
+        redis = current_app.redis_client
+        if redis:
+            try:
+                redis.delete(f"barangay_data:{current_user.barangay_id}")
+            except Exception as e:
+                logger.error(f"Redis cache delete error: {e}")
+
+        flash("Event updated and submitted for review!")
+        return redirect(url_for("barangay.barangay_events"))
+
+    return render_template("barangay/edit_event.html", event=event)
+
+@barangay_bp.route("/events/delete/<int:id>")
+@login_required
+def barangay_delete_event(id):
+    if current_user.role != "contributor":
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+
+    event = Event.query.get_or_404(id)
+
+    if event.barangay_id != current_user.barangay_id:
+        flash("Access denied. You can only delete events in your assigned barangay.", "error")
+        return redirect(url_for("barangay.barangay_events"))
+
+    db.session.delete(event)
+    db.session.commit()
+
+    redis = current_app.redis_client
+    if redis:
+        try:
+            redis.delete(f"barangay_data:{current_user.barangay_id}")
+        except Exception as e:
+            logger.error(f"Redis cache delete error: {e}")
+
+    flash("Event deleted successfully!")
+    return redirect(url_for("barangay.barangay_events"))
+
 # --- Contributor Gallery CRUD ---
 
 @barangay_bp.route("/gallery")
@@ -442,7 +634,7 @@ def barangay_gallery():
         flash("Access denied.")
         return redirect(url_for("public.index"))
 
-    gallery_items = GalleryItem.query.filter_by(user_id=current_user.id).order_by(GalleryItem.uploaded_at.desc()).all()
+    gallery_items = GalleryItem.query.filter_by(user_id=current_user.id).order_by(GalleryItem.created_at.desc()).all()
     return render_template("barangay/gallery.html", gallery_items=gallery_items)
 
 @barangay_bp.route("/gallery/add", methods=["GET", "POST"])
@@ -481,3 +673,78 @@ def barangay_add_gallery():
         return redirect(url_for("barangay.barangay_dashboard"))
 
     return render_template("barangay/add_gallery.html")
+
+@barangay_bp.route("/gallery/edit/<int:id>", methods=["GET", "POST"])
+@login_required
+@limiter.limit("10 per minute")
+def barangay_edit_gallery(id):
+    if current_user.role != "contributor":
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+
+    gallery_item = GalleryItem.query.get_or_404(id)
+
+    if gallery_item.user_id != current_user.id:
+        flash("Access denied. You can only edit your own gallery items.", "error")
+        return redirect(url_for("barangay.barangay_gallery"))
+
+    if request.method == "POST":
+        url = request.form.get("url", gallery_item.url)
+        caption = request.form.get("caption", "")
+        item_type = gallery_item.type
+
+        if "media_file" in request.files:
+            uploaded_url = save_uploaded_file(request.files["media_file"])
+            if uploaded_url:
+                url = uploaded_url
+                item_type = detect_media_type(request.files["media_file"].filename)
+
+        if not url:
+            flash("Please provide media.", "error")
+            return redirect(url_for("barangay.barangay_edit_gallery", id=id))
+
+        gallery_item.url = sanitize_url(url)
+        gallery_item.caption = sanitize_html_input(caption)
+        gallery_item.type = item_type
+        
+        gallery_item.status = "pending"
+
+        db.session.commit()
+
+        redis = current_app.redis_client
+        if redis:
+            try:
+                redis.delete(f"barangay_data:{current_user.barangay_id}")
+            except Exception as e:
+                logger.error(f"Redis cache delete error: {e}")
+
+        flash("Gallery item updated and submitted for review!")
+        return redirect(url_for("barangay.barangay_gallery"))
+
+    return render_template("barangay/edit_gallery.html", gallery_item=gallery_item)
+
+@barangay_bp.route("/gallery/delete/<int:id>")
+@login_required
+def barangay_delete_gallery(id):
+    if current_user.role != "contributor":
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+
+    gallery_item = GalleryItem.query.get_or_404(id)
+
+    if gallery_item.user_id != current_user.id:
+        flash("Access denied. You can only delete your own gallery items.", "error")
+        return redirect(url_for("barangay.barangay_gallery"))
+
+    db.session.delete(gallery_item)
+    db.session.commit()
+
+    redis = current_app.redis_client
+    if redis:
+        try:
+            redis.delete(f"barangay_data:{current_user.barangay_id}")
+        except Exception as e:
+            logger.error(f"Redis cache delete error: {e}")
+
+    flash("Gallery item deleted successfully!")
+    return redirect(url_for("barangay.barangay_gallery"))

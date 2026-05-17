@@ -1931,4 +1931,334 @@ document.addEventListener('DOMContentLoaded', function () {
 
     initLayoutSystem();
 
+    // ========================================
+    // SENIOR-FRIENDLY "GABAY MODE" CONTROLLER
+    // ========================================
+    let easyModeActive = false;
+    let easyModeLanguage = 'tl'; // 'tl' or 'en'
+    let easyModeCategory = null;
+    let easyModeIndex = 0;
+    let easyModeFilteredSpots = [];
+    let speechUtterance = null;
+
+    const easyOverlay = document.getElementById('easy-mode-overlay');
+    const easyToggle = document.getElementById('easy-mode-toggle');
+    const easyExit = document.getElementById('easy-mode-exit');
+    const easyLangTl = document.getElementById('easy-lang-tl');
+    const easyLangEn = document.getElementById('easy-lang-en');
+    const easyViewCategories = document.getElementById('easy-view-categories');
+    const easyViewDetail = document.getElementById('easy-view-detail');
+    const easySpotImg = document.getElementById('easy-spot-img');
+    const easySpotCatBadge = document.getElementById('easy-spot-cat-badge');
+    const easySpotTitle = document.getElementById('easy-spot-title');
+    const easySpotSubtitle = document.getElementById('easy-spot-subtitle');
+    const easySpotDesc = document.getElementById('easy-spot-desc');
+    const easySpeakBtn = document.getElementById('easy-speak-btn');
+    const easyNavBack = document.getElementById('easy-nav-back');
+    const easyNavMenu = document.getElementById('easy-nav-menu');
+    const easyNavNext = document.getElementById('easy-nav-next');
+
+    // Language buttons
+    if (easyLangTl) {
+        easyLangTl.addEventListener('click', () => setEasyLanguage('tl'));
+    }
+    if (easyLangEn) {
+        easyLangEn.addEventListener('click', () => setEasyLanguage('en'));
+    }
+
+    function setEasyLanguage(lang) {
+        easyModeLanguage = lang;
+        if (lang === 'tl') {
+            easyLangTl.classList.add('bg-[#C25A3F]', 'text-white');
+            easyLangTl.classList.remove('text-[#1C1C1C]', 'hover:bg-gray-100');
+            easyLangEn.classList.remove('bg-[#C25A3F]', 'text-white');
+            easyLangEn.classList.add('text-[#1C1C1C]', 'hover:bg-gray-100');
+            
+            document.querySelectorAll('.lang-tl').forEach(el => el.classList.remove('hidden'));
+            document.querySelectorAll('.lang-en').forEach(el => el.classList.add('hidden'));
+        } else {
+            easyLangEn.classList.add('bg-[#C25A3F]', 'text-white');
+            easyLangEn.classList.remove('text-[#1C1C1C]', 'hover:bg-gray-100');
+            easyLangTl.classList.remove('bg-[#C25A3F]', 'text-white');
+            easyLangTl.classList.add('text-[#1C1C1C]', 'hover:bg-gray-100');
+            
+            document.querySelectorAll('.lang-en').forEach(el => el.classList.remove('hidden'));
+            document.querySelectorAll('.lang-tl').forEach(el => el.classList.add('hidden'));
+        }
+        
+        // Stop current speech and re-render/update descriptions
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        if (easySpeakBtn) easySpeakBtn.classList.remove('playing');
+        
+        if (easyModeFilteredSpots.length > 0) {
+            renderCurrentEasySpot();
+        }
+    }
+
+    // Toggle button handler
+    if (easyToggle) {
+        easyToggle.addEventListener('click', () => {
+            toggleEasyMode(true);
+        });
+    }
+
+    if (easyExit) {
+        easyExit.addEventListener('click', () => {
+            toggleEasyMode(false);
+        });
+    }
+
+    function toggleEasyMode(active) {
+        easyModeActive = active;
+        
+        const sidebar = document.getElementById('attractions-sidebar');
+        if (sidebar) {
+            if (active) {
+                sidebar.classList.add('is-hidden');
+            } else {
+                sidebar.classList.remove('is-hidden');
+            }
+        }
+        
+        if (active) {
+            easyOverlay.classList.remove('hidden');
+            toggleMapGestures(false); // Lock gestures!
+            
+            // Go to categories menu initially
+            showEasyMenu();
+        } else {
+            easyOverlay.classList.add('hidden');
+            toggleMapGestures(true); // Restore gestures!
+            
+            if (window.speechSynthesis) window.speechSynthesis.cancel();
+            if (easySpeakBtn) easySpeakBtn.classList.remove('playing');
+        }
+
+        // Trigger map resize so canvas expands cleanly to full screen
+        setTimeout(() => {
+            if (map) {
+                if (isLeafletMode) {
+                    map.invalidateSize();
+                } else if (typeof map.resize === 'function') {
+                    map.resize();
+                }
+            }
+        }, 300);
+    }
+
+    function toggleMapGestures(enable) {
+        if (isLeafletMode) {
+            if (enable) {
+                map.dragging.enable();
+                map.touchZoom.enable();
+                map.doubleClickZoom.enable();
+            } else {
+                map.dragging.disable();
+                map.touchZoom.disable();
+                map.doubleClickZoom.disable();
+            }
+            return;
+        }
+        
+        const handlers = [
+            map.dragPan,
+            map.scrollZoom,
+            map.boxZoom,
+            map.dragRotate,
+            map.keyboard,
+            map.doubleClickZoom,
+            map.touchZoomRotate
+        ];
+        
+        handlers.forEach(handler => {
+            if (handler) {
+                enable ? handler.enable() : handler.disable();
+            }
+        });
+    }
+
+    // Category button click handlers
+    document.querySelectorAll('.easy-cat-card').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const cat = btn.getAttribute('data-easy-cat');
+            loadEasyCategory(cat);
+        });
+    });
+
+    async function loadEasyCategory(category) {
+        easyModeCategory = category;
+        easyModeIndex = 0;
+        
+        // Show loading screen in details area
+        easyViewCategories.classList.add('hidden');
+        easyViewDetail.classList.remove('hidden');
+        easySpotTitle.textContent = easyModeLanguage === 'tl' ? "Sandali lamang..." : "Loading spots...";
+        easySpotSubtitle.textContent = "";
+        easySpotDesc.textContent = easyModeLanguage === 'tl' ? "Kinukuha namin ang listahan ng mga magagandang lugar..." : "Retrieving location list from Mangatarem database...";
+        easySpotImg.src = "";
+        
+        easyNavBack.classList.add('hidden');
+        easyNavMenu.classList.remove('hidden');
+        easyNavNext.classList.add('hidden');
+        
+        try {
+            if (category === 'Historical' || category === 'Nature') {
+                const response = await fetch(`/api/attractions?category=${category}&per_page=50`);
+                const data = await response.json();
+                easyModeFilteredSpots = data.attractions || [];
+            } else if (category === 'Food') {
+                const response = await fetch(`/business/api?per_page=50`);
+                const data = await response.json();
+                // Filter businesses that match restaurant, cafe, fastfood, eatery
+                const foodTypes = ['restaurant', 'cafe', 'fastfood'];
+                easyModeFilteredSpots = (data.establishments || []).filter(est => foodTypes.includes(est.type));
+            } else if (category === 'Lodging') {
+                const response = await fetch(`/business/api?per_page=50`);
+                const data = await response.json();
+                // Filter businesses that match lodging, inn, hotel
+                const stayTypes = ['hotel', 'inn', 'lodging', 'homestay', 'resort'];
+                easyModeFilteredSpots = (data.establishments || []).filter(est => stayTypes.includes(est.type));
+            }
+            
+            if (easyModeFilteredSpots.length === 0) {
+                easySpotTitle.textContent = easyModeLanguage === 'tl' ? "Walang nahanap" : "No locations found";
+                easySpotDesc.textContent = easyModeLanguage === 'tl' ? "Paumanhin, walang mahanap na mga lugar sa kategoryang ito sa ngayon." : "Sorry, no entries in this category were found in the database.";
+            } else {
+                renderCurrentEasySpot();
+            }
+            
+        } catch (err) {
+            console.error("Error loading easy mode spots:", err);
+            easySpotTitle.textContent = "Error";
+            easySpotDesc.textContent = easyModeLanguage === 'tl' ? "Nagkaroon ng problema sa pagkonekta sa database. Paki-subukan muli." : "Failed to connect to the server database. Please try again.";
+        }
+    }
+
+    function renderCurrentEasySpot() {
+        if (easyModeFilteredSpots.length === 0) return;
+        const spot = easyModeFilteredSpots[easyModeIndex];
+        
+        // Populate standard visual items
+        const isAttraction = spot.category !== undefined;
+        const name = spot.name;
+        const barangay = spot.barangay || spot.barangay_id || 'Mangatarem';
+        const description = spot.description || (easyModeLanguage === 'tl' ? "Kasalukuyang inaayos ang kuwento para sa pamanang ito." : "A detailed description is currently being curated.");
+        const image = spot.image || spot.cover_image_url || spot.image_url || '/static/img/mangatarem_map_teaser.webp';
+        const categoryLabel = (isAttraction ? spot.category : (spot.type || 'Establishment')).toUpperCase();
+        
+        easySpotTitle.textContent = name;
+        easySpotSubtitle.textContent = `${barangay}, Mangatarem`;
+        easySpotDesc.textContent = description;
+        easySpotImg.src = image;
+        easySpotCatBadge.textContent = categoryLabel;
+        
+        // Show/hide navigation keys based on indices
+        easyNavMenu.classList.remove('hidden');
+        
+        if (easyModeIndex > 0) {
+            easyNavBack.classList.remove('hidden');
+        } else {
+            easyNavBack.classList.add('hidden');
+        }
+        
+        if (easyModeIndex < easyModeFilteredSpots.length - 1) {
+            easyNavNext.classList.remove('hidden');
+        } else {
+            easyNavNext.classList.add('hidden');
+        }
+        
+        // Auto-navigate map smoothly
+        const lat = parseFloat(spot.latitude || spot.lat || spot.latitude);
+        const lng = parseFloat(spot.longitude || spot.lng || spot.longitude);
+        if (lat && lng && !isNaN(lat) && !isNaN(lng)) {
+            easyModeFlyTo(lat, lng);
+        }
+    }
+
+    function showEasyMenu() {
+        easyViewCategories.classList.remove('hidden');
+        easyViewDetail.classList.add('hidden');
+        
+        easyNavBack.classList.add('hidden');
+        easyNavMenu.classList.add('hidden');
+        easyNavNext.classList.add('hidden');
+        
+        easyModeFilteredSpots = [];
+        easyModeIndex = 0;
+        
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        if (easySpeakBtn) easySpeakBtn.classList.remove('playing');
+    }
+
+    if (easyNavMenu) {
+        easyNavMenu.addEventListener('click', showEasyMenu);
+    }
+    
+    if (easyNavBack) {
+        easyNavBack.addEventListener('click', () => {
+            if (easyModeIndex > 0) {
+                easyModeIndex--;
+                renderCurrentEasySpot();
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
+                if (easySpeakBtn) easySpeakBtn.classList.remove('playing');
+            }
+        });
+    }
+
+    if (easyNavNext) {
+        easyNavNext.addEventListener('click', () => {
+            if (easyModeIndex < easyModeFilteredSpots.length - 1) {
+                easyModeIndex++;
+                renderCurrentEasySpot();
+                if (window.speechSynthesis) window.speechSynthesis.cancel();
+                if (easySpeakBtn) easySpeakBtn.classList.remove('playing');
+            }
+        });
+    }
+
+    // Text to Speech Narrator
+    if (easySpeakBtn) {
+        easySpeakBtn.addEventListener('click', () => {
+            if ('speechSynthesis' in window) {
+                if (window.speechSynthesis.speaking) {
+                    window.speechSynthesis.cancel();
+                    easySpeakBtn.classList.remove('playing');
+                    return;
+                }
+                
+                const spot = easyModeFilteredSpots[easyModeIndex];
+                if (!spot) return;
+                
+                const name = spot.name;
+                const barangay = spot.barangay || spot.barangay_id || 'Mangatarem';
+                const description = spot.description || '';
+                
+                let narrationText = "";
+                if (easyModeLanguage === 'tl') {
+                    narrationText = `Narito po tayo sa ${name}, sa barangay ${barangay}. ${description}`;
+                } else {
+                    narrationText = `We are at ${name}, located in barangay ${barangay}. ${description}`;
+                }
+                
+                easySpeakBtn.classList.add('playing');
+                
+                speechUtterance = new SpeechSynthesisUtterance(narrationText);
+                speechUtterance.lang = easyModeLanguage === 'tl' ? 'fil-PH' : 'en-US';
+                speechUtterance.rate = 0.82; // Slightly slow and extremely clear
+                
+                speechUtterance.onend = () => {
+                    easySpeakBtn.classList.remove('playing');
+                };
+                
+                speechUtterance.onerror = () => {
+                    easySpeakBtn.classList.remove('playing');
+                };
+                
+                window.speechSynthesis.speak(speechUtterance);
+            } else {
+                Swal.fire("Paumanhin / Sorry", "Hindi suportado ng iyong browser ang pagbasa ng kuwento. / Speech synthesis not supported by your device browser.", "warning");
+            }
+        });
+    }
+
 });

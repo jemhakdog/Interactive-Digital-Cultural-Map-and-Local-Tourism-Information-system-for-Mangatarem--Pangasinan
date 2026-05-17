@@ -97,7 +97,7 @@ def add_event():
         return redirect(url_for("public.index"))
     
     if request.method == "POST":
-        name = request.form.get("name")
+        name = request.form.get("name") or request.form.get("title")
         location = request.form.get("location")
         category = request.form.get("category")
         description = request.form.get("description")

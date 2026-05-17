@@ -2,6 +2,10 @@
 
 {% block title %}Edit Attraction - Barangay Hub{% endblock %}
 
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='vendor/leaflet/leaflet.css') }}" />
+{% endblock %}
+
 {% block content %}
 <div class="min-h-screen bg-[#f8fafc] py-12 px-6">
     <div class="container mx-auto max-w-3xl">
@@ -126,4 +130,29 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js') }}"></script>
+<script src="{{ url_for('static', filename='js/map-picker.js') }}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Initialize MapPicker
+        const picker = new MapPicker({
+            mapId: 'map-picker',
+            latInputId: 'input-lat',
+            lngInputId: 'input-lng',
+            defaultLocation: [15.7889, 120.2986],
+            zoom: 14
+        });
+
+        // Wire up Geolocation button
+        const btnLocate = document.getElementById('btn-locate');
+        if (btnLocate) {
+            btnLocate.addEventListener('click', () => {
+                picker.locate();
+            });
+        }
+    });
+</script>
 {% endblock %}

@@ -66,7 +66,7 @@ def _get_engagement_data(days: int = 7) -> Dict[str, List]:
 def _get_pending_items() -> Dict[str, any]:
     """Fetch all items awaiting admin approval."""
     return {
-        "users": User.query.filter_by(is_approved=False, role="contributor").all(),
+        "users": User.query.filter(User.is_approved == False, User.role.in_(["contributor", "business_owner"])).all(),
         "gallery": GalleryItem.query.filter_by(status="pending").all(),
         "reviews": AttractionReview.query.filter_by(status="pending").join(User, AttractionReview.user_id == User.id).join(Attraction, AttractionReview.attraction_id == Attraction.id).all(),
     }
