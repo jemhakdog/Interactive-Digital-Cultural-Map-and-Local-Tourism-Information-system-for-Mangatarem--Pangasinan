@@ -16,6 +16,9 @@ class AnalyticsPageView(db.Model):
     ip_address = db.Column(db.String(45), nullable=True)
     device_info = db.Column(db.Text, nullable=True)
 
+    def __init__(self, **kwargs):
+        super(AnalyticsPageView, self).__init__(**kwargs)
+
 
 class DatabaseAuditLog(db.Model):
     """Audit log for database operations (security monitoring)."""
@@ -34,6 +37,9 @@ class DatabaseAuditLog(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
 
     user = db.relationship('User', backref=db.backref('audit_logs', lazy=True))
+
+    def __init__(self, **kwargs):
+        super(DatabaseAuditLog, self).__init__(**kwargs)
 
     @classmethod
     def log_operation(cls, user_id, action, table_name, record_id=None, 
@@ -79,6 +85,9 @@ class VisitorLog(db.Model):
     # Relationships
     steward = db.relationship('User', foreign_keys=[logged_by], backref=db.backref('visitor_logs', lazy=True))
     visitor_user = db.relationship('User', foreign_keys=[visitor_user_id], backref=db.backref('personal_visits', lazy=True))
+
+    def __init__(self, **kwargs):
+        super(VisitorLog, self).__init__(**kwargs)
 
     @property
     def target_name(self):

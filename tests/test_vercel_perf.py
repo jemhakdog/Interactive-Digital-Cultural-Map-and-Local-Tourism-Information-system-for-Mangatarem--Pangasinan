@@ -4,7 +4,6 @@ Verify Vercel performance quick wins are correctly applied.
 Tests: Cache-Control headers, lazy Supabase loading, no auto-migrations on cold start.
 """
 import os
-import pytest
 
 # Simulate Vercel before importing app
 os.environ["VERCEL"] = "1"
@@ -32,17 +31,19 @@ def test_cache_control_absent_locally():
 
 def test_lazy_supabase_descriptor_exists():
     """Supabase should be accessible via app.supabase (lazy descriptor)."""
-    from app import app, _LazySupabase
-    assert isinstance(app.__class__.__dict__.get("supabase"), _LazySupabase)
+    from app import app
+    supabase_descriptor = app.__class__.__dict__.get("supabase")
+    assert supabase_descriptor is not None
+    assert hasattr(supabase_descriptor, "__get__")
+    assert supabase_descriptor.__class__.__name__ == "LazySupabase"
 
 
 def test_record_view_no_commit():
-    """record_view should use flush, not commit."""
+    """record_view should run in a background thread to avoid blocking."""
     import inspect
-    from routes.public import record_view
+    from modules.analytics.utils import record_view
     source = inspect.getsource(record_view)
-    assert "flush()" in source
-    assert "commit()" not in source
+    assert "threading.Thread" in source
 
 
 def test_pooler_bug_fixed():

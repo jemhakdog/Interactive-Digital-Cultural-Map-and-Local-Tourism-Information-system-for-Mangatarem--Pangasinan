@@ -12,6 +12,42 @@
 {% endblock %}
 
 {% block admin_content %}
+<!-- Sleek Date Range Filter -->
+<div class="glass-card p-6 rounded-[2rem] mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6 hover:shadow-lg hover:shadow-emerald-900/5 transition-all duration-300">
+    <div>
+        <h3 class="text-lg font-black text-emerald-950 tracking-tight">Filter Analytics Period</h3>
+        <p class="text-emerald-900/50 text-xs mt-1">Set date boundaries to analyze metrics and generate exports</p>
+    </div>
+    <form method="GET" action="{{ url_for('admin.visits_index') }}" class="flex flex-wrap items-center gap-4 w-full lg:w-auto">
+        {% if current_type %}
+        <input type="hidden" name="target_type" value="{{ current_type }}">
+        {% endif %}
+        {% if current_id %}
+        <input type="hidden" name="target_id" value="{{ current_id }}">
+        {% endif %}
+        <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+            <div class="flex items-center gap-2 bg-white/60 border border-emerald-900/10 rounded-2xl px-4 py-2.5 shadow-sm">
+                <span class="text-[9px] font-black text-emerald-900/40 uppercase tracking-widest">From</span>
+                <input type="date" name="start_date" value="{{ start_date or '' }}" class="bg-transparent text-sm font-bold text-emerald-950 outline-none w-32">
+            </div>
+            <div class="flex items-center gap-2 bg-white/60 border border-emerald-900/10 rounded-2xl px-4 py-2.5 shadow-sm">
+                <span class="text-[9px] font-black text-emerald-900/40 uppercase tracking-widest">To</span>
+                <input type="date" name="end_date" value="{{ end_date or '' }}" class="bg-transparent text-sm font-bold text-emerald-950 outline-none w-32">
+            </div>
+            <div class="flex gap-2 w-full sm:w-auto">
+                <button type="submit" class="flex-1 sm:flex-initial bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[10px] uppercase tracking-widest px-6 py-3.5 rounded-2xl transition-all shadow-lg shadow-emerald-600/20 active:scale-95">
+                    Apply
+                </button>
+                {% if start_date or end_date %}
+                <a href="{{ url_for('admin.visits_index', target_type=current_type, target_id=current_id) }}" class="bg-emerald-100 hover:bg-emerald-200 text-emerald-700 font-black text-[10px] uppercase tracking-widest px-4 py-3.5 rounded-2xl transition-all flex items-center justify-center">
+                    Clear
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </form>
+</div>
+
 <!-- Stats Overview -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
     <div class="glass-card p-6 rounded-3xl flex flex-col justify-between group hover:scale-[1.02] transition-all duration-300">
@@ -21,11 +57,11 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 01-9-3.812M13.712 11.288a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0z" />
                 </svg>
             </div>
-            <a href="{{ url_for('admin.export_visits') }}" class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase hover:bg-emerald-600 hover:text-white transition-colors">Export CSV</a>
+            <a href="{{ url_for('admin.export_visits', target_type=current_type, target_id=current_id, start_date=start_date, end_date=end_date) }}" class="text-[10px] font-black text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full uppercase hover:bg-emerald-600 hover:text-white transition-colors">Export CSV</a>
         </div>
         <div>
             <p class="text-4xl font-black text-emerald-950 mt-4 tracking-tighter">{{ stats.total }}</p>
-            <h3 class="text-emerald-900/80 font-bold uppercase tracking-wider text-[10px] mt-1">Total Lifetime Visitors</h3>
+            <h3 class="text-emerald-900/80 font-bold uppercase tracking-wider text-[10px] mt-1">Total Period Visitors</h3>
         </div>
     </div>
 
@@ -43,9 +79,10 @@
         </div>
     </div>
 
+    <!-- Amber styled card to respect Purple Ban -->
     <div class="glass-card p-6 rounded-3xl flex flex-col justify-between group hover:scale-[1.02] transition-all duration-300">
         <div class="flex justify-between items-start">
-            <div class="p-3 bg-purple-100 rounded-2xl text-purple-700">
+            <div class="p-3 bg-amber-100 rounded-2xl text-amber-700">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -53,8 +90,89 @@
             </div>
         </div>
         <div>
-            <p class="text-2xl font-black text-purple-950 mt-4 tracking-tight truncate">{{ stats.top_location }}</p>
-            <h3 class="text-purple-900/80 font-bold uppercase tracking-wider text-[10px] mt-1">Top Location</h3>
+            <p class="text-2xl font-black text-amber-950 mt-4 tracking-tight truncate">{{ stats.top_location }}</p>
+            <h3 class="text-amber-900/80 font-bold uppercase tracking-wider text-[10px] mt-1">Top Location</h3>
+        </div>
+    </div>
+</div>
+
+<!-- Analytics Charts & Export Center Grid -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">
+    <!-- Landmark Popularity Chart -->
+    <div class="lg:col-span-2 glass-card p-6 md:p-8 rounded-[2rem] flex flex-col justify-between hover:shadow-xl hover:shadow-emerald-950/5 transition-all">
+        <div>
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h3 class="text-xl font-black text-emerald-950 tracking-tight">Landmark Popularity Index</h3>
+                    <p class="text-emerald-900/50 text-xs">Web views (Explorer interest) vs. Physical check-ins (Local footprint)</p>
+                </div>
+                <span class="bg-emerald-50 text-emerald-700 text-[10px] font-black uppercase px-3 py-1 rounded-full tracking-wider">Top 5 Places</span>
+            </div>
+            
+            <div class="w-full relative h-[320px]">
+                <canvas id="destinationComparisonChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tourism Export Center -->
+    <div class="lg:col-span-1 glass-card p-6 md:p-8 rounded-[2rem] flex flex-col justify-between hover:shadow-xl hover:shadow-emerald-950/5 transition-all">
+        <div>
+            <h3 class="text-xl font-black text-emerald-950 tracking-tight mb-1">Tourism Export Center</h3>
+            <p class="text-emerald-900/50 text-xs mb-6">Securely download standardized CSV datasets for reporting</p>
+            
+            <div class="space-y-4">
+                <!-- Export 1: Visitor Logs -->
+                <a href="{{ url_for('admin.export_visits', target_type=current_type, target_id=current_id, start_date=start_date, end_date=end_date) }}" 
+                   class="flex items-center justify-between p-4 bg-white/60 hover:bg-emerald-50 rounded-2xl border border-emerald-900/5 group hover:border-emerald-600/20 hover:scale-[1.01] transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2.5 bg-emerald-100 rounded-xl text-emerald-700">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 01-9-3.812M13.712 11.288a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0z" stroke-width="2"/></svg>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-sm font-black text-emerald-950 group-hover:text-emerald-700 transition-colors">Visitor Registry Logs</p>
+                            <p class="text-[9px] font-bold text-emerald-900/40 uppercase tracking-widest">{% if start_date or end_date %}Filtered Period{% else %}All-time record{% endif %}</p>
+                        </div>
+                    </div>
+                    <svg class="w-5 h-5 text-emerald-900/30 group-hover:text-emerald-700 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+
+                {% if current_user.role == 'admin' %}
+                <!-- Export 2: Page Views Traffic -->
+                <a href="{{ url_for('admin.export_page_views', start_date=start_date, end_date=end_date) }}" 
+                   class="flex items-center justify-between p-4 bg-white/60 hover:bg-emerald-50 rounded-2xl border border-emerald-900/5 group hover:border-emerald-600/20 hover:scale-[1.01] transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2.5 bg-blue-100 rounded-xl text-blue-700">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-width="2"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-width="2"/></svg>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-sm font-black text-emerald-950 group-hover:text-emerald-700 transition-colors">Web Traffic Analytics</p>
+                            <p class="text-[9px] font-bold text-emerald-900/40 uppercase tracking-widest">{% if start_date or end_date %}Filtered Period{% else %}All-time record{% endif %}</p>
+                        </div>
+                    </div>
+                    <svg class="w-5 h-5 text-emerald-900/30 group-hover:text-emerald-700 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+
+                <!-- Export 3: Destination Insights (Amber styled to respect Purple Ban) -->
+                <a href="{{ url_for('admin.export_destination_insights') }}" 
+                   class="flex items-center justify-between p-4 bg-white/60 hover:bg-emerald-50 rounded-2xl border border-emerald-900/5 group hover:border-emerald-600/20 hover:scale-[1.01] transition-all">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2.5 bg-amber-100 rounded-xl text-amber-700">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-width="2"/></svg>
+                        </div>
+                        <div class="text-left">
+                            <p class="text-sm font-black text-emerald-950 group-hover:text-emerald-700 transition-colors">Destination Performance</p>
+                            <p class="text-[9px] font-bold text-amber-900/50 uppercase tracking-widest">Aggregated tourism metrics</p>
+                        </div>
+                    </div>
+                    <svg class="w-5 h-5 text-emerald-900/30 group-hover:text-emerald-700 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                </a>
+                {% else %}
+                <div class="p-4 bg-emerald-900/5 rounded-2xl text-center border border-dashed border-emerald-900/10">
+                    <p class="text-[10px] font-black text-emerald-900/40 uppercase tracking-widest leading-relaxed">Additional analytical reports are restricted to System Administrators</p>
+                </div>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>
@@ -64,7 +182,7 @@
     <!-- Log Visit Form -->
     <div class="lg:col-span-1">
         <div class="glass-card p-8 rounded-3xl sticky top-24">
-            <h3 class="text-xl font-black text-emerald-950 mb-6">Log New Visit</h3>
+            <h3 class="text-xl font-black text-emerald-950 mb-6">Log New Check-in</h3>
             <form action="{{ url_for('admin.log_visit') }}" method="POST" class="space-y-4">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 
@@ -136,13 +254,12 @@
                 </button>
             </form>
         </div>
-        </div>
     </div>
     {% endif %}
 </div>
 
 <!-- Audit & Reporting Section -->
-<div class="mb-12">
+<div class="mb-12 mt-8">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
         <div>
             <h2 class="text-3xl font-black text-emerald-950 tracking-tight">Location Audit Registry</h2>
@@ -175,7 +292,7 @@
                     {% if loc.type == 'attraction' %}
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-width="2"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-width="2"/></svg>
                     {% else %}
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-width="2"/></svg>
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-width="2"/></svg>
                     {% endif %}
                 </div>
                 
@@ -192,7 +309,7 @@
                     <p class="text-[9px] font-black uppercase text-emerald-900/40 tracking-widest">Total Visits</p>
                 </div>
 
-                <a href="{{ url_for('admin.visitor_registry', target_type=loc.type, target_id=loc.id) }}" 
+                <a href="{{ url_for('admin.visitor_registry', target_type=loc.type, target_id=loc.id, start_date=start_date, end_date=end_date) }}" 
                    class="bg-emerald-950 text-white font-black text-xs uppercase tracking-widest px-8 py-4 rounded-2xl hover:bg-emerald-800 transition-all shadow-lg shadow-emerald-950/10 flex items-center group-hover:scale-105">
                     View Logs
                     <svg class="w-4 h-4 ml-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 5l7 7-7 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -227,12 +344,12 @@
                     <select name="target" class="w-full bg-white/50 border border-emerald-900/10 rounded-2xl px-4 py-3 text-emerald-950 focus:ring-2 focus:ring-emerald-500 outline-none transition-all appearance-none cursor-pointer" required>
                         <option value="">Select location...</option>
                         <optgroup label="Attractions">
-                            {% for a in attractions %}
+                            {% for a in all_attractions %}
                             <option value="attraction:{{ a.id }}">{{ a.name }}</option>
                             {% endfor %}
                         </optgroup>
                         <optgroup label="Businesses">
-                            {% for e in establishments %}
+                            {% for e in all_establishments %}
                             <option value="business:{{ e.id }}">{{ e.name }}</option>
                             {% endfor %}
                         </optgroup>
@@ -287,13 +404,13 @@
 
     <!-- History Table -->
     <div class="w-full">
-        <div class="glass-card rounded-3xl overflow-hidden">
+        <div class="glass-card rounded-3xl overflow-hidden shadow-sm">
             <div class="bg-emerald-900/5 px-8 py-6 border-b border-emerald-900/10 flex justify-between items-center">
-                <h3 class="text-xl font-black text-emerald-950">Recent History</h3>
-                <span class="bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase px-3 py-1 rounded-full">{{ logs|length }} Recent Entries</span>
+                <h3 class="text-xl font-black text-emerald-950">Recent Logs</h3>
+                <span class="bg-emerald-100 text-emerald-700 text-[10px] font-black uppercase px-3 py-1 rounded-full">{{ logs|length }} Entries</span>
             </div>
             <div class="overflow-x-auto">
-                <table class="w-full text-left">
+                <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="text-[10px] font-black text-emerald-900/70 uppercase tracking-widest border-b border-emerald-900/10">
                             <th class="px-8 py-4">Date</th>
@@ -351,7 +468,7 @@
                                 <span class="text-emerald-900/60 text-[10px] font-black uppercase">{{ log.steward.username }}</span>
                             </td>
                             <td class="px-8 py-4 text-right">
-                                <a href="{{ url_for('admin.visitor_registry', target_type=log.target_type, target_id=log.target_id) }}" class="p-2 text-emerald-600 hover:bg-emerald-100 hover:scale-110 rounded-xl transition-all inline-block" title="View Detailed Registry">
+                                <a href="{{ url_for('admin.visitor_registry', target_type=log.target_type, target_id=log.target_id, start_date=start_date, end_date=end_date) }}" class="p-2 text-emerald-600 hover:bg-emerald-100 hover:scale-110 rounded-xl transition-all inline-block" title="View Detailed Registry">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -424,4 +541,9 @@
         });
     }
 </script>
+{% endblock %}
+
+{% block dashboard_scripts %}
+<div id="comparison-chart-source" data-chart='{{ comparison_chart_data|tojson|safe }}' class="hidden"></div>
+<script src="{{ url_for('static', filename='js/pages/visitor-analytics.js') }}" defer></script>
 {% endblock %}

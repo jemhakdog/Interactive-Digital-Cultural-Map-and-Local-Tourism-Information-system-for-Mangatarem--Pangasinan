@@ -1,6 +1,7 @@
 /**
  * reviews.js — Interactive review system for attraction detail pages.
- * Handles: rating fetch + render, star selector, file drag-drop, AJAX submit.
+ * Handles: rating fetch + render, star selector, file drag-drop, AJAX submit,
+ * nested replies, and dynamic pending feedback updates.
  */
 
 (function () {
@@ -40,7 +41,7 @@
   let isLoading     = false;
 
   // ─── Helpers ─────────────────────────────────────────────────────────────
-  function starHTML(rating, total) {
+  function starHTML(rating) {
     let html = '';
     for (let i = 1; i <= 5; i++) {
       html += `<svg class="w-4 h-4 ${i <= Math.round(rating) ? 'text-amber-400' : 'text-emerald-900/15'}" fill="currentColor" viewBox="0 0 20 20">
@@ -51,12 +52,41 @@
   }
 
   function timeAgo(isoString) {
-    const date  = new Date(isoString + 'Z');
+    if (!isoString) return 'just now';
+    const hasZ = isoString.endsWith('Z');
+    const date  = new Date(hasZ ? isoString : isoString + 'Z');
     const secs  = Math.floor((Date.now() - date.getTime()) / 1000);
     if (secs < 60)   return 'just now';
     if (secs < 3600) return `${Math.floor(secs / 60)}m ago`;
     if (secs < 86400) return `${Math.floor(secs / 3600)}h ago`;
     return date.toLocaleDateString('en-PH', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
+
+  function renderReplyCard(r) {
+    const initial = (r.username || 'V')[0].toUpperCase();
+    const photosHTML = (r.photos || []).map(p =>
+      `<a href="${p.url}" target="_blank" class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 hover:scale-105 transition-transform">
+         <img src="${p.url}" alt="Reply photo" class="w-full h-full object-cover" loading="lazy">
+       </a>`
+    ).join('');
+
+    const isPending = r.status === 'pending';
+    const pendingBadge = isPending ? `<span class="bg-amber-100 text-amber-800 text-[9px] font-black px-2 py-0.5 rounded-full uppercase tracking-wider">Pending Approval</span>` : '';
+
+    return `<div class="mt-4 pl-6 border-l-2 border-emerald-900/10 flex items-start gap-4">
+      <div class="w-8 h-8 rounded-xl bg-emerald-50 flex items-center justify-center text-emerald-700 font-black text-xs flex-shrink-0">
+        ${initial}
+      </div>
+      <div class="flex-1 min-w-0">
+        <div class="flex items-center gap-2 flex-wrap mb-1">
+          <span class="font-bold text-emerald-950 text-xs">${r.username || 'Visitor'}</span>
+          ${pendingBadge}
+          <span class="text-[9px] text-emerald-900/40 font-bold">${timeAgo(r.created_at)}</span>
+        </div>
+        ${r.comment ? `<p class="text-emerald-950/75 text-xs leading-relaxed mt-1">${r.comment}</p>` : ''}
+        ${photosHTML ? `<div class="flex flex-wrap gap-1.5 mt-2">${photosHTML}</div>` : ''}
+      </div>
+    </div>`;
   }
 
   function renderReviewCard(r) {
@@ -67,7 +97,21 @@
        </a>`
     ).join('');
 
-    return `<div class="bg-white border border-emerald-900/5 rounded-3xl p-8 shadow-sm hover:shadow-md transition-shadow">
+    const isPending = r.status === 'pending';
+    const pendingBadge = isPending ? `<span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider">Pending Approval</span>` : '';
+
+    const repliesHTML = (r.replies || []).map(renderReplyCard).join('');
+    const isAuthenticated = !!form;
+
+    const replyButtonHTML = isAuthenticated ? `
+      <button type="button" class="reply-trigger-btn mt-4 text-[11px] font-extrabold text-emerald-600 hover:text-emerald-500 flex items-center gap-1 transition-colors">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+        </svg> Reply
+      </button>
+    ` : '';
+
+    return `<div class="bg-white border border-emerald-900/5 rounded-3xl p-8 shadow-sm hover:shadow-md transition-shadow relative" data-review-id="${r.id}">
       <div class="flex items-start gap-5">
         <div class="w-11 h-11 rounded-2xl bg-emerald-100 flex items-center justify-center text-emerald-700 font-black text-lg flex-shrink-0">
           ${initial}
@@ -75,14 +119,53 @@
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-3 flex-wrap mb-1">
             <span class="font-bold text-emerald-950 text-sm">${r.username || 'Visitor'}</span>
-            <span class="flex items-center gap-0.5">${starHTML(r.rating)}</span>
+            ${r.rating ? `<span class="flex items-center gap-0.5">${starHTML(r.rating)}</span>` : ''}
+            ${pendingBadge}
             <span class="text-[10px] text-emerald-900/40 font-bold">${timeAgo(r.created_at)}</span>
           </div>
           ${r.comment ? `<p class="text-emerald-950/75 text-sm leading-relaxed mt-2">${r.comment}</p>` : ''}
           ${photosHTML ? `<div class="flex flex-wrap gap-2 mt-4">${photosHTML}</div>` : ''}
+          
+          ${replyButtonHTML}
+          
+          <!-- Inline reply form container -->
+          <div class="inline-reply-container"></div>
+
+          <!-- Replies Container -->
+          <div class="replies-list space-y-3 mt-4 ${r.replies && r.replies.length > 0 ? '' : 'hidden'}">
+            ${repliesHTML}
+          </div>
         </div>
       </div>
     </div>`;
+  }
+
+  function getInlineReplyFormHTML(reviewId) {
+    return `<form class="inline-reply-form mt-4 bg-emerald-50/20 border border-emerald-900/5 rounded-2xl p-5" data-parent-id="${reviewId}">
+      <textarea required placeholder="Write a reply..." rows="2" class="w-full bg-white border border-emerald-950/10 rounded-xl px-4 py-3 text-sm text-emerald-950 placeholder-emerald-900/40 focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:border-transparent transition-all resize-none"></textarea>
+      
+      <div class="flex items-center justify-between gap-4 mt-3 flex-wrap">
+        <!-- File Input wrapper -->
+        <div class="flex items-center gap-3">
+          <label class="cursor-pointer bg-white border border-emerald-900/10 hover:border-emerald-400/50 hover:bg-emerald-50/20 text-emerald-800 text-[11px] font-bold py-1.5 px-3 rounded-xl flex items-center gap-1.5 transition-all">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            Add Photos
+            <input type="file" multiple accept="image/*" class="reply-file-input hidden">
+          </label>
+          <span class="reply-file-count text-[10px] text-emerald-900/40 font-bold hidden">0 photos</span>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button type="button" class="reply-cancel-btn text-[11px] font-extrabold text-emerald-900/50 hover:text-emerald-900/70 px-3 py-1.5 transition-all">Cancel</button>
+          <button type="submit" class="reply-submit-btn bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-black py-1.5 px-4 rounded-xl flex items-center gap-1.5 shadow-sm shadow-emerald-600/10 active:scale-[0.98] transition-all">Submit</button>
+        </div>
+      </div>
+
+      <!-- File Previews -->
+      <div class="reply-photo-preview flex flex-wrap gap-2 mt-3"></div>
+    </form>`;
   }
 
   function renderDistribution(dist, total) {
@@ -125,8 +208,9 @@
       // Remove loading spinner on first load
       if (!append && loading) loading.remove();
 
-      // No reviews state
-      if (!append && data.reviews.length === 0) {
+      // Check total combined reviews (approved root + user pending root)
+      const totalCount = data.reviews.length + ((page === 1 && data.pending_reviews) ? data.pending_reviews.length : 0);
+      if (!append && totalCount === 0) {
         feed.innerHTML = `<div class="py-12 text-center">
           <div class="text-4xl mb-3">💬</div>
           <p class="font-bold text-emerald-900/60 text-sm">No reviews yet.</p>
@@ -136,7 +220,12 @@
       }
 
       // Render cards
-      const html = data.reviews.map(renderReviewCard).join('');
+      let html = '';
+      if (!append && page === 1 && data.pending_reviews && data.pending_reviews.length > 0) {
+        html += data.pending_reviews.map(renderReviewCard).join('');
+      }
+      html += data.reviews.map(renderReviewCard).join('');
+
       if (append) {
         feed.insertAdjacentHTML('beforeend', html);
       } else {
@@ -311,6 +400,8 @@
               b.style.textShadow = '';
             });
           }
+          // Reload reviews on page 1 to prepend pending items immediately in user feed
+          loadReviews(1);
         } else {
           showFeedback('❌ ' + (data.error || 'Something went wrong. Please try again.'), 'error');
         }
@@ -324,6 +415,178 @@
           </svg> Submit Review`;
         }
       }
+    });
+  }
+
+  // ─── Event Delegation on Feed ──────────────────────────────────────────────
+  if (feed) {
+    feed.addEventListener('click', e => {
+      // 1. Reply Button Trigger
+      const trigger = e.target.closest('.reply-trigger-btn');
+      if (trigger) {
+        const reviewCard = trigger.closest('[data-review-id]');
+        const reviewId   = reviewCard.dataset.reviewId;
+        const container  = reviewCard.querySelector('.inline-reply-container');
+        
+        // If form already exists, toggle it
+        const existingForm = container.querySelector('.inline-reply-form');
+        if (existingForm) {
+          existingForm.remove();
+        } else {
+          // Remove any other active inline forms in the feed first to keep UI clean
+          feed.querySelectorAll('.inline-reply-form').forEach(f => f.remove());
+          
+          container.innerHTML = getInlineReplyFormHTML(reviewId);
+          const newForm = container.querySelector('.inline-reply-form');
+          newForm.replyFiles = [];
+          
+          // Focus textarea
+          newForm.querySelector('textarea').focus();
+        }
+        return;
+      }
+
+      // 2. Cancel Button
+      const cancelBtn = e.target.closest('.reply-cancel-btn');
+      if (cancelBtn) {
+        cancelBtn.closest('.inline-reply-form').remove();
+        return;
+      }
+
+      // 3. Remove Reply Photo Preview
+      const removePhotoBtn = e.target.closest('.remove-reply-photo');
+      if (removePhotoBtn) {
+        const formEl = removePhotoBtn.closest('.inline-reply-form');
+        const idx = parseInt(removePhotoBtn.dataset.idx, 10);
+        formEl.replyFiles.splice(idx, 1);
+        renderReplyPreviews(formEl);
+        return;
+      }
+    });
+
+    feed.addEventListener('change', e => {
+      // 4. File input change
+      const fileInput = e.target.closest('.reply-file-input');
+      if (fileInput) {
+        const formEl = fileInput.closest('.inline-reply-form');
+        const newFiles = Array.from(fileInput.files);
+        
+        for (const file of newFiles) {
+          if (formEl.replyFiles.length >= 5) break;
+          if (!file.type.startsWith('image/')) continue;
+          if (file.size > 5 * 1024 * 1024) {
+            alert(`"${file.name}" exceeds 5MB limit.`);
+            continue;
+          }
+          formEl.replyFiles.push(file);
+        }
+        
+        renderReplyPreviews(formEl);
+      }
+    });
+
+    feed.addEventListener('submit', async e => {
+      // 5. Submit Form
+      const replyForm = e.target.closest('.inline-reply-form');
+      if (replyForm) {
+        e.preventDefault();
+        
+        const parentId = replyForm.dataset.parentId;
+        const textarea = replyForm.querySelector('textarea');
+        const commentText = textarea.value.trim();
+        
+        if (!commentText) return;
+        
+        // Build FormData
+        const fd = new FormData();
+        fd.append('comment', commentText);
+        fd.append('parent_id', parentId);
+        
+        // Get CSRF Token from main review form
+        if (form) {
+          const csrf = form.querySelector('input[name="csrf_token"]');
+          if (csrf) {
+            fd.append('csrf_token', csrf.value);
+          }
+        }
+        
+        // Append photos
+        replyForm.replyFiles.forEach(file => fd.append('photos', file));
+        
+        // UI submit state
+        const submitBtn = replyForm.querySelector('.reply-submit-btn');
+        const originalHTML = submitBtn.innerHTML;
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Submitting...';
+        
+        try {
+          const res = await fetch(`/attractions/${attractionId}/reviews`, {
+            method: 'POST',
+            body: fd
+          });
+          const data = await res.json();
+          
+          if (res.ok && data.success) {
+            // Create user pending reply card client-side
+            const pendingReply = {
+              id: data.review_id,
+              username: 'You', // Display "You"
+              comment: commentText,
+              created_at: new Date().toISOString(),
+              status: 'pending',
+              photos: replyForm.replyFiles.map(file => ({ url: URL.createObjectURL(file) }))
+            };
+            
+            // Append to replies list
+            const reviewCard = replyForm.closest('[data-review-id]');
+            const repliesList = reviewCard.querySelector('.replies-list');
+            repliesList.insertAdjacentHTML('beforeend', renderReplyCard(pendingReply));
+            repliesList.classList.remove('hidden');
+            
+            // Remove reply form
+            replyForm.remove();
+            
+            // Show toast message
+            showFeedback('✅ ' + data.message, 'success');
+          } else {
+            showFeedback('❌ ' + (data.error || 'Failed to submit reply.'), 'error');
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = originalHTML;
+          }
+        } catch (err) {
+          console.error(err);
+          showFeedback('❌ Network error. Failed to submit reply.', 'error');
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = originalHTML;
+        }
+      }
+    });
+  }
+
+  function renderReplyPreviews(formEl) {
+    const previewContainer = formEl.querySelector('.reply-photo-preview');
+    const countEl = formEl.querySelector('.reply-file-count');
+    
+    previewContainer.innerHTML = '';
+    
+    if (formEl.replyFiles.length > 0) {
+      countEl.textContent = `${formEl.replyFiles.length} photo${formEl.replyFiles.length !== 1 ? 's' : ''}`;
+      countEl.classList.remove('hidden');
+    } else {
+      countEl.classList.add('hidden');
+    }
+    
+    formEl.replyFiles.forEach((file, idx) => {
+      const url = URL.createObjectURL(file);
+      const el = document.createElement('div');
+      el.className = 'relative w-12 h-12 rounded-xl overflow-hidden shadow-sm flex-shrink-0 group';
+      el.innerHTML = `
+        <img src="${url}" class="w-full h-full object-cover">
+        <button type="button" data-idx="${idx}"
+          class="remove-reply-photo absolute top-0.5 right-0.5 w-4 h-4 bg-black/75 text-white rounded-full text-[9px] font-bold flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+          ✕
+        </button>`;
+      previewContainer.appendChild(el);
     });
   }
 

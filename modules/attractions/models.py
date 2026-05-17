@@ -51,15 +51,24 @@ class AttractionReview(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=False, index=True)
     attraction_id = db.Column(db.Integer, db.ForeignKey("ATTRACTION.id"), nullable=False, index=True)
-    rating = db.Column(db.Integer, nullable=False)
+    rating = db.Column(db.Integer, nullable=True)  # rating is now nullable for replies
     comment = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(20), default="pending", index=True)
+    parent_id = db.Column(db.Integer, db.ForeignKey('ATTRACTION_REVIEW.id'), nullable=True, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     user = db.relationship('User', backref=db.backref('reviews', lazy='dynamic'))
     attraction = db.relationship('Attraction', backref=db.backref('reviews', lazy='dynamic'))
     photos = db.relationship('ReviewPhoto', backref='review', lazy='dynamic', cascade='all, delete-orphan')
+
+    # Self-referential relationship for nested comment replies
+    replies = db.relationship(
+        'AttractionReview',
+        backref=db.backref('parent', remote_side=[id]),
+        lazy='dynamic',
+        cascade='all, delete-orphan'
+    )
 
     def to_dict(self):
         return {
@@ -70,6 +79,7 @@ class AttractionReview(db.Model):
             'rating': self.rating,
             'comment': self.comment,
             'status': self.status,
+            'parent_id': self.parent_id,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'photos': [p.to_dict() for p in self.photos.all()],
         }

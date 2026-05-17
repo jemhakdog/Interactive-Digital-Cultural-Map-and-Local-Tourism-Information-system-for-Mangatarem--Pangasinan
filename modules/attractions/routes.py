@@ -133,25 +133,67 @@ def _record_view(view_type, item_id=None, page_name=None):
 
 @attractions_bp.route("/<int:id>/reviews", methods=["GET"])
 def get_reviews(id):
-    """Return paginated approved reviews + rating summary for an attraction."""
-    attraction = Attraction.query.get_or_404(id)
+    """Return paginated approved reviews (root only) + replies + rating summary for an attraction."""
+    Attraction.query.get_or_404(id)
     page = request.args.get("page", 1, type=int)
     per_page = min(request.args.get("per_page", 6, type=int), 20)
 
+    # Paginate approved root reviews only
     pagination = (
         AttractionReview.query
-        .filter_by(attraction_id=id, status="approved")
+        .filter_by(attraction_id=id, parent_id=None, status="approved")
         .order_by(AttractionReview.created_at.desc())
         .paginate(page=page, per_page=per_page, error_out=False)
     )
 
-    reviews_data = [r.to_dict() for r in pagination.items]
+    reviews_data = []
+    for r in pagination.items:
+        r_dict = r.to_dict()
+        
+        # Query replies (approved always, plus pending for the logged-in user)
+        replies_query = AttractionReview.query.filter_by(attraction_id=id, parent_id=r.id)
+        if current_user.is_authenticated:
+            replies = replies_query.filter(
+                (AttractionReview.status == "approved") |
+                ((AttractionReview.status == "pending") & (AttractionReview.user_id == current_user.id))
+            ).order_by(AttractionReview.created_at.asc()).all()
+        else:
+            replies = replies_query.filter_by(status="approved").order_by(AttractionReview.created_at.asc()).all()
+            
+        r_dict["replies"] = [reply.to_dict() for reply in replies]
+        reviews_data.append(r_dict)
 
-    # Rating distribution (1–5)
+    # Fetch user's own pending root reviews if logged in
+    pending_reviews_data = []
+    if current_user.is_authenticated:
+        pending_root = (
+            AttractionReview.query
+            .filter_by(attraction_id=id, parent_id=None, user_id=current_user.id, status="pending")
+            .order_by(AttractionReview.created_at.desc())
+            .all()
+        )
+        for r in pending_root:
+            r_dict = r.to_dict()
+            # User's own pending root reviews will only have their own pending replies (if any)
+            replies = AttractionReview.query.filter_by(
+                attraction_id=id, 
+                parent_id=r.id, 
+                user_id=current_user.id, 
+                status="pending"
+            ).order_by(AttractionReview.created_at.asc()).all()
+            r_dict["replies"] = [reply.to_dict() for reply in replies]
+            pending_reviews_data.append(r_dict)
+
+    # Rating distribution (1–5) - only counts root reviews
     all_approved = (
         AttractionReview.query
         .with_entities(AttractionReview.rating)
-        .filter_by(attraction_id=id, status="approved")
+        .filter(
+            AttractionReview.attraction_id == id,
+            AttractionReview.status == "approved",
+            AttractionReview.parent_id.is_(None),
+            AttractionReview.rating.is_not(None)
+        )
         .all()
     )
     ratings = [r.rating for r in all_approved]
@@ -161,6 +203,7 @@ def get_reviews(id):
 
     return jsonify({
         "reviews": reviews_data,
+        "pending_reviews": pending_reviews_data,
         "summary": {
             "average": avg,
             "total": total,
@@ -180,31 +223,44 @@ def get_reviews(id):
 @login_required
 @limiter.limit("10 per hour")
 def post_review(id):
-    """Submit a review (with optional photos) for an attraction.
+    """Submit a review or reply (with optional photos) for an attraction.
 
     Accepts multipart/form-data:
-        - rating  (int, 1-5, required)
-        - comment (str, optional)
-        - photos  (files, optional, max 5)
+        - parent_id (int, optional, for replies)
+        - rating    (int, 1-5, required unless parent_id present)
+        - comment   (str, optional)
+        - photos    (files, optional, max 5)
     """
     from utils.file_helpers import save_uploaded_file
-    from utils.cache_helpers import cache_delete
+    from utils.cache_helpers import cache_delete, invalidate_attraction_cache
 
-    attraction = Attraction.query.get_or_404(id)
+    Attraction.query.get_or_404(id)
+    parent_id = request.form.get("parent_id", type=int)
 
-    # Validate rating
-    rating = request.form.get("rating", type=int)
-    if not rating or not (1 <= rating <= 5):
-        return jsonify({"error": "Rating must be between 1 and 5."}), 400
-
+    # Parse and validate comment
     comment = request.form.get("comment", "").strip() or None
 
-    # Create review record (pending — admin must approve the text)
+    rating = None
+    if parent_id:
+        # Replying to another review: verify parent exists and is root
+        parent = AttractionReview.query.get_or_404(parent_id)
+        if parent.parent_id is not None:
+            return jsonify({"error": "Cannot reply to a sub-reply."}), 400
+        if parent.attraction_id != id:
+            return jsonify({"error": "Parent review does not match this attraction."}), 400
+    else:
+        # Validate rating for root reviews
+        rating = request.form.get("rating", type=int)
+        if not rating or not (1 <= rating <= 5):
+            return jsonify({"error": "Rating must be between 1 and 5."}), 400
+
+    # Create review/reply record (pending — admin must approve)
     review = AttractionReview(
         user_id=current_user.id,
         attraction_id=id,
         rating=rating,
         comment=comment,
+        parent_id=parent_id,
         status="pending",
     )
     db.session.add(review)
@@ -225,11 +281,12 @@ def post_review(id):
 
     # Invalidate attraction detail cache
     cache_delete(f"attraction_detail_module:{id}")
+    invalidate_attraction_cache(attraction_id=id)
 
-    logger.info("Review %d posted for attraction %d by user %d", review.id, id, current_user.id)
+    logger.info("Review/Reply %d posted for attraction %d by user %d", review.id, id, current_user.id)
     return jsonify({
         "success": True,
         "review_id": review.id,
         "photos_saved": saved_photos,
-        "message": "Your review has been submitted and is pending approval. Thank you!",
+        "message": "Your post has been submitted and is pending approval. Thank you!",
     }), 201
