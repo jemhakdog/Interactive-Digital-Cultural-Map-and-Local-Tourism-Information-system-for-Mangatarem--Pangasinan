@@ -22,6 +22,46 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin=""/>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/map.css') }}?v=20260419-1">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/components/utility-overrides.css') }}">
+
+<!-- Pamana ng Mangatarem Accessible Design Styles -->
+<style>
+    .easy-mode-card {
+        background-color: #FAF9F6 !important;
+        border: 2px solid #1C1C1C !important;
+        box-shadow: 4px 4px 0px 0px #1C1C1C !important;
+    }
+    
+    .easy-mode-btn-green {
+        background-color: #2D5A27 !important;
+        color: #FAF9F6 !important;
+        border: 2px solid #1C1C1C !important;
+        box-shadow: 2px 2px 0px 0px #1C1C1C !important;
+    }
+    
+    .easy-mode-btn-terracotta {
+        background-color: #C25A3F !important;
+        color: #FAF9F6 !important;
+        border: 2px solid #1C1C1C !important;
+        box-shadow: 2px 2px 0px 0px #1C1C1C !important;
+    }
+    
+    .easy-mode-text-primary {
+        color: #1C1C1C !important;
+        font-family: 'Georgia', serif !important;
+    }
+    
+    /* Ensure WebSpeech play button feels highly interactive */
+    #easy-speak-btn.playing {
+        background-color: #C25A3F !important;
+        color: white !important;
+        animation: pulseSpeak 1.5s infinite ease-in-out;
+    }
+    
+    @keyframes pulseSpeak {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.85; transform: scale(0.98); }
+    }
+</style>
 {% endblock %}
 
 {% block body_height %}h-screen overflow-hidden{% endblock %}
@@ -343,6 +383,14 @@
             </button>
         </div>
 
+        <!-- Easy/Gabay Mode Toggle Button (Top Right) -->
+        <div class="absolute top-4 right-4 z-[400]">
+            <button id="easy-mode-toggle" class="bg-[#C25A3F] hover:bg-[#a64830] text-[#FAF9F6] font-bold px-4 py-2.5 rounded-xl shadow-[3px_3px_0px_0px_#1C1C1C] flex items-center gap-2 border-2 border-[#1C1C1C] active:translate-y-0.5 active:shadow-none transition-all text-xs tracking-wider animate-pulse uppercase">
+                <span class="inline-block w-2.5 h-2.5 bg-[#2D5A27] border border-white rounded-full animate-ping"></span>
+                👴 MADALING GAMITIN / EASY MAP
+            </button>
+        </div>
+
         <!-- Floating Controls -->
         <div class="absolute top-4 left-4 z-[400] flex flex-col gap-2">
             <!-- Layout Toggle Button -->
@@ -401,25 +449,124 @@
                 </button>
             </div>
         </div>
-    </div>
 
-    <!-- Offline Download Progress Card -->
-    <div id="download-card" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 bg-white rounded-2xl shadow-2xl p-6 z-[500] border border-gray-100">
-        <h3 class="text-lg font-bold text-gray-900 mb-2">Offline Map</h3>
-        <p class="text-sm text-gray-500 mb-4">Downloading Mangatarem map tiles for offline use. This area is approximately 213 sq km.</p>
+        <!-- Offline Download Progress Card -->
+        <div id="download-card" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 bg-white rounded-2xl shadow-2xl p-6 z-[500] border border-gray-100">
+            <h3 class="text-lg font-bold text-gray-900 mb-2">Offline Map</h3>
+            <p class="text-sm text-gray-500 mb-4">Downloading Mangatarem map tiles for offline use. This area is approximately 213 sq km.</p>
+            
+            <div class="w-full bg-gray-100 rounded-full h-2.5 mb-1">
+                <div id="download-progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-gray-400 font-bold uppercase mb-6">
+                <span id="download-status">Initializing...</span>
+                <span id="download-percentage">0%</span>
+            </div>
+
+            <button id="cancel-download-btn" class="w-full py-2 text-sm font-bold text-gray-500 hover:text-gray-700 transition">
+                Close
+            </button>
+        </div>
+
+        <!-- Senior-Friendly Easy Mode Overlay -->
+        <div id="easy-mode-overlay" class="hidden fixed inset-x-0 bottom-0 md:bottom-4 md:left-1/2 md:-translate-x-1/2 md:w-[480px] h-[52vh] md:h-[480px] bg-[#FAF9F6] border-t-4 md:border-2 border-[#1C1C1C] shadow-[0_-8px_30px_rgb(0,0,0,0.12)] md:rounded-2xl z-[9999] flex flex-col transition-all duration-300">
         
-        <div class="w-full bg-gray-100 rounded-full h-2.5 mb-1">
-            <div id="download-progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
-        </div>
-        <div class="flex justify-between text-[10px] text-gray-400 font-bold uppercase mb-6">
-            <span id="download-status">Initializing...</span>
-            <span id="download-percentage">0%</span>
+        <!-- Overlay Header -->
+        <div class="flex items-center justify-between p-3 border-b-2 border-[#1C1C1C] bg-[#FAF9F6] flex-shrink-0">
+            <!-- Bilingual Toggle -->
+            <div class="flex items-center border-2 border-[#1C1C1C] bg-white rounded-lg overflow-hidden p-0.5">
+                <button id="easy-lang-tl" class="px-3 py-1 text-xs font-bold transition-all bg-[#C25A3F] text-white">🇵🇭 Tagalog</button>
+                <button id="easy-lang-en" class="px-3 py-1 text-xs font-bold transition-all text-[#1C1C1C] hover:bg-gray-100">🇬🇧 English</button>
+            </div>
+            
+            <div class="font-bold text-sm tracking-tight text-[#1C1C1C] font-serif uppercase">
+                Gabay Map
+            </div>
+            
+            <!-- Giant Close Button -->
+            <button id="easy-mode-exit" class="p-2 border-2 border-[#1C1C1C] bg-white hover:bg-red-50 text-red-600 rounded-lg active:scale-95 transition-all" title="Exit Easy Mode">
+                <svg class="w-5 h-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
         </div>
 
-        <button id="cancel-download-btn" class="w-full py-2 text-sm font-bold text-gray-500 hover:text-gray-700 transition">
-            Close
-        </button>
+        <!-- Scrollable Content Area -->
+        <div class="flex-1 overflow-y-auto p-4 flex flex-col bg-[#FAF9F6] min-h-0">
+            
+            <!-- View 1: Category Selector Grid -->
+            <div id="easy-view-categories" class="grid grid-cols-2 gap-3 h-full items-center justify-center py-2">
+                <button data-easy-cat="Historical" class="easy-cat-card flex flex-col items-center justify-center p-4 border-2 border-[#1C1C1C] bg-white hover:bg-[#FAF9F6] active:translate-y-0.5 active:shadow-none transition-all shadow-[3px_3px_0px_0px_#1C1C1C] h-32">
+                    <span class="text-4xl mb-1">🏛️</span>
+                    <span class="text-xs font-bold text-[#1C1C1C] text-center font-sans tracking-wide">
+                        <span class="lang-tl">Simbahan at Gusali</span>
+                        <span class="lang-en hidden">Heritage Sites</span>
+                    </span>
+                </button>
+                <button data-easy-cat="Nature" class="easy-cat-card flex flex-col items-center justify-center p-4 border-2 border-[#1C1C1C] bg-white hover:bg-[#FAF9F6] active:translate-y-0.5 active:shadow-none transition-all shadow-[3px_3px_0px_0px_#1C1C1C] h-32">
+                    <span class="text-4xl mb-1">🌿</span>
+                    <span class="text-xs font-bold text-[#1C1C1C] text-center font-sans tracking-wide">
+                        <span class="lang-tl">Likas na Tanawin</span>
+                        <span class="lang-en hidden">Nature & Springs</span>
+                    </span>
+                </button>
+                <button data-easy-cat="Food" class="easy-cat-card flex flex-col items-center justify-center p-4 border-2 border-[#1C1C1C] bg-white hover:bg-[#FAF9F6] active:translate-y-0.5 active:shadow-none transition-all shadow-[3px_3px_0px_0px_#1C1C1C] h-32">
+                    <span class="text-4xl mb-1">🍽️</span>
+                    <span class="text-xs font-bold text-[#1C1C1C] text-center font-sans tracking-wide">
+                        <span class="lang-tl">Masasarap na Kainan</span>
+                        <span class="lang-en hidden">Local Eateries</span>
+                    </span>
+                </button>
+                <button data-easy-cat="Lodging" class="easy-cat-card flex flex-col items-center justify-center p-4 border-2 border-[#1C1C1C] bg-white hover:bg-[#FAF9F6] active:translate-y-0.5 active:shadow-none transition-all shadow-[3px_3px_0px_0px_#1C1C1C] h-32">
+                    <span class="text-4xl mb-1">🏨</span>
+                    <span class="text-xs font-bold text-[#1C1C1C] text-center font-sans tracking-wide">
+                        <span class="lang-tl">Matutuluyan / Inn</span>
+                        <span class="lang-en hidden">Places to Stay</span>
+                    </span>
+                </button>
+            </div>
+
+            <!-- View 2: Detailed Location Tour Card (Hidden by default) -->
+            <div id="easy-view-detail" class="hidden flex-1 flex flex-col gap-3 min-h-0">
+                <!-- Location Photo / Banner -->
+                <div class="w-full h-32 rounded-lg border-2 border-[#1C1C1C] overflow-hidden bg-gray-200 relative flex-shrink-0">
+                    <img id="easy-spot-img" src="" class="w-full h-full object-cover" alt="Spot Image">
+                    <span id="easy-spot-cat-badge" class="absolute top-2 left-2 bg-[#FAF9F6] border border-[#1C1C1C] px-2.5 py-0.5 rounded text-[10px] font-bold text-[#1C1C1C]">NATURE</span>
+                </div>
+                
+                <!-- Text Details -->
+                <div class="flex-1 min-h-0 flex flex-col gap-1.5 overflow-y-auto">
+                    <h3 id="easy-spot-title" class="text-xl font-bold text-[#1C1C1C] font-serif leading-tight">Saint Bartholomew Church</h3>
+                    <p id="easy-spot-subtitle" class="text-xs text-gray-500 font-bold tracking-wider">Poblacion, Mangatarem</p>
+                    <p id="easy-spot-desc" class="text-sm leading-relaxed text-[#1C1C1C] font-sans pr-1">Loading description...</p>
+                </div>
+                
+                <!-- Speech trigger / Read button -->
+                <button id="easy-speak-btn" class="w-full py-2.5 px-4 border-2 border-[#1C1C1C] bg-[#FAF9F6] hover:bg-[#e8e7e4] text-[#1C1C1C] font-bold rounded-lg flex items-center justify-center gap-2 transition active:scale-95 shadow-[2px_2px_0px_0px_#1C1C1C] flex-shrink-0">
+                    <span class="text-lg">🔊</span>
+                    <span class="text-xs tracking-wider uppercase">
+                        <span class="lang-tl">Basahin at Pakinggan</span>
+                        <span class="lang-en hidden">Read out loud</span>
+                    </span>
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Thumb-Driven Navigation Bar (Bottom of card) -->
+        <div class="p-3 border-t-2 border-[#1C1C1C] bg-white flex gap-2.5 items-center flex-shrink-0">
+            <button id="easy-nav-back" class="flex-1 py-3 border-2 border-[#1C1C1C] bg-white hover:bg-gray-50 text-[#1C1C1C] font-bold rounded-xl active:scale-95 transition-all text-sm shadow-[2px_2px_0px_0px_#1C1C1C] hidden">
+                ← <span class="lang-tl">Nakaraan</span><span class="lang-en hidden">Back</span>
+            </button>
+            <button id="easy-nav-menu" class="py-3 px-4 border-2 border-[#1C1C1C] bg-white hover:bg-gray-50 text-[#1C1C1C] font-bold rounded-xl active:scale-95 transition-all text-sm shadow-[2px_2px_0px_0px_#1C1C1C] hidden">
+                📋 <span class="lang-tl">Menu</span><span class="lang-en hidden">Menu</span>
+            </button>
+            <button id="easy-nav-next" class="flex-2 w-full py-3.5 border-2 border-[#1C1C1C] bg-[#2D5A27] hover:bg-[#23471e] text-[#FAF9F6] font-bold rounded-xl active:scale-95 transition-all text-base shadow-[2px_2px_0px_0px_#1C1C1C] flex items-center justify-center gap-1.5 hidden">
+                <span class="lang-tl">SUSUNOD (TULOY)</span><span class="lang-en hidden">NEXT SPOT</span> →
+            </button>
     </div>
+
+    </div> <!-- Closes Map Area Container -->
 
 
 </div>

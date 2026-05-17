@@ -141,6 +141,10 @@
         if (target.dataset.action === 'update-file-name') {
             handleClick(e);
         }
+
+        if (target.dataset.action === 'toggle-barangay') {
+            if (typeof toggleBarangay === 'function') toggleBarangay(target);
+        }
     }
 
     if (document.readyState === 'loading') {
