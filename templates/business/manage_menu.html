@@ -1,128 +1,188 @@
-{% extends "base.html" %}
-{% block title %}Manage Menu — {{ establishment.name }}{% endblock %}
-{% block content %}
-{% set is_dining = establishment and establishment.type in ['restaurant', 'cafe', 'fastfood'] %}
-<section class="min-h-screen pt-8 pb-16 px-4 transition-colors duration-700
-    {% if is_dining %}bg-dining-gradient
-    {% else %}bg-heritage-gradient{% endif %}">
-    
-    <div class="container mx-auto max-w-5xl">
-        <div class="mb-8">
-            <a href="{{ url_for('business.dashboard') }}" 
-                class="{% if is_dining %}text-orange-400 hover:text-orange-300{% else %}text-emerald-400 hover:text-emerald-300{% endif %} text-sm font-medium inline-flex items-center gap-1 mb-4 transition-colors">
-                ← Back to Dashboard
-            </a>
-            <h1 class="text-3xl font-bold text-white font-heading tracking-tight">Manage Menu</h1>
-            <p class="{% if is_dining %}text-orange-100/60{% else %}text-emerald-100/60{% endif %} mt-1">
-                {{ establishment.name }} — {{ items|length }} items listed
-            </p>
-        </div>
+{% extends "admin/admin_base.html" %}
 
-        <!-- Add Menu Item Form -->
-        <div class="{% if is_dining %}bg-orange-950/20{% else %}bg-emerald-900/20{% endif %} border border-white/10 rounded-3xl p-8 backdrop-blur-md mb-8">
-            <h2 class="text-lg font-bold {% if is_dining %}text-orange-300{% else %}text-emerald-300{% endif %} mb-5">Add Menu Item</h2>
-            <form method="POST" action="{{ url_for('business.add_menu_item') }}" class="space-y-5">
+{% block title %}Manage Menu — {{ establishment.name }}{% endblock %}
+
+{% block admin_content %}
+{% set is_dining = establishment and establishment.type in ['restaurant', 'cafe', 'fastfood'] %}
+{% if is_dining %}
+    {% set theme_color = 'orange' %}
+    {% set primary_text = 'text-orange-500' %}
+    {% set border_accent = 'border-orange-500/20' %}
+    {% set focus_ring = 'focus:ring-orange-500/20 focus:border-orange-500' %}
+    {% set fill_btn = 'bg-orange-600 hover:bg-orange-500 text-white shadow-lg shadow-orange-900/20' %}
+    {% set fill_icon = 'bg-orange-500/10 text-orange-500' %}
+{% else %}
+    {% set theme_color = 'green' %}
+    {% set primary_text = 'text-mongodb-green' %}
+    {% set border_accent = 'border-mongodb-green/10' %}
+    {% set focus_ring = 'focus:ring-mongodb-green/20 focus:border-mongodb-green' %}
+    {% set fill_btn = 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/20' %}
+    {% set fill_icon = 'bg-mongodb-green/10 text-mongodb-green' %}
+{% endif %}
+
+<div class="max-w-5xl mx-auto space-y-8 py-4">
+    <!-- Header -->
+    <div class="flex items-center justify-between pb-4 border-b border-slate-100">
+        <div class="space-y-1">
+            <a href="{{ url_for('business.dashboard') }}" class="text-xs font-black uppercase tracking-wider text-slate-400 hover:text-slate-600 flex items-center gap-1.5 transition-colors">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Back to Dashboard
+            </a>
+            <h1 class="text-xl font-black text-slate-800 tracking-tight font-display mt-2">Manage Culinary Menu</h1>
+            <p class="text-[10px] font-black text-slate-400 uppercase tracking-wider">{{ establishment.name }} — {{ items|length }} items listed</p>
+        </div>
+    </div>
+
+    <!-- Main Workspace Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Left: Add Menu Item Form (1 col) -->
+        <div class="bg-white border border-slate-100 p-6 rounded-3xl shadow-sm h-fit space-y-6">
+            <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+                <span class="w-2 h-2 rounded-full {% if is_dining %}bg-orange-500{% else %}bg-mongodb-green{% endif %}"></span>
+                <h2 class="text-xs font-black uppercase text-slate-700 tracking-wider">Add New Dish</h2>
+            </div>
+
+            <form method="POST" action="{{ url_for('business.add_menu_item') }}" class="space-y-4">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                    <div>
-                        <label class="block text-sm font-bold {% if is_dining %}text-orange-300/80{% else %}text-emerald-300/80{% endif %} mb-2">Item Name *</label>
-                        <input type="text" name="name" required placeholder="e.g., Bangus Sisig"
-                            class="w-full {% if is_dining %}bg-orange-900/30 ring-orange-500/50{% else %}bg-emerald-900/30 ring-emerald-500/50{% endif %} border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/20 focus:outline-none focus:ring-2">
+
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-wider">Dish Name *</label>
+                    <input type="text" name="name" required placeholder="e.g. Traditional Bangus Sisig"
+                           class="w-full bg-slate-50 border border-slate-200 text-xs font-bold rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 {{ focus_ring }} transition-all duration-300">
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-1.5">
+                        <label class="block text-[10px] font-black uppercase text-slate-400 tracking-wider">Price (₱) *</label>
+                        <input type="number" step="0.01" name="price" required placeholder="180.00"
+                               class="w-full bg-slate-50 border border-slate-200 text-xs font-bold rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 {{ focus_ring }} transition-all duration-300">
                     </div>
-                    <div>
-                        <label class="block text-sm font-bold {% if is_dining %}text-orange-300/80{% else %}text-emerald-300/80{% endif %} mb-2">Price (₱)</label>
-                        <input type="number" step="0.01" name="price" placeholder="120.00"
-                            class="w-full {% if is_dining %}bg-orange-900/30 ring-orange-500/50{% else %}bg-emerald-900/30 ring-emerald-500/50{% endif %} border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/20 focus:outline-none focus:ring-2">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-bold {% if is_dining %}text-orange-300/80{% else %}text-emerald-300/80{% endif %} mb-2">Category</label>
-                        <select name="category"
-                            class="w-full {% if is_dining %}bg-orange-900/30 ring-orange-500/50{% else %}bg-emerald-900/30 ring-emerald-500/50{% endif %} border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2">
+
+                    <div class="space-y-1.5">
+                        <label class="block text-[10px] font-black uppercase text-slate-400 tracking-wider">Category *</label>
+                        <select name="category" required
+                                class="w-full bg-slate-50 border border-slate-200 text-xs font-bold rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 {{ focus_ring }} transition-all duration-300">
                             <option value="main">🍛 Main Course</option>
                             <option value="appetizer">🥗 Appetizer</option>
                             <option value="dessert">🍰 Dessert</option>
-                            <option value="drinks">🥤 Drinks</option>
-                            <option value="snacks">🍟 Snacks</option>
+                            <option value="drinks">🥤 Drinks & Brews</option>
+                            <option value="snacks">🍟 Bistro Snacks</option>
                         </select>
                     </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-bold {% if is_dining %}text-orange-300/80{% else %}text-emerald-300/80{% endif %} mb-2">Description</label>
-                    <textarea name="description" rows="2" placeholder="Brief description..."
-                        class="w-full {% if is_dining %}bg-orange-900/30 ring-orange-500/50{% else %}bg-emerald-900/30 ring-emerald-500/50{% endif %} border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/20 focus:outline-none focus:ring-2"></textarea>
+
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-wider">Ingredients / Description</label>
+                    <textarea name="description" rows="2" placeholder="Brief details about flavor profiles, spice levels..."
+                              class="w-full bg-slate-50 border border-slate-200 text-xs font-bold rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 {{ focus_ring }} transition-all duration-300"></textarea>
                 </div>
-                <div>
-                    <label class="block text-sm font-bold {% if is_dining %}text-orange-300/80{% else %}text-emerald-300/80{% endif %} mb-2">Image URL</label>
+
+                <div class="space-y-1.5">
+                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-wider">Dish Image URL</label>
                     <input type="url" name="image_url" placeholder="https://..."
-                        class="w-full {% if is_dining %}bg-orange-900/30 ring-orange-500/50{% else %}bg-emerald-900/30 ring-emerald-500/50{% endif %} border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/20 focus:outline-none focus:ring-2">
+                           class="w-full bg-slate-50 border border-slate-200 text-xs font-bold rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 {{ focus_ring }} transition-all duration-300">
                 </div>
-                <div class="flex items-center gap-6">
-                    <label class="flex items-center gap-2 {% if is_dining %}text-orange-100/70{% else %}text-emerald-100/70{% endif %} text-sm cursor-pointer">
-                        <input type="checkbox" name="is_available" checked class="rounded {% if is_dining %}border-orange-600 text-orange-500{% else %}border-emerald-600 text-emerald-500{% endif %}">
-                        Available
+
+                <div class="grid grid-cols-2 gap-3 pt-2">
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-600 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 cursor-pointer hover:bg-slate-100 hover:text-slate-800 transition-all select-none">
+                        <input type="checkbox" name="is_available" checked class="rounded border-slate-300 text-mongodb-green focus:ring-2">
+                        <span>Available</span>
                     </label>
-                    <label class="flex items-center gap-2 {% if is_dining %}text-orange-100/70{% else %}text-emerald-100/70{% endif %} text-sm cursor-pointer">
-                        <input type="checkbox" name="is_bestseller" class="rounded {% if is_dining %}border-orange-600 text-orange-500{% else %}border-emerald-600 text-emerald-500{% endif %}">
-                        ⭐ Mark as Bestseller
+                    <label class="flex items-center gap-2 text-xs font-bold text-slate-600 bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 cursor-pointer hover:bg-slate-100 hover:text-slate-800 transition-all select-none">
+                        <input type="checkbox" name="is_bestseller" class="rounded border-slate-300 text-mongodb-green focus:ring-2">
+                        <span>⭐ Best Choice</span>
                     </label>
                 </div>
-                <button type="submit" class="{% if is_dining %}bg-orange-600 hover:bg-orange-500 shadow-orange-900/20{% else %}bg-emerald-600 hover:bg-emerald-500 shadow-emerald-900/20{% endif %} text-white font-bold py-3 px-8 rounded-xl transition-all duration-300 shadow-lg hover:scale-[1.02] active:scale-[0.98]">
-                    Add Item
+
+                <button type="submit" class="w-full py-3.5 text-xs font-black uppercase tracking-wider rounded-xl transition-all hover:scale-[1.01] active:scale-[0.99] {{ fill_btn }}">
+                    Add Menu Dish
                 </button>
             </form>
         </div>
 
-        <!-- Menu Items by Category -->
-        {% if grouped_items %}
-        {% for category, cat_items in grouped_items.items() %}
-        <div class="mb-8">
-            <h2 class="text-lg font-bold {% if is_dining %}text-orange-300{% else %}text-emerald-300{% endif %} mb-4 uppercase tracking-wider">
-                {% if category == 'main' %}🍛 Main Course{% elif category == 'appetizer' %}🥗 Appetizer{% elif category == 'dessert' %}🍰 Dessert{% elif category == 'drinks' %}🥤 Drinks{% elif category == 'snacks' %}🍟 Snacks{% else %}📋 {{ category }}{% endif %}
-            </h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                {% for item in cat_items %}
-                <div class="{% if is_dining %}bg-orange-950/20{% else %}bg-emerald-900/20{% endif %} border border-white/10 rounded-2xl overflow-hidden backdrop-blur-md transition-transform hover:scale-[1.01]">
-                    {% if item.image_url %}
-                    <div class="h-32 bg-cover bg-center" style="background-image: url('{{ item.image_url }}')"></div>
-                    {% endif %}
-                    <div class="p-5">
-                        <div class="flex items-start justify-between mb-2">
-                            <h3 class="text-white font-bold">
-                                {{ item.name }}
-                                {% if item.is_bestseller %}<span class="text-amber-400 text-xs ml-1">⭐ Best</span>{% endif %}
-                            </h3>
-                            {% if item.price %}
-                            <span class="{% if is_dining %}text-orange-400{% else %}text-emerald-400{% endif %} font-bold whitespace-nowrap">₱{{ "%.0f"|format(item.price) }}</span>
-                            {% endif %}
+        <!-- Right: Active Menu Catalog (2 cols) -->
+        <div class="lg:col-span-2 space-y-8">
+            {% if grouped_items %}
+                {% for category, cat_items in grouped_items.items() %}
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
+                            <span class="w-2 h-2 rounded-full {% if is_dining %}bg-orange-500{% else %}bg-mongodb-green{% endif %}"></span>
+                            <h2 class="text-xs font-black uppercase text-slate-700 tracking-wider">
+                                {% if category == 'main' %}🍛 Main Courses
+                                {% elif category == 'appetizer' %}🥗 Appetizers
+                                {% elif category == 'dessert' %}🍰 Desserts & Pastries
+                                {% elif category == 'drinks' %}🥤 Refreshing Drinks & Coffee
+                                {% elif category == 'snacks' %}🍟 Light Snacks
+                                {% else %}📋 {{ category | capitalize }}{% endif %}
+                            </h2>
                         </div>
-                        {% if item.description %}
-                        <p class="{% if is_dining %}text-orange-100/50{% else %}text-emerald-100/50{% endif %} text-sm mb-3 line-clamp-2">{{ item.description }}</p>
-                        {% endif %}
-                        <div class="flex items-center justify-between">
-                            <span class="text-xs {% if item.is_available %}{% if is_dining %}text-orange-400{% else %}text-emerald-400{% endif %}{% else %}text-red-400{% endif %}">
-                                {{ 'Available' if item.is_available else 'Unavailable' }}
-                            </span>
-                            <form method="POST" action="{{ url_for('business.delete_menu_item', item_id=item.id) }}" class="inline" data-action="confirm-delete" data-confirm-message="Delete this item?">
-                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                                <button type="submit" class="text-red-400/80 hover:text-red-400 text-xs font-medium transition-colors">Delete</button>
-                            </form>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {% for item in cat_items %}
+                                <div class="bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm flex flex-col justify-between group hover:border-slate-200 transition-all duration-300">
+                                    {% if item.image_url %}
+                                        <div class="h-32 bg-cover bg-center border-b border-slate-100" style="background-image: url('{{ item.image_url }}')">
+                                            {% if item.is_bestseller %}
+                                                <div class="p-3">
+                                                    <span class="px-2 py-0.5 text-[8px] font-black bg-amber-500 text-white rounded border border-white/10 uppercase tracking-wider">⭐ Bestseller</span>
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+
+                                    <div class="p-5 flex-grow flex flex-col justify-between space-y-3">
+                                        <div>
+                                            <div class="flex items-start justify-between gap-2">
+                                                <h3 class="text-sm font-black text-slate-800 leading-snug group-hover:{{ primary_text }} transition-colors">
+                                                    {{ item.name }}
+                                                </h3>
+                                                {% if item.price %}
+                                                    <span class="text-xs font-extrabold {{ primary_text }} whitespace-nowrap">₱{{ "%.0f"|format(item.price) }}</span>
+                                                {% endif %}
+                                            </div>
+
+                                            {% if item.description %}
+                                                <p class="text-xs font-semibold text-slate-400 mt-2 leading-relaxed line-clamp-2">{{ item.description }}</p>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="pt-3 border-t border-slate-100 flex items-center justify-between">
+                                            <span class="inline-block px-2 py-0.5 text-[8px] font-black uppercase rounded
+                                                {% if item.is_available %}bg-green-50 text-green-700 border border-green-200
+                                                {% else %}bg-red-50 text-red-700 border border-red-200{% endif %}">
+                                                {{ 'Available' if item.is_available else 'Unavailable' }}
+                                            </span>
+
+                                            <form method="POST" action="{{ url_for('business.delete_menu_item', item_id=item.id) }}" class="inline" onsubmit="return confirm('Delete this menu item from your listing?');">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="text-[9px] font-black uppercase text-red-500 hover:text-red-600 transition-colors flex items-center gap-1">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                                                    </svg>
+                                                    Remove Dish
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
                         </div>
                     </div>
-                </div>
                 {% endfor %}
-            </div>
+            {% else %}
+                <div class="text-center py-20 bg-white border border-slate-100 rounded-3xl shadow-sm">
+                    <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-slate-50 text-slate-300 mb-4 select-none">
+                        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-sm font-black text-slate-700">No Menu Dishes Listed</h3>
+                    <p class="text-xs font-semibold text-slate-400 mt-1 max-w-xs mx-auto">Use the creator panel on the left to configure your culinary specialties for public display details.</p>
+                </div>
+            {% endif %}
         </div>
-        {% endfor %}
-        {% else %}
-        <div class="text-center py-20 bg-white/5 rounded-3xl border border-white/5 border-dashed">
-            <div class="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-white/5 mb-4 text-white/20">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                </svg>
-            </div>
-            <p class="text-white/40">No menu items added yet. Add your first item above!</p>
-        </div>
-        {% endif %}
     </div>
-</section>
+</div>
 {% endblock %}

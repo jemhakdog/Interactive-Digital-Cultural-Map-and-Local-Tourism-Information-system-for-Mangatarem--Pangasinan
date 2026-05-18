@@ -5,7 +5,6 @@ Tests all input validation and sanitization to ensure SQL injection
 attacks are properly blocked.
 """
 
-import pytest
 from utils.security import (
     detect_sql_injection_attempt,
     validate_string_input,

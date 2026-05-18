@@ -46,7 +46,7 @@ def run_final_sync():
             cursor.execute(sql001)
             conn.commit()
             print("SUCCESS: 001 Initial Schema applied/verified.")
-        except Exception as e:
+        except Exception:
             conn.rollback()
             print("ERROR: 001 Schema sync failed.")
             traceback.print_exc()

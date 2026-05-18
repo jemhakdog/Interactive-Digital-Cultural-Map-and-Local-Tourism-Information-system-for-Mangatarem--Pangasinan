@@ -1,84 +1,122 @@
-{% extends 'base.html' %}
+{% extends 'admin/admin_base.html' %}
 
-{% block title %}Add Event - Barangay{% endblock %}
+{% block title %}Add Event - Barangay {{ current_user.barangay.name }} - GoMangatarem{% endblock %}
 
-{% block content %}
-<div class="container mx-auto px-6 py-12">
-    <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl shadow-lg">
-        <h1 class="text-2xl font-bold text-gray-800 mb-6">Add New Event</h1>
+{% block admin_content %}
+<div class="space-y-8 animate-fade-in font-body">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-2 border-b border-slate-100">
+        <div>
+            <h1 class="text-3xl font-black text-slate-800 font-heading tracking-tight leading-tight flex items-center gap-2">
+                <span>Publish Local Event</span>
+                <span class="w-2.5 h-2.5 rounded-full bg-mongodb-green inline-block animate-pulse"></span>
+            </h1>
+            <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider mt-1">
+                Barangay {{ current_user.barangay.name }} CBIS Tourism Events
+            </p>
+        </div>
+        <div>
+            <a href="{{ url_for('barangay.barangay_events') }}" class="px-4 py-2 border border-slate-200 text-slate-500 rounded-xl text-xs font-black uppercase hover:bg-slate-50 transition-all flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                Events List
+            </a>
+        </div>
+    </div>
 
+    <!-- Main Workspace Container -->
+    <div class="bg-white rounded-3xl border border-slate-150/80 shadow-sm p-6 lg:p-8">
         <form action="{{ url_for('barangay.barangay_add_event') }}" method="POST" enctype="multipart/form-data" class="space-y-6">
             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-            <div class="space-y-6">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Title</label>
-                    <input type="text" name="name" required minlength="1" maxlength="200"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2">
-                    <p class="text-xs text-gray-400 mt-1">Maximum 200 characters.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <!-- Title -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Event Title</label>
+                    <input type="text" name="name" required minlength="1" maxlength="200" placeholder="e.g. Barangay Patronal Fiesta"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300">
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Maximum 200 characters.</p>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Date</label>
-                    <input type="date" name="date" required
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2">
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Location</label>
-                    <input type="text" name="location" required
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2"
-                        placeholder="e.g. Barangay Plaza">
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Latitude</label>
-                        <input type="number" step="any" name="latitude"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2"
-                            placeholder="15.XXXX">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700">Longitude</label>
-                        <input type="number" step="any" name="longitude"
-                            class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2"
-                            placeholder="120.XXXX">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Category</label>
+                <!-- Category -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Category</label>
                     <select name="category" required
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2">
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300 cursor-pointer">
                         <option value="Civic">Civic</option>
                         <option value="Religious">Religious</option>
                         <option value="Entertainment">Entertainment</option>
                     </select>
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Description</label>
-                    <textarea name="description" rows="4" required maxlength="2000"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2"></textarea>
-                    <p class="text-xs text-gray-400 mt-1">Maximum 2000 characters.</p>
+                <!-- Date -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Date</label>
+                    <input type="date" name="date" required
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300">
                 </div>
 
-                <div>
-                    <label class="block text-sm font-medium text-gray-700">Upload Image</label>
-                    <input type="file" name="image" accept="image/*"
-                        class="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100">
-
-                    <label class="block text-sm font-medium text-gray-700 mt-2">Or Image URL</label>
-                    <input type="url" name="image_url"
-                        class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-green-500 focus:ring-green-500 border p-2"
-                        placeholder="https://...">
+                <!-- Location -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Location</label>
+                    <input type="text" name="location" required placeholder="e.g. Barangay Multi-Purpose Hall"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300">
                 </div>
 
-                <div class="flex justify-end gap-4">
-                    <a href="{{ url_for('barangay.barangay_dashboard') }}"
-                        class="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50">Cancel</a>
-                    <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700">Save
-                        Event</button>
+                <!-- Coordinates -->
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Latitude (Optional)</label>
+                    <input type="number" step="any" name="latitude" placeholder="15.xxxx"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300">
                 </div>
+                <div class="space-y-2">
+                    <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Longitude (Optional)</label>
+                    <input type="number" step="any" name="longitude" placeholder="120.xxxx"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300">
+                </div>
+
+                <!-- Description -->
+                <div class="md:col-span-2 space-y-2">
+                    <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Event Description</label>
+                    <textarea name="description" rows="5" required maxlength="2000" placeholder="Detail the activities, schedules, objectives, or participation instructions for this event..."
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs p-4 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300 resize-none"></textarea>
+                    <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Maximum 2000 characters.</p>
+                </div>
+
+                <!-- Visual Media uploads -->
+                <div class="md:col-span-2 p-6 bg-slate-50 rounded-2xl border border-slate-200/60 space-y-4">
+                    <h4 class="text-xs font-black text-slate-700 uppercase tracking-widest flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        Visual Media Assets
+                    </h4>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Upload Local File</label>
+                            <input type="file" name="image" accept="image/*"
+                                class="w-full text-xs text-slate-700 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border file:border-slate-200 file:text-[10px] file:font-black file:uppercase file:bg-white file:text-slate-600 hover:file:bg-slate-50 cursor-pointer">
+                        </div>
+
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Or Provide Remote URL</label>
+                            <input type="url" name="image_url" placeholder="https://domain.com/image.jpg"
+                                class="w-full bg-white border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit buttons -->
+            <div class="flex justify-end gap-3 pt-6 border-t border-slate-100">
+                <a href="{{ url_for('barangay.barangay_events') }}"
+                    class="px-5 py-2.5 border border-slate-200 text-slate-500 rounded-xl text-xs font-black uppercase hover:bg-slate-50 transition-all">
+                    Discard
+                </a>
+                <button type="submit"
+                    class="px-5 py-2.5 bg-mongodb-green text-dark-green rounded-xl text-xs font-black uppercase hover:bg-emerald-300 transition-all shadow-md shadow-dark-green/10">
+                    Save Event
+                </button>
             </div>
         </form>
     </div>

@@ -1,63 +1,89 @@
-{% extends "admin/dashboard.html" %}
+{% extends 'admin/admin_base.html' %}
 
-{% block admin_header %}
-<h1 class="text-4xl font-bold text-white mb-2">Heritage Archive</h1>
-<p class="text-emerald-100/80 font-medium">Manage Mangatarem's natural and cultural heritage records.</p>
+{% block title %}Heritage Archive - GoMangatarem Admin{% endblock %}
+
+{% block admin_head %}
+<!-- Dedicated styles if needed -->
 {% endblock %}
 
 {% block admin_content %}
-<div class="px-6 py-8">
-
-    <!-- Stats Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12 relative z-20 mt-4">
-        {% for stat in type_stats %}
-        <div class="glass-card p-6 border-l-4 border-emerald-500 hover:transform hover:translate-y-[-4px] transition-all duration-300">
-            <div class="flex justify-between items-start mb-4">
-                <div>
-                    <span class="text-[10px] font-bold uppercase tracking-widest text-emerald-600 mb-1 block">{{ stat.form }}</span>
-                    <h3 class="text-xl font-bold text-emerald-950">{{ stat.label }}</h3>
-                </div>
-                <div class="p-2 bg-emerald-500/10 rounded-lg">
-                    <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        {% if stat.slug == 'natural' %}
-                        <path d="M12 3L2 12h3v8h14v-8h3L12 3z"/>
-                        {% elif stat.slug == 'intangible' %}
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
-                        {% elif stat.slug == 'personality' %}
-                        <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                        {% elif stat.slug == 'institution' %}
-                        <path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-6h8v6zm-2-2v-2h-4v2h4z"/>
-                        {% else %}
-                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
-                        {% endif %}
+<div class="space-y-8 animate-fade-in font-body">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-2 border-b border-slate-100">
+        <div>
+            <div class="flex items-center gap-2 mb-2">
+                <a href="{{ url_for('admin.admin_dashboard') }}"
+                   class="text-slate-400 hover:text-dark-green flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors">
+                    <svg class="w-4 h-4 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
+                    Back to Hub
+                </a>
+            </div>
+            <h1 class="text-3xl font-black text-slate-800 font-heading tracking-tight leading-tight">
+                Heritage Archive
+            </h1>
+            <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider mt-1">
+                Manage Mangatarem's natural, cultural, built, and intangible heritage registries
+            </p>
+        </div>
+    </div>
+
+    <!-- Stats Bento Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for stat in type_stats %}
+        <div class="glass-card p-6 rounded-3xl border border-white/20 relative group hover:scale-[1.02] transition-all duration-300 flex flex-col justify-between">
+            <div>
+                <div class="flex justify-between items-start mb-4">
+                    <div class="min-w-0 pr-2">
+                        <span class="text-[9px] font-black uppercase tracking-wider text-dark-green bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 mb-1 inline-block">{{ stat.form }}</span>
+                        <h3 class="text-sm font-black text-slate-800 tracking-tight leading-tight">{{ stat.label }}</h3>
+                    </div>
+                    <div class="p-2.5 bg-slate-50 border border-slate-200 text-slate-500 rounded-2xl group-hover:scale-110 transition-transform">
+                        <svg class="w-5 h-5 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {% if stat.slug == 'natural' %}
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3L2 12h3v8h14v-8h3L12 3z"/>
+                            {% elif stat.slug == 'intangible' %}
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/>
+                            {% elif stat.slug == 'personality' %}
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
+                            {% elif stat.slug == 'institution' %}
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-6h8v6zm-2-2v-2h-4v2h4z"/>
+                            {% else %}
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/>
+                            {% endif %}
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Stats breakdown grid -->
+                <div class="grid grid-cols-3 gap-2 mb-6">
+                    <div class="text-center p-2.5 bg-slate-50 border border-slate-100 rounded-xl">
+                        <span class="block text-base font-black text-slate-800 leading-none">{{ stat.total }}</span>
+                        <span class="text-[8px] font-black uppercase text-slate-400 tracking-wider mt-1 block">Total</span>
+                    </div>
+                    <div class="text-center p-2.5 bg-emerald-50/50 border border-emerald-100 rounded-xl">
+                        <span class="block text-base font-black text-emerald-600 leading-none">{{ stat.approved }}</span>
+                        <span class="text-[8px] font-black uppercase text-emerald-500 tracking-wider mt-1 block">Approved</span>
+                    </div>
+                    <div class="text-center p-2.5 bg-yellow-50/50 border border-yellow-100 rounded-xl">
+                        <span class="block text-base font-black text-yellow-600 leading-none">{{ stat.pending }}</span>
+                        <span class="text-[8px] font-black uppercase text-yellow-500 tracking-wider mt-1 block">Pending</span>
+                    </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-3 gap-2 mb-6">
-                <div class="text-center p-2 bg-emerald-900/5 rounded">
-                    <span class="block text-xl font-bold text-emerald-950">{{ stat.total }}</span>
-                    <span class="text-[8px] uppercase text-emerald-900/60">Total</span>
-                </div>
-                <div class="text-center p-2 bg-emerald-500/5 rounded border border-emerald-500/20">
-                    <span class="block text-xl font-bold text-emerald-600">{{ stat.approved }}</span>
-                    <span class="text-[8px] uppercase text-emerald-600">Approved</span>
-                </div>
-                <div class="text-center p-2 bg-amber-500/5 rounded border border-amber-500/20">
-                    <span class="block text-xl font-bold text-amber-600">{{ stat.pending }}</span>
-                    <span class="text-[8px] uppercase text-amber-600">Pending</span>
-                </div>
-            </div>
-
+            <!-- Action shortcuts -->
             <div class="flex gap-2">
                 <a href="{{ url_for('admin.admin_heritage_list', heritage_type=stat.slug) }}" 
-                   class="flex-1 text-center py-2 bg-white/10 hover:bg-white/20 text-white text-xs font-bold rounded transition-colors uppercase tracking-wider">
-                    View List
+                   class="flex-grow text-center py-2.5 bg-slate-50 hover:bg-slate-100 text-slate-700 font-black text-[9px] uppercase tracking-wider rounded-xl border border-slate-200 transition-colors">
+                    Manage Roster
                 </a>
                 <a href="{{ url_for('admin.admin_heritage_add', heritage_type=stat.slug) }}" 
-                   class="p-2 bg-emerald-500 hover:bg-emerald-600 text-white rounded transition-colors">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                   class="p-2.5 bg-dark-green hover:bg-emerald-900 text-white rounded-xl transition-colors flex items-center justify-center cursor-pointer"
+                   title="Add record">
+                    <svg class="w-4 h-4 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
                     </svg>
                 </a>
             </div>
@@ -65,40 +91,51 @@
         {% endfor %}
     </div>
 
-    <!-- Quick Actions -->
-    <div class="glass-card p-8">
-        <h3 class="text-xl font-bold text-emerald-950 mb-6">Master Registry Overview</h3>
-        <div class="overflow-x-auto">
-            <table class="w-full text-left">
+    <!-- Master Registry Directory Table -->
+    <div class="glass-card rounded-[2rem] overflow-hidden">
+        <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <div>
+                <h3 class="text-base font-black text-slate-800">Master Registry Overview</h3>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider mt-1">Registry structures and tracking fields</p>
+            </div>
+        </div>
+        <div class="overflow-x-auto admin-scrollbar">
+            <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="text-emerald-900/60 text-xs uppercase tracking-widest border-b border-emerald-900/10">
-                        <th class="pb-4">Registry Type</th>
-                        <th class="pb-4">Form ID</th>
-                        <th class="pb-4">Map Layer</th>
-                        <th class="pb-4">Primary Field</th>
-                        <th class="pb-4 text-right">Actions</th>
+                    <tr class="bg-slate-50 border-b border-slate-100">
+                        <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Registry Type</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Form ID</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">Map Layer</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Primary Field</th>
+                        <th class="px-8 py-5 text-right text-[9px] font-black text-slate-400 uppercase tracking-widest">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="text-gray-600">
+                <tbody class="divide-y divide-slate-100">
                     {% for slug, config in heritage_types.items() %}
-                    <tr class="border-b border-white/5 hover:bg-white/5 transition-colors group">
-                        <td class="py-4 font-bold text-emerald-950">{{ config.label }}</td>
-                        <td class="py-4"><span class="px-2 py-1 bg-emerald-100 text-emerald-800 rounded text-[10px]">{{ config.form }}</span></td>
-                        <td class="py-4">
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <td class="px-8 py-5 font-black text-slate-800 text-xs">{{ config.label }}</td>
+                        <td class="px-6 py-5 align-middle">
+                            <span class="px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-500 rounded text-[9px] font-black uppercase tracking-wider">{{ config.form }}</span>
+                        </td>
+                        <td class="px-6 py-5 text-center align-middle">
                             {% if config.has_coords %}
-                            <span class="flex items-center gap-1 text-emerald-400 text-[10px] uppercase font-bold">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
-                                Active
+                            <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-600 border border-emerald-100 px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-wider">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                Active Layer
                             </span>
                             {% else %}
-                            <span class="text-gray-500 text-[10px] uppercase font-bold italic">N/A</span>
+                            <span class="text-slate-400 text-[8px] font-black uppercase tracking-wider bg-slate-100 px-2.5 py-1 rounded border border-slate-200/60">
+                                Spatial N/A
+                            </span>
                             {% endif %}
                         </td>
-                        <td class="py-4 text-xs font-mono text-emerald-700">{{ config.name_field }}</td>
-                        <td class="py-4 text-right">
+                        <td class="px-6 py-5 text-xs font-mono text-emerald-700 align-middle">
+                            {{ config.name_field }}
+                        </td>
+                        <td class="px-8 py-5 text-right align-middle">
                             <a href="{{ url_for('admin.admin_heritage_list', heritage_type=slug) }}" 
-                               class="text-xs font-bold text-emerald-400 hover:text-emerald-300 transition-colors uppercase tracking-widest">
-                                Manage
+                               class="inline-flex items-center gap-1 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-black text-[9px] uppercase tracking-wider rounded-xl transition-all shadow-sm cursor-pointer admin-action-btn">
+                                <span>Manage Directory</span>
                             </a>
                         </td>
                     </tr>
@@ -109,5 +146,3 @@
     </div>
 </div>
 {% endblock %}
-
-{% block dashboard_scripts %}{% endblock %}

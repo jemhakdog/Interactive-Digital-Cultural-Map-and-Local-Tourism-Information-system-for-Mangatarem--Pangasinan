@@ -1,5 +1,4 @@
 import sys
-import os
 
 # Add the project directory to sys.path
 sys.path.append('d:\\porjects\\Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan')

@@ -16,7 +16,7 @@ def run_debug():
     if '+psycopg2' in uri:
         uri = uri.replace('+psycopg2', '')
     
-    print(f"Connecting to host...") 
+    print("Connecting to host...") 
     try:
         conn = psycopg2.connect(uri)
     except Exception as e:

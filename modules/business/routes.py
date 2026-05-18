@@ -24,7 +24,6 @@ from utils.security import (
     validate_phone,
     sanitize_url,
 )
-import logging
 
 business_bp = Blueprint("business", __name__, url_prefix="/business")
 logger = logging.getLogger(__name__)

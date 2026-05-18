@@ -173,7 +173,7 @@
     {% endblock %}
 
     <!-- Admin Breadcrumb Bar -->
-    {% if current_user.is_authenticated and current_user.role == 'admin' %}
+    {% if current_user.is_authenticated and current_user.role == 'admin' and not request.path.startswith('/admin') %}
     {% include 'includes/admin_breadcrumb.html' %}
     {% endif %}
 

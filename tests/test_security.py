@@ -4,7 +4,6 @@ Security utility tests.
 Tests for input validation and sanitization functions.
 """
 
-import pytest
 import sys
 import os
 

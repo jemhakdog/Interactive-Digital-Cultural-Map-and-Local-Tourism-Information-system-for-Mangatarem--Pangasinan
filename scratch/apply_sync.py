@@ -1,6 +1,6 @@
 import os
 import sys
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from dotenv import load_dotenv
 from urllib.parse import quote_plus
 

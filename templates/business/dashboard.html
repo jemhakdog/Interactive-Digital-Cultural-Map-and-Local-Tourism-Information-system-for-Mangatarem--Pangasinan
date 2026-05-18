@@ -1,219 +1,344 @@
-{% extends "base.html" %}
-{% block title %}Business Dashboard — GoMangatarem{% endblock %}
-{% block body_class %}{% if establishment and establishment.type in ['restaurant', 'cafe', 'fastfood'] %}bg-orange-950{% else %}bg-emerald-950{% endif %}{% endblock %}
-{% block content %}
-{% set is_dining = establishment and establishment.type in ['restaurant', 'cafe', 'fastfood'] %}
-<section class="min-h-screen pt-8 pb-16 px-4 transition-colors duration-700
-    {% if is_dining %}
-    bg-dining-gradient bg-dining-dark
-    {% else %}
-    bg-heritage-gradient bg-heritage-dark
-    {% endif %}">
-    <div class="container mx-auto max-w-6xl">
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-4">
-            <div>
-                <h1 class="text-3xl font-bold text-white font-heading tracking-tight">
-                    {% if is_dining %}Dining Management{% elif establishment and establishment.type == 'inn' %}Hospitality Portal{% else %}Business Dashboard{% endif %}
-                </h1>
-                <p class="{% if is_dining %}text-orange-100/60{% else %}text-emerald-100/60{% endif %} mt-1">
-                    {% if is_dining %}Manage your restaurant or cafe menu and reviews{% else %}Manage your establishment listing{% endif %}
-                </p>
-            </div>
-            {% if not establishment %}
-            <a href="{{ url_for('business.create_establishment') }}"
-                class="{% if is_dining %}bg-orange-600 hover:bg-orange-500{% else %}bg-emerald-600 hover:bg-emerald-500{% endif %} text-white font-bold py-3 px-6 rounded-xl transition-all duration-300 shadow-lg inline-flex items-center gap-2 hover:scale-[1.02]">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                Create Listing
-            </a>
-            {% endif %}
-        </div>
+{% extends "admin/admin_base.html" %}
 
+{% block title %}Business Dashboard — GoMangatarem{% endblock %}
+
+{% block admin_content %}
+{% set is_dining = establishment and establishment.type in ['restaurant', 'cafe', 'fastfood'] %}
+{% if is_dining %}
+    {% set theme_color = 'orange' %}
+    {% set primary_text = 'text-orange-500' %}
+    {% set border_accent = 'border-orange-500/20' %}
+    {% set bg_card = 'bg-orange-950/20' %}
+    {% set hover_card = 'hover:bg-orange-950/30' %}
+    {% set accent_badge = 'bg-orange-500/10 text-orange-400 border border-orange-500/20' %}
+    {% set fill_btn = 'bg-orange-600 hover:bg-orange-500 text-white shadow-lg shadow-orange-900/40' %}
+    {% set text_btn = 'text-orange-400 bg-orange-950/40 hover:bg-orange-950/60 border border-orange-500/20' %}
+    {% set fill_icon = 'bg-orange-500/15 text-orange-400' %}
+{% else %}
+    {% set theme_color = 'green' %}
+    {% set primary_text = 'text-mongodb-green' %}
+    {% set border_accent = 'border-mongodb-green/10' %}
+    {% set bg_card = 'bg-emerald-950/15' %}
+    {% set hover_card = 'hover:bg-emerald-950/25' %}
+    {% set accent_badge = 'bg-mongodb-green/10 text-mongodb-green border border-mongodb-green/20' %}
+    {% set fill_btn = 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/40' %}
+    {% set text_btn = 'text-mongodb-green bg-emerald-950/40 hover:bg-emerald-950/60 border border-mongodb-green/20' %}
+    {% set fill_icon = 'bg-mongodb-green/15 text-mongodb-green' %}
+{% endif %}
+
+<div class="max-w-6xl mx-auto space-y-8 py-4">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 border-b border-gray-100">
+        <div>
+            <h1 class="text-2xl font-black text-slate-800 tracking-tight font-display">
+                {% if is_dining %}🍽️ Culinary Management Hub{% elif establishment and establishment.type == 'inn' %}🏨 Hospitality Partner Command{% else %}💼 Business Partner Portal{% endif %}
+            </h1>
+            <p class="text-xs font-bold text-slate-400 mt-1 uppercase tracking-wider">
+                {% if is_dining %}Promote menu listings, operating hours, and track customer reviews{% else %}Steward accommodation listings, room capacities, and track local visitor metrics{% endif %}
+            </p>
+        </div>
+        
         {% if establishment %}
-        <!-- Status Banner -->
+            <div class="flex items-center gap-2">
+                <span class="inline-block px-3 py-1.5 text-[10px] font-black uppercase rounded {{ accent_badge }}">
+                    Type: {{ establishment.type | upper }}
+                </span>
+                <span class="inline-block px-3 py-1.5 text-[10px] font-black uppercase rounded 
+                    {% if establishment.status == 'approved' %}bg-green-100 text-green-700 border border-green-200
+                    {% elif establishment.status == 'pending' %}bg-amber-100 text-amber-700 border border-amber-200
+                    {% else %}bg-red-100 text-red-700 border border-red-200{% endif %}">
+                    Status: {{ establishment.status }}
+                </span>
+            </div>
+        {% endif %}
+    </div>
+
+    {% if establishment %}
+        <!-- Pending Approval / Rejection Banners -->
         {% if establishment.status == 'pending' %}
-        <div class="bg-amber-500/10 border border-amber-500/20 rounded-2xl p-4 mb-8 flex items-center gap-3">
-            <svg class="w-6 h-6 text-amber-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-            <p class="text-amber-200 text-sm">Your listing is <strong>pending approval</strong>. It will be visible to tourists once an admin approves it.</p>
-        </div>
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl flex items-start gap-3 shadow-sm">
+                <svg class="w-5 h-5 text-amber-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                </svg>
+                <div>
+                    <h3 class="text-xs font-black uppercase text-amber-800 tracking-wider">Listing Awaiting Administrative Verification</h3>
+                    <p class="text-xs font-medium text-amber-700/80 mt-1">Your listing is currently under review by Mangatarem tourism administrators. Once verified, it will instantly become visible on the interactive municipal cultural map.</p>
+                </div>
+            </div>
         {% elif establishment.status == 'rejected' %}
-        <div class="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 mb-8 flex items-center gap-3">
-            <svg class="w-6 h-6 text-red-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-            <p class="text-red-200 text-sm">Your listing was <strong>rejected</strong>. Please update your information and contact admin.</p>
-        </div>
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 rounded-r-xl flex items-start gap-3 shadow-sm">
+                <svg class="w-5 h-5 text-red-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                    <h3 class="text-xs font-black uppercase text-red-800 tracking-wider">Listing Revision Required</h3>
+                    <p class="text-xs font-medium text-red-700/80 mt-1">Your listing details do not meet current verification standards. Please review your address coordinates, descriptive info, and resubmit.</p>
+                </div>
+            </div>
         {% endif %}
 
-        <!-- Stats Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
-            <div class="{% if is_dining %}bg-orange-950/40{% else %}bg-emerald-900/40{% endif %} border border-white/10 rounded-2xl p-5 backdrop-blur-md">
-                <p class="{% if is_dining %}text-orange-400{% else %}text-emerald-400{% endif %} text-xs font-bold uppercase tracking-wider mb-1">Status</p>
-                <p class="text-2xl font-bold text-white capitalize">{{ establishment.status }}</p>
+        <!-- Bento-Style Stats Overview Grid -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Metric 1: Rating -->
+            <div class="bg-white border border-slate-100 p-5 rounded-2xl shadow-sm flex flex-col justify-between group hover:border-slate-200 transition-all duration-300">
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">Average Rating</span>
+                <div class="flex items-baseline gap-2 mt-4">
+                    <span class="text-3xl font-black text-slate-800">
+                        {% if establishment.rating_avg > 0 %}
+                            {{ "%.1f"|format(establishment.rating_avg) }}
+                        {% else %}
+                            0.0
+                        {% endif %}
+                    </span>
+                    <span class="text-xs font-bold text-amber-500">
+                        {% if establishment.rating_avg > 0 %}
+                            ★ Rating
+                        {% else %}
+                            No Reviews Yet
+                        {% endif %}
+                    </span>
+                </div>
             </div>
-            <div class="{% if is_dining %}bg-orange-950/40{% else %}bg-emerald-900/40{% endif %} border border-white/10 rounded-2xl p-5 backdrop-blur-md">
-                <p class="{% if is_dining %}text-orange-400{% else %}text-emerald-400{% endif %} text-xs font-bold uppercase tracking-wider mb-1">Rating</p>
-                <p class="text-2xl font-bold text-white">
-                    {% if establishment.rating_avg > 0 %}
-                    {{ "%.1f"|format(establishment.rating_avg) }} ⭐
-                    {% else %}
-                    No reviews
-                    {% endif %}
-                </p>
+
+            <!-- Metric 2: Content Item Counts -->
+            <div class="bg-white border border-slate-100 p-5 rounded-2xl shadow-sm flex flex-col justify-between group hover:border-slate-200 transition-all duration-300">
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">
+                    {% if establishment.type == 'inn' %}Rooms / Lodgings{% else %}Active Menu Dishes{% endif %}
+                </span>
+                <div class="flex items-baseline gap-2 mt-4">
+                    <span class="text-3xl font-black text-slate-800">
+                        {% if establishment.type == 'inn' %}{{ stats.room_count }}{% else %}{{ stats.menu_count }}{% endif %}
+                    </span>
+                    <span class="text-xs font-bold {{ primary_text }}">Managed Items</span>
+                </div>
             </div>
-            <div class="{% if is_dining %}bg-orange-950/40{% else %}bg-emerald-900/40{% endif %} border border-white/10 rounded-2xl p-5 backdrop-blur-md">
-                <p class="{% if is_dining %}text-orange-400{% else %}text-emerald-400{% endif %} text-xs font-bold uppercase tracking-wider mb-1">
-                    {% if establishment.type == 'inn' %}Rooms{% else %}Menu Items{% endif %}
-                </p>
-                <p class="text-2xl font-bold text-white">
-                    {% if establishment.type == 'inn' %}{{ stats.room_count }}{% else %}{{ stats.menu_count }}{% endif %}
-                </p>
+
+            <!-- Metric 3: Customer Feedbacks -->
+            <div class="bg-white border border-slate-100 p-5 rounded-2xl shadow-sm flex flex-col justify-between group hover:border-slate-200 transition-all duration-300">
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">Total Reviews</span>
+                <div class="flex items-baseline gap-2 mt-4">
+                    <span class="text-3xl font-black text-slate-800">{{ stats.total_reviews }}</span>
+                    <span class="text-xs font-bold text-blue-500">Visitor Feedbacks</span>
+                </div>
             </div>
-            <div class="{% if is_dining %}bg-orange-950/40{% else %}bg-emerald-900/40{% endif %} border border-white/10 rounded-2xl p-5 backdrop-blur-md">
-                <p class="{% if is_dining %}text-orange-400{% else %}text-emerald-400{% endif %} text-xs font-bold uppercase tracking-wider mb-1">Reviews</p>
-                <p class="text-2xl font-bold text-white">{{ stats.total_reviews }}</p>
+
+            <!-- Metric 4: Direct Page Views -->
+            <div class="bg-white border border-slate-100 p-5 rounded-2xl shadow-sm flex flex-col justify-between group hover:border-slate-200 transition-all duration-300">
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">Verification Integrity</span>
+                <div class="flex items-baseline gap-2 mt-4">
+                    <span class="text-md font-black uppercase text-green-600">Approved</span>
+                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Active State</span>
+                </div>
             </div>
         </div>
 
-        <!-- Establishment Info Card -->
-        <div class="{% if is_dining %}bg-orange-900/20{% else %}bg-emerald-900/20{% endif %} border border-white/10 rounded-3xl overflow-hidden mb-8 backdrop-blur-md">
-            {% if establishment.cover_image_url %}
-            <div class="h-48 bg-cover bg-center" style="background-image: url('{{ establishment.cover_image_url }}')">
-                <div class="h-full bg-gradient-to-t from-emerald-950/80 to-transparent"></div>
-            </div>
-            {% endif %}
-            <div class="p-8">
-                <div class="flex items-start justify-between gap-4 flex-wrap">
-                    <div>
-                        <span class="text-xs font-bold text-emerald-400 uppercase tracking-widest">
-                            {% if establishment.type == 'inn' %}🏨 Inn / Lodge{% elif establishment.type == 'restaurant' %}🍽️ Restaurant{% elif establishment.type == 'cafe' %}☕ Café{% elif establishment.type == 'fastfood' %}🍔 Fast Food{% endif %}
-                        </span>
-                        <h2 class="text-2xl font-bold text-white mt-2 font-heading">{{ establishment.name }}</h2>
-                        {% if establishment.address %}
-                        <p class="text-emerald-100/50 text-sm mt-1">📍 {{ establishment.address }}</p>
+        <!-- Details Grid & Summary -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left: Profile Summary (2 cols) -->
+            <div class="lg:col-span-2 bg-white border border-slate-100 rounded-3xl overflow-hidden shadow-sm flex flex-col justify-between">
+                <div>
+                    {% if establishment.cover_image_url %}
+                        <div class="h-48 w-full bg-cover bg-center border-b border-slate-100" style="background-image: url('{{ establishment.cover_image_url }}')">
+                            <div class="w-full h-full bg-gradient-to-t from-slate-900/60 to-transparent flex items-end p-6">
+                                <span class="px-2.5 py-1 text-[8px] font-black bg-slate-900/80 text-white rounded border border-white/10 uppercase tracking-wider">Cover Image</span>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="h-28 w-full bg-slate-50 border-b border-slate-100 flex items-center justify-center text-slate-300">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 00-2 2z"></path>
+                            </svg>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="p-6">
+                        <div class="flex items-start justify-between gap-4">
+                            <div>
+                                <span class="text-[9px] font-black uppercase {{ primary_text }} tracking-widest">
+                                    {% if establishment.type == 'inn' %}🏨 Lodging & Accommodations
+                                    {% elif establishment.type == 'restaurant' %}🍽️ Dining & Culinary
+                                    {% elif establishment.type == 'cafe' %}☕ Local Brew Café
+                                    {% else %}🍔 Bistro Fastfood{% endif %}
+                                </span>
+                                <h2 class="text-lg font-black text-slate-800 mt-1 font-display tracking-tight">{{ establishment.name }}</h2>
+                                {% if establishment.address %}
+                                    <p class="text-xs font-semibold text-slate-400 mt-1 flex items-center gap-1">📍 {{ establishment.address }}</p>
+                                {% endif %}
+                            </div>
+                            <a href="{{ url_for('business.edit_establishment') }}" class="px-3.5 py-2 text-[10px] font-black uppercase rounded {{ text_btn }} shrink-0 flex items-center gap-1 hover:scale-[1.02] transition-transform">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
+                                </svg>
+                                Edit Profile
+                            </a>
+                        </div>
+                        
+                        {% if establishment.description %}
+                            <p class="text-xs font-semibold text-slate-500 mt-4 leading-relaxed border-t border-slate-100 pt-4">{{ establishment.description }}</p>
                         {% endif %}
                     </div>
-                    <a href="{{ url_for('business.edit_establishment') }}"
-                        class="bg-emerald-700/50 hover:bg-emerald-600 text-emerald-100 text-sm font-bold py-2 px-5 rounded-xl transition-all duration-300 inline-flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                        </svg>
-                        Edit Details
-                    </a>
                 </div>
-                {% if establishment.description %}
-                <p class="text-emerald-100/60 mt-4 leading-relaxed">{{ establishment.description[:200] }}{% if establishment.description|length > 200 %}...{% endif %}</p>
+
+                <div class="bg-slate-50 border-t border-slate-100 p-6 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                    <div>
+                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Contact Phone</p>
+                        <p class="text-xs font-bold text-slate-700 mt-1 truncate">{{ establishment.contact_number or 'Not Specified' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Contact Email</p>
+                        <p class="text-xs font-bold text-slate-700 mt-1 truncate">{{ establishment.email or 'Not Specified' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Price Range</p>
+                        <p class="text-xs font-bold text-slate-700 mt-1 uppercase">{{ establishment.price_range or '₱₱' }}</p>
+                    </div>
+                    <div>
+                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Map Coordinates</p>
+                        <p class="text-xs font-mono font-bold text-slate-600 mt-1 truncate">{{ "%.4f"|format(establishment.latitude) }}, {{ "%.4f"|format(establishment.longitude) }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Action Cards Bento Grid -->
+            <div class="space-y-4">
+                <!-- Action 1: Room/Menu Management -->
+                {% if establishment.type == 'inn' %}
+                    <a href="{{ url_for('business.manage_rooms') }}" class="block bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:border-emerald-500/20 hover:shadow-md hover:shadow-emerald-950/[0.02] transition-all group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl {{ fill_icon }} flex items-center justify-center transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-black text-slate-800 group-hover:text-emerald-600 transition-colors">Manage Rooms</h3>
+                                    <p class="text-xs font-bold text-slate-400 mt-0.5">{{ stats.room_count }} Rooms Configured</p>
+                                </div>
+                            </div>
+                            <svg class="w-4 h-4 text-slate-300 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('business.manage_menu') }}" class="block bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:border-orange-500/20 hover:shadow-md hover:shadow-orange-950/[0.02] transition-all group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl {{ fill_icon }} flex items-center justify-center transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-black text-slate-800 group-hover:text-orange-600 transition-colors">Manage Menu</h3>
+                                    <p class="text-xs font-bold text-slate-400 mt-0.5">{{ stats.menu_count }} Dishes Configured</p>
+                                </div>
+                            </div>
+                            <svg class="w-4 h-4 text-slate-300 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </a>
+                {% endif %}
+
+                <!-- Action 2: Customer Feedbacks -->
+                <a href="{{ url_for('business.view_reviews') }}" class="block bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:border-blue-500/20 hover:shadow-md hover:shadow-blue-950/[0.02] transition-all group">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-500 flex items-center justify-center transition-colors">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-sm font-black text-slate-800 group-hover:text-blue-600 transition-colors">Customer Feedbacks</h3>
+                                <p class="text-xs font-bold text-slate-400 mt-0.5">{{ stats.total_reviews }} Active Reviews</p>
+                            </div>
+                        </div>
+                        <svg class="w-4 h-4 text-slate-300 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
+                        </svg>
+                    </div>
+                </a>
+
+                <!-- Action 3: Guest Log Registry (Operations) -->
+                {% if establishment.status == 'approved' %}
+                    <a href="{{ url_for('admin.visitor_registry') }}?business_id={{ establishment.id }}" class="block bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:border-emerald-500/20 hover:shadow-md hover:shadow-emerald-950/[0.02] transition-all group">
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center gap-4">
+                                <div class="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center transition-colors">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+                                    </svg>
+                                </div>
+                                <div>
+                                    <h3 class="text-sm font-black text-slate-800 group-hover:text-teal-600 transition-colors">Log Visitor</h3>
+                                    <p class="text-xs font-bold text-slate-400 mt-0.5">Record Physical Walk-ins</p>
+                                </div>
+                            </div>
+                            <svg class="w-4 h-4 text-slate-300 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
+                            </svg>
+                        </div>
+                    </a>
                 {% endif %}
             </div>
         </div>
-
-        <!-- Quick Actions -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {% if establishment.type == 'inn' %}
-            <a href="{{ url_for('business.manage_rooms') }}"
-                class="bg-emerald-900/30 border border-white/10 rounded-2xl p-6 hover:bg-emerald-800/30 transition-all group backdrop-blur-md">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-emerald-800/50 flex items-center justify-center group-hover:bg-emerald-700/50 transition-colors">
-                        <svg class="w-6 h-6 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-white font-bold">Manage Rooms</h3>
-                        <p class="text-emerald-100/50 text-sm">{{ stats.room_count }} rooms listed</p>
-                    </div>
-                </div>
-            </a>
-            {% else %}
-            <a href="{{ url_for('business.manage_menu') }}"
-                class="bg-orange-900/30 border border-white/10 rounded-2xl p-6 hover:bg-orange-800/30 transition-all group backdrop-blur-md">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-orange-800/50 flex items-center justify-center group-hover:bg-orange-700/50 transition-colors">
-                        <svg class="w-6 h-6 text-orange-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-white font-bold">Manage Menu</h3>
-                        <p class="text-orange-100/50 text-sm">{{ stats.menu_count }} items listed</p>
-                    </div>
-                </div>
-            </a>
-            {% endif %}
-            
-            {% if establishment.status == 'approved' %}
-            <a href="{{ url_for('analytics_module.log_visitor', target_type='establishment', target_id=establishment.id) }}"
-                class="bg-blue-900/30 border border-blue-500/30 rounded-2xl p-6 hover:bg-blue-800/30 transition-all group backdrop-blur-md">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl bg-blue-800/50 flex items-center justify-center group-hover:bg-blue-700/50 transition-colors">
-                        <svg class="w-6 h-6 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-white font-bold">Log Visitor</h3>
-                        <p class="text-blue-100/50 text-sm">Record physical walk-ins</p>
-                    </div>
-                </div>
-            </a>
-            {% endif %}
-
-
-            <a href="{{ url_for('business.view_reviews') }}"
-                class="{% if is_dining %}bg-orange-950/30 hover:bg-orange-900/30{% else %}bg-emerald-950/30 hover:bg-emerald-900/30{% endif %} border border-white/10 rounded-2xl p-6 transition-all group backdrop-blur-md">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl {% if is_dining %}bg-orange-800/50 group-hover:bg-orange-700/50 text-orange-400{% else %}bg-emerald-800/50 group-hover:bg-emerald-700/50 text-emerald-400{% endif %} flex items-center justify-center transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-white font-bold">Reviews</h3>
-                        <p class="{% if is_dining %}text-orange-100/50{% else %}text-emerald-100/50{% endif %} text-sm">{{ stats.total_reviews }} reviews</p>
-                    </div>
-                </div>
-            </a>
-
-            <a href="{{ url_for('business.edit_establishment') }}"
-                class="{% if is_dining %}bg-orange-950/30 hover:bg-orange-900/30{% else %}bg-emerald-950/30 hover:bg-emerald-900/30{% endif %} border border-white/10 rounded-2xl p-6 transition-all group backdrop-blur-md">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-xl {% if is_dining %}bg-orange-800/50 group-hover:bg-orange-700/50 text-orange-400{% else %}bg-emerald-800/50 group-hover:bg-emerald-700/50 text-emerald-400{% endif %} flex items-center justify-center transition-colors">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                        </svg>
-                    </div>
-                    <div>
-                        <h3 class="text-white font-bold">Settings</h3>
-                        <p class="{% if is_dining %}text-orange-100/50{% else %}text-emerald-100/50{% endif %} text-sm">Edit details & hours</p>
-                    </div>
-                </div>
-            </a>
-        </div>
-
-        {% else %}
-        <!-- Empty State -->
-        <div class="text-center py-20">
-            <div class="inline-flex items-center justify-center w-24 h-24 rounded-3xl bg-emerald-800/30 border border-emerald-700/30 mb-6">
-                <svg class="w-12 h-12 text-emerald-500/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    {% else %}
+        <!-- Premium Onboarding Flow Empty State -->
+        <div class="max-w-3xl mx-auto py-12 px-6 bg-white border border-slate-100 rounded-3xl shadow-sm text-center">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-emerald-50 text-emerald-600 mb-6">
+                <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                 </svg>
             </div>
-            <h2 class="text-2xl font-bold text-white mb-3">No Establishment Yet</h2>
-            <p class="text-emerald-100/50 max-w-md mx-auto mb-8">Create your business listing to showcase your rooms, menu, and services to tourists visiting Mangatarem.</p>
-            <a href="{{ url_for('business.create_establishment') }}"
-                class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 px-8 rounded-xl transition-all duration-300 shadow-lg inline-flex items-center gap-2 hover:scale-[1.02]">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                Create Your Listing
-            </a>
+            
+            <h2 class="text-xl font-black text-slate-800 font-display tracking-tight">Setup Your Mangatarem Business Profile</h2>
+            <p class="text-xs font-semibold text-slate-400 mt-2 max-w-md mx-auto leading-relaxed">Let's publish your services to visiting tourists! We've prepared a quick draft based on your account session credentials.</p>
+            
+            <!-- Dynamic Prefilled Mock Draft Card -->
+            <div class="mt-8 p-6 bg-slate-50 rounded-2xl border border-slate-100 text-left space-y-4 max-w-md mx-auto">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[8px] font-black uppercase bg-emerald-100 text-emerald-700 rounded tracking-wider select-none">
+                    💡 Prefilled Onboarding Draft
+                </span>
+                
+                <div class="space-y-3">
+                    <div>
+                        <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Recommended Business Name</span>
+                        <p class="text-xs font-bold text-slate-700 mt-0.5">{{ current_user.username | capitalize }}'s Culinary Bistro & Lounge</p>
+                    </div>
+                    <div>
+                        <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Owner Representative</span>
+                        <p class="text-xs font-bold text-slate-700 mt-0.5">{{ current_user.username }}</p>
+                    </div>
+                    <div>
+                        <span class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Contact Email</span>
+                        <p class="text-xs font-bold text-slate-700 mt-0.5 truncate">{{ current_user.email }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Double Launch Action Buttons -->
+            <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+                <a href="{{ url_for('business.create_establishment') }}?type=restaurant&name={{ current_user.username | capitalize }}'s Bistro&email={{ current_user.email }}" 
+                   class="w-full sm:w-auto px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider text-white bg-orange-600 hover:bg-orange-500 shadow-md shadow-orange-950/20 transition-all hover:scale-[1.02] flex items-center justify-center gap-2">
+                    🍽️ Setup Culinary Spot
+                </a>
+                <a href="{{ url_for('business.create_establishment') }}?type=inn&name={{ current_user.username | capitalize }}'s Lodge&email={{ current_user.email }}" 
+                   class="w-full sm:w-auto px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-500 shadow-md shadow-emerald-950/20 transition-all hover:scale-[1.02] flex items-center justify-center gap-2">
+                    🏨 Setup Accommodation
+                </a>
+            </div>
+            
+            <div class="mt-8 border-t border-slate-100 pt-6 flex items-center justify-center gap-6 text-[9px] font-black text-slate-400 uppercase tracking-wider select-none">
+                <span>1. Form Details</span>
+                <span class="text-slate-300">•</span>
+                <span>2. Map Picker</span>
+                <span class="text-slate-300">•</span>
+                <span>3. Verify Listing</span>
+            </div>
         </div>
-        {% endif %}
-    </div>
-</section>
+    {% endif %}
+</div>
 {% endblock %}

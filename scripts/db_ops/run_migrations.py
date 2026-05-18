@@ -24,7 +24,6 @@ import sys
 import argparse
 import logging
 from pathlib import Path
-from datetime import datetime
 from typing import List, Tuple, Optional
 
 # Configure logging
@@ -73,7 +72,7 @@ def get_connection(database_url: Optional[str] = None):
             sys.exit(1)
         
         conn = psycopg2.connect(database_url)
-        logger.info(f"Connected to PostgreSQL database")
+        logger.info("Connected to PostgreSQL database")
         return conn
     
     elif db_type == 'mysql':
@@ -84,7 +83,7 @@ def get_connection(database_url: Optional[str] = None):
             sys.exit(1)
         
         conn = mysql.connector.connect(url=database_url)
-        logger.info(f"Connected to MySQL database")
+        logger.info("Connected to MySQL database")
         return conn
     
     else:
@@ -268,7 +267,7 @@ def run_migrations(database_url: Optional[str] = None, dry_run: bool = False) ->
                     mark_migration_applied(conn, migration_file.name, db_type)
             else:
                 failed_count += 1
-                logger.error(f"Migration failed! Stopping execution.")
+                logger.error("Migration failed! Stopping execution.")
                 break
         
         # Summary

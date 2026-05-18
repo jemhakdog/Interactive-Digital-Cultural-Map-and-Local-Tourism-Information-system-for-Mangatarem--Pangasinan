@@ -6,7 +6,6 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from app import create_app
 from extensions import db
 from models import VisitorLog, Attraction, Establishment, User
-from datetime import datetime
 
 app = create_app()
 
@@ -45,17 +44,17 @@ with app.app_context():
     try:
         db.session.add(new_log)
         db.session.commit()
-        print(f"[SUCCESS] Database Save")
+        print("[SUCCESS] Database Save")
         
         # 4. Retrieve it back to verify persistence
         saved_log = VisitorLog.query.order_by(VisitorLog.id.desc()).first()
-        print(f"\n--- LOG DETAILS ---")
+        print("\n--- LOG DETAILS ---")
         print(f"ID: {saved_log.id}")
         print(f"Visitors: {saved_log.visitor_count}")
         print(f"Date: {saved_log.visit_date}")
         print(f"Notes: {saved_log.notes}")
         print(f"Steward Backlink: {saved_log.steward.username}")
-        print(f"-------------------")
+        print("-------------------")
         
         print("\n[COMPLETE] Database synchronization is working!")
         

@@ -357,6 +357,22 @@ def _seed_database(app):
         db.session.commit()
         logger.info("Default admin user created.")
 
+    # Create default test_owner
+    if not User.query.filter_by(username="test_owner").first():
+        test_owner = User(username="test_owner", email="test_owner@example.com", role="business_owner", is_approved=True)
+        test_owner.set_password("owner123")
+        db.session.add(test_owner)
+        db.session.commit()
+        logger.info("Default test_owner user created.")
+
+    # Create default tourist
+    if not User.query.filter_by(username="tourist").first():
+        tourist = User(username="tourist", email="tourist@example.com", role="user", is_approved=True)
+        tourist.set_password("tourist123")
+        db.session.add(tourist)
+        db.session.commit()
+        logger.info("Default tourist user created.")
+
     # Seed establishments
     from models import Establishment, EstablishmentRoom, EstablishmentMenuItem
     if Establishment.query.first() is None:

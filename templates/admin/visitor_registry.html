@@ -1,191 +1,248 @@
-{% extends "base.html" %}
+{% extends 'admin/admin_base.html' %}
 
-{% block content %}
-<div class="min-h-screen bg-emerald-50/30 py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row md:items-center justify-between mb-12 gap-6">
-            <div>
-                <nav class="flex items-center space-x-2 text-emerald-900/60 text-xs font-black uppercase tracking-widest mb-4">
-                    <a href="{{ url_for('admin.admin_dashboard') }}" class="hover:text-emerald-600 transition-colors">Admin</a>
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    <a href="{{ url_for('admin.visits_index') }}" class="hover:text-emerald-600 transition-colors">Visits</a>
-                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    <span class="text-emerald-700 font-black">Registry</span>
-                </nav>
-                <h1 class="text-4xl font-black text-emerald-950 tracking-tight">
-                    Visitor <span class="text-emerald-600">Registry</span>
-                </h1>
-                {% if target_location %}
-                <p class="text-emerald-900/60 mt-2 font-bold flex items-center">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
-                    Showing records for <span class="text-emerald-950 ml-1">{{ target_location.name }}</span>
-                </p>
-                {% else %}
-                <p class="text-emerald-900/60 mt-2 font-medium">Master database of all identified tourism momentum.</p>
-                {% endif %}
-            </div>
+{% block title %}Visitor Registry - Admin Dashboard{% endblock %}
 
-            <div class="flex flex-wrap items-center gap-3">
-                <!-- Location Switcher -->
-                <form method="GET" class="flex flex-wrap items-center gap-3">
-                    <div class="relative group">
-                        <select name="target_type" onchange="this.form.submit()" 
-                                class="appearance-none bg-white border border-emerald-900/10 rounded-2xl px-6 py-3 pr-12 text-sm font-black text-emerald-950 focus:ring-2 focus:ring-emerald-500 outline-none transition-all cursor-pointer group-hover:shadow-lg">
-                            <option value="">All Types</option>
-                            <option value="attraction" {% if target_type == 'attraction' %}selected{% endif %}>Attractions</option>
-                            <option value="business" {% if target_type == 'business' %}selected{% endif %}>Businesses</option>
-                        </select>
-                        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-emerald-900/40">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </div>
-                    </div>
+{% block admin_head %}
+<!-- Page custom header styles -->
+{% endblock %}
 
-                    <div class="relative group">
-                        <select name="target_id" onchange="this.form.submit()"
-                                class="appearance-none bg-white border border-emerald-900/10 rounded-2xl px-6 py-3 pr-12 text-sm font-black text-emerald-950 focus:ring-2 focus:ring-emerald-500 outline-none transition-all cursor-pointer min-w-[240px] group-hover:shadow-lg">
-                            <option value="">All Locations</option>
-                            {% if target_type == 'attraction' or not target_type %}
-                            <optgroup label="Attractions">
-                                {% for a in all_attractions %}
-                                <option value="{{ a.id }}" {% if target_id == a.id|string %}selected{% endif %}>{{ a.name }}</option>
-                                {% endfor %}
-                            </optgroup>
-                            {% endif %}
-                            {% if target_type == 'business' or not target_type %}
-                            <optgroup label="Businesses">
-                                {% for e in all_establishments %}
-                                <option value="{{ e.id }}" {% if target_id == e.id|string %}selected{% endif %}>{{ e.name }}</option>
-                                {% endfor %}
-                            </optgroup>
-                            {% endif %}
-                        </select>
-                        <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-emerald-900/40">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                        </div>
-                    </div>
-
-                    <!-- Date range inputs within the unified switcher -->
-                    <div class="flex items-center gap-2 bg-white border border-emerald-900/10 rounded-2xl px-4 py-2.5 shadow-sm">
-                        <span class="text-[9px] font-black text-emerald-900/40 uppercase tracking-widest">From</span>
-                        <input type="date" name="start_date" value="{{ start_date or '' }}" class="bg-transparent text-sm font-bold text-emerald-950 outline-none w-28">
-                    </div>
-                    <div class="flex items-center gap-2 bg-white border border-emerald-900/10 rounded-2xl px-4 py-2.5 shadow-sm">
-                        <span class="text-[9px] font-black text-emerald-900/40 uppercase tracking-widest">To</span>
-                        <input type="date" name="end_date" value="{{ end_date or '' }}" class="bg-transparent text-sm font-bold text-emerald-950 outline-none w-28">
-                    </div>
-
-                    <div class="relative group">
-                        <input type="text" name="search" value="{{ search or '' }}" placeholder="Search name..." 
-                               class="bg-white border border-emerald-900/10 rounded-2xl px-6 py-3 pl-12 text-sm text-emerald-950 focus:ring-2 focus:ring-emerald-500 outline-none transition-all w-48 group-hover:shadow-lg">
-                        <svg class="w-5 h-5 absolute left-4 top-1/2 -translate-y-1/2 text-emerald-900/20 group-hover:text-emerald-600 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                    </div>
-
-                    <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[10px] uppercase tracking-widest px-5 py-3.5 rounded-2xl transition-all shadow-md active:scale-95">
-                        Filter
-                    </button>
-
-                    {% if target_type or target_id or search or start_date or end_date %}
-                    <a href="{{ url_for('admin.visitor_registry') }}" class="p-3 bg-red-50 text-red-500 rounded-2xl hover:bg-red-100 transition-colors flex items-center justify-center" title="Clear Filters">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    </a>
-                    {% endif %}
-                </form>
-
-                <a href="{{ url_for('admin.export_visits', target_type=target_type, target_id=target_id, search=search, start_date=start_date, end_date=end_date) }}" class="bg-emerald-600 text-white font-bold px-6 py-4 rounded-2xl hover:bg-emerald-700 transition-all shadow-lg shadow-emerald-600/20 flex items-center">
-                    <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                    Export
+{% block admin_content %}
+<div class="space-y-8 animate-fade-in font-body">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-2 border-b border-slate-100">
+        <div>
+            <div class="flex items-center gap-2 mb-2">
+                <a href="{{ url_for('admin.visits_index') }}"
+                   class="text-slate-400 hover:text-dark-green flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors">
+                    <svg class="w-4 h-4 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Tourism Analytics
                 </a>
             </div>
+            <h1 class="text-3xl font-black text-slate-800 font-heading tracking-tight leading-tight">
+                Visitor Registry
+            </h1>
+            {% if target_location %}
+            <p class="text-xs font-semibold text-slate-500 uppercase tracking-wider mt-1 flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse inline-block"></span>
+                <span>Showing records for</span>
+                <span class="text-dark-green font-black">{{ target_location.name }}</span>
+            </p>
+            {% else %}
+            <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider mt-1">
+                Master database of all identified tourism momentum
+            </p>
+            {% endif %}
         </div>
+        
+        <!-- Export Action -->
+        <div class="flex items-center gap-4">
+            <a href="{{ url_for('admin.export_visits', target_type=target_type, target_id=target_id, search=search, start_date=start_date, end_date=end_date) }}"
+               class="bg-dark-green hover:bg-emerald-900 text-white px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-wider shadow-md shadow-dark-green/10 flex items-center gap-2 transition-all duration-300 transform hover:-translate-y-0.5">
+                <svg class="w-4 h-4 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Export Dataset</span>
+            </a>
+        </div>
+    </div>
 
-        <!-- Registry Table -->
-        <div class="glass-card rounded-[2.5rem] overflow-hidden shadow-xl border border-white/20">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="text-[10px] font-black text-emerald-900/70 uppercase tracking-widest border-b border-emerald-900/10 bg-emerald-900/5">
-                            <th class="px-8 py-6">Visitor Identity</th>
-                            <th class="px-8 py-6">Age</th>
-                            <th class="px-8 py-6">Origin / Address</th>
-                            <th class="px-8 py-6 text-center">System Status</th>
-                            {% if not target_location %}
-                            <th class="px-8 py-6">Location Visited</th>
-                            {% endif %}
-                            <th class="px-8 py-6">Date</th>
-                            <th class="px-8 py-6">Logged By</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-emerald-900/5">
-                        {% for log in logs %}
-                        <tr class="hover:bg-white/50 transition-colors group">
-                            <td class="px-8 py-5">
-                                <div class="flex items-center">
-                                    <div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-black mr-4 group-hover:scale-110 transition-transform">
-                                        {{ log.visitor_name[0]|upper if log.visitor_name else '?' }}
-                                    </div>
-                                    <div>
-                                        <p class="text-emerald-950 font-black">{{ log.visitor_name or "Anonymous" }}</p>
-                                        <p class="text-[10px] text-emerald-900/60 font-bold uppercase tracking-tighter">{{ log.visitor_count }} in party</p>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="px-8 py-5">
-                                <span class="text-emerald-950 font-black">{{ log.visitor_age or "—" }}</span>
-                            </td>
-                            <td class="px-8 py-5">
-                                <span class="text-emerald-900/80 text-sm font-semibold">{{ log.visitor_address or "Not provided" }}</span>
-                            </td>
-                            <td class="px-8 py-5 text-center">
-                                {% if log.is_system_user %}
-                                <div class="inline-flex items-center bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wider">
-                                    <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"/></svg>
-                                    Digital User
-                                </div>
-                                {% else %}
-                                <span class="text-emerald-900/20 text-[10px] font-black uppercase">Manual Entry</span>
-                                {% endif %}
-                            </td>
-                            {% if not target_location %}
-                            <td class="px-8 py-5">
-                                <div class="flex flex-col">
-                                    <span class="text-emerald-950 font-bold text-sm">{{ log.target_name }}</span>
-                                    <span class="text-[9px] font-black uppercase text-emerald-900/30 tracking-widest">{{ log.target_type }}</span>
-                                </div>
-                            </td>
-                            {% endif %}
-                            <td class="px-8 py-5 text-emerald-900/60 text-xs font-black">
-                                {{ log.visit_date.strftime('%b %d, %Y') }}
-                            </td>
-                            <td class="px-8 py-5">
-                                <span class="text-emerald-900/60 text-[10px] font-black uppercase">{{ log.steward.username }}</span>
-                            </td>
-                        </tr>
-                        {% endfor %}
-
-                        {% if not logs %}
-                        <tr>
-                            <td colspan="7" class="px-8 py-20 text-center">
-                                <div class="flex flex-col items-center">
-                                    <div class="p-6 bg-emerald-100/50 rounded-full text-emerald-400 mb-6">
-                                        <svg class="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                                        </svg>
-                                    </div>
-                                    <p class="text-emerald-950 font-black text-3xl tracking-tight">No Detailed Records Found</p>
-                                    <p class="text-emerald-900/60 mt-2 font-medium text-lg">Detailed logs will appear here as stewards record visitor identities.</p>
-                                    <a href="{{ url_for('admin.visits_index') }}" class="mt-10 inline-flex items-center justify-center px-8 py-4 bg-emerald-600 text-white font-black uppercase tracking-widest text-xs rounded-2xl hover:bg-emerald-700 transition-all shadow-xl shadow-emerald-600/30">
-                                        Go back to Logging Dashboard
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endif %}
-                    </tbody>
-                </table>
+    <!-- Filter Control Bento Bar -->
+    <div class="glass-card p-6 rounded-[2rem]">
+        <form method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
+            <!-- Target Type Selector -->
+            <div class="lg:col-span-1 space-y-2">
+                <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider">Target Type</label>
+                <div class="relative">
+                    <select name="target_type" onchange="this.form.submit()"
+                            class="w-full appearance-none bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 pr-10 text-slate-800 text-xs font-bold focus:border-dark-green focus:ring-1 focus:ring-dark-green outline-none transition-all cursor-pointer">
+                        <option value="">All Types</option>
+                        <option value="attraction" {% if target_type == 'attraction' %}selected{% endif %}>Attractions</option>
+                        <option value="business" {% if target_type == 'business' %}selected{% endif %}>Businesses</option>
+                    </select>
+                    <div class="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                </div>
             </div>
+
+            <!-- Target Location Selector -->
+            <div class="lg:col-span-2 space-y-2">
+                <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider">Specific Destination</label>
+                <div class="relative">
+                    <select name="target_id" onchange="this.form.submit()"
+                            class="w-full appearance-none bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 pr-10 text-slate-800 text-xs font-bold focus:border-dark-green focus:ring-1 focus:ring-dark-green outline-none transition-all cursor-pointer">
+                        <option value="">All Locations</option>
+                        {% if target_type == 'attraction' or not target_type %}
+                        <optgroup label="Attractions">
+                            {% for a in all_attractions %}
+                            <option value="{{ a.id }}" {% if target_id == a.id|string %}selected{% endif %}>{{ a.name }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endif %}
+                        {% if target_type == 'business' or not target_type %}
+                        <optgroup label="Businesses">
+                            {% for e in all_establishments %}
+                            <option value="{{ e.id }}" {% if target_id == e.id|string %}selected{% endif %}>{{ e.name }}</option>
+                            {% endfor %}
+                        </optgroup>
+                        {% endif %}
+                    </select>
+                    <div class="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Date From -->
+            <div class="lg:col-span-1 space-y-2">
+                <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider">Date From</label>
+                <input type="date" name="start_date" value="{{ start_date or '' }}"
+                       class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-dark-green focus:ring-1 focus:ring-dark-green outline-none transition-all">
+            </div>
+
+            <!-- Date To -->
+            <div class="lg:col-span-1 space-y-2">
+                <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider">Date To</label>
+                <input type="date" name="end_date" value="{{ end_date or '' }}"
+                       class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-dark-green focus:ring-1 focus:ring-dark-green outline-none transition-all">
+            </div>
+
+            <!-- Search by Name -->
+            <div class="lg:col-span-1 space-y-2">
+                <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider">Visitor Name</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-300">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <input type="text" name="search" value="{{ search or '' }}" placeholder="Search name..."
+                           class="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3 text-xs font-bold text-slate-800 focus:border-dark-green focus:ring-1 focus:ring-dark-green outline-none transition-all shadow-sm">
+                </div>
+            </div>
+
+            <!-- Utility Action buttons -->
+            <div class="sm:col-span-2 lg:col-span-6 flex gap-2 justify-end mt-4">
+                {% if target_type or target_id or search or start_date or end_date %}
+                <a href="{{ url_for('admin.visitor_registry') }}"
+                   class="bg-red-50 hover:bg-red-100 text-red-600 font-black text-[10px] uppercase tracking-wider px-5 py-3 rounded-2xl transition-all flex items-center justify-center gap-1.5"
+                   title="Clear Filters">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    <span>Clear Filter</span>
+                </a>
+                {% endif %}
+                <button type="submit"
+                        class="bg-dark-green hover:bg-emerald-900 text-white font-black text-[10px] uppercase tracking-wider px-6 py-3 rounded-2xl transition-all shadow-md active:scale-95 cursor-pointer">
+                    Apply Filter
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Registry Table List -->
+    <div class="glass-card rounded-[2rem] overflow-hidden">
+        <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <div>
+                <h3 class="text-base font-black text-slate-800">Master Record Set</h3>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider mt-1">Detailed list of tourist entries</p>
+            </div>
+            <span class="bg-emerald-50 text-dark-green text-[9px] font-black border border-emerald-100 uppercase px-3 py-1 rounded-full tracking-wider">
+                {{ logs|length }} Logs found
+            </span>
+        </div>
+        <div class="overflow-x-auto admin-scrollbar">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-100">
+                        <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Visitor Identity</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Age</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Origin / Address</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">System Status</th>
+                        {% if not target_location %}
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Location Visited</th>
+                        {% endif %}
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Date</th>
+                        <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Logged By</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for log in logs %}
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <!-- Visitor Identity -->
+                        <td class="px-8 py-5">
+                            <div class="flex items-center">
+                                <div class="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-100 flex items-center justify-center text-dark-green font-black mr-4 group-hover:scale-105 transition-transform duration-300">
+                                    {{ log.visitor_name[0]|upper if log.visitor_name else '?' }}
+                                </div>
+                                <div>
+                                    <p class="text-slate-800 font-black text-xs leading-none">{{ log.visitor_name or "Anonymous Lead" }}</p>
+                                    <span class="inline-block text-[8px] font-black text-slate-400 uppercase tracking-wider mt-1.5 bg-slate-100 px-2 py-0.5 rounded">
+                                        {{ log.visitor_count }} in party
+                                    </span>
+                                </div>
+                            </div>
+                        </td>
+                        <!-- Age -->
+                        <td class="px-6 py-5 align-middle">
+                            <span class="text-slate-800 font-black text-xs">{{ log.visitor_age or "—" }}</span>
+                        </td>
+                        <!-- Origin/Address -->
+                        <td class="px-6 py-5 align-middle">
+                            <span class="text-slate-500 font-bold text-xs">{{ log.visitor_address or "Not provided" }}</span>
+                        </td>
+                        <!-- System status badge -->
+                        <td class="px-6 py-5 text-center align-middle">
+                            {% if log.is_system_user %}
+                            <span class="inline-flex items-center bg-emerald-50 text-emerald-600 border border-emerald-100 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider" title="Digital User">
+                                <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span>Digital</span>
+                            </span>
+                            {% else %}
+                            <span class="text-slate-400 text-[9px] font-black uppercase tracking-wider bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200">
+                                Manual Entry
+                            </span>
+                            {% endif %}
+                        </td>
+                        <!-- Location Visited -->
+                        {% if not target_location %}
+                        <td class="px-6 py-5 align-middle">
+                            <div class="flex flex-col">
+                                <span class="text-slate-800 font-black text-xs leading-tight">{{ log.target_name }}</span>
+                                <span class="inline-block text-[8px] font-black text-blue-600 bg-blue-50 border border-blue-100 px-2 py-0.5 rounded mt-1 max-w-fit uppercase">
+                                    {{ log.target_type }}
+                                </span>
+                            </div>
+                        </td>
+                        {% endif %}
+                        <!-- Date -->
+                        <td class="px-6 py-5 text-slate-400 text-xs font-bold align-middle">
+                            {{ log.visit_date.strftime('%b %d, %Y') }}
+                        </td>
+                        <!-- Logged By steward -->
+                        <td class="px-8 py-5 align-middle">
+                            <span class="text-slate-400 text-[9px] font-black uppercase tracking-wider">{{ log.steward.username }}</span>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="px-8 py-20 text-center">
+                            <div class="flex flex-col items-center gap-3">
+                                <div class="p-4 bg-slate-50 rounded-3xl text-slate-300">
+                                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                </div>
+                                <p class="font-black text-slate-800">No Detailed Records Found</p>
+                                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Detailed logs will appear here as check-ins are recorded</p>
+                                <a href="{{ url_for('admin.visits_index') }}" class="mt-4 bg-dark-green text-white font-black text-[9px] uppercase tracking-wider px-6 py-3 rounded-2xl hover:bg-emerald-900 transition-all shadow-md active:scale-95">
+                                    Go back to Tourism Analytics
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
 </div>

@@ -1,0 +1,207 @@
+{% extends 'admin/admin_base.html' %}
+
+{% block title %}Newsletter History - GoMangatarem{% endblock %}
+
+{% block admin_head %}
+<!-- Dedicated styles if needed -->
+{% endblock %}
+
+{% block admin_content %}
+<div class="space-y-8 animate-fade-in font-body">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-2 border-b border-slate-100">
+        <div>
+            <div class="flex items-center gap-2 mb-2">
+                <a href="{{ url_for('newsletter_admin.index') }}"
+                   class="text-slate-400 hover:text-dark-green flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors">
+                    <svg class="w-4 h-4 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back to Directory
+                </a>
+            </div>
+            <h1 class="text-3xl font-black text-slate-800 font-heading tracking-tight leading-tight">
+                Campaign History Log
+            </h1>
+            <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider mt-1">
+                Audit and review previously broadcasted announcements and newsletters
+            </p>
+        </div>
+
+        <!-- Compose Action Shortcut -->
+        <div class="flex items-center gap-4">
+            <a href="{{ url_for('newsletter_admin.compose') }}"
+               class="bg-dark-green hover:bg-emerald-900 text-white px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-wider shadow-md shadow-dark-green/10 flex items-center gap-2 transition-all duration-300 transform hover:-translate-y-0.5">
+                <svg class="w-4 h-4 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                <span>Compose Newsletter</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Campaigns Directory Table -->
+    <div class="glass-card rounded-[2rem] overflow-hidden">
+        <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <div>
+                <h3 class="text-base font-black text-slate-800">Dispatch Records Archive</h3>
+                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider mt-1">Full outbound dispatch list</p>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto admin-scrollbar">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-slate-50 border-b border-slate-100">
+                        <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Dispatch Subject</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Recipients</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Sent Timestamp</th>
+                        <th class="px-8 py-5 text-right text-[9px] font-black text-slate-400 uppercase tracking-widest">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    {% for item in history %}
+                    <tr class="hover:bg-slate-50/50 transition-colors group">
+                        <!-- Subject -->
+                        <td class="px-8 py-5 align-middle">
+                            <p class="font-black text-slate-800 text-xs leading-none max-w-md truncate">{{ item.subject }}</p>
+                        </td>
+                        <!-- Recipients Count Badge -->
+                        <td class="px-6 py-5 align-middle">
+                            <span class="inline-block bg-emerald-50 text-emerald-600 text-[8px] font-black uppercase px-2.5 py-1 rounded-full border border-emerald-200 tracking-wider">
+                                {{ item.recipient_count }} {% if item.recipient_count == 1 %}sub{% else %}subs{% endif %}
+                            </span>
+                        </td>
+                        <!-- Sent date -->
+                        <td class="px-6 py-5 text-slate-400 text-xs font-bold align-middle">
+                            {{ item.sent_at.strftime('%B %d, %Y at %I:%M %p') }}
+                        </td>
+                        <!-- Action -->
+                        <td class="px-8 py-5 text-right align-middle">
+                            <button onclick="openNewsletterPreview({{ item.id }})" 
+                                    class="inline-flex items-center gap-1.5 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 font-black text-[9px] uppercase tracking-wider rounded-xl transition-all shadow-sm cursor-pointer ml-auto admin-action-btn">
+                                <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                                <span>Inspect Payload</span>
+                            </button>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="px-8 py-20 text-center">
+                            <div class="flex flex-col items-center gap-3">
+                                <div class="p-4 bg-slate-50 rounded-3xl text-slate-300">
+                                    <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <p class="font-black text-slate-800">No campaigns recorded yet</p>
+                                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Historical records will appear here as newsletters are sent</p>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Premium Preview Modal Backdrop & Window -->
+<div id="newsletterPreviewModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-md animate-fade-in">
+    <div class="bg-white rounded-[2rem] max-w-3xl w-full max-h-[85vh] overflow-hidden shadow-2xl flex flex-col border border-slate-100 transform transition-transform scale-95 duration-200" id="modalCard">
+        <!-- Modal Header -->
+        <div class="px-8 py-6 bg-slate-900 flex justify-between items-center text-white">
+            <div class="min-w-0 pr-4">
+                <span class="text-[9px] uppercase font-black tracking-widest text-slate-400" id="modalSentDate">DATE SENT</span>
+                <h3 class="text-base font-black tracking-tight mt-1 truncate" id="modalSubject">Campaign Subject</h3>
+            </div>
+            <button onclick="closeNewsletterPreview()" class="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-slate-800 transition-all cursor-pointer">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+        
+        <!-- Modal Meta Stats -->
+        <div class="px-8 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
+            <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Payload Details</span>
+            <span class="bg-emerald-50 text-dark-green text-[9px] font-black px-3 py-1 rounded-full border border-emerald-100" id="modalRecipientCount">0 Recipient(s)</span>
+        </div>
+
+        <!-- Modal Body Content -->
+        <div class="flex-1 p-6 md:p-8 overflow-y-auto bg-slate-50/50 min-h-[300px]">
+            <div id="modalContentFrameContainer" class="w-full h-full min-h-[300px] border border-slate-200 rounded-2xl overflow-hidden bg-white shadow-inner">
+                <iframe id="modalContentFrame" class="w-full h-full min-h-[350px] border-none" sandbox="allow-same-origin"></iframe>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="px-8 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
+            <button onclick="closeNewsletterPreview()" class="px-6 py-3 bg-dark-green hover:bg-emerald-900 text-white rounded-xl font-black text-[9px] uppercase tracking-wider shadow-sm transition-all cursor-pointer">
+                Dismiss Inspector
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openNewsletterPreview(id) {
+        const modal = document.getElementById('newsletterPreviewModal');
+        const modalCard = document.getElementById('modalCard');
+        
+        fetch(`/admin/newsletter/history/${id}/content`)
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById('modalSubject').innerText = data.subject;
+                document.getElementById('modalSentDate').innerText = `SENT ON: ${data.sent_at}`;
+                document.getElementById('modalRecipientCount').innerText = `${data.recipient_count} Recipient(s)`;
+                
+                const iframe = document.getElementById('modalContentFrame');
+                iframe.srcdoc = `
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <style>
+                            body {
+                                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+                                font-size: 14px;
+                                line-height: 1.6;
+                                color: #1e293b;
+                                padding: 24px;
+                                margin: 0;
+                            }
+                            a { color: #022c22; font-weight: 700; text-decoration: underline; }
+                        </style>
+                    </head>
+                    <body>
+                        ${data.content}
+                    </body>
+                    </html>
+                `;
+                
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    modalCard.classList.remove('scale-95');
+                    modalCard.classList.add('scale-100');
+                }, 50);
+            })
+            .catch(err => {
+                console.error("Failed to load newsletter:", err);
+                alert("An error occurred while fetching the campaign history.");
+            });
+    }
+
+    function closeNewsletterPreview() {
+        const modal = document.getElementById('newsletterPreviewModal');
+        const modalCard = document.getElementById('modalCard');
+        
+        modalCard.classList.remove('scale-100');
+        modalCard.classList.add('scale-95');
+        
+        setTimeout(() => {
+            modal.classList.add('hidden');
+        }, 150);
+    }
+</script>
+{% endblock %}

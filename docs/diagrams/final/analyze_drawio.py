@@ -1,4 +1,3 @@
-import re
 import xml.etree.ElementTree as ET
 
 file_path = 'docs/diagrams/final/dfd-level-1-clean_v1.drawio'

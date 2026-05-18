@@ -254,16 +254,16 @@ def test_performance() -> bool:
     min_time = min(times)
     max_time = max(times)
     
-    print_info(f"\nStatistics:")
+    print_info("\nStatistics:")
     print_info(f"  Average: {avg_time:.2f}ms")
     print_info(f"  Min: {min_time:.2f}ms")
     print_info(f"  Max: {max_time:.2f}ms")
     
     if avg_time < 200:
-        print_success(f"Performance target met! Average < 200ms")
+        print_success("Performance target met! Average < 200ms")
         return True
     else:
-        print_warning(f"Performance target NOT met. Average > 200ms")
+        print_warning("Performance target NOT met. Average > 200ms")
         print_info("Consider enabling Redis caching or check database indexes")
         return True  # Don't fail on performance in development
 

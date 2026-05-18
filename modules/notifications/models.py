@@ -11,3 +11,16 @@ class NewsletterSubscriber(db.Model):
     
     def __repr__(self):
         return f'<NewsletterSubscriber {self.email}>'
+
+
+class NewsletterHistory(db.Model):
+    __tablename__ = 'NEWSLETTER_HISTORY'
+    id = db.Column(db.Integer, primary_key=True)
+    subject = db.Column(db.String(200), nullable=False)
+    content = db.Column(db.Text, nullable=False)
+    recipient_count = db.Column(db.Integer, default=0)
+    sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f'<NewsletterHistory {self.subject}>'
+

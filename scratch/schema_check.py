@@ -1,6 +1,5 @@
 import os
 import sys
-import logging
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, inspect
 
@@ -18,7 +17,6 @@ os.environ['DB_PROVIDER'] = 'supabase'
 
 from app import create_app
 from extensions import db
-import models
 
 def check_schema():
     print("Initializing Flask App context...")

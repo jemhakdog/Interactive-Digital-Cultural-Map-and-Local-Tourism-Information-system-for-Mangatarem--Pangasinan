@@ -1,4 +1,3 @@
-import os
 from app import create_app
 from extensions import db
 from modules.notifications.models import NewsletterSubscriber

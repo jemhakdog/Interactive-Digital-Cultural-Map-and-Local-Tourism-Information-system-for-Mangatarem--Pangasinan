@@ -4,9 +4,7 @@ import sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from app import create_app
-from extensions import db
-from models import VisitorLog, Attraction, User
-from datetime import datetime
+from models import VisitorLog, Attraction
 
 app = create_app()
 

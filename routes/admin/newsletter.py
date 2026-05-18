@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, request, flash, redirect, url_for
+from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, current_app
 from flask_login import login_required, current_user
-from models import db, NewsletterSubscriber
+from models import db, NewsletterSubscriber, NewsletterHistory
 from utils.email_sender import send_email
 from utils.security import validate_string_input, sanitize_html_input
 import csv
@@ -86,6 +86,19 @@ def compose():
             if send_email(subject, sub.email, content):
                 success_count += 1
         
+        if success_count > 0:
+            try:
+                history_entry = NewsletterHistory(
+                    subject=subject,
+                    content=content,
+                    recipient_count=success_count
+                )
+                db.session.add(history_entry)
+                db.session.commit()
+            except Exception as e:
+                db.session.rollback()
+                current_app.logger.error(f"Failed to record newsletter history: {e}")
+        
         flash(f"Newsletter sent successfully to {success_count} subscribers.", "success")
         return redirect(url_for("newsletter_admin.index"))
 
@@ -129,3 +142,24 @@ def export_subscribers():
     response = Response(generate(), mimetype='text/csv')
     response.headers.set("Content-Disposition", "attachment", filename=f"subscribers_{datetime.now().strftime('%Y%m%d')}.csv")
     return response
+
+@newsletter_admin_bp.route("/admin/newsletter/history")
+@login_required
+@admin_required
+def history():
+    """List historical newsletter campaigns."""
+    history_records = NewsletterHistory.query.order_by(NewsletterHistory.sent_at.desc()).all()
+    return render_template("admin/newsletter/history.html", history=history_records)
+
+@newsletter_admin_bp.route("/admin/newsletter/history/<int:id>/content")
+@login_required
+@admin_required
+def history_content(id):
+    """Return the content of a historical newsletter as JSON."""
+    record = NewsletterHistory.query.get_or_404(id)
+    return jsonify({
+        "subject": record.subject,
+        "content": record.content,
+        "sent_at": record.sent_at.strftime("%B %d, %Y at %I:%M %p"),
+        "recipient_count": record.recipient_count
+    })

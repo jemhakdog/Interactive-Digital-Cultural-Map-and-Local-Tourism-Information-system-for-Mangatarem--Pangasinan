@@ -24,8 +24,41 @@ dependencies = [
     "gunicorn",
     "requests",
     "httpx",
+    "beautifulsoup4>=4.14.3",
 ]
 
 [tool.uv]
 managed = true
 package = false
+
+[tool.ruff]
+# Exclude a variety of common directories
+exclude = [
+    ".git",
+    ".mypy_cache",
+    ".ruff_cache",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "dist",
+    "node_modules",
+    "venv",
+    "migrations",
+    "tests",
+    "scripts",
+    "scratch",
+    ".agent",
+]
+
+# Allow unused imports in __init__.py files
+[tool.ruff.lint]
+ignore = [
+    "E402", # Allow module level imports not at top of file
+    "F401", # Allow unused imports in __init__.py and other entrypoints
+    "E722", # Allow bare except statements
+    "F841", # Allow unused local variables
+    "F403", # Allow wildcard imports
+    "F405", # Allow names from wildcard imports
+    "E712", # Allow == False equality checks (needed for SQLAlchmey filter_by)
+    "E741", # Allow short/ambiguous variables like l
+]

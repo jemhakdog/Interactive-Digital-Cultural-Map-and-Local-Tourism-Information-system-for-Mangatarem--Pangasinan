@@ -17,8 +17,7 @@ import os
 import sys
 import argparse
 import logging
-from pathlib import Path
-from typing import Dict, List, Set, Tuple, Optional
+from typing import Dict, List, Tuple, Optional
 
 # Configure logging
 logging.basicConfig(

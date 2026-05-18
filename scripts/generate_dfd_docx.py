@@ -1,7 +1,6 @@
 from docx import Document
 from docx.oxml import parse_xml
-from docx.oxml.ns import qn
-from docx.shared import Pt, RGBColor
+from docx.shared import Pt
 from pathlib import Path
 
 # --- Constants & Config ---

@@ -214,7 +214,7 @@ def generate_multi_layer_mvt(
     """
     # For SQLite, return empty but valid PBF tile
     if _is_sqlite():
-        logger.warning(f"SQLite detected - returning empty tile for multi-layer request")
+        logger.warning("SQLite detected - returning empty tile for multi-layer request")
         return _generate_empty_pbf()
     
     if layer_names is None:

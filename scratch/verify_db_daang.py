@@ -6,7 +6,6 @@ root_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
 sys.path.append(root_dir)
 
 from app import create_app
-from extensions import db
 from modules.attractions.models import Attraction
 
 app = create_app()

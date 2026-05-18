@@ -10,7 +10,7 @@ os.environ['DB_PROVIDER'] = 'supabase'
 
 try:
     uri = get_database_uri()
-    print(f"Connecting to host...") 
+    print("Connecting to host...") 
     engine = create_engine(uri)
     with engine.connect() as conn:
         result = conn.execute(text("SELECT migration_name FROM _migrations ORDER BY id"))

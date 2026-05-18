@@ -1,5 +1,4 @@
 from app import create_app
-from extensions import db
 from models import Attraction, Establishment, Event, HeritageProfile
 
 app = create_app()

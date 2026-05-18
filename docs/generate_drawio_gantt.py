@@ -1,5 +1,4 @@
 import xml.etree.ElementTree as ET
-import datetime
 
 def create_cell(parent, id, value, x, y, width, height, style):
     cell = ET.SubElement(parent, 'mxCell', id=str(id), value=value, style=style, vertex="1", parent="1")

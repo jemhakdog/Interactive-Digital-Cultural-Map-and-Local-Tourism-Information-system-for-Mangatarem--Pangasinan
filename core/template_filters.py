@@ -8,7 +8,7 @@ Registers filters that can be used in templates:
 """
 
 from markupsafe import Markup, escape
-from utils.security import sanitize_html_input, validate_and_escape, sanitize_url
+from utils.security import sanitize_html_input, sanitize_url
 
 
 # Allowed HTML tags for rich text rendering in templates

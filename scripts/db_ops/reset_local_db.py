@@ -1,5 +1,4 @@
 import os
-import sys
 
 def reset_local_db():
     db_file = 'mangatarem.db'

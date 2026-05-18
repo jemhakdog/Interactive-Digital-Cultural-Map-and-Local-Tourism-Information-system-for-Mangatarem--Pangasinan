@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify, current_app
+from flask import Blueprint, request, jsonify
 from extensions import limiter
 from functools import wraps
 from flask_login import current_user
@@ -64,7 +64,7 @@ def pull_updates():
         JSON response with the result of the operation.
     """
     try:
-        print(f"[PROGRESSIVE LOG] [update] > pull_updates > ENTRY")
+        print("[PROGRESSIVE LOG] [update] > pull_updates > ENTRY")
         logger.info("Pull updates endpoint called - initiating git pull and file copy")
 
         # For security, you might want to verify a token or check request headers
@@ -89,7 +89,7 @@ def pull_updates():
         os.chdir(source_repo)
 
         # Pull the latest changes from GitHub
-        print(f"[PROGRESSIVE LOG] [update] > pull_updates > LOGIC: Executing git pull")
+        print("[PROGRESSIVE LOG] [update] > pull_updates > LOGIC: Executing git pull")
         result = subprocess.run(["git", "pull"], capture_output=True, text=True)
 
         if result.returncode != 0:
@@ -139,7 +139,7 @@ def pull_updates():
         os.chdir(original_cwd)
 
         print(
-            f"[PROGRESSIVE LOG] [update] > pull_updates > SUCCESS: Pulled updates and synchronized files"
+            "[PROGRESSIVE LOG] [update] > pull_updates > SUCCESS: Pulled updates and synchronized files"
         )
         logger.info("Successfully completed git pull and file copy operations")
 

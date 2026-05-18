@@ -1,8 +1,7 @@
-import os
 
 # Suppress prints from app.py by mocking some things or just ignoring them
 from app import app
-from models import User, db
+from models import User
 
 with app.app_context():
     users = User.query.all()

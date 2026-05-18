@@ -1,6 +1,5 @@
 import os
 from app import app, db
-from models import Attraction, Event, GalleryItem, AttractionReview
 from sqlalchemy import inspect
 
 def verify_schema():
@@ -34,7 +33,7 @@ def verify_schema():
                 print(f"  ❌ MISSING: {missing}")
                 all_passed = False
             else:
-                print(f"  ✅ All expected columns present.")
+                print("  ✅ All expected columns present.")
         
         if all_passed:
             print("\n🌟 VERIFICATION SUCCESSFUL: All tables updated correctly.")

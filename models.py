@@ -1,45 +1,42 @@
-from extensions import db
-from flask_login import UserMixin
-from werkzeug.security import generate_password_hash, check_password_hash
-from datetime import datetime, timedelta
-import secrets
+# Core Model Shim (Import Hub)
+# This file bridges the modular monolith structure, allowing old code and routes 
+# to import models from a single central location while keeping model definitions
+# beautifully isolated in their respective modules/ directories.
 
-# auth models shim
+from extensions import db
+
+# === Auth Module Models ===
 from modules.auth.models import User, PasswordResetToken
 
-# attractions models shim
+# === Attractions Module Models ===
 from modules.attractions.models import Attraction, AttractionReview, ReviewPhoto, UserFavoriteAttraction
 
-# events models shim
+# === Events Module Models ===
 from modules.events.models import Event, UserEventInterest
 
-# business models shim
-from modules.business.models import Establishment, EstablishmentRoom, EstablishmentMenuItem, EstablishmentReview, UserFavoriteEstablishment
-
-# barangay models shim
+# === Barangay Module Models ===
 from modules.barangay.models import BarangayInfo
 
-# heritage models shim
+# === Business Module Models ===
+from modules.business.models import Establishment, EstablishmentRoom, EstablishmentMenuItem, EstablishmentReview, UserFavoriteEstablishment
+
+# === Heritage Module Models ===
 from modules.heritage.models import HeritageProfile
 
-# gallery models shim
+# === Gallery Module Models ===
 from modules.gallery.models import GalleryItem
 
-# analytics models shim
+# === Analytics Module Models ===
 from modules.analytics.models import AnalyticsPageView, DatabaseAuditLog, VisitorLog
 
-# notifications models shim
-from modules.notifications.models import NewsletterSubscriber
+# === Notifications Module Models ===
+from modules.notifications.models import NewsletterSubscriber, NewsletterHistory
 
-
-# === Heritage Models (Tourism Forms) ===
-
-# Import heritage models to register them with SQLAlchemy
-# === Heritage Models (Tourism Forms - Detail Tables) ===
-from heritage_models.natural_heritage import NaturalHeritage  # Form 01A
-from heritage_models.built_heritage import BuiltHeritage      # Form 02A
-from heritage_models.movable_heritage import MovableHeritage  # Form 03A
-from heritage_models.intangible_heritage import IntangibleHeritage  # Form 04A
-from heritage_models.personality_profile import PersonalityProfile  # Form 05
-from heritage_models.cultural_institution import CulturalInstitution  # Form 06
-from heritage_models.lgu_culture_program import LGUCultureProgram  # Form 07
+# === Heritage Models (Forms 01-07) ===
+from heritage_models.built_heritage import BuiltHeritage
+from heritage_models.movable_heritage import MovableHeritage
+from heritage_models.natural_heritage import NaturalHeritage
+from heritage_models.intangible_heritage import IntangibleHeritage
+from heritage_models.personality_profile import PersonalityProfile
+from heritage_models.cultural_institution import CulturalInstitution
+from heritage_models.lgu_culture_program import LGUCultureProgram

@@ -14,7 +14,7 @@ logger = logging.getLogger(__name__)
 @login_required
 def visits_index():
     """Display all visitor logs with statistics."""
-    if current_user.role not in ["admin", "contributor"]:
+    if current_user.role not in ["admin", "contributor", "business_owner"]:
         flash("Access denied.")
         return redirect(url_for("public.index"))
     
@@ -27,7 +27,26 @@ def visits_index():
     # Base query
     query = VisitorLog.query
     if current_user.role != "admin":
-        query = query.filter_by(logged_by=current_user.id)
+        from sqlalchemy import or_
+        if current_user.role == "business_owner":
+            owned_est_ids = [e.id for e in Establishment.query.filter_by(owner_id=current_user.id).all()]
+            query = query.filter(
+                or_(
+                    VisitorLog.logged_by == current_user.id,
+                    db.and_(VisitorLog.target_type == "establishment", VisitorLog.target_id.in_(owned_est_ids))
+                )
+            )
+        elif current_user.role == "contributor":
+            from modules.attractions.models import Attraction
+            stewarded_attr_ids = [a.id for a in Attraction.query.filter_by(user_id=current_user.id).all()]
+            query = query.filter(
+                or_(
+                    VisitorLog.logged_by == current_user.id,
+                    db.and_(VisitorLog.target_type == "attraction", VisitorLog.target_id.in_(stewarded_attr_ids))
+                )
+            )
+        else:
+            query = query.filter_by(logged_by=current_user.id)
     
     if target_type:
         query = query.filter_by(target_type=target_type)
@@ -63,9 +82,26 @@ def visits_index():
     )
 
     if current_user.role != "admin":
-        stats_query = stats_query.filter(VisitorLog.logged_by == current_user.id)
-        month_stats_query = month_stats_query.filter(VisitorLog.logged_by == current_user.id)
-        top_loc_query = top_loc_query.filter(VisitorLog.logged_by == current_user.id)
+        from sqlalchemy import or_
+        if current_user.role == "business_owner":
+            owned_est_ids = [e.id for e in Establishment.query.filter_by(owner_id=current_user.id).all()]
+            filter_cond = or_(
+                VisitorLog.logged_by == current_user.id,
+                db.and_(VisitorLog.target_type == "establishment", VisitorLog.target_id.in_(owned_est_ids))
+            )
+        elif current_user.role == "contributor":
+            from modules.attractions.models import Attraction
+            stewarded_attr_ids = [a.id for a in Attraction.query.filter_by(user_id=current_user.id).all()]
+            filter_cond = or_(
+                VisitorLog.logged_by == current_user.id,
+                db.and_(VisitorLog.target_type == "attraction", VisitorLog.target_id.in_(stewarded_attr_ids))
+            )
+        else:
+            filter_cond = (VisitorLog.logged_by == current_user.id)
+            
+        stats_query = stats_query.filter(filter_cond)
+        month_stats_query = month_stats_query.filter(filter_cond)
+        top_loc_query = top_loc_query.filter(filter_cond)
 
     if start_date:
         try:
@@ -111,6 +147,8 @@ def visits_index():
         VisitorLog.target_id,
         func.sum(VisitorLog.visitor_count).label('count')
     )
+    if current_user.role != "admin":
+        location_counts_query = location_counts_query.filter(filter_cond)
     if start_date:
         try:
             parsed_start = datetime.strptime(start_date, '%Y-%m-%d').date()
@@ -147,6 +185,8 @@ def visits_index():
         VisitorLog.target_id,
         func.sum(VisitorLog.visitor_count).label('total_visits')
     )
+    if current_user.role != "admin":
+        top_5_query = top_5_query.filter(filter_cond)
     if start_date:
         try:
             parsed_start = datetime.strptime(start_date, '%Y-%m-%d').date()
@@ -189,6 +229,9 @@ def visits_index():
     if current_user.role == "contributor":
         form_attractions = Attraction.query.filter_by(steward_id=current_user.id).all()
         form_establishments = Establishment.query.filter_by(owner_id=current_user.id).all()
+    elif current_user.role == "business_owner":
+        form_attractions = []
+        form_establishments = Establishment.query.filter_by(owner_id=current_user.id).all()
     else:
         form_attractions = attractions
         form_establishments = establishments
@@ -213,7 +256,7 @@ def visits_index():
 @login_required
 def export_visits():
     """Export visitor logs to CSV with dynamic filtering."""
-    if current_user.role not in ["admin", "contributor"]:
+    if current_user.role not in ["admin", "contributor", "business_owner"]:
         flash("Access denied.")
         return redirect(url_for("public.index"))
 
@@ -225,7 +268,26 @@ def export_visits():
 
     query = VisitorLog.query
     if current_user.role != "admin":
-        query = query.filter_by(logged_by=current_user.id)
+        from sqlalchemy import or_
+        if current_user.role == "business_owner":
+            owned_est_ids = [e.id for e in Establishment.query.filter_by(owner_id=current_user.id).all()]
+            query = query.filter(
+                or_(
+                    VisitorLog.logged_by == current_user.id,
+                    db.and_(VisitorLog.target_type == "establishment", VisitorLog.target_id.in_(owned_est_ids))
+                )
+            )
+        elif current_user.role == "contributor":
+            from modules.attractions.models import Attraction
+            stewarded_attr_ids = [a.id for a in Attraction.query.filter_by(user_id=current_user.id).all()]
+            query = query.filter(
+                or_(
+                    VisitorLog.logged_by == current_user.id,
+                    db.and_(VisitorLog.target_type == "attraction", VisitorLog.target_id.in_(stewarded_attr_ids))
+                )
+            )
+        else:
+            query = query.filter_by(logged_by=current_user.id)
 
     if target_type:
         query = query.filter_by(target_type=target_type)
@@ -410,9 +472,9 @@ def export_destination_insights():
 @login_required
 def visitor_registry():
     """Master table view for all detailed visitor records."""
-    if current_user.role != "admin":
+    if current_user.role not in ["admin", "contributor", "business_owner"]:
         flash("Access denied.")
-        return redirect(url_for("admin.visits_index"))
+        return redirect(url_for("public.index"))
 
     # Filtering parameters
     target_type = request.args.get('target_type')
@@ -422,6 +484,28 @@ def visitor_registry():
     end_date = request.args.get('end_date')
 
     query = VisitorLog.query.filter(VisitorLog.visitor_name.isnot(None))
+
+    if current_user.role != "admin":
+        from sqlalchemy import or_
+        if current_user.role == "business_owner":
+            owned_est_ids = [e.id for e in Establishment.query.filter_by(owner_id=current_user.id).all()]
+            query = query.filter(
+                or_(
+                    VisitorLog.logged_by == current_user.id,
+                    db.and_(VisitorLog.target_type == "establishment", VisitorLog.target_id.in_(owned_est_ids))
+                )
+            )
+        elif current_user.role == "contributor":
+            from modules.attractions.models import Attraction
+            stewarded_attr_ids = [a.id for a in Attraction.query.filter_by(user_id=current_user.id).all()]
+            query = query.filter(
+                or_(
+                    VisitorLog.logged_by == current_user.id,
+                    db.and_(VisitorLog.target_type == "attraction", VisitorLog.target_id.in_(stewarded_attr_ids))
+                )
+            )
+        else:
+            query = query.filter_by(logged_by=current_user.id)
 
     target_location = None
     if target_type and target_id:

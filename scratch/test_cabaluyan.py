@@ -1,5 +1,4 @@
 import requests
-import json
 
 url = "https://nominatim.openstreetmap.org/search"
 headers = {

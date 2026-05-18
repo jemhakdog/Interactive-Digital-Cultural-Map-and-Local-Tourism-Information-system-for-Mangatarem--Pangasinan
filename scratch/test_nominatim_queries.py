@@ -39,9 +39,9 @@ test_scenarios = {
 }
 
 for name, queries in test_scenarios.items():
-    print(f"\n==========================================")
+    print("\n==========================================")
     print(f"Testing scenarios for: {name}")
-    print(f"==========================================")
+    print("==========================================")
     
     for query in queries:
         time.sleep(1.5)

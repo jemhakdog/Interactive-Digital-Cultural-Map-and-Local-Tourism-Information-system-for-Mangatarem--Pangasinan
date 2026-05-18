@@ -53,7 +53,7 @@ def setup_contributor():
         
         db.session.commit()
         print(f"SUCCESS: User '{username}' is ready to login with role '{role}' and password '{password}'.")
-        print(f"Login URL: http://localhost:5002/auth/login")
+        print("Login URL: http://localhost:5002/auth/login")
 
 if __name__ == "__main__":
     setup_contributor()

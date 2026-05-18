@@ -85,7 +85,7 @@ def _validate_email_available(email: str) -> bool:
     return True
 
 
-def _validate_barangay_representative(barangay_id: str, role: str) -> bool:
+def _validate_barangay_representative(barangay_id: Optional[int], role: str) -> bool:
     """
     Check if barangay already has an approved representative.
     """
@@ -104,7 +104,7 @@ def _validate_barangay_representative(barangay_id: str, role: str) -> bool:
     return True
 
 
-def _create_user_from_form(username: str, email: str, password: str, role: str, barangay_id: Optional[str]) -> User:
+def _create_user_from_form(username: str, email: str, password: str, role: str, barangay_id: Optional[int]) -> User:
     """
     Create new user from registration form data.
     """
@@ -156,11 +156,11 @@ def _generate_unique_username(base_username: str) -> str:
     return username
 
 
-def _create_google_user(email: str, name: Optional[str]) -> Optional[User]:
+def _create_google_user(email: str, name: Optional[str], role: str) -> Optional[User]:
     """
-    Create new user from Google OAuth data.
+    Create new user from Google OAuth data with a chosen role.
     """
-    log_logic("auth", "google_login", f"User not found, creating new account for {email}")
+    log_logic("auth", "google_login", f"User not found, creating new account for {email} with role {role}")
     
     # Generate base username from name or email
     if name:
@@ -174,13 +174,13 @@ def _create_google_user(email: str, name: Optional[str]) -> Optional[User]:
         user = User(
             username=username,
             email=email,
-            role="user",
-            is_approved=True,
+            role=role,
+            is_approved=(role == "user"),
         )
         user.set_password(os.urandom(24).hex()) # Dummy password for Google users
         db.session.add(user)
         db.session.commit()
-        log_success("auth", "google_login", f"Created new user '{username}' for '{email}'")
+        log_success("auth", "google_login", f"Created new user '{username}' for '{email}' with role '{role}'")
         return user
     except Exception as e:
         db.session.rollback()
@@ -192,9 +192,8 @@ def _check_role_restrictions(user: User) -> bool:
     """
     Check if user role is allowed for Google Sign-In.
     """
-    if user.role in ["admin", "contributor"]:
-        log_error("auth", "google_login", f"Role '{user.role}' restricted from Google Sign-In")
-        return False
+    # Relaxed to allow existing users with any role (including admin, contributor, and business owner) to sign in via Google.
+    log_logic("auth", "google_login", f"Allowing role '{user.role}' for Google Sign-In")
     return True
 
 
@@ -248,7 +247,18 @@ def register():
         email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
         role = request.form.get("role", "user")
-        barangay_id = request.form.get("barangay")
+        barangay_name = request.form.get("barangay")
+        
+        barangay_id = None
+        if role == "contributor" and barangay_name:
+            from modules.barangay.models import BarangayInfo
+            barangay_record = BarangayInfo.query.filter_by(name=barangay_name).first()
+            if not barangay_record:
+                # Create the barangay if it doesn't exist
+                barangay_record = BarangayInfo(name=barangay_name)
+                db.session.add(barangay_record)
+                db.session.commit()
+            barangay_id = barangay_record.id
 
         log_query("auth", "register", f"Checking existence for username='{username}', email='{email}'")
 
@@ -354,6 +364,7 @@ def register_business():
 
 @auth_bp.route("/google-login", methods=["POST"])
 def google_login():
+    from flask import session
     log_entry("auth", "google_login")
     token = request.form.get("credential")
     
@@ -371,35 +382,87 @@ def google_login():
     email, name = credentials
     user = User.query.filter_by(email=email).first()
     
-    # Create new user if doesn't exist
+    # NEW USER: Redirect to role selection page
     if not user:
-        user = _create_google_user(email, name)
-        if not user:
-            flash("An error occurred while creating your account. Please try again.", "error")
-            return redirect(url_for("auth.login"))
-        
-        log_success("auth", "google_login", f"Logged in NEW user '{user.username}' (ID: {user.id})")
-        login_user(user, remember=True)
-        flash(f"Welcome to GoMangatarem, {name or user.username}!", "success")
-        return redirect(url_for("user.dashboard"))
+        log_logic("auth", "google_login", f"New user '{email}' detected. Storing details and redirecting to role selection.")
+        session['oauth_signup'] = {
+            'email': email,
+            'name': name
+        }
+        return redirect(url_for("auth.select_role"))
     
-    # Check role restrictions for existing users
+    # EXISTING USER: Handle login
     if not _check_role_restrictions(user):
         flash(
-            "Google Sign-In is only available for regular visitor accounts. Please use your credentials to log in.",
+            "Google Sign-In is not allowed for this account.",
             "error",
         )
         return redirect(url_for("auth.login"))
     
+    # Check approval status for unapproved accounts
+    if not _check_approval_status(user):
+        log_logic("auth", "google_login", f"Redirecting unapproved user '{user.username}' to pending page")
+        return redirect(url_for("auth.pending_approval"))
+    
     log_success("auth", "google_login", f"Logging in existing user {email} (ID: {user.id})")
     login_user(user, remember=True)
+    
+    flash(f"Welcome back, {user.username}!", "success")
     
     if user.role == "admin":
         return redirect(url_for("admin.admin_dashboard"))
     elif user.role == "contributor":
         return redirect(url_for("barangay.barangay_dashboard"))
+    elif user.role == "business_owner":
+        return redirect(url_for("business.dashboard"))
+    elif user.role == "user":
+        return redirect(url_for("user.dashboard"))
     
-    return redirect(url_for("user.dashboard"))
+    return redirect(url_for("public.index"))
+
+
+@auth_bp.route("/select-role", methods=["GET", "POST"])
+def select_role():
+    from flask import session
+    log_entry("auth", "select_role", method=request.method)
+    
+    oauth_signup = session.get('oauth_signup')
+    if not oauth_signup:
+        log_error("auth", "select_role", "No Google session registration data found")
+        flash("Google sign-in session expired. Please try again.", "error")
+        return redirect(url_for("auth.login"))
+    
+    email = oauth_signup.get('email')
+    name = oauth_signup.get('name')
+    
+    if request.method == "POST":
+        role = request.form.get("role")
+        if role not in ["user", "business_owner", "contributor"]:
+            flash("Invalid role selected.", "error")
+            return redirect(url_for("auth.select_role"))
+        
+        # Create user with selected role
+        user = _create_google_user(email, name, role)
+        if not user:
+            flash("An error occurred while creating your account. Please try again.", "error")
+            return redirect(url_for("auth.login"))
+        
+        # Clean up session
+        session.pop('oauth_signup', None)
+        
+        # Log in the user
+        login_user(user, remember=True)
+        
+        if role == "user":
+            flash(f"Welcome to GoMangatarem, {name or user.username}!", "success")
+            return redirect(url_for("user.dashboard"))
+        
+        # Business Owner and Barangay Representative are pending approval
+        flash("Account created! Awaiting administrator approval.", "success")
+        return redirect(url_for("auth.pending_approval"))
+        
+    log_render("auth", "select_role", "select_role.html")
+    return render_template("auth/select_role.html", email=email, name=name)
 
 
 @auth_bp.route("/logout")

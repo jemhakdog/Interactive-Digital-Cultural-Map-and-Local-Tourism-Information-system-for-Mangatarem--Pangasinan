@@ -1,6 +1,4 @@
-import sys
 from app import create_app
-from extensions import db
 from modules.attractions.models import Attraction
 
 app = create_app()

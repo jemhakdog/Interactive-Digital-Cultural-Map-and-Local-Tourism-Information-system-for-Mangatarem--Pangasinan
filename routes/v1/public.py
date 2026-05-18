@@ -1,9 +1,10 @@
 import os
 import logging
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, current_app
 from models import db, User, Attraction, Event, BarangayInfo
 from utils.logger_helper import log_entry
 from modules.analytics.utils import record_view
+import json
 
 public_v1_bp = Blueprint("public_v1", __name__, url_prefix="/v1")
 logger = logging.getLogger(__name__)
@@ -45,6 +46,29 @@ def events_v2_view():
     return render_template(
         "pagez/events_v2.html", 
         events=events
+    )
+
+
+@public_v1_bp.route("/lgu-events")
+def lgu_events_view():
+    """
+    Display the scraped LGU events from Mangatarem website.
+    """
+    logger.info("LGU Scraped Events listing accessed")
+    record_view("page", page_name="lgu_events")
+    
+    events_path = os.path.join(current_app.root_path, 'data', 'scraped_events.json')
+    scraped_events = []
+    if os.path.exists(events_path):
+        with open(events_path, 'r', encoding='utf-8') as f:
+            try:
+                scraped_events = json.load(f)
+            except Exception as e:
+                logger.error(f"Error parsing scraped events JSON: {e}")
+                
+    return render_template(
+        "pagez/lgu_events.html", 
+        events=scraped_events
     )
 
 

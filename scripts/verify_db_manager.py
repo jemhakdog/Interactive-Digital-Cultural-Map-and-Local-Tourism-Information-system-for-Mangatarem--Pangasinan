@@ -1,4 +1,3 @@
-import os
 import logging
 from utils.db_manager import get_database_uri
 from dotenv import load_dotenv

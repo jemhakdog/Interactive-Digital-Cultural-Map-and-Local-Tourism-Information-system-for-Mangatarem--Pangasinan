@@ -41,10 +41,41 @@
         transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
+    /* Standard input glass fields fallback to protect from global resets */
+    input.input-glass, select.input-glass {
+        padding-left: 1.25rem !important;
+        padding-right: 1.25rem !important;
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+        font-size: 1rem !important;
+        line-height: 1.5 !important;
+        border-radius: 1rem !important;
+    }
+
+    /* Highly specific rules for inputs inside relative wrappers that contain absolute icons */
+    .relative.group input.input-glass,
+    .relative input.input-glass {
+        padding-left: 3.25rem !important; /* Forces 52px left padding to keep text safe from the absolute icon */
+        padding-right: 1.25rem !important;
+        padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
+    }
+
     .input-glass:focus {
         background: rgba(2, 44, 34, 0.6);
         border-color: #10b981;
         box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+    }
+
+    /* Fallback spacing to prevent visual crowding when Tailwind's spacing utilities are overridden */
+    .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 1.75rem !important; /* Slightly more relaxed vertical spacing for premium look */
+    }
+    .space-y-2 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 0.625rem !important; /* Airy gap between label and input */
+    }
+    .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+        margin-top: 2.25rem !important;
     }
 
     .gold-shimmer {
