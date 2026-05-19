@@ -135,3 +135,19 @@ def invalidate_event_cache(event_id: Optional[int] = None, barangay_id: Optional
     
     if barangay_id:
         cache_delete(f"barangay_data:{barangay_id}")
+
+def invalidate_business_cache(establishment_id: Optional[int] = None, barangay_id: Optional[int] = None):
+    """
+    Centralized helper to invalidate all caches related to businesses/establishments.
+    """
+    cache_delete("home_featured_establishments_v2")
+    cache_invalidate_pattern("api_establishments:*")
+    cache_invalidate_pattern("search:*")
+    
+    if establishment_id:
+        cache_delete(f"establishment_detail_module:{establishment_id}")
+        cache_delete(f"establishment_detail_v1:{establishment_id}")
+        
+    if barangay_id:
+        cache_delete(f"barangay_data:{barangay_id}")
+

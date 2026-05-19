@@ -27,6 +27,10 @@ document.addEventListener('DOMContentLoaded', function () {
             attractions: [],
             establishments: []
         },
+        visitedIds: {
+            attractions: [],
+            establishments: []
+        },
         currentRouteLayer: null, // Track Leaflet route layer
         selectedCoords: null // Track currently selected alternative/primary coordinates
     };
@@ -271,7 +275,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // 1. Category Filter
         if (state.currentCategory !== 'all') {
-            filtered = filtered.filter(p => p.category.toLowerCase() === state.currentCategory.toLowerCase());
+            filtered = filtered.filter(p => {
+                const cat = p.category.toLowerCase();
+                const current = state.currentCategory.toLowerCase();
+                if (current === 'restaurant') {
+                    return cat === 'restaurant' || cat === 'fastfood';
+                }
+                return cat === current;
+            });
         }
 
         // 2. Search Filter
@@ -423,6 +434,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const viewDetails = document.getElementById('modal-view-details');
         const directionsBtn = document.getElementById('modal-directions');
         const bookmarkBtn = document.getElementById('modal-bookmark');
+        const visitBtn = document.getElementById('modal-visit');
         const alternativesContainer = document.getElementById('modal-alternatives-container');
         const alternativesSelect = document.getElementById('modal-alternatives-select');
 
@@ -438,6 +450,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 e.stopPropagation();
                 handleToggleBookmark(place.id, place.type, bookmarkBtn);
             };
+        }
+
+        const isVisited = (place.type === 'attraction' && state.visitedIds.attractions.includes(place.id)) ||
+                          (place.type === 'establishment' && state.visitedIds.establishments.includes(place.id));
+        
+        if (visitBtn) {
+            visitBtn.dataset.id = place.id;
+            visitBtn.dataset.type = place.type;
+            visitBtn.classList.toggle('active', isVisited);
         }
 
         img.src = place.image || place.cover_image_url || PLACEHOLDER_IMG;
@@ -568,10 +589,21 @@ document.addEventListener('DOMContentLoaded', function () {
                     attractions: data.attractions || [],
                     establishments: data.establishments || []
                 };
-                applyFilters(); // Re-render to show bookmark state
             }
+            
+            // Fetch visited IDs
+            const vRes = await fetch('/user/visits/ids');
+            const vData = await vRes.json();
+            if (vData.success) {
+                state.visitedIds = {
+                    attractions: vData.attractions || [],
+                    establishments: vData.establishments || []
+                };
+            }
+            
+            applyFilters(); // Re-render to show bookmark/visited state
         } catch (error) {
-            console.error('Error fetching bookmarks:', error);
+            console.error('Error fetching bookmarks/visited:', error);
         }
     }
 
@@ -801,7 +833,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 state.currentNavMode = mode;
                 state.isNavigating = true;
 
-                const profile = mode === 'driving' ? 'driving' : mode === 'walking' ? 'walking' : 'cycling';
+                const profile = mode === 'driving' ? 'car' : mode === 'walking' ? 'foot' : 'bicycle';
                 // Using OSRM Public Demo Server
                 const url = `https://router.project-osrm.org/route/v1/${profile}/${origin.lng},${origin.lat};${destination.lng},${destination.lat}?overview=full&geometries=geojson&steps=true`;
                 console.log("🌐 [Routing] Fetching from OSRM:", url);
@@ -989,17 +1021,56 @@ document.addEventListener('DOMContentLoaded', function () {
             const instructionsEl = document.getElementById('nav-instructions');
             if (instructionsEl) {
                 instructionsEl.innerHTML = data.legs[0].steps.map(step => {
+                    const type = step.maneuver.type || '';
+                    const modifier = step.maneuver.modifier || '';
+                    const name = step.name || '';
+                    
                     let icon = '●';
-                    if (step.maneuver.type && step.maneuver.type.includes('turn')) {
-                        icon = (step.maneuver.modifier && step.maneuver.modifier.includes('right')) ? '→' : '←';
+                    if (type === 'arrive') {
+                        icon = '🏁';
+                    } else if (type === 'depart') {
+                        icon = '▲';
+                    } else if (modifier.includes('right')) {
+                        icon = modifier.includes('sharp') || modifier.includes('slight') ? '↗' : '→';
+                    } else if (modifier.includes('left')) {
+                        icon = modifier.includes('sharp') || modifier.includes('slight') ? '↖' : '←';
+                    } else if (modifier === 'straight') {
+                        icon = '↑';
                     }
+
+                    // Generate human-readable instruction if undefined (e.g. from OSRM)
+                    let instructionText = step.maneuver.instruction;
+                    if (!instructionText) {
+                        const capitalize = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
+                        if (type === 'depart') {
+                            instructionText = name ? `Head ${modifier} on ${name}` : 'Depart';
+                        } else if (type === 'arrive') {
+                            instructionText = name ? `Arrive at ${name}` : 'Arrive at destination';
+                        } else if (type === 'turn') {
+                            instructionText = `Turn ${modifier} ${name ? 'onto ' + name : ''}`.trim();
+                        } else if (type === 'continue') {
+                            instructionText = `Continue ${modifier} ${name ? 'on ' + name : ''}`.trim();
+                        } else if (type === 'fork') {
+                            instructionText = `Take the fork ${modifier} ${name ? 'onto ' + name : ''}`.trim();
+                        } else if (type === 'merge') {
+                            instructionText = `Merge ${modifier} ${name ? 'onto ' + name : ''}`.trim();
+                        } else if (type === 'new name') {
+                            instructionText = name ? `Continue onto ${name}` : 'Continue straight';
+                        } else {
+                            const action = capitalize(type) || 'Proceed';
+                            const direction = modifier ? ` ${modifier}` : '';
+                            const road = name ? ` onto ${name}` : '';
+                            instructionText = `${action}${direction}${road}`.replace(/\s+/g, ' ').trim();
+                        }
+                    }
+
                     return `
                         <div class="instruction-step">
                             <div class="w-6 h-6 flex items-center justify-center bg-[#00ED64]/10 rounded-lg shrink-0 text-[#00ED64] text-[10px] font-bold">
                                 ${icon}
                             </div>
                             <div>
-                                <p class="text-[11px] text-gray-800 font-bold leading-tight">${step.maneuver.instruction}</p>
+                                <p class="text-[11px] text-gray-800 font-bold leading-tight">${instructionText}</p>
                                 <p class="text-[9px] text-gray-400 mt-0.5">${(step.distance / 1000).toFixed(2)} km</p>
                             </div>
                         </div>
@@ -1559,4 +1630,6 @@ document.addEventListener('DOMContentLoaded', function () {
             console.warn("⚠️ Could not add 3D buildings to this style:", e);
         }
     }
+    
+    window.fetchBookmarks = fetchBookmarks;
 });

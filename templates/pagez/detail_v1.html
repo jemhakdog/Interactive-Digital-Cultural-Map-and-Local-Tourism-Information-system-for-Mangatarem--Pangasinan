@@ -231,6 +231,15 @@
                     </button>
                     {% if current_user.is_authenticated and current_user.role == 'user' %}
                     <div class="flex gap-2">
+                        <button id="open-visit-modal" 
+                                data-id="{{ attraction.id }}" 
+                                data-type="attraction"
+                                class="back-btn hover:bg-emerald-500/20 hover:text-emerald-400 transition-all {{ 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' if is_visited else '' }}"
+                                title="{{ 'You have logged a visit here' if is_visited else 'Mark as Visited' }}">
+                            <svg class="w-5 h-5 {{ 'text-emerald-400 fill-emerald-500/10' if is_visited else '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                        </button>
                         <button id="toggle-favorite" 
                                 data-id="{{ attraction.id }}" 
                                 data-type="attraction"
@@ -306,6 +315,29 @@
                         </svg>
                         Route on Interactive Map
                     </a>
+                    
+                    {% if current_user.is_authenticated and current_user.role == 'user' %}
+                    <div class="flex gap-3 mb-3">
+                        <button id="info-toggle-favorite" 
+                                data-id="{{ attraction.id }}" 
+                                data-type="attraction"
+                                class="flex-1 flex items-center justify-center gap-2 py-3 border rounded-2xl text-xs font-bold transition-colors {{ 'bg-red-50 text-red-500 border-red-200 hover:bg-red-100/50' if is_favorite else 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-red-200 hover:text-red-500' }}">
+                            <svg class="w-4 h-4 {{ 'fill-current text-red-500' if is_favorite else 'fill-none' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                            <span>{{ 'Favorited' if is_favorite else 'Favorite' }}</span>
+                        </button>
+                        <button id="info-open-visit-modal" 
+                                data-id="{{ attraction.id }}" 
+                                data-type="attraction"
+                                class="flex-1 flex items-center justify-center gap-2 py-3 border rounded-2xl text-xs font-bold transition-colors {{ 'bg-emerald-50 text-emerald-600 border-emerald-200 hover:bg-emerald-100/50' if is_visited else 'border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-emerald-200 hover:text-emerald-600' }}">
+                            <svg class="w-4 h-4 {{ 'text-emerald-600 fill-emerald-100' if is_visited else 'text-emerald-600' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                            <span>{{ 'Visited' if is_visited else 'Mark Visited' }}</span>
+                        </button>
+                    </div>
+                    {% endif %}
                     
                     <a href="https://www.google.com/maps/search/?api=1&query={{ attraction.latitude }},{{ attraction.longitude }}" target="_blank" class="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-2xl text-xs font-bold text-gray-500 hover:bg-gray-50 transition-colors">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -536,4 +568,7 @@
         </main>
     </div>
 </div>
+{% if current_user.is_authenticated and current_user.role == 'user' %}
+    {% include 'includes/user_actions_modal.html' %}
+{% endif %}
 {% endblock %}

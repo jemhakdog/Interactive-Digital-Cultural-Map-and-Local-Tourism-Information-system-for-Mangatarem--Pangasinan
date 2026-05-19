@@ -4,10 +4,9 @@
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-    const favoriteBtn = document.getElementById('toggle-favorite');
-    const visitBtn = document.getElementById('open-visit-modal');
+    const favoriteBtns = document.querySelectorAll('#toggle-favorite, #info-toggle-favorite, .toggle-favorite');
+    const visitBtns = document.querySelectorAll('#open-visit-modal, #info-open-visit-modal, .open-visit-modal');
     const modal = document.getElementById('visit-modal');
-    const modalContent = document.getElementById('visit-modal-content');
     const closeBtn = document.getElementById('close-visit-modal');
     const backdrop = document.getElementById('visit-modal-backdrop');
     const visitForm = document.getElementById('visit-form');
@@ -17,14 +16,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitSpinner = document.getElementById('submit-visit-spinner');
 
     // -- Favorite Toggle Logic --
-    if (favoriteBtn) {
-        favoriteBtn.addEventListener('click', async () => {
-            const targetId = favoriteBtn.dataset.id;
-            const targetType = favoriteBtn.dataset.type;
+    favoriteBtns.forEach(btn => {
+        btn.addEventListener('click', async () => {
+            const targetId = btn.dataset.id;
+            const targetType = btn.dataset.type;
             
-            // Add loading state
-            favoriteBtn.disabled = true;
-            favoriteBtn.style.opacity = '0.7';
+            if (!targetId || !targetType) return;
+
+            // Add loading state across all matching buttons
+            favoriteBtns.forEach(b => {
+                b.disabled = true;
+                b.style.opacity = '0.7';
+            });
 
             try {
                 const response = await fetch('/user/favorites/toggle', {
@@ -42,38 +45,50 @@ document.addEventListener('DOMContentLoaded', () => {
                 const result = await response.json();
 
                 if (result.success) {
-                    // Update UI state
                     const isFavorite = result.action === 'added';
-                    const svg = favoriteBtn.querySelector('svg');
                     
-                    if (isFavorite) {
-                        if (favoriteBtn.classList.contains('fav-icon-only')) {
-                            favoriteBtn.classList.add('is-favorited');
-                            if (svg) {
-                                svg.setAttribute('fill', 'currentColor');
-                                svg.classList.add('text-red-500', 'fill-red-500', 'stroke-red-500');
-                                svg.classList.remove('fill-none');
+                    // Synchronously update all favorite buttons in the DOM
+                    favoriteBtns.forEach(b => {
+                        const svg = b.querySelector('svg');
+                        
+                        if (isFavorite) {
+                            if (b.classList.contains('fav-icon-only')) {
+                                b.classList.add('is-favorited');
+                                if (svg) {
+                                    svg.setAttribute('fill', 'currentColor');
+                                    svg.className.value = 'w-5 h-5 text-red-500 fill-red-500 stroke-red-500';
+                                }
+                            } else {
+                                b.className = 'flex-1 flex items-center justify-center gap-2 py-3 border rounded-2xl text-xs font-bold transition-colors bg-red-50 text-red-500 border-red-200 hover:bg-red-100/50';
+                                if (svg) {
+                                    svg.className.value = 'w-4 h-4 fill-current text-red-500';
+                                }
+                                const span = b.querySelector('span');
+                                if (span) span.textContent = 'Saved';
                             }
                         } else {
-                            favoriteBtn.classList.remove('bg-transparent', 'border-white/20', 'text-white', 'bg-emerald-900/30');
-                            favoriteBtn.classList.add('bg-red-500', 'border-red-500', 'text-white');
-                            // For business detail which has lighter theme
-                            favoriteBtn.classList.add('bg-red-500/20', 'border-red-500/50', 'text-red-300');
-                            
-                            svg.classList.add('fill-current');
-                            svg.classList.remove('fill-none');
-                            favoriteBtn.innerHTML = `
-                                <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                </svg>
-                                Saved
-                            `;
+                            if (b.classList.contains('fav-icon-only')) {
+                                b.classList.remove('is-favorited');
+                                if (svg) {
+                                    svg.setAttribute('fill', 'none');
+                                    svg.className.value = 'w-5 h-5';
+                                }
+                            } else {
+                                b.className = 'flex-1 flex items-center justify-center gap-2 py-3 border rounded-2xl text-xs font-bold transition-colors border-gray-200 text-gray-600 hover:bg-gray-50 hover:border-red-200 hover:text-red-500';
+                                if (svg) {
+                                    svg.className.value = 'w-4 h-4 fill-none';
+                                }
+                                const span = b.querySelector('span');
+                                if (span) span.textContent = 'Favorite';
+                            }
                         }
-                    } else {
-                        // Revert classes - this is tricky because of different page themes
-                        // We'll just reload the page for now to keep it simple and consistent with the theme
+                    });
+                    
+                    // If on map, trigger bookmark refetch, otherwise reload to fully reflect visual state
+                    if (window.location.pathname.includes('/map') && typeof window.fetchBookmarks === 'function') {
+                        window.fetchBookmarks();
+                    } else if (result.action === 'removed') {
                         location.reload();
-                        return;
                     }
                 } else {
                     alert(result.error || 'Something went wrong.');
@@ -82,25 +97,27 @@ document.addEventListener('DOMContentLoaded', () => {
                 console.error('Favorite Toggle Error:', err);
                 alert('Network error. Please try again.');
             } finally {
-                favoriteBtn.disabled = false;
-                favoriteBtn.style.opacity = '1';
+                favoriteBtns.forEach(b => {
+                    b.disabled = false;
+                    b.style.opacity = '1';
+                });
             }
         });
-    }
+    });
 
     // -- Visit Modal Logic --
-    const openModal = () => {
+    const openModal = (e) => {
         if (!modal) return;
         modal.classList.remove('hidden');
-        // Small timeout to allow 'hidden' to be removed before adding 'active' for transitions
         setTimeout(() => {
             modal.classList.add('active');
         }, 10);
         document.body.style.overflow = 'hidden';
         
-        // Pre-fill target data from favorite button or similar
-        const targetId = favoriteBtn?.dataset.id || '';
-        const targetType = favoriteBtn?.dataset.type || '';
+        // Get attributes from clicked element
+        const clickedBtn = e.currentTarget;
+        const targetId = clickedBtn.dataset.id || '';
+        const targetType = clickedBtn.dataset.type || '';
         
         document.getElementById('visit-target-id').value = targetId;
         document.getElementById('visit-target-type').value = targetType;
@@ -110,7 +127,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeModal = () => {
         if (!modal) return;
         modal.classList.remove('active');
-        // Wait for transition before adding hidden
         setTimeout(() => {
             if (!modal.classList.contains('active')) {
                 modal.classList.add('hidden');
@@ -120,7 +136,8 @@ document.addEventListener('DOMContentLoaded', () => {
         visitFeedback.classList.add('hidden');
     };
 
-    if (visitBtn) visitBtn.addEventListener('click', openModal);
+    // Attach event listeners to any elements that can open or close the modal
+    visitBtns.forEach(btn => btn.addEventListener('click', openModal));
     if (closeBtn) closeBtn.addEventListener('click', closeModal);
     if (backdrop) backdrop.addEventListener('click', closeModal);
 
@@ -160,8 +177,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     
                     setTimeout(() => {
                         closeModal();
-                        // Reset form
                         visitForm.reset();
+                        
+                        // Smart non-disruptive refresh on Map page, reload on attraction details
+                        if (window.location.pathname.includes('/map') && typeof window.fetchBookmarks === 'function') {
+                            window.fetchBookmarks();
+                        } else {
+                            location.reload();
+                        }
                     }, 1500);
                 } else {
                     visitFeedback.textContent = result.error || 'Failed to log visit.';

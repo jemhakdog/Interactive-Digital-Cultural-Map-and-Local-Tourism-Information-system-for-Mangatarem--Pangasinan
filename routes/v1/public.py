@@ -93,10 +93,17 @@ def attraction_detail_v1_view(id):
 
     # Check if favorited by current user
     is_favorite = False
+    is_visited = False
     from flask_login import current_user
     if current_user.is_authenticated:
+        from models import VisitorLog
         is_favorite = UserFavoriteAttraction.query.filter_by(
             user_id=current_user.id, attraction_id=id
+        ).first() is not None
+        is_visited = VisitorLog.query.filter_by(
+            visitor_user_id=current_user.id,
+            target_type="attraction",
+            target_id=id
         ).first() is not None
 
     cache_key = f"attraction_detail_v1:{id}"
@@ -112,6 +119,7 @@ def attraction_detail_v1_view(id):
             nearby_stay=cached_data['nearby_stay'],
             nearby_eat=cached_data['nearby_eat'],
             is_favorite=is_favorite,
+            is_visited=is_visited,
         )
 
     # Cache MISS - Fetch data
@@ -177,6 +185,7 @@ def attraction_detail_v1_view(id):
         nearby_stay=nearby_stay,
         nearby_eat=nearby_eat,
         is_favorite=is_favorite,
+        is_visited=is_visited,
     )
 
 

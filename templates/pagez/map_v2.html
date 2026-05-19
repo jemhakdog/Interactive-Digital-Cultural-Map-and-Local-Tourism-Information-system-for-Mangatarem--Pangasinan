@@ -435,6 +435,36 @@
         transition: all 0.2s;
     }
 
+    /* Visited Toggle Styles */
+    .visit-btn {
+        width: 40px;
+        height: 40px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        cursor: pointer;
+        background: #F3F4F6;
+        color: #9CA3AF;
+        border: 1px solid #E5E7EB;
+    }
+    
+    .visit-btn:hover {
+        background: #E5E7EB;
+        transform: scale(1.05);
+    }
+    
+    .visit-btn.active {
+        background: #E6FFF0;
+        color: #059669;
+        border-color: #D1FAE5;
+    }
+    
+    .visit-btn.active svg {
+        fill: rgba(5, 150, 105, 0.1);
+    }
+
     /* Bookmark Toggle Styles */
     .bookmark-btn {
         width: 40px;
@@ -807,19 +837,21 @@
 
         <!-- Mode Selector -->
         <div class="flex gap-2 mb-6">
-            <button class="nav-mode-btn active" data-mode="driving">
+            <button class="nav-mode-btn active" data-mode="driving" title="Driving Mode">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
                 </svg>
             </button>
-            <button class="nav-mode-btn" data-mode="walking">
+            <button class="nav-mode-btn" data-mode="walking" title="Walking Mode">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 18l-3.8-4.2H8L4 18M9 22l2-6h2l2 6M12 10V6M12 4a1 1 0 100-2 1 1 0 000 2zM16 11.8V9a2 2 0 00-2-2H9.7" />
                 </svg>
             </button>
-            <button class="nav-mode-btn" data-mode="cycling">
+            <button class="nav-mode-btn" data-mode="cycling" title="Cycling Mode">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                    <circle cx="5.5" cy="17.5" r="3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <circle cx="18.5" cy="17.5" r="3.5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 6a2 2 0 100-4 2 2 0 000 4zm-3 11.5V14l-3-3 3-3h3l3.5 3h1.5M12 14h3.5l1-4.5" />
                 </svg>
             </button>
         </div>
@@ -940,11 +972,20 @@
             <div class="modal-content">
                 <div class="flex justify-between items-start mb-2">
                     <h2 id="modal-title" class="modal-title !mb-0">Place Name</h2>
-                    <button id="modal-bookmark" class="bookmark-btn" title="Bookmark this place">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-                        </svg>
-                    </button>
+                    <div class="flex gap-2">
+                        {% if current_user.is_authenticated and current_user.role == 'user' %}
+                        <button id="modal-visit" class="visit-btn open-visit-modal" data-id="" data-type="" title="Mark as Visited">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+                            </svg>
+                        </button>
+                        {% endif %}
+                        <button id="modal-bookmark" class="bookmark-btn" title="Bookmark this place">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
                 <div class="modal-location">
                     <svg class="w-4 h-4 text-[#00ED64]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -983,6 +1024,9 @@
         </div>
     </div>
 </div>
+{% if current_user.is_authenticated and current_user.role == 'user' %}
+    {% include 'includes/user_actions_modal.html' %}
+{% endif %}
 {% endblock %}
 
 {% block scripts %}
@@ -993,5 +1037,8 @@
     window.MAPBOX_TOKEN = "{{ mapbox_token }}";
     window.USER_AUTH = {{ 'true' if current_user.is_authenticated else 'false' }};
 </script>
+{% if current_user.is_authenticated and current_user.role == 'user' %}
+<script src="{{ url_for('static', filename='js/pages/user-actions.js') }}" defer></script>
+{% endif %}
 <script src="{{ url_for('static', filename='js/pages/map_v2.js') }}?v=1.1.8"></script>
 {% endblock %}

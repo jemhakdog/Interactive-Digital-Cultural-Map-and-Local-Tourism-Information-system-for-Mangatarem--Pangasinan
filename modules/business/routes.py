@@ -117,7 +117,7 @@ def detail(id):
         ).order_by(EstablishmentMenuItem.category, EstablishmentMenuItem.name).all()
 
     reviews = EstablishmentReview.query.filter_by(
-        establishment_id=establishment.id, status="approved"
+        establishment_id=establishment.id, status="approved", parent_id=None
     ).order_by(EstablishmentReview.created_at.desc()).all()
 
     # Check if favorited by current user
@@ -165,7 +165,7 @@ def submit_review(id):
 
     # Recalculate establishment rating
     approved_reviews = EstablishmentReview.query.filter_by(
-        establishment_id=establishment.id, status="approved"
+        establishment_id=establishment.id, status="approved", parent_id=None
     ).all()
     if approved_reviews:
         establishment.rating_avg = sum(r.rating for r in approved_reviews) / len(approved_reviews)

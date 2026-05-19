@@ -92,7 +92,7 @@ def delete_establishment(id):
 def manage_establishment_reviews():
     """Manage establishment reviews (approve/reject)."""
     status = request.args.get("status", "pending")
-    query = EstablishmentReview.query
+    query = EstablishmentReview.query.filter_by(parent_id=None)
     if status != "all":
         query = query.filter_by(status=status)
 
@@ -117,7 +117,7 @@ def approve_establishment_review(id):
     # Recalculate establishment rating
     est = review.establishment
     approved_reviews = EstablishmentReview.query.filter_by(
-        establishment_id=est.id, status="approved"
+        establishment_id=est.id, status="approved", parent_id=None
     ).all()
     if approved_reviews:
         est.rating_avg = sum(r.rating for r in approved_reviews) / len(approved_reviews)

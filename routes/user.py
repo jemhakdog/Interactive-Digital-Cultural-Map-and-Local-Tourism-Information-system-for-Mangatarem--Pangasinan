@@ -197,6 +197,20 @@ def get_favorite_ids():
     })
 
 
+@user_bp.route("/visits/ids")
+@login_required
+def get_visited_ids():
+    """API endpoint to get list of visited attraction and establishment IDs for the current user."""
+    logs = VisitorLog.query.filter_by(visitor_user_id=current_user.id).all()
+    visited_attractions = list(set([log.target_id for log in logs if log.target_type == 'attraction']))
+    visited_establishments = list(set([log.target_id for log in logs if log.target_type == 'establishment']))
+    return jsonify({
+        "success": True,
+        "attractions": visited_attractions,
+        "establishments": visited_establishments
+    })
+
+
 @user_bp.route("/visits")
 @login_required
 @user_required

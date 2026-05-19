@@ -201,8 +201,8 @@
 
     <!-- Active Contributor Form & Audit Section -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <!-- Log Visit Form (Contributors) -->
-        {% if current_user.role == 'contributor' %}
+        <!-- Log Visit Form -->
+        {% if current_user.role in ['contributor', 'business_owner', 'admin'] %}
         <div class="lg:col-span-1 glass-card p-6 md:p-8 rounded-[2rem] h-fit">
             <h3 class="text-lg font-black text-slate-800 mb-6 flex items-center">
                 <span class="w-8 h-8 rounded-lg bg-emerald-50 text-dark-green border border-emerald-100 flex items-center justify-center mr-3">
@@ -213,6 +213,7 @@
             <form action="{{ url_for('admin.log_visit') }}" method="POST" class="space-y-4">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 
+                {% if attractions and establishments %}
                 <div>
                     <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Target Type</label>
                     <select name="target_type" id="target_type" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-dark-green focus:ring-1 focus:ring-dark-green outline-none transition-all cursor-pointer" required>
@@ -220,20 +221,29 @@
                         <option value="establishment">Establishment</option>
                     </select>
                 </div>
+                {% elif attractions %}
+                <input type="hidden" name="target_type" id="target_type" value="attraction">
+                {% else %}
+                <input type="hidden" name="target_type" id="target_type" value="establishment">
+                {% endif %}
 
                 <div>
                     <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Select Location</label>
                     <select name="target_id" id="target_id" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-dark-green focus:ring-1 focus:ring-dark-green outline-none transition-all cursor-pointer" required>
+                        {% if attractions %}
                         <optgroup label="Attractions" id="opt-attractions">
                             {% for item in attractions %}
                             <option value="{{ item.id }}">{{ item.name }}</option>
                             {% endfor %}
                         </optgroup>
-                        <optgroup label="Establishments" id="opt-establishments" class="hidden">
+                        {% endif %}
+                        {% if establishments %}
+                        <optgroup label="Establishments" id="opt-establishments" class="{% if attractions %}hidden{% endif %}">
                             {% for item in establishments %}
                             <option value="{{ item.id }}">{{ item.name }}</option>
                             {% endfor %}
                         </optgroup>
+                        {% endif %}
                     </select>
                 </div>
 
@@ -284,7 +294,7 @@
         {% endif %}
 
         <!-- Audit & Reporting List -->
-        <div class="{% if current_user.role == 'contributor' %}lg:col-span-2{% else %}lg:col-span-3{% endif %} space-y-6">
+        <div class="{% if current_user.role in ['contributor', 'business_owner', 'admin'] %}lg:col-span-2{% else %}lg:col-span-3{% endif %} space-y-6">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
                     <h3 class="text-base font-black text-slate-800 tracking-tight">Location Audit Registry</h3>
@@ -467,18 +477,18 @@
 <script>
     document.addEventListener("DOMContentLoaded", function() {
         const targetTypeSelect = document.getElementById('target_type');
-        if (targetTypeSelect) {
+        if (targetTypeSelect && targetTypeSelect.tagName === 'SELECT') {
             targetTypeSelect.addEventListener('change', function() {
                 const type = this.value;
                 const attractionGroup = document.getElementById('opt-attractions');
                 const establishmentGroup = document.getElementById('opt-establishments');
                 
                 if (type === 'attraction') {
-                    attractionGroup.classList.remove('hidden');
-                    establishmentGroup.classList.add('hidden');
+                    if (attractionGroup) attractionGroup.classList.remove('hidden');
+                    if (establishmentGroup) establishmentGroup.classList.add('hidden');
                 } else {
-                    attractionGroup.classList.add('hidden');
-                    establishmentGroup.classList.remove('hidden');
+                    if (attractionGroup) attractionGroup.classList.add('hidden');
+                    if (establishmentGroup) establishmentGroup.classList.remove('hidden');
                 }
                 
                 const firstVisible = document.querySelector(`#target_id optgroup:not(.hidden) option`);

@@ -132,17 +132,6 @@
                         </div>
                     </a>
 
-                    <!-- Heritage Registry -->
-                    <a href="{{ url_for('admin.admin_heritage_dashboard') }}" 
-                       class="flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all duration-200 group {% if request.endpoint and request.endpoint.startswith('admin.admin_heritage') %}{{ bg_active }}{% else %}text-slate-400 hover:bg-emerald-950/30 hover:text-white{% endif %}">
-                        <div class="flex items-center gap-3">
-                            <svg class="w-4 h-4 {{ icon_color }} group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 14v3a2 2 0 002 2h4a2 2 0 002-2v-3M8 14V7a2 2 0 012-2h4a2 2 0 012 2v7M8 14h8m-8 0a2 2 0 100 4h8a2 2 0 100-4m-8 0V7m8 7V7m-4 11h.01"></path>
-                            </svg>
-                            <span>Heritage Registry</span>
-                        </div>
-                    </a>
-
                     <!-- Visits Analytics -->
                     <a href="{{ url_for('admin.visits_index') }}" 
                        class="flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all duration-200 group {% if request.endpoint == 'admin.visits_index' %}{{ bg_active }}{% else %}text-slate-400 hover:bg-emerald-950/30 hover:text-white{% endif %}">
@@ -187,16 +176,7 @@
                         </div>
                     </a>
 
-                    <!-- Documents / Content -->
-                    <a href="{{ url_for('admin.admin_documents') }}" 
-                       class="flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all duration-200 group {% if request.endpoint == 'admin.admin_documents' %}{{ bg_active }}{% else %}text-slate-400 hover:bg-emerald-950/30 hover:text-white{% endif %}">
-                        <div class="flex items-center gap-3">
-                            <svg class="w-4 h-4 {{ icon_color }} group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            <span>Documents</span>
-                        </div>
-                    </a>
+                   
                 {% elif current_user.is_authenticated and current_user.role == 'contributor' %}
                     <!-- Dashboard (Steward Command Center) -->
                     <a href="{{ url_for('barangay.barangay_dashboard') }}" 
@@ -334,7 +314,7 @@
                         </div>
                     </a>
 
-                    <!-- Browse Local Peers -->
+                    <!-- Browse Local Peers
                     <a href="{{ url_for('business.browse_peers') }}" 
                        class="flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all duration-200 group {% if request.endpoint == 'business.browse_peers' %}{{ bg_active }}{% else %}text-slate-400 {{ hover_bg }}{% endif %}">
                         <div class="flex items-center gap-3">
@@ -343,7 +323,7 @@
                             </svg>
                             <span>Browse Local Peers</span>
                         </div>
-                    </a>
+                    </a> -->
                 {% endif %}
             </nav>
         </div>

@@ -83,21 +83,111 @@ def seed_data():
 
         # --- EVENTS ---
         new_events = [
-            {"name": "Tupig Festival", "category": "Festival", "description": "Annual celebration of the local tupig delicacy.", "date": datetime(2026, 12, 1)}
+            {
+                "barangay_name": "Malabobo",
+                "name": "Malabobo Eco-Adventure & Bamboo Festival",
+                "description": "Celebrate the lush bamboo groves of Malabobo with eco-tours, hand-crafted bamboo exhibitions, and traditional bamboo dance performances near the Manleluag Spring protected landscape.",
+                "date": datetime(2026, 4, 12, 9, 0),
+                "location": "Malabobo Eco-Park",
+                "latitude": 15.7033,
+                "longitude": 120.2758,
+                "category": "Civic",
+                "image_url": "https://images.unsplash.com/photo-1502082553048-f009c37129b9?q=80&w=2070&auto=format&fit=crop"
+            },
+            {
+                "barangay_name": "Poblacion",
+                "name": "Mangatarem Tupig Festival (Grand Fiesta)",
+                "description": "The premier annual event of Mangatarem celebrating our signature native rice cake, Tupig. Features the Grand Tupig Cook-off, street dancing competition, and cultural night.",
+                "date": datetime(2026, 12, 28, 8, 0),
+                "location": "Municipal Town Plaza",
+                "latitude": 15.7891,
+                "longitude": 120.2928,
+                "category": "Entertainment",
+                "image_url": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?q=80&w=2074&auto=format&fit=crop"
+            },
+            {
+                "barangay_name": "Cabaluyan",
+                "name": "Cabaluyan Mango Harvest and Agri-Fiesta",
+                "description": "Join the sweet harvest of the famous sweet carabao mangoes of Cabaluyan. Features fresh mango markets, family fruit-picking tours, and backyard farming seminars.",
+                "date": datetime(2026, 5, 15, 7, 30),
+                "location": "Cabaluyan Community Orchard",
+                "latitude": 15.8012,
+                "longitude": 120.2854,
+                "category": "Entertainment",
+                "image_url": "https://images.unsplash.com/photo-1553279768-865429fa0078?q=80&w=2074&auto=format&fit=crop"
+            },
+            {
+                "barangay_name": "Bogtong",
+                "name": "Bogtong Clay Pottery and Crafts Festival",
+                "description": "Honoring the historic pottery-making tradition of Bogtong. Highlights include live clay-sculpting demonstrations, DIY pottery workshops for visitors, and an artisan stoneware fair.",
+                "date": datetime(2026, 10, 20, 10, 0),
+                "location": "Bogtong Pottery Workshop Center",
+                "latitude": 15.7725,
+                "longitude": 120.3120,
+                "category": "Civic",
+                "image_url": "https://images.unsplash.com/photo-1565192647048-f997ed87f5e2?q=80&w=2070&auto=format&fit=crop"
+            },
+            {
+                "barangay_name": "Dorongan",
+                "name": "Dorongan Golden Corn and Agricultural Fair",
+                "description": "Dorongan's thanksgiving celebration for its bountiful corn harvests. Featuring corn-themed culinary contests, agricultural machinery displays, and traditional folk music.",
+                "date": datetime(2026, 3, 18, 9, 30),
+                "location": "Dorongan Barangay Hall Plaza",
+                "latitude": 15.7610,
+                "longitude": 120.2650,
+                "category": "Civic",
+                "image_url": "https://images.unsplash.com/photo-1551754655-cd27e38d20f6?q=80&w=2070&auto=format&fit=crop"
+            },
+            {
+                "barangay_name": "Quetegan",
+                "name": "Quetegan Basi Wine & Rice Harvest Festival",
+                "description": "A celebration of traditional sugarcane wine (Basi) brewing and golden rice harvest. Enjoy local wine tastings, traditional rice-mashing rituals, and acoustic folk music under the stars.",
+                "date": datetime(2026, 11, 24, 17, 0),
+                "location": "Quetegan Heritage Fields",
+                "latitude": 15.8150,
+                "longitude": 120.3080,
+                "category": "Entertainment",
+                "image_url": "https://images.unsplash.com/photo-1543257580-7269da773bf5?q=80&w=2070&auto=format&fit=crop"
+            },
+            {
+                "barangay_name": "Pacalat",
+                "name": "Pacalat River Flotilla & Fishery Celebration",
+                "description": "A vibrant river flotilla parade along the Pacalat River, celebrating inland fishery abundance and advocating for river conservation and sustainable angling.",
+                "date": datetime(2026, 6, 8, 8, 30),
+                "location": "Pacalat Riverbank Park",
+                "latitude": 15.8320,
+                "longitude": 120.2950,
+                "category": "Civic",
+                "image_url": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?q=80&w=2073&auto=format&fit=crop"
+            },
+            {
+                "barangay_name": "Parian",
+                "name": "Parian Handloom Weaving & Abel Heritage Festival",
+                "description": "A premium showcase of the centuries-old traditional handloom weaving of Parian. Features local 'Abel' textile fashion displays, loom-weaving workshops, and historical walking tours.",
+                "date": datetime(2026, 9, 15, 13, 0),
+                "location": "Parian Cultural Hall",
+                "latitude": 15.7950,
+                "longitude": 120.2980,
+                "category": "Religious",
+                "image_url": "https://images.unsplash.com/photo-1528747045269-390fe33c19f2?q=80&w=2070&auto=format&fit=crop"
+            }
         ]
 
         for event_data in new_events:
             existing = Event.query.filter(Event.name.ilike(event_data["name"])).first()
             if not existing:
+                brgy = BarangayInfo.query.filter(BarangayInfo.name.ilike(event_data["barangay_name"])).first()
+                brgy_id = brgy.id if brgy else default_barangay.id
                 event = Event(
                     name=event_data["name"],
                     category=event_data["category"],
                     description=event_data["description"],
                     date=event_data["date"],
-                    location="Municipal Plaza",
-                    latitude=DEFAULT_LAT,
-                    longitude=DEFAULT_LNG,
-                    barangay_id=default_barangay.id,
+                    location=event_data["location"],
+                    latitude=event_data["latitude"],
+                    longitude=event_data["longitude"],
+                    barangay_id=brgy_id,
+                    image_url=event_data["image_url"],
                     status="approved"
                 )
                 db.session.add(event)

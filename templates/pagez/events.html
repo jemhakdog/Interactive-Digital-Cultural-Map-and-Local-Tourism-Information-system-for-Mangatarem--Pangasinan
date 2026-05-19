@@ -75,9 +75,15 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                         </svg>
-                        <span class="font-medium text-lg">{{ event.location }} <span class="mx-3 text-gray-300">|</span>
-                            {{
-                            event.date.strftime('%I:%M %p') }}</span>
+                        <span class="font-medium text-lg">
+                            {% if event.barangay %}
+                                📍 {{ event.barangay.name }} &bull; {{ event.location }}
+                            {% else %}
+                                📍 {{ event.location }}
+                            {% endif %}
+                            <span class="mx-3 text-gray-300">|</span>
+                            {{ event.date.strftime('%I:%M %p') }}
+                        </span>
                     </div>
 
                     <div class="event-actions">

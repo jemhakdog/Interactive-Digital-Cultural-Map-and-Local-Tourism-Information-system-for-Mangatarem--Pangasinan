@@ -225,7 +225,7 @@ def visits_index():
     form_attractions = []
     form_establishments = []
     if current_user.role == "contributor":
-        form_attractions = Attraction.query.filter_by(steward_id=current_user.id).all()
+        form_attractions = Attraction.query.filter_by(user_id=current_user.id).all()
         form_establishments = Establishment.query.filter_by(owner_id=current_user.id).all()
     elif current_user.role == "business_owner":
         form_attractions = []
@@ -445,9 +445,9 @@ def export_destination_insights():
             .filter_by(view_type='establishment', item_id=est.id).scalar() or 0
 
         avg_rating = db.session.query(func.avg(EstablishmentReview.rating))\
-            .filter_by(establishment_id=est.id, status='approved').scalar() or 0.0
+            .filter_by(establishment_id=est.id, status='approved', parent_id=None).scalar() or 0.0
         reviews_count = db.session.query(func.count(EstablishmentReview.id))\
-            .filter_by(establishment_id=est.id, status='approved').scalar() or 0
+            .filter_by(establishment_id=est.id, status='approved', parent_id=None).scalar() or 0
 
         cw.writerow([
             est.name,
@@ -534,6 +534,19 @@ def visitor_registry():
     attractions = Attraction.query.all()
     establishments = Establishment.query.all()
 
+    # Fetch options for logging form (Role-based)
+    form_attractions = []
+    form_establishments = []
+    if current_user.role == "contributor":
+        form_attractions = Attraction.query.filter_by(user_id=current_user.id).all()
+        form_establishments = Establishment.query.filter_by(owner_id=current_user.id).all()
+    elif current_user.role == "business_owner":
+        form_attractions = []
+        form_establishments = Establishment.query.filter_by(owner_id=current_user.id).all()
+    else:
+        form_attractions = attractions
+        form_establishments = establishments
+
     return render_template(
         "admin/visitor_registry.html",
         logs=logs,
@@ -544,7 +557,9 @@ def visitor_registry():
         start_date=start_date,
         end_date=end_date,
         all_attractions=attractions,
-        all_establishments=establishments
+        all_establishments=establishments,
+        attractions=form_attractions,
+        establishments=form_establishments
     )
 
 @admin_bp.route("/visits/log", methods=["POST"])
@@ -592,7 +607,8 @@ def log_visit():
             return jsonify({"success": True, "message": "Visit logged successfully"})
         
         flash("Visit logged successfully.")
-        return redirect(url_for("admin.visits_index"))
+        next_url = request.form.get("next") or request.args.get("next") or url_for("admin.visits_index")
+        return redirect(next_url)
         
     except Exception as e:
         db.session.rollback()
@@ -600,4 +616,5 @@ def log_visit():
         if request.is_json:
             return jsonify({"success": False, "error": str(e)}), 500
         flash(f"Error: {e}")
-        return redirect(url_for("admin.visits_index"))
+        next_url = request.form.get("next") or request.args.get("next") or url_for("admin.visits_index")
+        return redirect(next_url)
