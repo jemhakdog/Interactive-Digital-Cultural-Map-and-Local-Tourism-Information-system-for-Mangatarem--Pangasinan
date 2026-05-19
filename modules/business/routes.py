@@ -158,12 +158,38 @@ def submit_review(id):
         establishment_id=establishment.id,
         rating=rating,
         comment=sanitized_comment,
-        status="pending",
+        status="approved",
     )
     db.session.add(review)
+    db.session.flush()
+
+    # Recalculate establishment rating
+    approved_reviews = EstablishmentReview.query.filter_by(
+        establishment_id=establishment.id, status="approved"
+    ).all()
+    if approved_reviews:
+        establishment.rating_avg = sum(r.rating for r in approved_reviews) / len(approved_reviews)
+        establishment.review_count = len(approved_reviews)
+    else:
+        establishment.rating_avg = 0
+        establishment.review_count = 0
+
+    # Dispatch notification to the establishment owner
+    if establishment.owner_id and establishment.owner_id != current_user.id:
+        try:
+            from modules.notifications.models import create_notification
+            create_notification(
+                user_id=establishment.owner_id,
+                title="New Establishment Review",
+                message=f"A customer ({current_user.username}) left a {rating}-star review for your establishment '{establishment.name}'.",
+                link=url_for("business.detail", id=establishment.id)
+            )
+        except Exception as e:
+            logger.error(f"Failed to dispatch review notification: {e}")
+
     db.session.commit()
 
-    flash("Your review has been submitted and is pending approval.", "success")
+    flash("Your review has been posted successfully.", "success")
     return redirect(url_for("business.detail", id=id))
 
 # --- Dashboard Routes ---
@@ -667,7 +693,8 @@ def view_reviews():
         return redirect(url_for("business.create_establishment"))
 
     reviews = EstablishmentReview.query.filter_by(
-        establishment_id=establishment.id
+        establishment_id=establishment.id,
+        parent_id=None
     ).order_by(EstablishmentReview.created_at.desc()).all()
 
     return render_template(
@@ -675,6 +702,46 @@ def view_reviews():
         establishment=establishment,
         reviews=reviews,
     )
+
+@business_bp.route("/reviews/reply/<int:review_id>", methods=["POST"])
+@login_required
+@business_owner_required
+@limiter.limit("10 per minute")
+def reply_to_review(review_id):
+    establishment = _get_owner_establishment()
+    if not establishment:
+        flash("Please create your establishment first.", "error")
+        return redirect(url_for("business.create_establishment"))
+
+    review = EstablishmentReview.query.get_or_404(review_id)
+    if review.establishment_id != establishment.id:
+        flash("Access denied. This review is not for your establishment.", "error")
+        return redirect(url_for("business.view_reviews"))
+
+    comment = request.form.get("comment", "").strip()
+    if not comment:
+        flash("Please provide a response comment.", "error")
+        return redirect(url_for("business.view_reviews"))
+
+    # Create the reply review record
+    reply = EstablishmentReview(
+        user_id=current_user.id,
+        establishment_id=establishment.id,
+        parent_id=review.id,
+        comment=sanitize_html_input(comment),
+        rating=None,  # Replies do not have ratings
+        status="approved"  # Business owner responses are approved instantly
+    )
+    db.session.add(reply)
+    db.session.commit()
+
+    # Invalidate public caches for this establishment
+    from utils.cache_helpers import cache_delete, invalidate_business_cache
+    cache_delete(f"establishment_detail_module:{establishment.id}")
+    invalidate_business_cache(establishment_id=establishment.id)
+
+    flash("Response posted successfully!")
+    return redirect(url_for("business.view_reviews"))
 
 @business_bp.route("/browse")
 @login_required

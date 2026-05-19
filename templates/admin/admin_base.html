@@ -252,6 +252,17 @@
                             <span>Media Gallery</span>
                         </div>
                     </a>
+
+                    <!-- Reviews -->
+                    <a href="{{ url_for('barangay.barangay_reviews') }}" 
+                       class="flex items-center justify-between px-4 py-3 rounded-xl text-xs font-bold transition-all duration-200 group {% if request.endpoint == 'barangay.barangay_reviews' %}bg-dark-green text-mongodb-green border border-mongodb-green/10 shadow-lg shadow-dark-green/30{% else %}text-slate-400 hover:bg-emerald-950/30 hover:text-white{% endif %}">
+                        <div class="flex items-center gap-3">
+                            <svg class="w-4 h-4 text-mongodb-green group-hover:scale-110 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                            </svg>
+                            <span>Reviews</span>
+                        </div>
+                    </a>
                 {% elif current_user.is_authenticated and current_user.role == 'business_owner' %}
                     <!-- Dashboard Overview -->
                     <a href="{{ url_for('business.dashboard') }}" 
@@ -394,16 +405,63 @@
                     <span class="text-[10px] font-black uppercase text-dark-green/70">Campaign</span>
                 </a>
 
-                <!-- Notification Bell with Glowing Badge -->
-                <div class="relative" id="admin-notifications-bell">
-                    <button class="p-2.5 text-slate-400 hover:text-dark-green hover:bg-slate-50 rounded-xl transition-all relative">
+                <!-- Notification Bell with Glowing Dropdown -->
+                <div class="relative inline-block text-left" id="admin-notifications-dropdown-container">
+                    <button id="notification-bell-btn" class="p-2.5 text-slate-400 hover:text-dark-green hover:bg-slate-50 rounded-xl transition-all relative focus:outline-none">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                         </svg>
+                        {% if unread_notifications_count and unread_notifications_count > 0 %}
                         <!-- Pulsing badge indicator -->
-                        <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-yellow-500 rounded-full animate-ping"></span>
-                        <span class="absolute top-2.5 right-2.5 w-2 h-2 bg-yellow-500 rounded-full"></span>
+                        <span class="absolute top-2 right-2 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[9px] font-black text-white px-1 shadow-lg shadow-rose-500/25 ring-2 ring-white" id="notification-badge-count">
+                            {{ unread_notifications_count }}
+                        </span>
+                        {% endif %}
                     </button>
+
+                    <!-- Dropdown Panel (hidden by default) -->
+                    <div id="notification-dropdown-panel" class="hidden absolute right-0 mt-3 w-80 sm:w-96 bg-white/95 backdrop-blur-md rounded-3xl shadow-[0_20px_50px_rgba(0,0,0,0.15)] border border-slate-100 divide-y divide-slate-100 focus:outline-none z-50 origin-top-right transform transition-all duration-300 scale-95 opacity-0">
+                        <div class="px-5 py-4 flex items-center justify-between bg-slate-50/50 rounded-t-3xl">
+                            <h3 class="text-xs font-black text-slate-800 uppercase tracking-widest">Inbox Notifications</h3>
+                            {% if unread_notifications_count and unread_notifications_count > 0 %}
+                            <button id="mark-all-read-btn" class="text-[10px] font-black text-emerald-600 hover:text-emerald-700 uppercase tracking-wider transition-colors">
+                                Clear All
+                            </button>
+                            {% endif %}
+                        </div>
+                        <div class="py-2 max-h-80 overflow-y-auto admin-scrollbar" id="notifications-list-container">
+                            {% if latest_notifications %}
+                                {% for notif in latest_notifications %}
+                                <div class="px-5 py-4 hover:bg-slate-50/70 transition-colors flex gap-3 relative {% if not notif.is_read %}bg-emerald-50/5{% endif %}" data-notif-id="{{ notif.id }}">
+                                    <!-- Status indicator dot -->
+                                    {% if not notif.is_read %}
+                                    <span class="absolute top-5 left-2 w-1.5 h-1.5 bg-rose-500 rounded-full"></span>
+                                    {% endif %}
+                                    <div class="flex-grow space-y-1">
+                                        <p class="text-xs font-black text-slate-800">{{ notif.title }}</p>
+                                        <p class="text-[11px] text-slate-500 font-medium leading-relaxed">{{ notif.message }}</p>
+                                        <div class="flex items-center justify-between pt-1">
+                                            <span class="text-[9px] text-slate-400 font-code font-bold">{{ notif.created_at.strftime('%b %d, %I:%M %p') }}</span>
+                                            {% if not notif.is_read %}
+                                            <button class="mark-single-read text-[9px] text-emerald-600 hover:text-emerald-700 font-black uppercase tracking-wider transition-colors font-sans" data-id="{{ notif.id }}">
+                                                Dismiss
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <div class="px-5 py-8 text-center text-slate-400 space-y-2">
+                                    <svg class="w-8 h-8 mx-auto text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0a2 2 0 01-2 2H6a2 2 0 01-2-2m16 0V9a2 2 0 00-2-2H6a2 2 0 00-2 2v2m16 0V5a2 2 0 00-2-2H6a2 2 0 00-2 2v2m16 0v12a2 2 0 01-2 2H6a2 2 0 01-2-2v-3"></path>
+                                    </svg>
+                                    <p class="text-xs font-black uppercase tracking-widest text-slate-400">All Quiet</p>
+                                    <p class="text-[10px] text-slate-400/70 font-medium">You have no new notifications.</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
 
                 <div class="h-8 w-px bg-slate-200"></div>
@@ -466,6 +524,127 @@
                 closeSidebar();
             }
         });
+
+        // Notifications Dropdown Handler
+        const bellBtn = document.getElementById('notification-bell-btn');
+        const dropdownPanel = document.getElementById('notification-dropdown-panel');
+        
+        if (bellBtn && dropdownPanel) {
+            bellBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const isOpen = !dropdownPanel.classList.contains('hidden');
+                if (isOpen) {
+                    // Close
+                    dropdownPanel.classList.remove('scale-100', 'opacity-100');
+                    dropdownPanel.classList.add('scale-95', 'opacity-0');
+                    setTimeout(() => dropdownPanel.classList.add('hidden'), 150);
+                } else {
+                    // Open
+                    dropdownPanel.classList.remove('hidden');
+                    setTimeout(() => {
+                        dropdownPanel.classList.remove('scale-95', 'opacity-0');
+                        dropdownPanel.classList.add('scale-100', 'opacity-100');
+                    }, 10);
+                }
+            });
+
+            // Close on click outside
+            document.addEventListener('click', (e) => {
+                if (!dropdownPanel.contains(e.target) && e.target !== bellBtn && !bellBtn.contains(e.target)) {
+                    dropdownPanel.classList.remove('scale-100', 'opacity-100');
+                    dropdownPanel.classList.add('scale-95', 'opacity-0');
+                    setTimeout(() => dropdownPanel.classList.add('hidden'), 150);
+                }
+            });
+        }
+
+        // AJAX helper for CSRF header protection
+        const getCsrfToken = () => {
+            return document.querySelector('input[name="csrf_token"]')?.value || '';
+        };
+
+        // Mark Single Read Handler
+        const markSingleButtons = document.querySelectorAll('.mark-single-read');
+        markSingleButtons.forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const notifId = btn.getAttribute('data-id');
+                const notificationRow = btn.closest('[data-notif-id]');
+                
+                try {
+                    const response = await fetch(`/notifications/mark-read/${notifId}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-Token': getCsrfToken()
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        // Success - fade out and remove indicator
+                        if (notificationRow) {
+                            notificationRow.classList.remove('bg-emerald-50/5');
+                            const indicator = notificationRow.querySelector('.absolute.bg-rose-500');
+                            if (indicator) indicator.remove();
+                            btn.remove();
+                        }
+                        
+                        // Decrement badge count
+                        const badge = document.getElementById('notification-badge-count');
+                        if (badge) {
+                            let count = parseInt(badge.textContent.trim()) - 1;
+                            if (count <= 0) {
+                                badge.remove();
+                                const clearBtn = document.getElementById('mark-all-read-btn');
+                                if (clearBtn) clearBtn.remove();
+                            } else {
+                                badge.textContent = count;
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to dismiss notification:', error);
+                }
+            });
+        });
+
+        // Mark All Read Handler
+        const markAllBtn = document.getElementById('mark-all-read-btn');
+        if (markAllBtn) {
+            markAllBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                try {
+                    const response = await fetch('/notifications/mark-read', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-Token': getCsrfToken()
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        // Clear badge
+                        const badge = document.getElementById('notification-badge-count');
+                        if (badge) badge.remove();
+                        markAllBtn.remove();
+                        
+                        // Remove all red dots and dismiss buttons
+                        document.querySelectorAll('[data-notif-id]').forEach(row => {
+                            row.classList.remove('bg-emerald-50/5');
+                            const indicator = row.querySelector('.absolute.bg-rose-500');
+                            if (indicator) indicator.remove();
+                            const dismissBtn = row.querySelector('.mark-single-read');
+                            if (dismissBtn) dismissBtn.remove();
+                        });
+                    }
+                } catch (error) {
+                    console.error('Failed to clear notifications:', error);
+                }
+            });
+        }
     });
 </script>
 {% endblock %}

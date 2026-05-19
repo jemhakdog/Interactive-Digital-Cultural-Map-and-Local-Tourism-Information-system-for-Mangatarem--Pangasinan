@@ -254,14 +254,14 @@ def post_review(id):
         if not rating or not (1 <= rating <= 5):
             return jsonify({"error": "Rating must be between 1 and 5."}), 400
 
-    # Create review/reply record (pending — admin must approve)
+    # Create review/reply record (approved immediately)
     review = AttractionReview(
         user_id=current_user.id,
         attraction_id=id,
         rating=rating,
         comment=comment,
         parent_id=parent_id,
-        status="pending",
+        status="approved",
     )
     db.session.add(review)
     db.session.flush()  # get review.id before saving photos
@@ -288,5 +288,5 @@ def post_review(id):
         "success": True,
         "review_id": review.id,
         "photos_saved": saved_photos,
-        "message": "Your post has been submitted and is pending approval. Thank you!",
+        "message": "Your review has been posted successfully. Thank you!",
     }), 201

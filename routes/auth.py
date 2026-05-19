@@ -6,7 +6,7 @@ Print statements replaced with logging helpers.
 Complex route handlers decomposed into focused functions.
 """
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, current_app, make_response
 from flask_login import login_user, logout_user, login_required, current_user
 from models import db, User, PasswordResetToken
 from extensions import limiter
@@ -280,6 +280,18 @@ def login():
         Rendered login template or redirect after successful login
     """
     log_entry("auth", "login", method=request.method)
+    
+    if current_user.is_authenticated:
+        logger.info(f"Authenticated user '{current_user.username}' (role: {current_user.role}) visiting login page - redirecting to dashboard")
+        if current_user.role == "admin":
+            return redirect(url_for("admin.admin_dashboard"))
+        elif current_user.role == "contributor":
+            return redirect(url_for("barangay.barangay_dashboard"))
+        elif current_user.role == "business_owner":
+            return redirect(url_for("business.dashboard"))
+        elif current_user.role == "user":
+            return redirect(url_for("user.dashboard"))
+            
     logger.info("Login page accessed")
     
     if request.method == "POST":
@@ -328,6 +340,18 @@ def register():
         Rendered registration template or redirect after successful registration
     """
     log_entry("auth", "register", method=request.method)
+    
+    if current_user.is_authenticated:
+        logger.info(f"Authenticated user '{current_user.username}' (role: {current_user.role}) visiting register page - redirecting to dashboard")
+        if current_user.role == "admin":
+            return redirect(url_for("admin.admin_dashboard"))
+        elif current_user.role == "contributor":
+            return redirect(url_for("barangay.barangay_dashboard"))
+        elif current_user.role == "business_owner":
+            return redirect(url_for("business.dashboard"))
+        elif current_user.role == "user":
+            return redirect(url_for("user.dashboard"))
+            
     logger.info("Registration page accessed")
     
     if request.method == "POST":
@@ -392,6 +416,18 @@ def register_business():
     Creates business_owner accounts requiring admin approval.
     """
     log_entry("auth", "register_business", method=request.method)
+    
+    if current_user.is_authenticated:
+        logger.info(f"Authenticated user '{current_user.username}' (role: {current_user.role}) visiting register business page - redirecting to dashboard")
+        if current_user.role == "admin":
+            return redirect(url_for("admin.admin_dashboard"))
+        elif current_user.role == "contributor":
+            return redirect(url_for("barangay.barangay_dashboard"))
+        elif current_user.role == "business_owner":
+            return redirect(url_for("business.dashboard"))
+        elif current_user.role == "user":
+            return redirect(url_for("user.dashboard"))
+            
     logger.info("Business registration page accessed")
     
     if request.method == "POST":
@@ -604,11 +640,19 @@ def reset_password(token: str):
 
         if len(new_password) < 8:
             flash("Password must be at least 8 characters.", "error")
-            return render_template("auth/reset_password.html", token=token)
+            response = make_response(render_template("auth/reset_password.html", token=token))
+            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+            return response
 
         if new_password != confirm_password:
             flash("Passwords do not match.", "error")
-            return render_template("auth/reset_password.html", token=token)
+            response = make_response(render_template("auth/reset_password.html", token=token))
+            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+            return response
 
         reset_record.user.set_password(new_password)
         reset_record.used = True
@@ -618,7 +662,11 @@ def reset_password(token: str):
         flash("Your password has been reset. You can now log in.", "success")
         return redirect(url_for("auth.login"))
 
-    return render_template("auth/reset_password.html", token=token)
+    response = make_response(render_template("auth/reset_password.html", token=token))
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, max-age=0"
+    response.headers["Pragma"] = "no-cache"
+    response.headers["Expires"] = "0"
+    return response
 
 
 @auth_bp.route("/pending-approval")

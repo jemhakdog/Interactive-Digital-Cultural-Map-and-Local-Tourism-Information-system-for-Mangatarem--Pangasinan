@@ -57,3 +57,7 @@ tailwindcss-*
 *output.txt
 *debug.txt
 *audit.txt
+
+# External repositories / Cloned tools
+Athena-Public/
+

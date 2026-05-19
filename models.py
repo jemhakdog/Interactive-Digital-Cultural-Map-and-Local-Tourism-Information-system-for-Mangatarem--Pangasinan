@@ -40,3 +40,6 @@ from heritage_models.intangible_heritage import IntangibleHeritage
 from heritage_models.personality_profile import PersonalityProfile
 from heritage_models.cultural_institution import CulturalInstitution
 from heritage_models.lgu_culture_program import LGUCultureProgram
+
+# === Chat Module Models ===
+from modules.chat.models import ChatRoom, ChatParticipant, ChatMessage

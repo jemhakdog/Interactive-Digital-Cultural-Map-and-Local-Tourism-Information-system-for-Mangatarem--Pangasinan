@@ -1,7 +1,7 @@
 import os
 import logging
 from flask import Blueprint, render_template, current_app
-from models import db, User, Attraction, Event, BarangayInfo
+from models import db, User, Attraction, Event, BarangayInfo, UserFavoriteAttraction
 from utils.logger_helper import log_entry
 from modules.analytics.utils import record_view
 import json
@@ -91,6 +91,14 @@ def attraction_detail_v1_view(id):
     # Record view
     record_view("attraction", item_id=id)
 
+    # Check if favorited by current user
+    is_favorite = False
+    from flask_login import current_user
+    if current_user.is_authenticated:
+        is_favorite = UserFavoriteAttraction.query.filter_by(
+            user_id=current_user.id, attraction_id=id
+        ).first() is not None
+
     cache_key = f"attraction_detail_v1:{id}"
     cached_data = cache_get(cache_key)
     
@@ -103,6 +111,7 @@ def attraction_detail_v1_view(id):
             related_gallery=cached_data['related_gallery'],
             nearby_stay=cached_data['nearby_stay'],
             nearby_eat=cached_data['nearby_eat'],
+            is_favorite=is_favorite,
         )
 
     # Cache MISS - Fetch data
@@ -167,6 +176,7 @@ def attraction_detail_v1_view(id):
         related_gallery=related_gallery,
         nearby_stay=nearby_stay,
         nearby_eat=nearby_eat,
+        is_favorite=is_favorite,
     )
 
 

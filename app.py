@@ -10,7 +10,7 @@ import sys
 import logging
 from flask import Flask, render_template, request, send_from_directory
 from werkzeug.middleware.proxy_fix import ProxyFix
-from extensions import db, login_manager, limiter, csrf
+from extensions import db, login_manager, limiter, csrf, socketio
 from config import config_by_name
 from routes import register_blueprints
 from utils.template_filters import register_filters
@@ -70,6 +70,7 @@ def create_app(config_name=None):
     login_manager.init_app(app)
     limiter.init_app(app)
     csrf.init_app(app)
+    socketio.init_app(app, cors_allowed_origins="*")
     
     @login_manager.user_loader
     def load_user(user_id):
@@ -190,10 +191,29 @@ def _register_context_processors(app: Flask) -> None:
     @app.context_processor
     def inject_utilities():
         from datetime import datetime
+        from flask_login import current_user
+        
+        unread_notifications_count = 0
+        latest_notifications = []
+        
+        if current_user and current_user.is_authenticated:
+            try:
+                from modules.notifications.models import UserNotification
+                unread_notifications_count = UserNotification.query.filter_by(
+                    user_id=current_user.id, is_read=False
+                ).count()
+                latest_notifications = UserNotification.query.filter_by(
+                    user_id=current_user.id
+                ).order_by(UserNotification.created_at.desc()).limit(5).all()
+            except Exception:
+                pass
+                
         return dict(
             config=app.config,
             mapbox_token=os.environ.get("mapbox_token") or os.environ.get("MAPBOX_TOKEN", ""),
-            now=datetime.utcnow
+            now=datetime.utcnow,
+            unread_notifications_count=unread_notifications_count,
+            latest_notifications=latest_notifications
         )
 
 
@@ -233,7 +253,7 @@ def _register_request_hooks(app: Flask) -> None:
             "style-src": "'self' https://fonts.googleapis.com https://api.mapbox.com https://unpkg.com https://cdn.jsdelivr.net https://*.jsdelivr.net https://vercel.live 'unsafe-inline'",
             "img-src": "'self' data: https: blob: https://vercel.com https://*.vercel.com https://*.basemaps.cartocdn.com https://*.arcgisonline.com",
             "font-src": "'self' https://fonts.gstatic.com data:",
-            "connect-src": "'self' https://router.project-osrm.org https://*.basemaps.cartocdn.com https://unpkg.com https://cdn.jsdelivr.net https://*.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://placehold.co https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com https://*.supabase.co https://*.upstash.io https://accounts.google.com https://vercel.live https://*.vercel.live wss://*.vercel.live https://*.arcgisonline.com",
+            "connect-src": "'self' https://router.project-osrm.org https://*.basemaps.cartocdn.com https://unpkg.com https://cdn.jsdelivr.net https://*.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://placehold.co https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com https://*.supabase.co https://*.upstash.io https://accounts.google.com https://vercel.live https://*.vercel.live wss://*.vercel.live https://*.arcgisonline.com ws://127.0.0.1:5002 ws://localhost:5002 wss://*",
             "worker-src": "'self' blob:",
             "frame-ancestors": "'none'",
             "base-uri": "'self'",
@@ -457,4 +477,4 @@ def _seed_database(app):
 app = create_app()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=5002, debug=True)
+    socketio.run(app, host="0.0.0.0", port=5002, debug=True)

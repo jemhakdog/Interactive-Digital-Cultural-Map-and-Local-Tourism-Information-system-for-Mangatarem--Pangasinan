@@ -37,7 +37,6 @@ def visits_index():
                 )
             )
         elif current_user.role == "contributor":
-            from modules.attractions.models import Attraction
             stewarded_attr_ids = [a.id for a in Attraction.query.filter_by(user_id=current_user.id).all()]
             query = query.filter(
                 or_(
@@ -90,7 +89,6 @@ def visits_index():
                 db.and_(VisitorLog.target_type == "establishment", VisitorLog.target_id.in_(owned_est_ids))
             )
         elif current_user.role == "contributor":
-            from modules.attractions.models import Attraction
             stewarded_attr_ids = [a.id for a in Attraction.query.filter_by(user_id=current_user.id).all()]
             filter_cond = or_(
                 VisitorLog.logged_by == current_user.id,
@@ -278,7 +276,6 @@ def export_visits():
                 )
             )
         elif current_user.role == "contributor":
-            from modules.attractions.models import Attraction
             stewarded_attr_ids = [a.id for a in Attraction.query.filter_by(user_id=current_user.id).all()]
             query = query.filter(
                 or_(
@@ -496,7 +493,6 @@ def visitor_registry():
                 )
             )
         elif current_user.role == "contributor":
-            from modules.attractions.models import Attraction
             stewarded_attr_ids = [a.id for a in Attraction.query.filter_by(user_id=current_user.id).all()]
             query = query.filter(
                 or_(
@@ -512,10 +508,8 @@ def visitor_registry():
         query = query.filter_by(target_type=target_type, target_id=target_id)
         # Fetch location name for context
         if target_type == 'attraction':
-            from modules.attractions.models import Attraction
             target_location = Attraction.query.get(target_id)
         else:
-            from modules.business.models import Establishment
             target_location = Establishment.query.get(target_id)
     
     if search:
@@ -537,8 +531,6 @@ def visitor_registry():
     logs = query.order_by(VisitorLog.visit_date.desc()).all()
 
     # Fetch all locations for the registry filter
-    from modules.attractions.models import Attraction
-    from modules.business.models import Establishment
     attractions = Attraction.query.all()
     establishments = Establishment.query.all()
 

@@ -25,6 +25,8 @@ dependencies = [
     "requests",
     "httpx",
     "beautifulsoup4>=4.14.3",
+    "flask-socketio>=5.6.1",
+    "eventlet>=0.41.0",
 ]
 
 [tool.uv]

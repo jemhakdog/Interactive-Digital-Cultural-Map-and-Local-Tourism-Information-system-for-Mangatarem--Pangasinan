@@ -50,4 +50,11 @@
     } else {
         initPasswordValidation();
     }
+
+    // Force page reload if loaded from the Back-Forward Cache (Bfcache)
+    window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+            window.location.reload();
+        }
+    });
 })();

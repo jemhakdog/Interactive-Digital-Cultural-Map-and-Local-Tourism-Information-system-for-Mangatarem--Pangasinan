@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from models import User
 from modules.analytics.utils import record_view
 from .models import BarangayInfo
-from modules.attractions.models import Attraction
+from modules.attractions.models import Attraction, AttractionReview
 from modules.events.models import Event
 from modules.gallery.models import GalleryItem
 from utils.file_helpers import save_uploaded_file, detect_media_type
@@ -172,12 +172,22 @@ def barangay_dashboard():
     all_events = Event.query.filter_by(barangay_id=current_user.barangay_id).all()
     all_gallery = GalleryItem.query.filter_by(user_id=current_user.id).all()
 
+    reviews_count = (
+        AttractionReview.query.join(Attraction, AttractionReview.attraction_id == Attraction.id)
+        .filter(
+            Attraction.barangay_id == current_user.barangay_id,
+            AttractionReview.parent_id.is_(None)
+        )
+        .count()
+    )
+
     stats = {
         "total": len(all_attractions) + len(all_events),
         "approved": sum(1 for x in all_attractions + all_events if x.status == 'approved'),
         "pending": sum(1 for x in all_attractions + all_events if x.status == 'pending'),
         "rejected": sum(1 for x in all_attractions + all_events if x.status == 'rejected'),
         "gallery": len(all_gallery),
+        "reviews": reviews_count,
     }
 
     activity_items = []
@@ -189,6 +199,32 @@ def barangay_dashboard():
     recent_activity = sorted(activity_items, key=lambda x: x['date'] if x['date'] else datetime.min, reverse=True)[:5]
 
     return render_template("barangay/dashboard.html", stats=stats, recent_activity=recent_activity)
+
+@barangay_bp.route("/reviews")
+@login_required
+def barangay_reviews():
+    """View reviews left on attractions in the contributor's assigned barangay."""
+    if current_user.role != "contributor":
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+
+    reviews = (
+        AttractionReview.query.join(Attraction, AttractionReview.attraction_id == Attraction.id)
+        .filter(
+            Attraction.barangay_id == current_user.barangay_id,
+            AttractionReview.parent_id.is_(None)
+        )
+        .order_by(AttractionReview.created_at.desc())
+        .all()
+    )
+
+    barangay_name = current_user.barangay.name if current_user.barangay else "Assigned Barangay"
+
+    return render_template(
+        "barangay/reviews.html",
+        reviews=reviews,
+        barangay_name=barangay_name
+    )
 
 # --- Contributor Profile Management ---
 
@@ -679,3 +715,41 @@ def barangay_delete_gallery(id):
 
     flash("Gallery item deleted successfully!")
     return redirect(url_for("barangay.barangay_gallery"))
+
+@barangay_bp.route("/reviews/reply/<int:review_id>", methods=["POST"])
+@login_required
+@limiter.limit("10 per minute")
+def barangay_reply_to_review(review_id):
+    if current_user.role != "contributor":
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+
+    review = AttractionReview.query.get_or_404(review_id)
+    if review.attraction.barangay_id != current_user.barangay_id:
+        flash("Access denied. This attraction is not in your barangay.", "error")
+        return redirect(url_for("barangay.barangay_reviews"))
+
+    comment = request.form.get("comment", "").strip()
+    if not comment:
+        flash("Please provide a response comment.", "error")
+        return redirect(url_for("barangay.barangay_reviews"))
+
+    # Create the reply
+    reply = AttractionReview(
+        user_id=current_user.id,
+        attraction_id=review.attraction_id,
+        parent_id=review.id,
+        comment=sanitize_html_input(comment),
+        rating=None,  # Replies do not have ratings
+        status="approved"  # Steward replies are approved instantly
+    )
+    db.session.add(reply)
+    db.session.commit()
+
+    # Invalidate attraction detail cache
+    from utils.cache_helpers import cache_delete, invalidate_attraction_cache
+    cache_delete(f"attraction_detail_module:{review.attraction_id}")
+    invalidate_attraction_cache(attraction_id=review.attraction_id)
+
+    flash("Response posted successfully!")
+    return redirect(url_for("barangay.barangay_reviews"))

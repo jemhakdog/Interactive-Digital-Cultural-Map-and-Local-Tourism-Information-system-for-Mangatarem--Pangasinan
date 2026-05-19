@@ -102,12 +102,21 @@ class EstablishmentReview(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('USER.id'), nullable=False, index=True)
     establishment_id = db.Column(db.Integer, db.ForeignKey('ESTABLISHMENT.id', ondelete='CASCADE'), nullable=False, index=True)
-    rating = db.Column(db.Integer, nullable=False)
+    rating = db.Column(db.Integer, nullable=True)  # rating is nullable for replies
     comment = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(20), default='pending')
+    parent_id = db.Column(db.Integer, db.ForeignKey('ESTABLISHMENT_REVIEW.id', ondelete='CASCADE'), nullable=True, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    user = db.relationship('User', backref=db.backref('establishment_reviews', lazy=True))
+    user = db.relationship('User', backref=db.backref('establishment_reviews', lazy='dynamic'))
+
+    # Self-referential relationship for nested comment replies
+    replies = db.relationship(
+        'EstablishmentReview',
+        backref=db.backref('parent', remote_side=[id]),
+        lazy='dynamic',
+        cascade='all, delete-orphan'
+    )
 
 
 class UserFavoriteEstablishment(db.Model):

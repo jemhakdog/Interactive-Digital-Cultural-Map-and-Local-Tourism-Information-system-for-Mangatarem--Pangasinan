@@ -43,10 +43,10 @@ def admin_attractions():
 @login_required
 @limiter.limit("10 per minute")
 def add_attraction():
-    """Add new attraction (admin only)."""
+    """Add new attraction (admin or contributor)."""
     log_entry("admin", "add_attraction", method=request.method)
     
-    if current_user.role != "admin":
+    if current_user.role not in ["admin", "contributor"]:
         log_error("admin", "add_attraction", "Access denied")
         flash("Access denied.")
         return redirect(url_for("public.index"))
@@ -101,6 +101,22 @@ def add_attraction():
                 return redirect(url_for("admin.add_attraction"))
             directions = sanitize_html_input(directions)
 
+        # Determine barangay assignment
+        if current_user.role == "contributor":
+            barangay_id = current_user.barangay_id
+            if not barangay_id:
+                flash("Your account is not assigned to any Barangay.", "error")
+                return redirect(url_for("admin.admin_attractions"))
+        else:
+            barangay_id = int(request.form.get("barangay_id", 1))
+
+        # Stewardship Oversight Fields
+        physical_status = request.form.get("physical_status", "Open Public")
+        if physical_status not in ["Open Public", "Temporarily Closed", "Restricted Access", "Special Events Only"]:
+            physical_status = "Open Public"
+        
+        is_verified = request.form.get("is_verified") == "true"
+
         attraction = Attraction(
             name=name,
             category=category,
@@ -110,8 +126,10 @@ def add_attraction():
             image_url=image_url,
             directions=directions,
             user_id=current_user.id,
-            barangay_id=int(request.form.get("barangay_id", 1)),
+            barangay_id=barangay_id,
             status="approved",
+            physical_status=physical_status,
+            is_verified=is_verified,
         )
         db.session.add(attraction)
         db.session.commit()
@@ -186,14 +204,18 @@ def delete_attraction(id):
 @login_required
 @limiter.limit("10 per minute")
 def edit_attraction(id):
-    """Edit attraction (admin or owner only)."""
+    """Edit attraction (admin or authorized barangay representative)."""
     log_entry("admin", "edit_attraction", id=id, method=request.method)
     attraction = Attraction.query.get_or_404(id)
     
-    if current_user.role != "admin" and attraction.user_id != current_user.id:
+    is_admin = (current_user.role == "admin")
+    is_barangay_steward = (current_user.role == "contributor" and current_user.barangay_id == attraction.barangay_id)
+    
+    if not (is_admin or is_barangay_steward or attraction.user_id == current_user.id):
         log_error("admin", "edit_attraction", "Access denied")
         flash("Access denied.")
         return redirect(url_for("public.index"))
+        
     if request.method == "POST":
         name = request.form.get("name")
         description = request.form.get("description")
@@ -231,12 +253,14 @@ def edit_attraction(id):
             flash("Coordinates are out of range.", "error")
             return redirect(url_for("admin.edit_attraction", id=id))
 
-        if barangay_id_str:
-            valid_bar, barangay_id, err_bar = validate_integer(barangay_id_str, min_value=1)
-            if not valid_bar:
-                flash("Invalid barangay ID.", "error")
-                return redirect(url_for("admin.edit_attraction", id=id))
-            attraction.barangay_id = barangay_id
+        # Reassigning Barangay is restricted to Admin role
+        if is_admin:
+            if barangay_id_str:
+                valid_bar, barangay_id, err_bar = validate_integer(barangay_id_str, min_value=1)
+                if not valid_bar:
+                    flash("Invalid barangay ID.", "error")
+                    return redirect(url_for("admin.edit_attraction", id=id))
+                attraction.barangay_id = barangay_id
 
         directions = request.form.get("directions")
         if directions:
@@ -246,12 +270,21 @@ def edit_attraction(id):
                 return redirect(url_for("admin.edit_attraction", id=id))
             directions = sanitize_html_input(directions)
 
+        # Stewardship Oversight Fields
+        physical_status = request.form.get("physical_status", "Open Public")
+        if physical_status not in ["Open Public", "Temporarily Closed", "Restricted Access", "Special Events Only"]:
+            physical_status = "Open Public"
+        
+        is_verified = request.form.get("is_verified") == "true"
+
         attraction.name = name
         attraction.category = category
         attraction.description = description
         attraction.latitude = lat_val
         attraction.longitude = lng_val
         attraction.directions = directions
+        attraction.physical_status = physical_status
+        attraction.is_verified = is_verified
 
         # Handle image upload
         if "image" in request.files:
@@ -262,9 +295,8 @@ def edit_attraction(id):
         if request.form.get("image_url"):
             attraction.image_url = request.form.get("image_url")
 
-        # Contributors require re-approval
-        if current_user.role == "contributor":
-            attraction.status = "pending"
+        # Keeping it approved since Barangay Representatives have administrative stewardship
+        attraction.status = "approved"
 
         db.session.commit()
         log_success("admin", "edit_attraction", f"Attraction '{attraction.name}' updated")
@@ -273,7 +305,7 @@ def edit_attraction(id):
         from utils.cache_helpers import invalidate_attraction_cache
         invalidate_attraction_cache(attraction_id=id, barangay_id=attraction.barangay_id)
 
-        flash("Attraction updated.")
+        flash("Attraction updated successfully.")
         return redirect(url_for("admin.admin_attractions"))
     
     barangays = BarangayInfo.query.order_by(BarangayInfo.name).all()

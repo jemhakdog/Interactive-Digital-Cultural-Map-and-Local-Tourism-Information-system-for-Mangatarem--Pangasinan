@@ -41,6 +41,16 @@
   let isLoading     = false;
 
   // ─── Helpers ─────────────────────────────────────────────────────────────
+  function escapeHTML(str) {
+    if (!str) return '';
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   function starHTML(rating) {
     let html = '';
     for (let i = 1; i <= 5; i++) {
@@ -79,11 +89,11 @@
       </div>
       <div class="flex-1 min-w-0">
         <div class="flex items-center gap-2 flex-wrap mb-1">
-          <span class="font-bold text-emerald-950 text-xs">${r.username || 'Visitor'}</span>
+          <span class="font-bold text-emerald-950 text-xs">${escapeHTML(r.username || 'Visitor')}</span>
           ${pendingBadge}
           <span class="text-[9px] text-emerald-900/40 font-bold">${timeAgo(r.created_at)}</span>
         </div>
-        ${r.comment ? `<p class="text-emerald-950/75 text-xs leading-relaxed mt-1">${r.comment}</p>` : ''}
+        ${r.comment ? `<p class="text-emerald-950/75 text-xs leading-relaxed mt-1">${escapeHTML(r.comment)}</p>` : ''}
         ${photosHTML ? `<div class="flex flex-wrap gap-1.5 mt-2">${photosHTML}</div>` : ''}
       </div>
     </div>`;
@@ -118,12 +128,12 @@
         </div>
         <div class="flex-1 min-w-0">
           <div class="flex items-center gap-3 flex-wrap mb-1">
-            <span class="font-bold text-emerald-950 text-sm">${r.username || 'Visitor'}</span>
+            <span class="font-bold text-emerald-950 text-sm">${escapeHTML(r.username || 'Visitor')}</span>
             ${r.rating ? `<span class="flex items-center gap-0.5">${starHTML(r.rating)}</span>` : ''}
             ${pendingBadge}
             <span class="text-[10px] text-emerald-900/40 font-bold">${timeAgo(r.created_at)}</span>
           </div>
-          ${r.comment ? `<p class="text-emerald-950/75 text-sm leading-relaxed mt-2">${r.comment}</p>` : ''}
+          ${r.comment ? `<p class="text-emerald-950/75 text-sm leading-relaxed mt-2">${escapeHTML(r.comment)}</p>` : ''}
           ${photosHTML ? `<div class="flex flex-wrap gap-2 mt-4">${photosHTML}</div>` : ''}
           
           ${replyButtonHTML}

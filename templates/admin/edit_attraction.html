@@ -139,6 +139,43 @@ Edit Attraction - {% if current_user.role == 'admin' %}Admin{% else %}Barangay{%
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Stewardship Section -->
+                        <div class="glass-card p-8 rounded-[2rem] space-y-6">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="p-2 bg-emerald-100 rounded-xl text-emerald-700">
+                                    <svg class="w-5 h-5 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                                    </svg>
+                                </div>
+                                <h3 class="text-xl font-bold text-emerald-950">Stewardship Oversight</h3>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Physical Status -->
+                                <div>
+                                    <label
+                                        class="block text-xs font-bold text-emerald-900/70 uppercase tracking-widest mb-2">Physical Status</label>
+                                    <select name="physical_status" required
+                                        class="w-full !bg-white !text-emerald-950 border border-emerald-900/10 rounded-2xl px-5 py-4 font-bold input-focus outline-none appearance-none form-input cursor-pointer">
+                                        <option value="Open Public" {% if attraction.physical_status == 'Open Public' %}selected{% endif %}>Open Public</option>
+                                        <option value="Temporarily Closed" {% if attraction.physical_status == 'Temporarily Closed' %}selected{% endif %}>Temporarily Closed</option>
+                                        <option value="Restricted Access" {% if attraction.physical_status == 'Restricted Access' %}selected{% endif %}>Restricted Access</option>
+                                        <option value="Special Events Only" {% if attraction.physical_status == 'Special Events Only' %}selected{% endif %}>Special Events Only</option>
+                                    </select>
+                                </div>
+
+                                <!-- Verification -->
+                                <div class="flex items-center md:pl-6 pt-4 md:pt-0">
+                                    <label class="relative flex items-center cursor-pointer select-none">
+                                        <input type="checkbox" name="is_verified" value="true" {% if attraction.is_verified %}checked{% endif %} class="sr-only peer">
+                                        <div class="w-14 h-7 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:left-[4px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-600"></div>
+                                        <span class="ml-4 text-xs font-bold text-emerald-950 uppercase tracking-wider">Officially Verified Landmark</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Right Column: Media -->

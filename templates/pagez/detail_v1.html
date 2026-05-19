@@ -35,6 +35,9 @@
 
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/pages/reviews.js') }}" defer></script>
+{% if current_user.is_authenticated %}
+<script src="{{ url_for('static', filename='js/pages/user-actions.js') }}" defer></script>
+{% endif %}
 {% endblock %}
 
 {% block head %}
@@ -208,6 +211,9 @@
 {% endblock %}
 
 {% block content %}
+{% if current_user.is_authenticated %}
+<input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+{% endif %}
 <div class="mobile-app-layout">
     <div class="layout-wrapper">
         <main class="main-content-area !p-0 md:!p-6">
@@ -223,13 +229,18 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                         </svg>
                     </button>
+                    {% if current_user.is_authenticated and current_user.role == 'user' %}
                     <div class="flex gap-2">
-                        <button class="back-btn">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <button id="toggle-favorite" 
+                                data-id="{{ attraction.id }}" 
+                                data-type="attraction"
+                                class="back-btn fav-icon-only {{ 'is-favorited' if is_favorite else '' }}">
+                            <svg class="w-5 h-5 {{ 'text-red-500 fill-red-500 stroke-red-500' if is_favorite else '' }}" fill="{{ 'currentColor' if is_favorite else 'none' }}" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
                             </svg>
                         </button>
                     </div>
+                    {% endif %}
                 </div>
 
                 <div class="hero-content">
@@ -259,16 +270,33 @@
                         </div>
                         <div class="border-l border-r border-gray-100">
                             <div class="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Status</div>
-                            <div class="text-gray-900 font-bold text-sm">Open Public</div>
+                            {% if attraction.physical_status == 'Temporarily Closed' %}
+                            <div class="text-rose-600 font-bold text-sm">Closed</div>
+                            {% elif attraction.physical_status == 'Restricted Access' %}
+                            <div class="text-amber-600 font-bold text-sm">Restricted</div>
+                            {% elif attraction.physical_status == 'Special Events Only' %}
+                            <div class="text-purple-600 font-bold text-sm">Events Only</div>
+                            {% else %}
+                            <div class="text-emerald-600 font-bold text-sm">Open</div>
+                            {% endif %}
                         </div>
                         <div>
                             <div class="text-gray-500 text-[10px] uppercase font-bold tracking-wider mb-1">Verified</div>
-                            <div class="text-blue-500 font-bold text-sm flex justify-center items-center gap-1">
+                            {% if attraction.is_verified %}
+                            <div class="text-[#00E25F] font-bold text-sm flex justify-center items-center gap-1">
                                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                                     <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
                                 </svg>
                                 Official
                             </div>
+                            {% else %}
+                            <div class="text-gray-400 font-bold text-sm flex justify-center items-center gap-1">
+                                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                </svg>
+                                User Spot
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
 

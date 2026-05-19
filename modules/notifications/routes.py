@@ -63,3 +63,38 @@ def subscribe():
             return jsonify({"status": "error", "message": "An error occurred. Please try again later."}), 500
         flash("An error occurred. Please try again later.", "error")
         return redirect(url_for("public.index"))
+
+
+from flask_login import login_required, current_user
+from modules.notifications.models import UserNotification
+
+@notifications_bp.route("/mark-read", methods=["POST"])
+@login_required
+def mark_all_read():
+    """Mark all unread notifications of current user as read."""
+    try:
+        unread = UserNotification.query.filter_by(user_id=current_user.id, is_read=False).all()
+        for notification in unread:
+            notification.is_read = True
+        db.session.commit()
+        return jsonify({"status": "success", "message": "All notifications marked as read."})
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error marking notifications as read: {e}")
+        return jsonify({"status": "error", "message": "An error occurred."}), 500
+
+
+@notifications_bp.route("/mark-read/<int:id>", methods=["POST"])
+@login_required
+def mark_single_read(id):
+    """Mark a single notification of current user as read."""
+    try:
+        notification = UserNotification.query.filter_by(id=id, user_id=current_user.id).first_or_404()
+        notification.is_read = True
+        db.session.commit()
+        return jsonify({"status": "success", "message": "Notification marked as read."})
+    except Exception as e:
+        db.session.rollback()
+        logger.error(f"Error marking notification as read: {e}")
+        return jsonify({"status": "error", "message": "An error occurred."}), 500
+

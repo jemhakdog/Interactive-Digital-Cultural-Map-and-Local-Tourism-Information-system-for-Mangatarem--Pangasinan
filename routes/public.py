@@ -40,6 +40,18 @@ def index():
     Render the home page with featured content.
     Optimized to use SQL-side random sampling and Redis caching.
     """
+    from flask_login import current_user
+    if current_user.is_authenticated:
+        logger.info(f"Authenticated user '{current_user.username}' (role: {current_user.role}) visiting home page - redirecting to dashboard")
+        if current_user.role == "admin":
+            return redirect(url_for("admin.admin_dashboard"))
+        elif current_user.role == "contributor":
+            return redirect(url_for("barangay.barangay_dashboard"))
+        elif current_user.role == "business_owner":
+            return redirect(url_for("business.dashboard"))
+        elif current_user.role == "user":
+            return redirect(url_for("user.dashboard"))
+            
     logger.info("Home page accessed")
     record_view("page", page_name="home")
 

@@ -21,12 +21,28 @@ class Attraction(db.Model):
     
     status = db.Column(db.String(20), default="pending", index=True)
     is_featured = db.Column(db.Boolean, default=False)
+    physical_status = db.Column(db.String(50), default="Open Public", nullable=True)
+    is_verified = db.Column(db.Boolean, default=True, nullable=True)
     # Linked to User (steward) who manages this attraction
     user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=True, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
 
     user = db.relationship('User', foreign_keys=[user_id], backref='attractions')
     
+    @property
+    def rating(self):
+        """Calculate the average rating of approved reviews."""
+        approved_reviews = self.reviews.filter_by(
+            status="approved", 
+            parent_id=None
+        ).all()
+        if not approved_reviews:
+            return None
+        ratings = [r.rating for r in approved_reviews if r.rating is not None]
+        if not ratings:
+            return None
+        return round(sum(ratings) / len(ratings), 1)
+
     def to_dict(self):
         """Convert Attraction to dictionary for JSON serialization."""
         return {
@@ -41,6 +57,8 @@ class Attraction(db.Model):
             'barangay_id': self.barangay_id,
             'barangay_name': self.barangay.name if self.barangay else None,
             'status': self.status,
+            'physical_status': self.physical_status,
+            'is_verified': self.is_verified,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'osm_alternatives': self.osm_alternatives
         }

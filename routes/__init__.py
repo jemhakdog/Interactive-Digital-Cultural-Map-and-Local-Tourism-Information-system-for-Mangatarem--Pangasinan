@@ -40,3 +40,7 @@ def register_blueprints(app):
     app.register_blueprint(notifications_bp)
     app.register_blueprint(analytics_bp)
 
+    from modules.chat.routes import chat_bp
+    import modules.chat.sockets  # Register socket handlers
+    app.register_blueprint(chat_bp)
+

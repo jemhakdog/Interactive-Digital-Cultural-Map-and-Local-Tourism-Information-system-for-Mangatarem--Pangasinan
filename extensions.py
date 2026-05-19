@@ -3,6 +3,7 @@ from flask_login import LoginManager
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from flask_wtf.csrf import CSRFProtect
+from flask_socketio import SocketIO
 
 # Initialize extensions without app
 # They will be initialized with the app instance in the application factory (app.py)
@@ -23,3 +24,5 @@ limiter = Limiter(
 )
 
 csrf = CSRFProtect()
+
+socketio = SocketIO()
