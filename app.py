@@ -10,6 +10,7 @@ import sys
 import logging
 from flask import Flask, render_template, request, send_from_directory
 from werkzeug.middleware.proxy_fix import ProxyFix
+import models
 from extensions import db, login_manager, limiter, csrf, socketio
 from config import config_by_name
 from routes import register_blueprints

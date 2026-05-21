@@ -27,6 +27,7 @@ def register_blueprints(app):
     from modules.gallery.routes import gallery_bp
     from modules.notifications.routes import notifications_bp
     from modules.analytics.routes import analytics_bp
+    from modules.booking.routes import booking_bp
 
     from .v1.documents import v1_docs_bp
     from .v1.public import public_v1_bp
@@ -39,6 +40,7 @@ def register_blueprints(app):
     app.register_blueprint(gallery_bp)
     app.register_blueprint(notifications_bp)
     app.register_blueprint(analytics_bp)
+    app.register_blueprint(booking_bp)
 
     from modules.chat.routes import chat_bp
     import modules.chat.sockets  # Register socket handlers

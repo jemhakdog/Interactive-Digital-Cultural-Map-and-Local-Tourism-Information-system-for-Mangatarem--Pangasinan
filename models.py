@@ -43,3 +43,6 @@ from heritage_models.lgu_culture_program import LGUCultureProgram
 
 # === Chat Module Models ===
 from modules.chat.models import ChatRoom, ChatParticipant, ChatMessage
+
+# === Booking Module Models ===
+from modules.booking.models import BookableAsset, BookingSlot, Reservation
