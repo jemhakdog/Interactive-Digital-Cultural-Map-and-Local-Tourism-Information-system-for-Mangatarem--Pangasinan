@@ -9,7 +9,7 @@
         <div>
             <h1 class="text-3xl font-black text-slate-800 font-heading tracking-tight leading-tight flex items-center gap-2">
                 <span>Events Stewardship</span>
-                <span class="w-2.5 h-2.5 rounded-full bg-mongodb-green inline-block animate-pulse"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-premium-blue inline-block animate-pulse"></span>
             </h1>
             <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider mt-1">
                 Registry of festivals and community events mapped under Barangay {{ current_user.barangay.name }}
@@ -17,7 +17,7 @@
         </div>
         <div class="flex items-center gap-3">
             <a href="{{ url_for('barangay.barangay_add_event') }}"
-                class="px-4 py-2.5 bg-mongodb-green text-dark-green rounded-xl text-xs font-black uppercase hover:bg-emerald-300 transition-all shadow-md shadow-dark-green/10 flex items-center gap-2">
+                class="px-4 py-2.5 bg-premium-blue text-royal-blue rounded-xl text-xs font-black uppercase hover:bg-sky-300 transition-all shadow-md shadow-royal-blue/10 flex items-center gap-2">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
                 Publish Event
             </a>
@@ -72,7 +72,7 @@
                         <!-- Status Badge -->
                         <td class="px-6 py-5">
                             {% if event.status == 'approved' %}
-                            <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-[9px] font-black uppercase rounded-full border border-emerald-200">
+                            <span class="px-3 py-1 bg-sky-100 text-sky-800 text-[9px] font-black uppercase rounded-full border border-sky-200">
                                 Verified
                             </span>
                             {% elif event.status == 'rejected' %}
@@ -90,7 +90,7 @@
                         <td class="px-8 py-5 text-right">
                             <div class="flex items-center justify-end gap-2">
                                 <a href="{{ url_for('barangay.barangay_edit_event', id=event.id) }}"
-                                    class="p-2 text-slate-400 hover:text-mongodb-green hover:bg-emerald-50/50 rounded-xl transition-all"
+                                    class="p-2 text-slate-400 hover:text-premium-blue hover:bg-sky-50/50 rounded-xl transition-all"
                                     title="Edit Event">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />

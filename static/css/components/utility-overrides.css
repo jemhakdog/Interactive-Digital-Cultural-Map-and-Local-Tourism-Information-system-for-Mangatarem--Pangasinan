@@ -8,8 +8,8 @@
 
 /* Map card color overrides */
 .map-card-title {
-    color: #064e3b !important;
-    -webkit-text-fill-color: #064e3b !important;
+    color: #0f172a !important;
+    -webkit-text-fill-color: #0f172a !important;
 }
 
 .map-card-subtitle {
@@ -36,11 +36,11 @@
 }
 
 .map-card-badge-icon {
-    color: #10b981 !important;
+    color: #0ea5e9 !important;
 }
 
 .map-card-badge-text {
-    color: #047857 !important;
+    color: #0369a1 !important;
 }
 
 .map-card-category-nature {

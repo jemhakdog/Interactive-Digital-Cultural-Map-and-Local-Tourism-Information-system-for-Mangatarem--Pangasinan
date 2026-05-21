@@ -71,8 +71,8 @@
         <aside class="desktop-sidebar hidden md:flex">
             <div class="mb-12">
                 <div class="flex items-center gap-3 mb-2">
-                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold" style="background-color: #00E25F;">M</div>
-                    <span class="text-xs font-bold uppercase tracking-[0.2em]" style="color: #00E25F;">Discovery</span>
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold" style="background-color: #0ea5e9;">M</div>
+                    <span class="text-xs font-bold uppercase tracking-[0.2em]" style="color: #0ea5e9;">Discovery</span>
                 </div>
                 <h2 class="text-3xl font-bold text-gray-900 font-serif">Mangatarem</h2>
             </div>
@@ -142,7 +142,32 @@
                 <div class="horizontal-scroller" id="popularBarangays">
                     {% set popular = barangays|sort(attribute='attraction_count', reverse=True) %}
                     {% for b in popular[:5] %}
+                    {% if b.name == "Poblacion" %}
+                     <a href="{{ url_for('barangay.profile', name=b.name) }}" class="popular-card">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/06/2173Poblacion%2C_Lingayen%2C_Pangasinan_52.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" class="popular-card-img" alt="{{ b.name }}">
+                        <span class="popular-card-tag">{{ b.tags[0] if b.tags else 'Discovery' }}</span>
+                        <div class="popular-card-info">
+                            <h3 class="font-bold text-gray-800">{{ b.name }}</h3>
+                            <p class="text-xs text-gray-500 mt-1">🏰 {{ b.attraction_count }} Attractions</p>
+                        </div>
+                    </a>
+                    {%endif%}
+                      
+                  
+                    
+                     <a href="{{ url_for('barangay.profile', name=b.name) }}" class="popular-card">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/06/2173Poblacion%2C_Lingayen%2C_Pangasinan_52.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" class="popular-card-img" alt="{{ b.name }}">
+                        <span class="popular-card-tag">{{ b.tags[0] if b.tags else 'Discovery' }}</span>
+                        <div class="popular-card-info">
+                            <h3 class="font-bold text-gray-800">{{ b.name }}</h3>
+                            <p class="text-xs text-gray-500 mt-1">🏰 {{ b.attraction_count }} Attractions</p>
+                        </div>
+                    </a>
+                    
+                    
                     <a href="{{ url_for('barangay.profile', name=b.name) }}" class="popular-card">
+                         {% if b.name == "Poblacion" %}
+                         {% else %}
                         <img src="{{ b.image_url or 'https://placehold.co/400x300?text=' + b.name }}" class="popular-card-img" alt="{{ b.name }}">
                         <span class="popular-card-tag">{{ b.tags[0] if b.tags else 'Discovery' }}</span>
                         <div class="popular-card-info">
@@ -150,6 +175,8 @@
                             <p class="text-xs text-gray-500 mt-1">🏰 {{ b.attraction_count }} Attractions</p>
                         </div>
                     </a>
+                    
+                    {%endif%}
                     {% endfor %}
                 </div>
             </section>

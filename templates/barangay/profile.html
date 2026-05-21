@@ -9,7 +9,7 @@
         <div>
             <h1 class="text-3xl font-black text-slate-800 font-heading tracking-tight leading-tight flex items-center gap-2">
                 <span>Manage Barangay Profile</span>
-                <span class="w-2.5 h-2.5 rounded-full bg-mongodb-green inline-block animate-pulse"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-premium-blue inline-block animate-pulse"></span>
             </h1>
             <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider mt-1">
                 Barangay {{ current_user.barangay.name }} CBIS Registry Profile
@@ -33,7 +33,7 @@
                 <div class="space-y-2">
                     <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Mission Statement</label>
                     <textarea name="mission" rows="4"
-                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs p-4 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs p-4 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-premium-blue/20 focus:border-premium-blue transition-all duration-300"
                         placeholder="Enter the official barangay mission statement here...">{{ info.mission if info else '' }}</textarea>
                 </div>
 
@@ -41,7 +41,7 @@
                 <div class="space-y-2">
                     <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Vision Statement</label>
                     <textarea name="vision" rows="4"
-                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs p-4 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs p-4 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-premium-blue/20 focus:border-premium-blue transition-all duration-300"
                         placeholder="Enter the official barangay vision statement here...">{{ info.vision if info else '' }}</textarea>
                 </div>
             </div>
@@ -51,7 +51,7 @@
                 <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">History & Origin Description</label>
                 <p class="text-[10px] font-bold text-slate-400">Provide an academic summary detailing the historical roots and local folklore of the barangay.</p>
                 <textarea name="history" rows="6"
-                    class="w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs p-4 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300"
+                    class="w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs p-4 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-premium-blue/20 focus:border-premium-blue transition-all duration-300"
                     placeholder="Enter barangay history here...">{{ info.history if info else '' }}</textarea>
             </div>
 
@@ -60,7 +60,7 @@
                 <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Cultural Assets Inventory</label>
                 <p class="text-[10px] font-bold text-slate-400">List significant local landmarks, ancient structures, or historical artifacts.</p>
                 <textarea name="cultural_assets" rows="4"
-                    class="w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs p-4 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300"
+                    class="w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs p-4 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-premium-blue/20 focus:border-premium-blue transition-all duration-300"
                     placeholder="Provide list of cultural assets...">{{ info.cultural_assets if info else '' }}</textarea>
             </div>
 
@@ -69,7 +69,7 @@
                 <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Local Traditions & Customary Observances</label>
                 <p class="text-[10px] font-bold text-slate-400">Describe barangay festivals, community rituals, or annual celebrations.</p>
                 <textarea name="traditions" rows="4"
-                    class="w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs p-4 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300"
+                    class="w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs p-4 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-premium-blue/20 focus:border-premium-blue transition-all duration-300"
                     placeholder="Describe traditions here...">{{ info.traditions if info else '' }}</textarea>
             </div>
 
@@ -78,7 +78,7 @@
                 <div class="space-y-2">
                     <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Livelihoods & Practices</label>
                     <textarea name="local_practices" rows="4"
-                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs p-4 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs p-4 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-premium-blue/20 focus:border-premium-blue transition-all duration-300"
                         placeholder="Detail agricultural practices, traditional crafts, or micro-businesses...">{{ info.local_practices if info else '' }}</textarea>
                 </div>
 
@@ -86,7 +86,7 @@
                 <div class="space-y-2">
                     <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Unique Community Characteristics</label>
                     <textarea name="unique_features" rows="4"
-                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs p-4 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300"
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs p-4 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-premium-blue/20 focus:border-premium-blue transition-all duration-300"
                         placeholder="Detail geographic landscapes, natural springs, or outstanding features...">{{ info.unique_features if info else '' }}</textarea>
                 </div>
             </div>
@@ -98,7 +98,7 @@
                     Cancel
                 </a>
                 <button type="submit"
-                    class="px-5 py-2.5 bg-mongodb-green text-dark-green rounded-xl text-xs font-black uppercase hover:bg-emerald-300 transition-all shadow-md shadow-dark-green/10">
+                    class="px-5 py-2.5 bg-premium-blue text-royal-blue rounded-xl text-xs font-black uppercase hover:bg-sky-300 transition-all shadow-md shadow-royal-blue/10">
                     Save Profile Settings
                 </button>
             </div>

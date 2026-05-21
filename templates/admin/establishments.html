@@ -13,8 +13,8 @@
         <div>
             <div class="flex items-center gap-2 mb-2">
                 <a href="{{ url_for('admin.admin_dashboard') }}"
-                   class="text-slate-400 hover:text-dark-green flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors">
-                    <svg class="w-4 h-4 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="text-slate-400 hover:text-royal-blue flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors">
+                    <svg class="w-4 h-4 text-premium-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                     Back to Hub
@@ -39,7 +39,7 @@
         {% for val, label in statuses %}
         <a href="{{ url_for('admin.manage_establishments', status=val) }}"
            class="px-5 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-wider transition-all border
-                  {{ 'bg-dark-green border-dark-green text-white shadow-md shadow-dark-green/10' if current_status == val else 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-700' }}">
+                  {{ 'bg-royal-blue border-royal-blue text-white shadow-md shadow-royal-blue/10' if current_status == val else 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-700' }}">
             {{ label }}
         </a>
         {% endfor %}
@@ -54,7 +54,7 @@
             {% if est.status == 'pending' %}
             <div class="absolute left-0 top-0 h-full w-1.5 bg-yellow-500"></div>
             {% elif est.status == 'approved' %}
-            <div class="absolute left-0 top-0 h-full w-1.5 bg-emerald-500"></div>
+            <div class="absolute left-0 top-0 h-full w-1.5 bg-sky-500"></div>
             {% else %}
             <div class="absolute left-0 top-0 h-full w-1.5 bg-red-500"></div>
             {% endif %}
@@ -73,17 +73,17 @@
                         <div>
                             <h3 class="text-slate-800 font-black text-base leading-tight">{{ est.name }}</h3>
                             <div class="flex flex-wrap items-center gap-x-4 gap-y-1.5 text-[9px] font-black uppercase text-slate-400 mt-2 tracking-wider">
-                                <span class="text-mongodb-green bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                                <span class="text-premium-blue bg-sky-50 px-2 py-0.5 rounded border border-sky-100">
                                     {% if est.type == 'inn' %}Inn{% elif est.type == 'restaurant' %}Restaurant{% elif est.type == 'cafe' %}Café{% elif est.type == 'fastfood' %}Fast Food{% endif %}
                                 </span>
                                 {% if est.barangay %}
                                 <span class="flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+                                    <svg class="w-3.5 h-3.5 text-premium-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                                     <span>Brgy. {{ est.barangay.name }}</span>
                                 </span>
                                 {% endif %}
                                 <span class="flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                                    <svg class="w-3.5 h-3.5 text-premium-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
                                     <span>Owner: {{ est.owner.username }}</span>
                                 </span>
                                 <span>📅 {{ est.created_at.strftime('%b %d, %Y') }}</span>
@@ -94,7 +94,7 @@
                     <div class="flex items-center gap-3 flex-shrink-0 md:ml-4">
                         <span class="text-[8px] font-black uppercase tracking-wider px-3 py-1 rounded border
                             {{ 'bg-yellow-50 border-yellow-200 text-yellow-600' if est.status == 'pending' else
-                               'bg-emerald-50 border-emerald-200 text-emerald-600' if est.status == 'approved' else
+                               'bg-sky-50 border-sky-200 text-sky-600' if est.status == 'approved' else
                                'bg-red-50 border-red-200 text-red-600' }}">
                             {{ est.status|title }}
                         </span>
@@ -102,7 +102,7 @@
                         {% if est.status == 'pending' %}
                         <form method="POST" action="{{ url_for('admin.approve_establishment', id=est.id) }}" class="inline">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                            <button type="submit" class="bg-emerald-500 hover:bg-emerald-600 text-white text-[9px] font-black uppercase tracking-wider py-2.5 px-4 rounded-xl shadow-md shadow-emerald-500/10 cursor-pointer admin-action-btn">
+                            <button type="submit" class="bg-sky-500 hover:bg-sky-600 text-white text-[9px] font-black uppercase tracking-wider py-2.5 px-4 rounded-xl shadow-md shadow-sky-500/10 cursor-pointer admin-action-btn">
                                 Approve
                             </button>
                         </form>
@@ -153,7 +153,7 @@
         </p>
         {% if current_status != 'all' %}
         <a href="{{ url_for('admin.manage_establishments', status='all') }}"
-           class="mt-6 inline-block bg-dark-green hover:bg-emerald-900 text-white font-black text-[9px] uppercase tracking-wider px-5 py-3 rounded-2xl transition-all shadow-sm">
+           class="mt-6 inline-block bg-royal-blue hover:bg-sky-900 text-white font-black text-[9px] uppercase tracking-wider px-5 py-3 rounded-2xl transition-all shadow-sm">
             View All Establishments
         </a>
         {% endif %}

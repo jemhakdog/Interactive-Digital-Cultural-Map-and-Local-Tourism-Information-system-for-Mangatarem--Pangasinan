@@ -66,7 +66,7 @@ def test_admin_history_routes(app, client):
         
     response = client.get("/admin/newsletter/history")
     assert response.status_code == 200
-    assert b"Campaign Dispatch Records" in response.data
+    assert b"Dispatch Records Archive" in response.data
     assert b"Admin Test Subject" in response.data
 
     # 4. JSON Content AJAX endpoint should succeed and return exact payload

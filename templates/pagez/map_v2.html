@@ -18,7 +18,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/leaflet.css') }}" />
 <style>
     :root {
-        --primary-green: #00ED64;
+        --primary-green: #0ea5e9;
         --soft-green: #E6FFF0;
         --text-dark: #1F1D2B;
         --text-gray: #929292;
@@ -457,7 +457,7 @@
     
     .visit-btn.active {
         background: #E6FFF0;
-        color: #059669;
+        color: #0284c7;
         border-color: #D1FAE5;
     }
     
@@ -556,7 +556,7 @@
     .map-control-btn:hover {
         transform: translateY(-2px);
         box-shadow: 0 15px 30px rgba(0,0,0,0.2);
-        color: #00ED64;
+        color: #0ea5e9;
     }
 
     .map-control-btn:active {
@@ -818,8 +818,8 @@
     <div id="nav-panel" class="fixed top-24 left-6 z-[60] w-80 bg-white/95 backdrop-blur-md rounded-[32px] shadow-2xl p-6 border border-white/20 hidden">
         <div class="flex justify-between items-center mb-6">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 bg-[#00ED64]/10 rounded-2xl flex items-center justify-center">
-                    <svg class="w-5 h-5 text-[#00ED64]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div class="w-10 h-10 bg-[#0ea5e9]/10 rounded-2xl flex items-center justify-center">
+                    <svg class="w-5 h-5 text-[#0ea5e9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                     </svg>
                 </div>
@@ -860,8 +860,8 @@
         <div class="space-y-4 mb-6 relative">
             <div class="absolute left-[19px] top-5 bottom-5 w-0.5 border-dashed border-l-2 border-gray-100"></div>
             <div class="flex items-center gap-4 relative">
-                <div class="w-10 h-10 rounded-2xl border-2 border-[#00ED64] bg-white flex items-center justify-center shrink-0 z-10 shadow-sm">
-                    <div class="w-2.5 h-2.5 bg-[#00ED64] rounded-full"></div>
+                <div class="w-10 h-10 rounded-2xl border-2 border-[#0ea5e9] bg-white flex items-center justify-center shrink-0 z-10 shadow-sm">
+                    <div class="w-2.5 h-2.5 bg-[#0ea5e9] rounded-full"></div>
                 </div>
                 <div class="flex-1">
                     <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-0.5">Origin</p>
@@ -904,12 +904,12 @@
     <div class="absolute inset-0 pointer-events-none z-[45] flex flex-col justify-end">
         <div id="bottom-sheet" class="bottom-sheet pointer-events-auto bg-white rounded-[32px] p-6 shadow-premium transition-all flex flex-col">
             <div id="sheet-handle"></div>
-            <div class="search-input-container mb-6 bg-gray-50 border border-gray-100 group focus-within:border-[#00ED64]/30 transition-all">
-                <svg class="w-5 h-5 text-gray-400 group-focus-within:text-[#00ED64] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div class="search-input-container mb-6 bg-gray-50 border border-gray-100 group focus-within:border-[#0ea5e9]/30 transition-all">
+                <svg class="w-5 h-5 text-gray-400 group-focus-within:text-[#0ea5e9] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                 </svg>
                 <input type="text" id="route-search" placeholder="Search places or barangays..." class="bg-transparent">
-                <button id="search-locate-btn" class="p-2 -mr-2 text-gray-400 hover:text-[#00ED64] transition-colors" title="Use my current location">
+                <button id="search-locate-btn" class="p-2 -mr-2 text-gray-400 hover:text-[#0ea5e9] transition-colors" title="Use my current location">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
@@ -930,7 +930,7 @@
             <div id="place-stats" class="hidden pt-4 border-t border-gray-100 mt-4">
                 <div class="flex items-center justify-between gap-4">
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 bg-[#E6FFF0] rounded-xl flex items-center justify-center text-[#00ED64]">
+                        <div class="w-9 h-9 bg-[#E6FFF0] rounded-xl flex items-center justify-center text-[#0ea5e9]">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                             </svg>
@@ -941,7 +941,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-3">
-                        <div class="w-9 h-9 bg-[#E6FFF0] rounded-xl flex items-center justify-center text-[#00ED64]">
+                        <div class="w-9 h-9 bg-[#E6FFF0] rounded-xl flex items-center justify-center text-[#0ea5e9]">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
@@ -988,7 +988,7 @@
                     </div>
                 </div>
                 <div class="modal-location">
-                    <svg class="w-4 h-4 text-[#00ED64]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-[#0ea5e9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
                     </svg>
@@ -998,13 +998,13 @@
                 <!-- Alternative Coordinates Selector -->
                 <div id="modal-alternatives-container" class="hidden mt-3 mb-4 p-3 bg-gray-50 border border-gray-100 rounded-2xl">
                     <label for="modal-alternatives-select" class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1.5 flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5 text-[#00ED64]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-3.5 h-3.5 text-[#0ea5e9]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
                         </svg>
                         Select Coordinate Location
                     </label>
                     <div class="relative">
-                        <select id="modal-alternatives-select" class="w-full bg-white border border-gray-200 rounded-xl py-2.5 px-3 pr-8 text-xs font-bold text-gray-900 focus:border-[#00ED64]/50 focus:ring-0 focus:outline-none appearance-none cursor-pointer">
+                        <select id="modal-alternatives-select" class="w-full bg-white border border-gray-200 rounded-xl py-2.5 px-3 pr-8 text-xs font-bold text-gray-900 focus:border-[#0ea5e9]/50 focus:ring-0 focus:outline-none appearance-none cursor-pointer">
                             <!-- Dynamic options injected by JS -->
                         </select>
                         <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2.5 text-gray-500">

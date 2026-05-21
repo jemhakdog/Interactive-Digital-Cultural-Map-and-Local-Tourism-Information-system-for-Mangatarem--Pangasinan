@@ -15,13 +15,13 @@
     {% set text_btn = 'text-orange-500 hover:text-orange-600 font-bold' %}
 {% else %}
     {% set theme_color = 'green' %}
-    {% set primary_text = 'text-mongodb-green' %}
-    {% set border_accent = 'border-mongodb-green/10' %}
-    {% set bg_card = 'bg-emerald-50' %}
-    {% set focus_ring = 'focus:ring-mongodb-green/20 focus:border-mongodb-green' %}
-    {% set accent_badge = 'bg-mongodb-green/10 text-mongodb-green border border-mongodb-green/20' %}
-    {% set fill_btn = 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/20' %}
-    {% set text_btn = 'text-mongodb-green hover:text-emerald-700 font-bold' %}
+    {% set primary_text = 'text-premium-blue' %}
+    {% set border_accent = 'border-premium-blue/10' %}
+    {% set bg_card = 'bg-sky-50' %}
+    {% set focus_ring = 'focus:ring-premium-blue/20 focus:border-premium-blue' %}
+    {% set accent_badge = 'bg-premium-blue/10 text-premium-blue border border-premium-blue/20' %}
+    {% set fill_btn = 'bg-sky-600 hover:bg-sky-500 text-white shadow-lg shadow-sky-900/20' %}
+    {% set text_btn = 'text-premium-blue hover:text-sky-700 font-bold' %}
 {% endif %}
 
 <div class="max-w-4xl mx-auto space-y-8 py-4">
@@ -47,7 +47,7 @@
         <!-- Block 1: Basic Classification -->
         <div class="space-y-4">
             <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
-                <span class="w-2 h-2 rounded-full {% if is_dining %}bg-orange-500{% else %}bg-mongodb-green{% endif %}"></span>
+                <span class="w-2 h-2 rounded-full {% if is_dining %}bg-orange-500{% else %}bg-premium-blue{% endif %}"></span>
                 <h2 class="text-xs font-black uppercase text-slate-700 tracking-wider">Classification & Overview</h2>
             </div>
             
@@ -83,7 +83,7 @@
         <!-- Block 2: Spatial Map Alignment -->
         <div class="space-y-4">
             <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
-                <span class="w-2 h-2 rounded-full {% if is_dining %}bg-orange-500{% else %}bg-mongodb-green{% endif %}"></span>
+                <span class="w-2 h-2 rounded-full {% if is_dining %}bg-orange-500{% else %}bg-premium-blue{% endif %}"></span>
                 <h2 class="text-xs font-black uppercase text-slate-700 tracking-wider">Map Coordinates & Address</h2>
             </div>
 
@@ -126,7 +126,7 @@
         <!-- Block 3: Public Contact Matrix -->
         <div class="space-y-4">
             <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
-                <span class="w-2 h-2 rounded-full {% if is_dining %}bg-orange-500{% else %}bg-mongodb-green{% endif %}"></span>
+                <span class="w-2 h-2 rounded-full {% if is_dining %}bg-orange-500{% else %}bg-premium-blue{% endif %}"></span>
                 <h2 class="text-xs font-black uppercase text-slate-700 tracking-wider">Contact Details & Web Presence</h2>
             </div>
 
@@ -160,7 +160,7 @@
         <!-- Block 4: Amenities & Pricing Structure -->
         <div class="space-y-4">
             <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
-                <span class="w-2 h-2 rounded-full {% if is_dining %}bg-orange-500{% else %}bg-mongodb-green{% endif %}"></span>
+                <span class="w-2 h-2 rounded-full {% if is_dining %}bg-orange-500{% else %}bg-premium-blue{% endif %}"></span>
                 <h2 class="text-xs font-black uppercase text-slate-700 tracking-wider">Commercial Metrics & Amenities</h2>
             </div>
 
@@ -184,7 +184,7 @@
                         <label class="flex items-center gap-2.5 text-xs font-bold text-slate-600 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3.5 cursor-pointer hover:bg-slate-100 hover:text-slate-800 transition-all select-none">
                             <input type="checkbox" name="amenities" value="{{ amenity }}"
                                    {{ 'checked' if establishment and establishment.amenities and amenity in establishment.amenities }}
-                                   class="rounded border-slate-300 text-mongodb-green focus:ring-mongodb-green/20 focus:ring-2">
+                                   class="rounded border-slate-300 text-premium-blue focus:ring-premium-blue/20 focus:ring-2">
                             <span>{{ amenity_labels[amenity] }}</span>
                         </label>
                     {% endfor %}
@@ -195,7 +195,7 @@
         <!-- Block 5: Brand Identity Cover & Media -->
         <div class="space-y-4">
             <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
-                <span class="w-2 h-2 rounded-full {% if is_dining %}bg-orange-500{% else %}bg-mongodb-green{% endif %}"></span>
+                <span class="w-2 h-2 rounded-full {% if is_dining %}bg-orange-500{% else %}bg-premium-blue{% endif %}"></span>
                 <h2 class="text-xs font-black uppercase text-slate-700 tracking-wider">Visual Brand Presence</h2>
             </div>
 
@@ -221,7 +221,7 @@
         <!-- Block 6: Operating Hours Grid -->
         <div class="space-y-4">
             <div class="flex items-center gap-2 border-b border-slate-100 pb-3">
-                <span class="w-2 h-2 rounded-full {% if is_dining %}bg-orange-500{% else %}bg-mongodb-green{% endif %}"></span>
+                <span class="w-2 h-2 rounded-full {% if is_dining %}bg-orange-500{% else %}bg-premium-blue{% endif %}"></span>
                 <h2 class="text-xs font-black uppercase text-slate-700 tracking-wider">Weekly Operating Hours Grid</h2>
             </div>
 

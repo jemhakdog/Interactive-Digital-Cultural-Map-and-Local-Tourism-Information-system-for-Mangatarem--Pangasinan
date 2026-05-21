@@ -2,12 +2,12 @@
 
 :root {
     --bg-gray: #F8F9FA;
-    --card-purple: #D1D2F9;
+    --card-cyan: #D1F4F9;
     --card-pink: #F9D1D1;
     --card-teal: #D1F9F2;
     --card-gold: #F9E8D1;
     
-    --text-purple: #5B5D8F;
+    --text-cyan: #0E7490;
     --text-pink: #8F5B5B;
     --text-teal: #5B8F88;
     --text-gold: #8F7B5B;
@@ -26,12 +26,12 @@ body {
     display: none;
 }
 
-.event-card-purple { background: var(--card-purple); }
+.event-card-cyan { background: var(--card-cyan); }
 .event-card-pink { background: var(--card-pink); }
 .event-card-teal { background: var(--card-teal); }
 .event-card-gold { background: var(--card-gold); }
 
-.text-purple-dark { color: var(--text-purple); }
+.text-cyan-dark { color: var(--text-cyan); }
 .text-pink-dark { color: var(--text-pink); }
 .text-teal-dark { color: var(--text-teal); }
 .text-gold-dark { color: var(--text-gold); }
@@ -63,36 +63,36 @@ body {
     }
 }
 
-.event-card-purple, .event-card-pink, .event-card-teal, .event-card-gold {
+.event-card-cyan, .event-card-pink, .event-card-teal, .event-card-gold {
     animation: slideInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 /* Delay for staggered animation */
-.event-card-purple:nth-child(1) { animation-delay: 0.1s; }
+.event-card-cyan:nth-child(1) { animation-delay: 0.1s; }
 .event-card-pink:nth-child(2) { animation-delay: 0.2s; }
 .event-card-teal:nth-child(3) { animation-delay: 0.3s; }
 .event-card-gold:nth-child(4) { animation-delay: 0.4s; }
 
 /* Custom Active States */
 .category-chip.active {
-    background-color: #00E25F;
+    background-color: #0ea5e9;
     color: white;
-    box-shadow: 0 10px 20px rgba(0, 226, 95, 0.2);
+    box-shadow: 0 10px 20px rgba(14, 165, 233, 0.2);
 }
 
 .month-btn.active {
-    color: #00E25F !important;
+    color: #0ea5e9 !important;
     opacity: 1 !important;
 }
 
 .calendar-day-btn.active {
-    background-color: #00E25F !important;
+    background-color: #0ea5e9 !important;
     color: white !important;
 }
 
 /* Responsive Overrides */
 @media (min-width: 768px) {
-    .event-card-purple, .event-card-pink, .event-card-teal, .event-card-gold {
+    .event-card-cyan, .event-card-pink, .event-card-teal, .event-card-gold {
         border-radius: 40px;
     }
 }

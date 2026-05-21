@@ -13,15 +13,15 @@
         <div>
             <h1 class="text-3xl font-black text-slate-800 font-heading tracking-tight leading-tight flex items-center gap-2">
                 <span>Barangay {{ current_user.barangay.name }} Command Center</span>
-                <span class="w-2.5 h-2.5 rounded-full bg-mongodb-green inline-block animate-pulse"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-premium-blue inline-block animate-pulse"></span>
             </h1>
             <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider mt-1">
                 Stewardship of Community-Based Information System (CBIS)
             </p>
         </div>
         <div class="flex items-center gap-3">
-            <span class="bg-emerald-50 text-dark-green text-[10px] font-black px-4 py-2 rounded-full border border-emerald-100 uppercase tracking-widest shadow-sm flex items-center gap-2">
-                <span class="w-2 h-2 rounded-full bg-mongodb-green inline-block animate-ping"></span>
+            <span class="bg-sky-50 text-royal-blue text-[10px] font-black px-4 py-2 rounded-full border border-sky-100 uppercase tracking-widest shadow-sm flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-premium-blue inline-block animate-ping"></span>
                 Barangay Steward Active
             </span>
         </div>
@@ -32,12 +32,12 @@
         <!-- Total Assets Card -->
         <div class="glass-card p-6 rounded-3xl flex flex-col justify-between group">
             <div class="flex justify-between items-start">
-                <div class="p-3 bg-emerald-50 text-dark-green rounded-2xl group-hover:scale-110 transition-transform duration-300">
+                <div class="p-3 bg-sky-50 text-royal-blue rounded-2xl group-hover:scale-110 transition-transform duration-300">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                 </div>
-                <span class="text-[10px] font-black bg-emerald-500/10 text-emerald-600 px-2 py-0.5 rounded border border-emerald-500/10">Total Mapped</span>
+                <span class="text-[10px] font-black bg-sky-500/10 text-sky-600 px-2 py-0.5 rounded border border-sky-500/10">Total Mapped</span>
             </div>
             <div>
                 <p class="text-4xl font-black text-slate-800 mt-6 tracking-tighter leading-none">{{ stats.total }}</p>
@@ -95,7 +95,7 @@
                 {% if stats.rejected > 0 %}
                 <span class="text-[10px] font-black bg-rose-100 text-rose-700 px-2 py-0.5 rounded border border-rose-200">Action Required</span>
                 {% else %}
-                <span class="text-[10px] font-black bg-emerald-100 text-emerald-700 px-2 py-0.5 rounded border border-emerald-200">Clear</span>
+                <span class="text-[10px] font-black bg-sky-100 text-sky-700 px-2 py-0.5 rounded border border-sky-200">Clear</span>
                 {% endif %}
             </div>
             <div>
@@ -105,7 +105,7 @@
         </div>
 
         <!-- Total Reviews Card (Teal Accent Card) -->
-        <a href="{{ url_for('barangay.barangay_reviews') }}" class="glass-card p-6 rounded-3xl flex flex-col justify-between group hover:border-emerald-500/20 transition-all duration-300">
+        <a href="{{ url_for('barangay.barangay_reviews') }}" class="glass-card p-6 rounded-3xl flex flex-col justify-between group hover:border-sky-500/20 transition-all duration-300">
             <div class="flex justify-between items-start">
                 <div class="p-3 bg-teal-50 text-teal-600 rounded-2xl group-hover:scale-110 transition-transform duration-300">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,7 +135,7 @@
                         {% for item in recent_activity %}
                         <div class="px-8 py-5 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
                             <div class="flex items-center gap-4">
-                                <div class="w-10 h-10 rounded-xl bg-emerald-50 text-dark-green flex items-center justify-center font-bold text-lg select-none">
+                                <div class="w-10 h-10 rounded-xl bg-sky-50 text-royal-blue flex items-center justify-center font-bold text-lg select-none">
                                     {% if item.type == 'Attraction' %}🏰{% else %}📅{% endif %}
                                 </div>
                                 <div>
@@ -146,10 +146,10 @@
                             <div class="flex items-center gap-3">
                                 {% if item.status == 'approved' %}
                                     <div class="flex flex-col items-end gap-1.5">
-                                        <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-[9px] font-black uppercase rounded-full border border-emerald-200">Approved</span>
+                                        <span class="px-3 py-1 bg-sky-100 text-sky-800 text-[9px] font-black uppercase rounded-full border border-sky-200">Approved</span>
                                         {% if item.type == 'Attraction' %}
                                         <a href="{{ url_for('analytics_module.log_visitor', target_type='attraction', target_id=item.id) }}" 
-                                           class="text-[9px] font-black text-mongodb-green hover:text-dark-green uppercase hover:underline flex items-center gap-1">
+                                           class="text-[9px] font-black text-premium-blue hover:text-royal-blue uppercase hover:underline flex items-center gap-1">
                                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
                                             Log Visit
                                         </a>
@@ -179,17 +179,17 @@
         <!-- Quick Contributions & Gallery -->
         <div class="space-y-6">
             <!-- Add Attraction CTA -->
-            <div class="dark-bento-card p-8 rounded-3xl text-white shadow-xl shadow-emerald-950/20 relative overflow-hidden group">
+            <div class="dark-bento-card p-8 rounded-3xl text-white shadow-xl shadow-sky-950/20 relative overflow-hidden group">
                 <div class="absolute -right-10 -bottom-10 w-40 h-40 bg-white/5 rounded-full blur-3xl group-hover:scale-150 transition-transform duration-700"></div>
                 <h3 class="text-lg font-black tracking-tight mb-2">Contribute Heritage</h3>
                 <p class="text-slate-400 text-xs font-semibold mb-6 leading-relaxed">Map a new cultural asset or publish local events under CBIS stewardship.</p>
                 
                 <div class="space-y-3 relative z-10">
-                    <a href="{{ url_for('barangay.barangay_add_attraction') }}" class="w-full bg-mongodb-green text-dark-green py-3 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-emerald-300 transition-all shadow-md shadow-dark-green/20">
+                    <a href="{{ url_for('barangay.barangay_add_attraction') }}" class="w-full bg-premium-blue text-royal-blue py-3 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-sky-300 transition-all shadow-md shadow-royal-blue/20">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4" /></svg>
                         Add Landmark
                     </a>
-                    <a href="{{ url_for('barangay.barangay_add_event') }}" class="w-full bg-emerald-950/30 text-white border border-emerald-900/30 py-3 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-emerald-900/40 hover:border-emerald-800 transition-all">
+                    <a href="{{ url_for('barangay.barangay_add_event') }}" class="w-full bg-sky-950/30 text-white border border-sky-900/30 py-3 rounded-2xl font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 hover:bg-sky-900/40 hover:border-sky-800 transition-all">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                         Publish Event
                     </a>
@@ -200,13 +200,13 @@
             <div class="bg-white rounded-3xl p-6 border border-slate-150/80 shadow-sm">
                 <div class="flex items-center justify-between mb-4">
                     <h3 class="text-xs font-black text-slate-800 uppercase tracking-widest">Media Gallery</h3>
-                    <a href="{{ url_for('barangay.barangay_gallery') }}" class="text-[10px] font-black text-mongodb-green hover:underline">View All</a>
+                    <a href="{{ url_for('barangay.barangay_gallery') }}" class="text-[10px] font-black text-premium-blue hover:underline">View All</a>
                 </div>
                 <div class="grid grid-cols-2 gap-3">
-                    <div class="aspect-square bg-slate-50 rounded-2xl border border-slate-200 border-dashed flex items-center justify-center text-slate-300 hover:text-mongodb-green hover:border-mongodb-green hover:bg-emerald-50/10 cursor-pointer transition-all">
+                    <div class="aspect-square bg-slate-50 rounded-2xl border border-slate-200 border-dashed flex items-center justify-center text-slate-300 hover:text-premium-blue hover:border-premium-blue hover:bg-sky-50/10 cursor-pointer transition-all">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                     </div>
-                    <div class="aspect-square bg-slate-50 rounded-2xl border border-slate-200 border-dashed flex items-center justify-center text-slate-300 hover:text-mongodb-green hover:border-mongodb-green hover:bg-emerald-50/10 cursor-pointer transition-all">
+                    <div class="aspect-square bg-slate-50 rounded-2xl border border-slate-200 border-dashed flex items-center justify-center text-slate-300 hover:text-premium-blue hover:border-premium-blue hover:bg-sky-50/10 cursor-pointer transition-all">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg>
                     </div>
                 </div>

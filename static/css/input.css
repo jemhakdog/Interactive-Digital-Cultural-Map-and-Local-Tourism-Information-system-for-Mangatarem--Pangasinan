@@ -4,17 +4,17 @@
 
 @layer base {
   body {
-    @apply font-body font-light text-forest-black bg-white antialiased;
+    @apply font-body font-light text-sapphire-black bg-white antialiased;
   }
 }
 
 @layer components {
   .btn-pill-primary {
-    @apply px-10 py-3.5 rounded-full bg-mongodb-green text-black font-body font-bold text-sm transition-all duration-300 hover:scale-105 active:scale-95 border-2 border-mongodb-green shadow-xl shadow-mongodb-green/10 hover:shadow-mongodb-green/20;
+    @apply px-10 py-3.5 rounded-full bg-premium-blue text-black font-body font-bold text-sm transition-all duration-300 hover:scale-105 active:scale-95 border-2 border-premium-blue shadow-xl shadow-premium-blue/10 hover:shadow-premium-blue/20;
   }
   
   .btn-pill-secondary {
-    @apply px-10 py-3.5 rounded-full bg-deep-teal text-white font-body font-medium text-sm transition-all duration-300 hover:bg-forest-black hover:text-mongodb-green hover:border-mongodb-green/30 border-2 border-teal-gray/20 shadow-lg;
+    @apply px-10 py-3.5 rounded-full bg-deep-teal text-white font-body font-medium text-sm transition-all duration-300 hover:bg-sapphire-black hover:text-premium-blue hover:border-premium-blue/30 border-2 border-teal-gray/20 shadow-lg;
   }
 }
 
@@ -31,7 +31,7 @@
     left: 0;
     width: 100%;
     height: 2px;
-    background-color: #00ed64; /* mongodb-green */
+    background-color: #00ed64; /* premium-blue */
     transition: width 0.3s ease;
   }
 
@@ -40,7 +40,7 @@
   }
 
   .source-code-label {
-    @apply font-code text-[14px] uppercase tracking-[2px] font-medium text-mongodb-green;
+    @apply font-code text-[14px] uppercase tracking-[2px] font-medium text-premium-blue;
   }
 
   .shadow-forest {

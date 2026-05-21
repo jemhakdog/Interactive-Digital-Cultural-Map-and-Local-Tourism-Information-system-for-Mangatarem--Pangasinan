@@ -1,12 +1,12 @@
     :root {
-        --aurora-color-1: #064e3b;
-        /* emerald-900 */
-        --aurora-color-2: #065f46;
-        /* emerald-800 */
+        --aurora-color-1: #0f172a;
+        /* sky-900 */
+        --aurora-color-2: #1e293b;
+        /* sky-800 */
         --aurora-color-3: #14532d;
         /* green-900 */
-        --aurora-color-4: #022c22;
-        /* emerald-950 */
+        --aurora-color-4: #020617;
+        /* sky-950 */
     }
 
     body {

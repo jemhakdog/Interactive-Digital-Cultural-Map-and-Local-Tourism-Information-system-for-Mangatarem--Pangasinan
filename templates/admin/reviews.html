@@ -13,8 +13,8 @@
         <div>
             <div class="flex items-center gap-2 mb-2">
                 <a href="{{ url_for('admin.admin_dashboard') }}"
-                   class="text-slate-400 hover:text-dark-green flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors">
-                    <svg class="w-4 h-4 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="text-slate-400 hover:text-royal-blue flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors">
+                    <svg class="w-4 h-4 text-premium-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                     Back to Hub
@@ -34,7 +34,7 @@
         {% for s, label in [('pending','Pending'), ('approved','Approved'), ('all','All')] %}
         <a href="{{ url_for('admin.reviews_list', status=s) }}"
            class="px-5 py-2.5 rounded-2xl font-black text-[10px] uppercase tracking-wider transition-all border
-                  {% if status_filter == s %}bg-dark-green border-dark-green text-white shadow-md shadow-dark-green/10{% else %}bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-700{% endif %}">
+                  {% if status_filter == s %}bg-royal-blue border-royal-blue text-white shadow-md shadow-royal-blue/10{% else %}bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100 hover:text-slate-700{% endif %}">
             <span>{{ label }}</span>
             {% if s == 'pending' %}
             <span class="ml-1.5 bg-yellow-500 text-white text-[9px] font-black px-2 py-0.5 rounded-full border border-yellow-400">
@@ -53,7 +53,7 @@
             {% if review.status == 'pending' %}
             <div class="absolute left-0 top-0 h-full w-1.5 bg-yellow-500"></div>
             {% elif review.status == 'approved' %}
-            <div class="absolute left-0 top-0 h-full w-1.5 bg-emerald-500"></div>
+            <div class="absolute left-0 top-0 h-full w-1.5 bg-sky-500"></div>
             {% else %}
             <div class="absolute left-0 top-0 h-full w-1.5 bg-red-500"></div>
             {% endif %}
@@ -85,7 +85,7 @@
                                 <!-- Status Badge -->
                                 <span class="text-[8px] font-black uppercase tracking-wider px-2 py-0.5 rounded border
                                     {% if review.status == 'pending' %}bg-yellow-50 border-yellow-200 text-yellow-600
-                                    {% elif review.status == 'approved' %}bg-emerald-50 border-emerald-200 text-emerald-600
+                                    {% elif review.status == 'approved' %}bg-sky-50 border-sky-200 text-sky-600
                                     {% else %}bg-red-50 border-red-200 text-red-600{% endif %}">
                                     {{ review.status }}
                                 </span>
@@ -100,8 +100,8 @@
                             <!-- Attraction Location Link -->
                             <p class="text-[9px] font-black text-slate-400 uppercase tracking-wider mb-3.5">
                                 <a href="{{ url_for('attractions.detail', id=review.attraction_id) }}" target="_blank"
-                                   class="hover:text-dark-green transition-colors flex items-center gap-1">
-                                    <svg class="w-3.5 h-3.5 text-mongodb-green inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                   class="hover:text-royal-blue transition-colors flex items-center gap-1">
+                                    <svg class="w-3.5 h-3.5 text-premium-blue inline" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                                     </svg>
                                     <span>{{ review.attraction.name if review.attraction else 'Unknown Location' }}</span>
@@ -149,7 +149,7 @@
                     <div class="flex items-center gap-2 flex-shrink-0 lg:self-center">
                         {% if review.status != 'approved' %}
                         <a href="{{ url_for('admin.approve_review', id=review.id, next=request.url) }}"
-                           class="bg-emerald-500 hover:bg-emerald-600 text-white font-black text-[9px] uppercase tracking-wider px-5 py-3 rounded-xl transition-all shadow-md shadow-emerald-500/10 flex items-center gap-1.5 admin-action-btn">
+                           class="bg-sky-500 hover:bg-sky-600 text-white font-black text-[9px] uppercase tracking-wider px-5 py-3 rounded-xl transition-all shadow-md shadow-sky-500/10 flex items-center gap-1.5 admin-action-btn">
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
                             <span>Approve</span>
                         </a>

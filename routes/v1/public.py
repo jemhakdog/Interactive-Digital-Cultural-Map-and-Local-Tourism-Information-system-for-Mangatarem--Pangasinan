@@ -248,13 +248,14 @@ def barangays_v1_view():
             image_url = next((a.image_url for a in attractions if a.image_url), None)
 
         tags = sorted(list(set(a.category for a in attractions if a.category)))
-
+        
         barangay_list.append({
             "name": brgy.name,
             "image_url": image_url,
             "tags": tags,
             "attraction_count": len(attractions),
         })
+        print(barangay_list)
 
     barangay_list.sort(key=lambda x: x["name"])
         

@@ -5,17 +5,17 @@
     <!-- Header -->
     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-8">
         <div class="space-y-2">
-            <h1 class="text-4xl md:text-5xl font-black text-emerald-950 tracking-tight">
-                {{ title }} <span class="text-emerald-600">Overview</span>
+            <h1 class="text-4xl md:text-5xl font-black text-sky-950 tracking-tight">
+                {{ title }} <span class="text-sky-600">Overview</span>
             </h1>
-            <p class="text-emerald-900/40 max-w-2xl text-lg font-bold uppercase tracking-wider">
+            <p class="text-sky-900/40 max-w-2xl text-lg font-bold uppercase tracking-wider">
                 Manage all versions and assets for this document category.
             </p>
         </div>
         
         <a href="{{ back_url }}" 
-           class="px-6 py-3 bg-white border border-emerald-100 text-emerald-700 font-bold rounded-2xl transition-all duration-300 hover:bg-emerald-50 flex items-center gap-3 shadow-sm">
-            <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+           class="px-6 py-3 bg-white border border-sky-100 text-sky-700 font-bold rounded-2xl transition-all duration-300 hover:bg-sky-50 flex items-center gap-3 shadow-sm">
+            <svg class="w-5 h-5 text-sky-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
             </svg>
             <span>Back to Dashboard</span>
@@ -23,58 +23,58 @@
     </div>
 
     <!-- Files Table -->
-    <div class="bg-white border border-emerald-100 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-emerald-950/5">
+    <div class="bg-white border border-sky-100 rounded-[2.5rem] overflow-hidden shadow-2xl shadow-sky-950/5">
         <div class="overflow-x-auto">
             <table class="w-full text-left">
                 <thead>
-                    <tr class="border-b border-emerald-50 bg-emerald-50/50">
-                        <th class="px-8 py-6 text-emerald-900/40 text-[10px] font-black uppercase tracking-widest">Document Name</th>
+                    <tr class="border-b border-sky-50 bg-sky-50/50">
+                        <th class="px-8 py-6 text-sky-900/40 text-[10px] font-black uppercase tracking-widest">Document Name</th>
                         {% if is_category_view %}
-                        <th class="px-8 py-6 text-emerald-900/40 text-[10px] font-black uppercase tracking-widest">Form Type</th>
+                        <th class="px-8 py-6 text-sky-900/40 text-[10px] font-black uppercase tracking-widest">Form Type</th>
                         {% endif %}
-                        <th class="px-8 py-6 text-emerald-900/40 text-[10px] font-black uppercase tracking-widest">Last Modified</th>
-                        <th class="px-8 py-6 text-emerald-900/40 text-[10px] font-black uppercase tracking-widest">Size</th>
-                        <th class="px-8 py-6 text-emerald-900/40 text-[10px] font-black uppercase tracking-widest text-right">Actions</th>
+                        <th class="px-8 py-6 text-sky-900/40 text-[10px] font-black uppercase tracking-widest">Last Modified</th>
+                        <th class="px-8 py-6 text-sky-900/40 text-[10px] font-black uppercase tracking-widest">Size</th>
+                        <th class="px-8 py-6 text-sky-900/40 text-[10px] font-black uppercase tracking-widest text-right">Actions</th>
                     </tr>
                 </thead>
-                <tbody class="divide-y divide-emerald-50">
+                <tbody class="divide-y divide-sky-50">
                     {% for file in files %}
-                    <tr class="group hover:bg-emerald-50/30 transition-all duration-300">
+                    <tr class="group hover:bg-sky-50/30 transition-all duration-300">
                         <td class="px-8 py-6">
                             <div class="flex items-center gap-4">
-                                <div class="p-3 bg-white border border-emerald-100 rounded-xl group-hover:scale-110 transition-transform">
-                                    <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <div class="p-3 bg-white border border-sky-100 rounded-xl group-hover:scale-110 transition-transform">
+                                    <svg class="w-5 h-5 text-sky-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                     </svg>
                                 </div>
-                                <span class="text-emerald-950 font-bold">{{ file.name }}</span>
+                                <span class="text-sky-950 font-bold">{{ file.name }}</span>
                             </div>
                         </td>
                         {% if is_category_view %}
                         <td class="px-8 py-6">
-                            <span class="px-3 py-1 bg-emerald-50 border border-emerald-100 text-emerald-600 text-[10px] font-black uppercase tracking-widest rounded-lg">
+                            <span class="px-3 py-1 bg-sky-50 border border-sky-100 text-sky-600 text-[10px] font-black uppercase tracking-widest rounded-lg">
                                 {{ file.label }}
                             </span>
                         </td>
                         {% endif %}
                         <td class="px-8 py-6">
-                            <span class="text-emerald-950/60 font-medium">{{ file.updated_at }}</span>
+                            <span class="text-sky-950/60 font-medium">{{ file.updated_at }}</span>
                         </td>
                         <td class="px-8 py-6">
-                            <span class="text-emerald-900/40 text-xs font-mono">{{ file.size }}</span>
+                            <span class="text-sky-900/40 text-xs font-mono">{{ file.size }}</span>
                         </td>
                         <td class="px-8 py-6 text-right">
                             <div class="flex justify-end gap-3">
                                 <a href="{{ url_for('admin.admin_document_create', slug=file.slug) }}" 
-                                   class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black rounded-xl uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/20">
+                                   class="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-[10px] font-black rounded-xl uppercase tracking-widest transition-all shadow-lg shadow-sky-500/20">
                                     Rapid Create
                                 </a>
                                 <a href="{{ url_for('admin.admin_document_edit', slug=file.slug) }}" 
-                                   class="px-5 py-2.5 bg-white border border-emerald-100 text-emerald-600 text-[10px] font-black rounded-xl uppercase tracking-widest hover:bg-emerald-50 transition-all shadow-sm">
+                                   class="px-5 py-2.5 bg-white border border-sky-100 text-sky-600 text-[10px] font-black rounded-xl uppercase tracking-widest hover:bg-sky-50 transition-all shadow-sm">
                                     Edit Struct
                                 </a>
                                 <a href="{{ url_for('admin.admin_document_export', slug=file.slug) }}" 
-                                   class="p-2.5 bg-white border border-emerald-100 hover:border-amber-500/50 text-amber-600 rounded-xl transition-all shadow-sm" title="Export .docx">
+                                   class="p-2.5 bg-white border border-sky-100 hover:border-amber-500/50 text-amber-600 rounded-xl transition-all shadow-sm" title="Export .docx">
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                     </svg>

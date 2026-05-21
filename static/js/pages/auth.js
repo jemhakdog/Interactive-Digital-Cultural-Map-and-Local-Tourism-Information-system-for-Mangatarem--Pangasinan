@@ -26,10 +26,11 @@
                 var textType = isRegister ? 'signup_with' : 'signin_with';
                 var containerWidth = document.getElementById('google-btn-container').offsetWidth;
                 var width = Math.min(isRegister ? 400 : 384, containerWidth);
+                var theme = window.innerWidth >= 1024 ? 'outline' : 'filled_black';
 
                 btn.innerHTML = '';
                 google.accounts.id.renderButton(btn, {
-                    type: 'standard', shape: 'pill', theme: 'filled_black',
+                    type: 'standard', shape: 'pill', theme: theme,
                     text: textType, size: 'large', logo_alignment: 'left',
                     width: width
                 });

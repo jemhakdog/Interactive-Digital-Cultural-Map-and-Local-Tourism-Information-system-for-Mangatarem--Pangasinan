@@ -5,12 +5,12 @@
     <!-- Breadcrumbs/Sub-header -->
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
-            <h2 class="text-3xl font-black text-emerald-950 font-heading">Document <span class="bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent underline underline-offset-8 decoration-emerald-200">Vault</span></h2>
-            <p class="text-emerald-900/40 font-medium text-sm mt-2 uppercase tracking-[0.2em]">Tourism Data Architecture & Form Management</p>
+            <h2 class="text-3xl font-black text-sky-950 font-heading">Document <span class="bg-gradient-to-r from-sky-600 to-teal-600 bg-clip-text text-transparent underline underline-offset-8 decoration-sky-200">Vault</span></h2>
+            <p class="text-sky-900/40 font-medium text-sm mt-2 uppercase tracking-[0.2em]">Tourism Data Architecture & Form Management</p>
         </div>
         <div class="flex gap-4">
             <div class="relative">
-                <button onclick="toggleRapidCreate(event)" class="px-6 py-3 bg-emerald-600 text-white font-bold rounded-2xl hover:bg-emerald-700 transition-all flex items-center gap-2 shadow-lg shadow-emerald-500/20">
+                <button onclick="toggleRapidCreate(event)" class="px-6 py-3 bg-sky-600 text-white font-bold rounded-2xl hover:bg-sky-700 transition-all flex items-center gap-2 shadow-lg shadow-sky-500/20">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                     </svg>
@@ -19,19 +19,19 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M19 9l-7 7-7-7"></path>
                     </svg>
                 </button>
-                <div id="rapid-create-dropdown" class="absolute right-0 top-full mt-3 w-72 bg-white border border-emerald-100 rounded-3xl shadow-2xl z-[110] hidden animate-fade-in p-2">
-                    <div class="text-[10px] font-black text-emerald-900/30 uppercase tracking-[0.2em] px-4 py-3">Select Heritage Template</div>
+                <div id="rapid-create-dropdown" class="absolute right-0 top-full mt-3 w-72 bg-white border border-sky-100 rounded-3xl shadow-2xl z-[110] hidden animate-fade-in p-2">
+                    <div class="text-[10px] font-black text-sky-900/30 uppercase tracking-[0.2em] px-4 py-3">Select Heritage Template</div>
                     <div class="space-y-1">
                         {% for form in forms %}
-                        <a href="{{ url_for('admin.admin_document_create', slug=form.slug) }}" class="flex items-center gap-4 px-4 py-3 hover:bg-emerald-50 rounded-2xl transition-all group/item">
-                            <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600 group-hover/item:bg-emerald-500 group-hover/item:text-white transition-all">
+                        <a href="{{ url_for('admin.admin_document_create', slug=form.slug) }}" class="flex items-center gap-4 px-4 py-3 hover:bg-sky-50 rounded-2xl transition-all group/item">
+                            <div class="w-10 h-10 bg-sky-50 rounded-xl flex items-center justify-center text-sky-600 group-hover/item:bg-sky-500 group-hover/item:text-white transition-all">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                 </svg>
                             </div>
                             <div>
-                                <div class="text-sm font-black text-emerald-950">{{ form.label }}</div>
-                                <div class="text-[10px] font-bold text-emerald-900/40 uppercase tracking-wider">{{ form.category }}</div>
+                                <div class="text-sm font-black text-sky-950">{{ form.label }}</div>
+                                <div class="text-[10px] font-bold text-sky-900/40 uppercase tracking-wider">{{ form.category }}</div>
                             </div>
                         </a>
                         {% endfor %}
@@ -39,14 +39,14 @@
                 </div>
             </div>
              <button data-action="open-modal" data-modal-id="import-modal"
-                    class="px-6 py-3 bg-white border border-emerald-100 text-emerald-700 font-bold rounded-2xl hover:bg-emerald-50 transition-all flex items-center gap-2 shadow-sm">
+                    class="px-6 py-3 bg-white border border-sky-100 text-sky-700 font-bold rounded-2xl hover:bg-sky-50 transition-all flex items-center gap-2 shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                 </svg>
                 Import
             </button>
             <a href="{{ url_for('admin.admin_documents_export_all') }}" 
-               class="px-6 py-3 bg-white border border-emerald-100 text-emerald-700 font-bold rounded-2xl hover:bg-emerald-50 transition-all flex items-center gap-2 shadow-sm">
+               class="px-6 py-3 bg-white border border-sky-100 text-sky-700 font-bold rounded-2xl hover:bg-sky-50 transition-all flex items-center gap-2 shadow-sm">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                 </svg>
@@ -58,25 +58,25 @@
     <!-- Folders Section -->
     <section>
         <div class="flex items-center justify-between mb-8">
-            <h3 class="text-xl font-black text-emerald-950 flex items-center gap-3">
-                <span class="w-2 h-8 bg-emerald-500 rounded-full"></span>
+            <h3 class="text-xl font-black text-sky-950 flex items-center gap-3">
+                <span class="w-2 h-8 bg-sky-500 rounded-full"></span>
                 Form Categories
             </h3>
-            <div class="flex items-center gap-2 text-emerald-600/50 font-bold text-xs uppercase tracking-widest">
+            <div class="flex items-center gap-2 text-sky-600/50 font-bold text-xs uppercase tracking-widest">
                 <span>{{ folders|length }} Folders</span>
             </div>
         </div>
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {% for folder in folders %}
-            <a href="{{ url_for('admin.admin_document_category_files', category_name=folder.name) }}" class="glass-card-light p-8 rounded-[2.5rem] group hover:scale-[1.03] hover:shadow-2xl hover:shadow-emerald-500/10 transition-all duration-500 cursor-pointer relative overflow-hidden block">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-500/5 rounded-full -mr-16 -mt-16 group-hover:bg-emerald-500/10 transition-colors"></div>
+            <a href="{{ url_for('admin.admin_document_category_files', category_name=folder.name) }}" class="glass-card-light p-8 rounded-[2.5rem] group hover:scale-[1.03] hover:shadow-2xl hover:shadow-sky-500/10 transition-all duration-500 cursor-pointer relative overflow-hidden block">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-sky-500/5 rounded-full -mr-16 -mt-16 group-hover:bg-sky-500/10 transition-colors"></div>
                 <div class="relative z-10">
                     <div class="w-16 h-16 bg-white rounded-[1.5rem] shadow-sm flex items-center justify-center mb-6 group-hover:rotate-6 transition-transform duration-500">
-                        <svg class="w-8 h-8 text-emerald-500" fill="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-8 h-8 text-sky-500" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"></path>
                         </svg>
                     </div>
-                    <h4 class="text-xl font-black text-emerald-950 mb-2 truncate group-hover:text-emerald-600 transition-colors">{{ folder.name }}</h4>
+                    <h4 class="text-xl font-black text-sky-950 mb-2 truncate group-hover:text-sky-600 transition-colors">{{ folder.name }}</h4>
                     <p class="text-gray-400 font-bold text-[10px] uppercase tracking-widest">{{ folder.count }} Structures • {{ folder.total_size }}</p>
                 </div>
             </a>
@@ -89,26 +89,26 @@
         <!-- Recent Structures -->
         <div class="lg:col-span-8">
             <div class="flex items-center justify-between mb-8">
-                <h3 class="text-xl font-black text-emerald-950 flex items-center gap-3">
+                <h3 class="text-xl font-black text-sky-950 flex items-center gap-3">
                     <span class="w-2 h-8 bg-teal-500 rounded-full"></span>
                     Recent Activity
                 </h3>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {% for item in recent %}
-                <div class="bg-white border border-emerald-100 rounded-[2rem] p-6 hover:border-emerald-500/50 hover:shadow-xl transition-all group">
+                <div class="bg-white border border-sky-100 rounded-[2rem] p-6 hover:border-sky-500/50 hover:shadow-xl transition-all group">
                     <div class="flex items-start justify-between mb-4">
-                        <div class="p-3 bg-emerald-50 rounded-2xl text-emerald-500 group-hover:scale-110 transition-transform">
+                        <div class="p-3 bg-sky-50 rounded-2xl text-sky-500 group-hover:scale-110 transition-transform">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
                         </div>
-                        <span class="text-[8px] font-black uppercase tracking-widest text-emerald-300">{{ item.updated_at }}</span>
+                        <span class="text-[8px] font-black uppercase tracking-widest text-sky-300">{{ item.updated_at }}</span>
                     </div>
-                    <h5 class="font-black text-emerald-950 truncate mb-1">{{ item.label }}</h5>
+                    <h5 class="font-black text-sky-950 truncate mb-1">{{ item.label }}</h5>
                     <p class="text-[10px] font-bold text-gray-400 tracking-wider">DOCX ARCHIVE • {{ item.size }}</p>
                     <div class="mt-4 flex gap-2">
-                        <a href="{{ url_for('admin.admin_document_edit', slug=item.slug) if item.slug else '#' }}" class="text-[10px] font-black text-emerald-600 uppercase tracking-widest hover:text-emerald-700">Open Editor</a>
+                        <a href="{{ url_for('admin.admin_document_edit', slug=item.slug) if item.slug else '#' }}" class="text-[10px] font-black text-sky-600 uppercase tracking-widest hover:text-sky-700">Open Editor</a>
                     </div>
                 </div>
                 {% endfor %}
@@ -117,18 +117,18 @@
 
         <!-- Local Filters/Stats -->
         <div class="lg:col-span-4">
-            <div class="bg-emerald-950 rounded-[2.5rem] p-8 text-white relative overflow-hidden group h-full flex flex-col justify-center shadow-2xl">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full -mr-32 -mt-32"></div>
+            <div class="bg-sky-950 rounded-[2.5rem] p-8 text-white relative overflow-hidden group h-full flex flex-col justify-center shadow-2xl">
+                <div class="absolute top-0 right-0 w-64 h-64 bg-sky-500/10 blur-[80px] rounded-full -mr-32 -mt-32"></div>
                 <div class="relative z-10">
                     <h4 class="text-2xl font-black mb-2 font-heading">Vault Health</h4>
-                    <p class="text-emerald-400/60 text-sm font-medium mb-8">System data integrity is optimal</p>
+                    <p class="text-sky-400/60 text-sm font-medium mb-8">System data integrity is optimal</p>
                     <div class="space-y-6">
                         <div class="flex justify-between items-end">
-                            <span class="text-xs font-bold uppercase tracking-widest text-emerald-400">Sync Status</span>
+                            <span class="text-xs font-bold uppercase tracking-widest text-sky-400">Sync Status</span>
                             <span class="text-sm font-black">100% Validated</span>
                         </div>
                         <div class="w-full h-1.5 bg-white/10 rounded-full overflow-hidden">
-                            <div class="w-[100%] h-full bg-emerald-400 shadow-[0_0_15px_rgba(52,211,153,0.5)]"></div>
+                            <div class="w-[100%] h-full bg-sky-400 shadow-[0_0_15px_rgba(52,211,153,0.5)]"></div>
                         </div>
                     </div>
                 </div>
@@ -139,7 +139,7 @@
     <!-- Rapid Entry Records Section (NEW) -->
     <section>
         <div class="flex items-center justify-between mb-8">
-            <h3 class="text-xl font-black text-emerald-950 flex items-center gap-3">
+            <h3 class="text-xl font-black text-sky-950 flex items-center gap-3">
                 <span class="w-2 h-8 bg-amber-500 rounded-full"></span>
                 Structured Records
             </h3>
@@ -160,7 +160,7 @@
                             <div class="p-1.5 bg-amber-50 rounded-md text-amber-400 group-hover/item:bg-amber-500 group-hover/item:text-white">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                             </div>
-                            <div class="text-[11px] font-black text-emerald-950">{{ form.label }}</div>
+                            <div class="text-[11px] font-black text-sky-950">{{ form.label }}</div>
                         </a>
                         {% endfor %}
                     </div>
@@ -183,10 +183,10 @@
                         <span class="block text-[10px] font-bold text-gray-400">{{ record.created_at.strftime('%b %d, %H:%M') }}</span>
                     </div>
                 </div>
-                <h4 class="text-lg font-black text-emerald-950 mb-4 truncate">{{ record.name_of_asset or "Unnamed Asset" }}</h4>
+                <h4 class="text-lg font-black text-sky-950 mb-4 truncate">{{ record.name_of_asset or "Unnamed Asset" }}</h4>
                 <div class="flex gap-2">
                     <a href="{{ url_for('admin.admin_document_record_edit', record_id=record.id) }}" 
-                       class="flex-1 text-center py-2 bg-emerald-50 text-emerald-600 text-[10px] font-black rounded-xl uppercase tracking-widest hover:bg-emerald-100 transition-all">
+                       class="flex-1 text-center py-2 bg-sky-50 text-sky-600 text-[10px] font-black rounded-xl uppercase tracking-widest hover:bg-sky-100 transition-all">
                         Edit Record
                     </a>
                     <a href="{{ url_for('admin.admin_heritage_export_docx', profile_id=record.id) }}" 
@@ -198,8 +198,8 @@
             {% endfor %}
         </div>
         {% else %}
-        <div class="bg-white/50 border border-dashed border-emerald-100 rounded-[2.5rem] p-12 text-center">
-            <p class="text-emerald-900/40 font-bold uppercase tracking-widest text-sm">No structured records found yet.</p>
+        <div class="bg-white/50 border border-dashed border-sky-100 rounded-[2.5rem] p-12 text-center">
+            <p class="text-sky-900/40 font-bold uppercase tracking-widest text-sm">No structured records found yet.</p>
             <p class="text-gray-400 text-xs mt-2">Use the "Rapid Create" button in the asset overview below to start.</p>
         </div>
         {% endif %}
@@ -208,19 +208,19 @@
     <!-- All Files Section -->
     <section>
         <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
-            <h3 class="text-xl font-black text-emerald-950 flex items-center gap-3">
+            <h3 class="text-xl font-black text-sky-950 flex items-center gap-3">
                 <span class="w-2 h-8 bg-blue-500 rounded-full"></span>
                 Data Assets Overview
             </h3>
             <!-- Search Bar Mini -->
             <div class="relative w-full md:w-80 group">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                    <svg class="w-4 h-4 text-emerald-500/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-sky-500/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
                     </svg>
                 </div>
                 <input type="text" id="doc-search" placeholder="Search structures..." 
-                       class="w-full bg-white border border-emerald-100 rounded-2xl pl-10 pr-4 py-3 text-sm text-emerald-950 placeholder-emerald-900/30 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500/50 transition-all shadow-sm">
+                       class="w-full bg-white border border-sky-100 rounded-2xl pl-10 pr-4 py-3 text-sm text-sky-950 placeholder-sky-900/30 focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500/50 transition-all shadow-sm">
             </div>
         </div>
 
@@ -228,59 +228,59 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left">
                     <thead>
-                        <tr class="bg-emerald-50/50">
-                            <th class="px-10 py-6 text-emerald-900/40 text-[10px] font-black uppercase tracking-widest">Title & Category</th>
-                            <th class="px-10 py-6 text-emerald-900/40 text-[10px] font-black uppercase tracking-widest text-center">Structure</th>
-                            <th class="px-10 py-6 text-emerald-900/40 text-[10px] font-black uppercase tracking-widest">Files</th>
-                            <th class="px-10 py-6 text-emerald-900/40 text-[10px] font-black uppercase tracking-widest text-right">Actions</th>
+                        <tr class="bg-sky-50/50">
+                            <th class="px-10 py-6 text-sky-900/40 text-[10px] font-black uppercase tracking-widest">Title & Category</th>
+                            <th class="px-10 py-6 text-sky-900/40 text-[10px] font-black uppercase tracking-widest text-center">Structure</th>
+                            <th class="px-10 py-6 text-sky-900/40 text-[10px] font-black uppercase tracking-widest">Files</th>
+                            <th class="px-10 py-6 text-sky-900/40 text-[10px] font-black uppercase tracking-widest text-right">Actions</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-emerald-50/50" id="docs-list-body">
+                    <tbody class="divide-y divide-sky-50/50" id="docs-list-body">
                         {% for form in forms %}
-                        <tr class="document-row group hover:bg-emerald-50/30 transition-all duration-300" data-label="{{ form.label|lower }}" data-category="{{ form.category|lower }}">
+                        <tr class="document-row group hover:bg-sky-50/30 transition-all duration-300" data-label="{{ form.label|lower }}" data-category="{{ form.category|lower }}">
                             <td class="px-10 py-8">
                                 <div class="flex items-center gap-4">
-                                    <div class="p-3 bg-white rounded-2xl shadow-sm text-emerald-600 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
+                                    <div class="p-3 bg-white rounded-2xl shadow-sm text-sky-600 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-500">
                                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                                         </svg>
                                     </div>
                                     <div class="min-w-0">
-                                        <span class="text-[9px] font-black text-emerald-500 uppercase tracking-widest">{{ form.category }}</span>
-                                        <h4 class="text-base font-black text-emerald-950 group-hover:text-emerald-600 transition-colors truncate">{{ form.label }}</h4>
+                                        <span class="text-[9px] font-black text-sky-500 uppercase tracking-widest">{{ form.category }}</span>
+                                        <h4 class="text-base font-black text-sky-950 group-hover:text-sky-600 transition-colors truncate">{{ form.label }}</h4>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-10 py-8">
                                 <div class="flex justify-center gap-6">
                                     <div class="text-center">
-                                        <span class="block text-xl font-black text-emerald-950">{{ form.para_count }}</span>
+                                        <span class="block text-xl font-black text-sky-950">{{ form.para_count }}</span>
                                         <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">PARAS</span>
                                     </div>
                                     <div class="text-center">
-                                        <span class="block text-xl font-black text-emerald-900">{{ form.table_count }}</span>
+                                        <span class="block text-xl font-black text-sky-900">{{ form.table_count }}</span>
                                         <span class="text-[9px] font-bold text-gray-400 uppercase tracking-tighter">TABLES</span>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-10 py-8">
                                 <div class="flex items-center gap-2">
-                                    <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
-                                    <span class="text-sm font-bold text-emerald-950">{{ form.file_count }} versions</span>
+                                    <div class="w-2 h-2 rounded-full bg-sky-500 animate-pulse"></div>
+                                    <span class="text-sm font-bold text-sky-950">{{ form.file_count }} versions</span>
                                 </div>
                             </td>
                             <td class="px-10 py-8">
                                 <div class="flex justify-end gap-3">
                                     <a href="{{ url_for('admin.admin_document_create', slug=form.slug) }}" 
-                                       class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black rounded-xl uppercase tracking-widest transition-all shadow-lg shadow-emerald-500/10">
+                                       class="px-5 py-2.5 bg-sky-600 hover:bg-sky-700 text-white text-[10px] font-black rounded-xl uppercase tracking-widest transition-all shadow-lg shadow-sky-500/10">
                                         Rapid Create
                                     </a>
                                     <a href="{{ url_for('admin.admin_document_edit', slug=form.slug) }}" 
-                                       class="px-5 py-2.5 bg-white border border-emerald-100 text-emerald-600 text-[10px] font-black rounded-xl uppercase tracking-widest hover:bg-emerald-50 transition-all shadow-sm">
+                                       class="px-5 py-2.5 bg-white border border-sky-100 text-sky-600 text-[10px] font-black rounded-xl uppercase tracking-widest hover:bg-sky-50 transition-all shadow-sm">
                                         Edit Struct
                                     </a>
                                     <a href="{{ url_for('admin.admin_document_files', slug=form.slug) }}" 
-                                       class="p-2.5 bg-white border border-emerald-100 text-emerald-600 rounded-xl hover:bg-emerald-50 transition-all shadow-sm" title="Explore Versioning">
+                                       class="p-2.5 bg-white border border-sky-100 text-sky-600 rounded-xl hover:bg-sky-50 transition-all shadow-sm" title="Explore Versioning">
                                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                                         </svg>
@@ -296,14 +296,14 @@
     </section>
 
     <!-- Import Modal (Premium Refinement) -->
-    <div id="import-modal" class="fixed inset-0 bg-emerald-950/80 backdrop-blur-md z-[100] flex items-center justify-center hidden p-6 animate-fade-in group/modal">
+    <div id="import-modal" class="fixed inset-0 bg-sky-950/80 backdrop-blur-md z-[100] flex items-center justify-center hidden p-6 animate-fade-in group/modal">
         <div class="bg-white rounded-[3rem] p-12 w-full max-w-2xl shadow-[0_50px_100px_-20px_rgba(6,78,59,0.3)] relative overflow-hidden">
-            <div class="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 blur-[100px] rounded-full -mr-40 -mt-40"></div>
+            <div class="absolute top-0 right-0 w-80 h-80 bg-sky-500/10 blur-[100px] rounded-full -mr-40 -mt-40"></div>
             
             <div class="relative">
                 <div class="flex justify-between items-center mb-12">
-                    <h2 class="text-3xl font-black text-emerald-900 tracking-tight font-heading">Import <span class="text-emerald-500 underline underline-offset-4 decoration-emerald-200">Asset</span></h2>
-                    <button data-action="close-modal" data-modal-id="import-modal" class="p-3 bg-gray-50 hover:bg-gray-100 rounded-2xl text-gray-400 hover:text-emerald-950 transition-all">
+                    <h2 class="text-3xl font-black text-sky-900 tracking-tight font-heading">Import <span class="text-sky-500 underline underline-offset-4 decoration-sky-200">Asset</span></h2>
+                    <button data-action="close-modal" data-modal-id="import-modal" class="p-3 bg-gray-50 hover:bg-gray-100 rounded-2xl text-gray-400 hover:text-sky-950 transition-all">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -312,20 +312,20 @@
 
                 <form action="{{ url_for('admin.admin_document_import') }}" method="POST" enctype="multipart/form-data" class="space-y-10">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                    <div class="group/file relative h-64 rounded-[2.5rem] border-2 border-dashed border-emerald-100 hover:border-emerald-500 hover:bg-emerald-50 transition-all flex flex-col items-center justify-center gap-6 cursor-pointer overflow-hidden">
+                    <div class="group/file relative h-64 rounded-[2.5rem] border-2 border-dashed border-sky-100 hover:border-sky-500 hover:bg-sky-50 transition-all flex flex-col items-center justify-center gap-6 cursor-pointer overflow-hidden">
                         <input type="file" name="docx_file" class="absolute inset-0 opacity-0 cursor-pointer" id="fileInput" data-action="update-file-name">
-                        <div class="w-20 h-20 bg-emerald-500 text-white rounded-3xl flex items-center justify-center shadow-2xl shadow-emerald-500/40 group-hover/file:scale-110 transition-transform duration-500">
+                        <div class="w-20 h-20 bg-sky-500 text-white rounded-3xl flex items-center justify-center shadow-2xl shadow-sky-500/40 group-hover/file:scale-110 transition-transform duration-500">
                             <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                             </svg>
                         </div>
                         <div class="text-center">
-                            <p id="fileName" class="text-xl font-black text-emerald-950">Draft .docx structure</p>
+                            <p id="fileName" class="text-xl font-black text-sky-950">Draft .docx structure</p>
                             <p class="text-gray-400 font-bold text-xs uppercase tracking-widest mt-2">Maximum file size: 10MB</p>
                         </div>
                     </div>
 
-                    <button type="submit" class="w-full py-6 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-2xl uppercase tracking-[0.2em] transition-all shadow-[0_20px_40px_rgba(5,150,105,0.3)] active:scale-[0.98] flex items-center justify-center gap-4">
+                    <button type="submit" class="w-full py-6 bg-sky-600 hover:bg-sky-700 text-white font-black rounded-2xl uppercase tracking-[0.2em] transition-all shadow-[0_20px_40px_rgba(5,150,105,0.3)] active:scale-[0.98] flex items-center justify-center gap-4">
                         <span>Initiate Upload</span>
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7l5 5m0 0l-5 5m5-5H6"></path>

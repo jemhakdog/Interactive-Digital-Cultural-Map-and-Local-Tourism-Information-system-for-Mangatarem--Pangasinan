@@ -75,11 +75,11 @@
             Visions of <span class="text-primary-400 drop-shadow-[0_0_15px_rgba(52,211,153,0.3)]">Mangatarem</span>
         </h1>
         <p class="text-lg md:text-xl font-light mb-10 max-w-2xl mx-auto opacity-80 leading-relaxed font-sans">
-            Explore the emerald soul of our town through the eyes of those who call it home.
+            Explore the sky soul of our town through the eyes of those who call it home.
         </p>
         <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button data-action="open-modal" data-modal-id="upload-modal"
-                class="btn-premium group relative bg-white text-emerald-950 px-10 py-4 rounded-full font-bold text-base hover:shadow-2xl hover:shadow-emerald-500/20 transition-all duration-300 flex items-center gap-3">
+                class="btn-premium group relative bg-white text-sky-950 px-10 py-4 rounded-full font-bold text-base hover:shadow-2xl hover:shadow-sky-500/20 transition-all duration-300 flex items-center gap-3">
                 <svg class="w-5 h-5 group-hover:translate-y-[-2px] transition-transform" fill="none"
                     stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
@@ -108,17 +108,17 @@
                 <div
                     class="flex items-center p-1 bg-gray-100 rounded-2xl w-full xl:w-auto overflow-x-auto no-scrollbar">
                     <button
-                        class="filter-btn active px-6 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 bg-white text-emerald-900 shadow-sm"
+                        class="filter-btn active px-6 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 bg-white text-sky-900 shadow-sm"
                         data-filter="all">
                         All Stories
                     </button>
                     <button
-                        class="filter-btn px-6 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 text-gray-500 hover:text-emerald-800"
+                        class="filter-btn px-6 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 text-gray-500 hover:text-sky-800"
                         data-filter="photo">
                         Heritage Photos
                     </button>
                     <button
-                        class="filter-btn px-6 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 text-gray-500 hover:text-emerald-800"
+                        class="filter-btn px-6 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 text-gray-500 hover:text-sky-800"
                         data-filter="video">
                         Documentaries
                     </button>
@@ -128,13 +128,13 @@
                 <div class="flex flex-col sm:flex-row items-center gap-4 w-full xl:w-auto">
                     <div class="relative w-full sm:w-64 group">
                         <select id="barangay-filter"
-                            class="appearance-none w-full bg-white px-5 py-3 rounded-xl border border-gray-200 text-sm font-semibold focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 outline-none transition-all cursor-pointer">
+                            class="appearance-none w-full bg-white px-5 py-3 rounded-xl border border-gray-200 text-sm font-semibold focus:ring-4 focus:ring-sky-500/5 focus:border-sky-500 outline-none transition-all cursor-pointer">
                             <option value="all">Everywhere in Mangatarem</option>
                             {% for barangay in barangays %}
                             <option value="{{ barangay }}">{{ barangay }}</option>
                             {% endfor %}
                         </select>
-                        <svg class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-emerald-500 transition-colors"
+                        <svg class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-sky-500 transition-colors"
                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path d="M19 9l-7 7-7-7" stroke-width="2.5" stroke-linecap="round"
                                 stroke-linejoin="round" />
@@ -143,11 +143,11 @@
 
                     <div class="relative w-full sm:w-56 group">
                         <select id="sort-filter"
-                            class="appearance-none w-full bg-white px-5 py-3 rounded-xl border border-gray-200 text-sm font-semibold focus:ring-4 focus:ring-emerald-500/5 focus:border-emerald-500 outline-none transition-all cursor-pointer">
+                            class="appearance-none w-full bg-white px-5 py-3 rounded-xl border border-gray-200 text-sm font-semibold focus:ring-4 focus:ring-sky-500/5 focus:border-sky-500 outline-none transition-all cursor-pointer">
                             <option value="newest">Latest Uploads</option>
                             <option value="oldest">Time Capsule</option>
                         </select>
-                        <svg class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-emerald-500 transition-colors"
+                        <svg class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-sky-500 transition-colors"
                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path d="M19 9l-7 7-7-7" stroke-width="2.5" stroke-linecap="round"
                                 stroke-linejoin="round" />
@@ -177,7 +177,7 @@
                 </div>
                 {% else %}
                 <div
-                    class="relative w-full aspect-[3/4] sm:aspect-video flex items-center justify-center overflow-hidden bg-emerald-950">
+                    class="relative w-full aspect-[3/4] sm:aspect-video flex items-center justify-center overflow-hidden bg-sky-950">
                     <video src="{{ item.url }}" loop muted playsinline
                         class="w-full h-full object-cover opacity-60 group-hover:opacity-100 transition duration-700"></video>
                     <div class="absolute inset-0 flex items-center justify-center">
@@ -224,8 +224,8 @@
         <!-- Cinematic Empty State -->
         <div class="flex flex-col items-center justify-center py-24 text-center max-w-xl mx-auto staggered-entry">
             <div
-                class="w-24 h-24 bg-emerald-50 rounded-3xl rotate-12 flex items-center justify-center mb-8 border border-emerald-100 shadow-inner">
-                <svg class="w-10 h-10 text-emerald-300 -rotate-12" fill="none" stroke="currentColor"
+                class="w-24 h-24 bg-sky-50 rounded-3xl rotate-12 flex items-center justify-center mb-8 border border-sky-100 shadow-inner">
+                <svg class="w-10 h-10 text-sky-300 -rotate-12" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
                         d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
@@ -236,7 +236,7 @@
             <p class="text-gray-500 mb-10 leading-relaxed font-medium">There are currently no media entries. Be the
                 first to immortalize our heritage by contributing your photos or videos.</p>
             <button data-action="open-modal" data-modal-id="upload-modal"
-                class="bg-emerald-950 text-white px-10 py-3.5 rounded-full font-bold hover:shadow-xl hover:shadow-emerald-950/20 transition-all duration-300">
+                class="bg-sky-950 text-white px-10 py-3.5 rounded-full font-bold hover:shadow-xl hover:shadow-sky-950/20 transition-all duration-300">
                 Submit First Entry
             </button>
         </div>
@@ -252,9 +252,12 @@
     <div class="absolute top-0 inset-x-0 p-6 flex justify-between items-center z-50">
         <div class="flex items-center gap-3">
             <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10">
-                <img src="/static/images/logo-icon.png" alt="Logo" class="w-6 h-6 object-contain opacity-50"
-                    onerror="this.classList.add('hidden')">
-                <span class="text-white/40 font-bold text-lg">M</span>
+                <svg class="w-6 h-6 opacity-80" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 3C12 3 7.5 7.5 7.5 12C7.5 16.5 12 21 12 21C12 21 16.5 16.5 16.5 12C16.5 7.5 12 3 12 3Z" stroke="#D4AF37" stroke-width="1.5" stroke-linejoin="round" />
+                    <path d="M12 21V12" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" />
+                    <path d="M12 12C12 12 9.5 9.5 7.5 12" stroke="#38bdf8" stroke-width="1.2" stroke-linecap="round" />
+                    <path d="M12 15C12 15 14.5 12.5 16.5 12" stroke="#38bdf8" stroke-width="1.2" stroke-linecap="round" />
+                </svg>
             </div>
             <div class="text-white/40 text-[10px] font-bold uppercase tracking-[0.2em]">GoMangatarem Cinema</div>
         </div>
@@ -307,11 +310,11 @@
 
 <!-- Modern Contributor Modal -->
 <div id="upload-modal"
-    class="fixed inset-0 z-[100] bg-emerald-950/40 hidden flex items-center justify-center backdrop-blur-md transition-all">
+    class="fixed inset-0 z-[100] bg-sky-950/40 hidden flex items-center justify-center backdrop-blur-md transition-all">
     <div
         class="bg-white rounded-[2.5rem] p-12 max-w-md w-full mx-4 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] transform transition-all relative">
         <button data-action="close-modal" data-modal-id="upload-modal"
-            class="absolute top-8 right-8 p-2 text-gray-400 hover:text-emerald-950 transition-colors">
+            class="absolute top-8 right-8 p-2 text-gray-400 hover:text-sky-950 transition-colors">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -319,7 +322,7 @@
 
         <div class="text-center mb-10">
             <div
-                class="w-20 h-20 bg-emerald-50 rounded-3xl flex items-center justify-center mx-auto mb-6 text-emerald-600">
+                class="w-20 h-20 bg-sky-50 rounded-3xl flex items-center justify-center mx-auto mb-6 text-sky-600">
                 <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z">
@@ -330,24 +333,24 @@
             <p class="text-gray-500 font-medium">Verification Required</p>
         </div>
 
-        <div class="bg-emerald-50/50 rounded-3xl p-6 mb-10 border border-emerald-100 flex items-start gap-4">
-            <span class="text-emerald-600 mt-1">
+        <div class="bg-sky-50/50 rounded-3xl p-6 mb-10 border border-sky-100 flex items-start gap-4">
+            <span class="text-sky-600 mt-1">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
             </span>
-            <p class="text-sm text-emerald-900 leading-relaxed font-medium">To maintain the highest level of archival
+            <p class="text-sm text-sky-900 leading-relaxed font-medium">To maintain the highest level of archival
                 integrity, contributions are currently limited to verified barangay curators.</p>
         </div>
 
         <div class="space-y-4">
             <a href="{{ url_for('auth.login') }}"
-                class="flex items-center justify-center bg-emerald-950 text-white py-4 rounded-2xl font-bold hover:bg-emerald-900 shadow-xl shadow-emerald-950/10 transition-all duration-300">
+                class="flex items-center justify-center bg-sky-950 text-white py-4 rounded-2xl font-bold hover:bg-sky-900 shadow-xl shadow-sky-950/10 transition-all duration-300">
                 Sign In to Contribute
             </a>
             <button data-action="close-modal" data-modal-id="upload-modal"
-                class="w-full py-4 text-emerald-600 font-bold hover:text-emerald-800 transition-colors">
+                class="w-full py-4 text-sky-600 font-bold hover:text-sky-800 transition-colors">
                 Return to Gallery
             </button>
         </div>

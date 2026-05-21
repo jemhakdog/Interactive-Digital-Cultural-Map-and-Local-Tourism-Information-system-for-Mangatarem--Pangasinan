@@ -4,10 +4,10 @@
 
 /* Custom marker cluster styling */
 .custom-cluster {
-    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
     border: 3px solid #fff;
     border-radius: 50%;
-    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+    box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -42,9 +42,9 @@
 
 .tracking-active {
     background-color: #ecfdf5 !important;
-    color: #059669 !important;
-    border-color: #10b981 !important;
-    box-shadow: 0 0 15px rgba(16, 185, 129, 0.3) !important;
+    color: #0284c7 !important;
+    border-color: #0ea5e9 !important;
+    box-shadow: 0 0 15px rgba(14, 165, 233, 0.3) !important;
 }
 
 .custom-marker-icon:hover {
@@ -128,7 +128,7 @@
 .leaflet-control-zoom-in,
 .leaflet-control-zoom-out {
     background-color: #fff !important;
-    color: #064e3b !important;
+    color: #0f172a !important;
     border: 1px solid #ecfdf5 !important;
     width: 36px !important;
     height: 36px !important;
@@ -140,7 +140,7 @@
 .leaflet-control-zoom-in:hover,
 .leaflet-control-zoom-out:hover {
     background-color: #ecfdf5 !important;
-    color: #059669 !important;
+    color: #0284c7 !important;
 }
 
 .leaflet-control-zoom-in {
@@ -173,7 +173,7 @@
     left: 50%;
     width: 0;
     height: 3px;
-    background: #059669;
+    background: #0284c7;
     transition: all 0.3s ease;
     transform: translateX(-50%);
 }
@@ -185,9 +185,9 @@
 /* Filter button active state */
 /* Filter button active state */
 .filter-btn.active {
-    background-color: #059669 !important; /* emerald-600 */
+    background-color: #0284c7 !important; /* sky-600 */
     color: white !important;
-    border-color: #059669 !important;
+    border-color: #0284c7 !important;
     box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
 }
 
@@ -237,7 +237,7 @@
 }
 
 .absolute.top-4.left-4.z-\[400\] button:hover {
-    background: rgba(16, 185, 129, 0.1) !important;
+    background: rgba(14, 165, 233, 0.1) !important;
 }
 
 /* Morphing Sidebar Transition */

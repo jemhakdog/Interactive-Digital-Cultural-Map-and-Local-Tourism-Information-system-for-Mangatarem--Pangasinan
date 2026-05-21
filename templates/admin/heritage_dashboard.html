@@ -13,8 +13,8 @@
         <div>
             <div class="flex items-center gap-2 mb-2">
                 <a href="{{ url_for('admin.admin_dashboard') }}"
-                   class="text-slate-400 hover:text-dark-green flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors">
-                    <svg class="w-4 h-4 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="text-slate-400 hover:text-royal-blue flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors">
+                    <svg class="w-4 h-4 text-premium-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                     Back to Hub
@@ -36,11 +36,11 @@
             <div>
                 <div class="flex justify-between items-start mb-4">
                     <div class="min-w-0 pr-2">
-                        <span class="text-[9px] font-black uppercase tracking-wider text-dark-green bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100 mb-1 inline-block">{{ stat.form }}</span>
+                        <span class="text-[9px] font-black uppercase tracking-wider text-royal-blue bg-sky-50 px-2 py-0.5 rounded border border-sky-100 mb-1 inline-block">{{ stat.form }}</span>
                         <h3 class="text-sm font-black text-slate-800 tracking-tight leading-tight">{{ stat.label }}</h3>
                     </div>
                     <div class="p-2.5 bg-slate-50 border border-slate-200 text-slate-500 rounded-2xl group-hover:scale-110 transition-transform">
-                        <svg class="w-5 h-5 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg class="w-5 h-5 text-premium-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             {% if stat.slug == 'natural' %}
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3L2 12h3v8h14v-8h3L12 3z"/>
                             {% elif stat.slug == 'intangible' %}
@@ -62,9 +62,9 @@
                         <span class="block text-base font-black text-slate-800 leading-none">{{ stat.total }}</span>
                         <span class="text-[8px] font-black uppercase text-slate-400 tracking-wider mt-1 block">Total</span>
                     </div>
-                    <div class="text-center p-2.5 bg-emerald-50/50 border border-emerald-100 rounded-xl">
-                        <span class="block text-base font-black text-emerald-600 leading-none">{{ stat.approved }}</span>
-                        <span class="text-[8px] font-black uppercase text-emerald-500 tracking-wider mt-1 block">Approved</span>
+                    <div class="text-center p-2.5 bg-sky-50/50 border border-sky-100 rounded-xl">
+                        <span class="block text-base font-black text-sky-600 leading-none">{{ stat.approved }}</span>
+                        <span class="text-[8px] font-black uppercase text-sky-500 tracking-wider mt-1 block">Approved</span>
                     </div>
                     <div class="text-center p-2.5 bg-yellow-50/50 border border-yellow-100 rounded-xl">
                         <span class="block text-base font-black text-yellow-600 leading-none">{{ stat.pending }}</span>
@@ -80,9 +80,9 @@
                     Manage Roster
                 </a>
                 <a href="{{ url_for('admin.admin_heritage_add', heritage_type=stat.slug) }}" 
-                   class="p-2.5 bg-dark-green hover:bg-emerald-900 text-white rounded-xl transition-colors flex items-center justify-center cursor-pointer"
+                   class="p-2.5 bg-royal-blue hover:bg-sky-900 text-white rounded-xl transition-colors flex items-center justify-center cursor-pointer"
                    title="Add record">
-                    <svg class="w-4 h-4 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-4 h-4 text-premium-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v16m8-8H4"></path>
                     </svg>
                 </a>
@@ -119,8 +119,8 @@
                         </td>
                         <td class="px-6 py-5 text-center align-middle">
                             {% if config.has_coords %}
-                            <span class="inline-flex items-center gap-1 bg-emerald-50 text-emerald-600 border border-emerald-100 px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-wider">
-                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                            <span class="inline-flex items-center gap-1 bg-sky-50 text-sky-600 border border-sky-100 px-2.5 py-1 rounded-full text-[8px] font-black uppercase tracking-wider">
+                                <span class="w-1.5 h-1.5 rounded-full bg-sky-500 animate-pulse"></span>
                                 Active Layer
                             </span>
                             {% else %}
@@ -129,7 +129,7 @@
                             </span>
                             {% endif %}
                         </td>
-                        <td class="px-6 py-5 text-xs font-mono text-emerald-700 align-middle">
+                        <td class="px-6 py-5 text-xs font-mono text-sky-700 align-middle">
                             {{ config.name_field }}
                         </td>
                         <td class="px-8 py-5 text-right align-middle">

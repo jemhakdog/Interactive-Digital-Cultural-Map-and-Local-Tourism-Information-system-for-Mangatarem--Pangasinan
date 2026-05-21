@@ -6,12 +6,12 @@
 {% block content %}
 <section class="min-h-screen bg-heritage-cream paper-texture pb-16">
     <!-- Hero -->
-    <div class="relative h-64 md:h-80 bg-emerald-900/40 bg-cover bg-center"
+    <div class="relative h-64 md:h-80 bg-sky-900/40 bg-cover bg-center"
         {% if establishment.cover_image_url %}style="background-image: url('{{ establishment.cover_image_url }}')"{% endif %}>
-        <div class="absolute inset-0 bg-gradient-to-t from-emerald-950/90 via-emerald-950/40 to-transparent"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-sky-950/90 via-sky-950/40 to-transparent"></div>
         <div class="absolute bottom-0 left-0 right-0 px-4 pb-8">
             <div class="container mx-auto max-w-5xl">
-                <a href="{{ url_for('business.index') }}" class="text-emerald-300 hover:text-white text-sm font-medium inline-flex items-center gap-1 mb-4">← Back to Directory</a>
+                <a href="{{ url_for('business.index') }}" class="text-sky-300 hover:text-white text-sm font-medium inline-flex items-center gap-1 mb-4">← Back to Directory</a>
                 <div class="flex items-end gap-4">
                     {% if establishment.logo_url %}
                     <img src="{{ establishment.logo_url }}" alt="{{ establishment.name }} logo"
@@ -19,7 +19,7 @@
                         loading="lazy" decoding="async">
                     {% endif %}
                     <div>
-                        <span class="text-emerald-300 text-xs font-bold uppercase tracking-widest">
+                        <span class="text-sky-300 text-xs font-bold uppercase tracking-widest">
                             {% if establishment.type == 'inn' %}🏨 Inn / Lodge{% elif establishment.type == 'restaurant' %}🍽️ Restaurant{% elif establishment.type == 'cafe' %}☕ Café{% elif establishment.type == 'fastfood' %}🍔 Fast Food{% endif %}
                         </span>
                         <h1 class="text-3xl md:text-4xl font-bold text-white font-display tracking-tight mt-1">{{ establishment.name }}</h1>
@@ -35,8 +35,8 @@
             <div class="lg:col-span-2 space-y-8">
                 <!-- Description -->
                 {% if establishment.description %}
-                <div class="bg-white border border-emerald-900/5 rounded-3xl p-6 shadow-sm">
-                    <h2 class="text-lg font-bold text-emerald-800 mb-3 font-display">About</h2>
+                <div class="bg-white border border-sky-900/5 rounded-3xl p-6 shadow-sm">
+                    <h2 class="text-lg font-bold text-sky-800 mb-3 font-display">About</h2>
                     <p class="text-teal-gray leading-relaxed">{{ establishment.description }}</p>
                 </div>
                 {% endif %}
@@ -44,10 +44,10 @@
                 <!-- Rooms Section (for inns) -->
                 {% if establishment.type == 'inn' and rooms %}
                 <div>
-                    <h2 class="text-xl font-bold text-forest-black font-display mb-5">Available Rooms</h2>
+                    <h2 class="text-xl font-bold text-sapphire-black font-display mb-5">Available Rooms</h2>
                     <div class="space-y-4">
                         {% for room in rooms %}
-                        <div class="bg-white border border-emerald-900/5 rounded-3xl overflow-hidden shadow-sm">
+                        <div class="bg-white border border-sky-900/5 rounded-3xl overflow-hidden shadow-sm">
                             <div class="flex flex-col md:flex-row">
                                 {% if room.image_urls and room.image_urls|length > 0 %}
                                 <div class="md:w-48 h-40 md:h-auto bg-cover bg-center flex-shrink-0 img-skeleton">
@@ -58,8 +58,8 @@
                                 {% endif %}
                                 <div class="p-5 flex-1">
                                     <div class="flex items-start justify-between mb-2">
-                                        <h3 class="text-forest-black font-bold text-lg">{{ room.name }}</h3>
-                                        <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ 'bg-emerald-50 text-emerald-700' if room.is_available else 'bg-red-50 text-red-700' }}">
+                                        <h3 class="text-sapphire-black font-bold text-lg">{{ room.name }}</h3>
+                                        <span class="text-xs font-bold px-2.5 py-1 rounded-full {{ 'bg-sky-50 text-sky-700' if room.is_available else 'bg-red-50 text-red-700' }}">
                                             {{ 'Available' if room.is_available else 'Full' }}
                                         </span>
                                     </div>
@@ -68,14 +68,14 @@
                                     {% endif %}
                                     <div class="flex items-center gap-4 mb-3">
                                         {% if room.price_per_night %}
-                                        <span class="text-emerald-800 font-bold text-lg">₱{{ "%.0f"|format(room.price_per_night) }}<span class="text-sm font-normal text-teal-gray/50">/night</span></span>
+                                        <span class="text-sky-800 font-bold text-lg">₱{{ "%.0f"|format(room.price_per_night) }}<span class="text-sm font-normal text-teal-gray/50">/night</span></span>
                                         {% endif %}
                                         <span class="text-teal-gray text-sm">👤 {{ room.capacity }} guest{{ 's' if room.capacity != 1 }}</span>
                                     </div>
                                     {% if room.amenities %}
                                     <div class="flex flex-wrap gap-1">
                                         {% for a in room.amenities %}
-                                        <span class="text-xs bg-emerald-50 text-emerald-750 px-2 py-1 rounded-md font-medium">{{ a|replace('_', ' ')|title }}</span>
+                                        <span class="text-xs bg-sky-50 text-sky-750 px-2 py-1 rounded-md font-medium">{{ a|replace('_', ' ')|title }}</span>
                                         {% endfor %}
                                     </div>
                                     {% endif %}
@@ -90,16 +90,16 @@
                 <!-- Menu Section (for restaurants/cafes) -->
                 {% if establishment.type in ['restaurant', 'cafe', 'fastfood'] and menu_items %}
                 <div>
-                    <h2 class="text-xl font-bold text-forest-black font-display mb-5">Menu Highlights</h2>
+                    <h2 class="text-xl font-bold text-sapphire-black font-display mb-5">Menu Highlights</h2>
                     {% set ns = namespace(current_cat='') %}
                     {% for item in menu_items %}
                     {% if item.category != ns.current_cat %}
                     {% set ns.current_cat = item.category %}
-                    <h3 class="text-emerald-850 font-bold text-sm uppercase tracking-wider mt-6 mb-3">
+                    <h3 class="text-sky-850 font-bold text-sm uppercase tracking-wider mt-6 mb-3">
                         {% if item.category == 'main' %}🍛 Main Course{% elif item.category == 'appetizer' %}🥗 Appetizer{% elif item.category == 'dessert' %}🍰 Dessert{% elif item.category == 'drinks' %}🥤 Drinks{% elif item.category == 'snacks' %}🍟 Snacks{% else %}📋 {{ item.category|title }}{% endif %}
                     </h3>
                     {% endif %}
-                    <div class="bg-white border border-emerald-900/5 rounded-2xl p-4 mb-3 shadow-sm flex items-center gap-4">
+                    <div class="bg-white border border-sky-900/5 rounded-2xl p-4 mb-3 shadow-sm flex items-center gap-4">
                         {% if item.image_url %}
                         <div class="w-16 h-16 rounded-lg overflow-hidden img-skeleton flex-shrink-0">
                             <img src="{{ item.image_url }}" alt="{{ item.name }}"
@@ -109,12 +109,12 @@
                         {% endif %}
                         <div class="flex-1 min-w-0">
                             <div class="flex items-start justify-between gap-2">
-                                <h4 class="text-forest-black font-medium truncate">
+                                <h4 class="text-sapphire-black font-medium truncate">
                                     {{ item.name }}
                                     {% if item.is_bestseller %}<span class="text-amber-400 text-xs ml-1">⭐</span>{% endif %}
                                 </h4>
                                 {% if item.price %}
-                                <span class="text-emerald-800 font-bold whitespace-nowrap">₱{{ "%.0f"|format(item.price) }}</span>
+                                <span class="text-sky-800 font-bold whitespace-nowrap">₱{{ "%.0f"|format(item.price) }}</span>
                                 {% endif %}
                             </div>
                             {% if item.description %}
@@ -128,7 +128,7 @@
 
                 <!-- Reviews -->
                 <div>
-                    <h2 class="text-xl font-bold text-forest-black font-display mb-5">
+                    <h2 class="text-xl font-bold text-sapphire-black font-display mb-5">
                         Reviews
                         {% if establishment.review_count > 0 %}
                         <span class="text-teal-gray/60 text-sm font-normal">({{ establishment.review_count }})</span>
@@ -138,14 +138,14 @@
                     {% if reviews %}
                     <div class="space-y-4">
                         {% for review in reviews %}
-                        <div class="bg-white border border-emerald-900/5 rounded-2xl p-5 shadow-sm">
+                        <div class="bg-white border border-sky-900/5 rounded-2xl p-5 shadow-sm">
                             <div class="flex items-center justify-between mb-2">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-9 h-9 rounded-full bg-emerald-50 flex items-center justify-center">
-                                        <span class="text-emerald-800 font-bold text-xs">{{ review.user.username[0]|upper }}</span>
+                                    <div class="w-9 h-9 rounded-full bg-sky-50 flex items-center justify-center">
+                                        <span class="text-sky-800 font-bold text-xs">{{ review.user.username[0]|upper }}</span>
                                     </div>
                                     <div>
-                                        <p class="text-forest-black text-sm font-medium">{{ review.user.username }}</p>
+                                        <p class="text-sapphire-black text-sm font-medium">{{ review.user.username }}</p>
                                         <p class="text-teal-gray/60 text-xs">{{ review.created_at.strftime('%b %d, %Y') }}</p>
                                     </div>
                                 </div>
@@ -167,14 +167,14 @@
 
                     <!-- Review Form -->
                     {% if current_user.is_authenticated and current_user.role == 'user' %}
-                    <div class="bg-white border border-emerald-900/5 rounded-3xl p-6 shadow-sm mt-6">
-                        <h3 class="text-forest-black font-bold mb-4 font-display text-lg">Leave a Review</h3>
+                    <div class="bg-white border border-sky-900/5 rounded-3xl p-6 shadow-sm mt-6">
+                        <h3 class="text-sapphire-black font-bold mb-4 font-display text-lg">Leave a Review</h3>
                         <form method="POST" action="{{ url_for('business.submit_review', id=establishment.id) }}" class="space-y-4">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                             <div>
-                                <label class="block text-sm font-bold text-emerald-800 mb-2">Rating</label>
+                                <label class="block text-sm font-bold text-sky-800 mb-2">Rating</label>
                                 <select name="rating" required
-                                    class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-forest-black text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600">
+                                    class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sapphire-black text-sm focus:outline-none focus:ring-2 focus:ring-sky-600/20 focus:border-sky-600">
                                     <option value="5">⭐⭐⭐⭐⭐ Excellent</option>
                                     <option value="4">⭐⭐⭐⭐ Great</option>
                                     <option value="3">⭐⭐⭐ Good</option>
@@ -183,11 +183,11 @@
                                 </select>
                             </div>
                             <div>
-                                <label class="block text-sm font-bold text-emerald-800 mb-2">Comment</label>
+                                <label class="block text-sm font-bold text-sky-800 mb-2">Comment</label>
                                 <textarea name="comment" rows="3" placeholder="Share your experience..."
-                                    class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-forest-black placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/20 focus:border-emerald-600"></textarea>
+                                    class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-3 text-sapphire-black placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-sky-600/20 focus:border-sky-600"></textarea>
                             </div>
-                            <button type="submit" class="bg-emerald-800 hover:bg-emerald-700 text-white font-bold py-2.5 px-5 rounded-xl transition-all text-sm shadow-sm cursor-pointer">
+                            <button type="submit" class="bg-sky-800 hover:bg-sky-700 text-white font-bold py-2.5 px-5 rounded-xl transition-all text-sm shadow-sm cursor-pointer">
                                 Submit Review
                             </button>
                         </form>
@@ -204,14 +204,14 @@
                     <button id="toggle-favorite" 
                             data-id="{{ establishment.id }}" 
                             data-type="establishment"
-                            class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border transition-all font-bold text-sm {{ 'bg-red-500/20 border-red-500/50 text-red-300' if is_favorite else 'bg-emerald-900/30 border-white/10 text-emerald-100/70 hover:border-red-500/30 hover:bg-red-500/10' }}">
+                            class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border transition-all font-bold text-sm {{ 'bg-red-500/20 border-red-500/50 text-red-300' if is_favorite else 'bg-sky-900/30 border-white/10 text-sky-100/70 hover:border-red-500/30 hover:bg-red-500/10' }}">
                         <svg class="w-4 h-4 {{ 'fill-current' if is_favorite else 'fill-none stroke-current' }}" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                         </svg>
                         {{ 'Saved' if is_favorite else 'Favorite' }}
                     </button>
                     <button id="open-visit-modal" 
-                            class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border bg-emerald-900/30 border-white/10 text-emerald-100/70 hover:border-emerald-500/30 hover:bg-emerald-500/10 transition-all font-bold text-sm">
+                            class="flex-1 flex items-center justify-center gap-2 py-3 rounded-xl border bg-sky-900/30 border-white/10 text-sky-100/70 hover:border-sky-500/30 hover:bg-sky-500/10 transition-all font-bold text-sm">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                         </svg>
@@ -221,19 +221,19 @@
                 {% endif %}
 
                 <!-- Quick Info -->
-                <div class="bg-white border border-emerald-900/5 rounded-3xl p-6 shadow-sm">
-                    <h2 class="text-lg font-bold text-forest-black mb-4 font-display">Details</h2>
+                <div class="bg-white border border-sky-900/5 rounded-3xl p-6 shadow-sm">
+                    <h2 class="text-lg font-bold text-sapphire-black mb-4 font-display">Details</h2>
                     <div class="space-y-4 text-sm">
                         {% if establishment.rating_avg > 0 %}
                         <div class="flex items-center gap-3">
                             <span class="text-amber-400">★</span>
-                            <span class="text-forest-black font-bold">{{ "%.1f"|format(establishment.rating_avg) }}</span>
+                            <span class="text-sapphire-black font-bold">{{ "%.1f"|format(establishment.rating_avg) }}</span>
                             <span class="text-teal-gray/70">({{ establishment.review_count }} review{{ 's' if establishment.review_count != 1 }})</span>
                         </div>
                         {% endif %}
                         {% if establishment.price_range %}
                         <div class="flex items-center gap-3">
-                            <span class="text-emerald-800 w-5">💰</span>
+                            <span class="text-sky-800 w-5">💰</span>
                             <span class="text-teal-gray font-medium">
                                 {% if establishment.price_range == 'budget' %}Budget Friendly{% elif establishment.price_range == 'moderate' %}Moderate{% elif establishment.price_range == 'premium' %}Premium{% endif %}
                             </span>
@@ -241,26 +241,26 @@
                         {% endif %}
                         {% if establishment.address %}
                         <div class="flex items-start gap-3">
-                            <span class="text-emerald-800 w-5 mt-0.5">📍</span>
+                            <span class="text-sky-800 w-5 mt-0.5">📍</span>
                             <span class="text-teal-gray">{{ establishment.address }}</span>
                         </div>
                         {% endif %}
                         {% if establishment.contact_number %}
                         <div class="flex items-center gap-3">
-                            <span class="text-emerald-800 w-5">📞</span>
-                            <a href="tel:{{ establishment.contact_number }}" class="text-emerald-800 hover:text-emerald-700 font-medium">{{ establishment.contact_number }}</a>
+                            <span class="text-sky-800 w-5">📞</span>
+                            <a href="tel:{{ establishment.contact_number }}" class="text-sky-800 hover:text-sky-700 font-medium">{{ establishment.contact_number }}</a>
                         </div>
                         {% endif %}
                         {% if establishment.email %}
                         <div class="flex items-center gap-3">
-                            <span class="text-emerald-800 w-5">✉️</span>
-                            <a href="mailto:{{ establishment.email }}" class="text-emerald-800 hover:text-emerald-700 font-medium truncate">{{ establishment.email }}</a>
+                            <span class="text-sky-800 w-5">✉️</span>
+                            <a href="mailto:{{ establishment.email }}" class="text-sky-800 hover:text-sky-700 font-medium truncate">{{ establishment.email }}</a>
                         </div>
                         {% endif %}
                         {% if establishment.website %}
                         <div class="flex items-center gap-3">
-                            <span class="text-emerald-800 w-5">🌐</span>
-                            <a href="{{ establishment.website }}" target="_blank" class="text-emerald-800 hover:text-emerald-700 font-medium truncate">Visit Website</a>
+                            <span class="text-sky-800 w-5">🌐</span>
+                            <a href="{{ establishment.website }}" target="_blank" class="text-sky-800 hover:text-sky-700 font-medium truncate">Visit Website</a>
                         </div>
                         {% endif %}
                     </div>
@@ -268,12 +268,12 @@
 
                 <!-- Amenities -->
                 {% if establishment.amenities %}
-                <div class="bg-white border border-emerald-900/5 rounded-3xl p-6 shadow-sm">
-                    <h2 class="text-lg font-bold text-forest-black mb-4 font-display">Amenities</h2>
+                <div class="bg-white border border-sky-900/5 rounded-3xl p-6 shadow-sm">
+                    <h2 class="text-lg font-bold text-sapphire-black mb-4 font-display">Amenities</h2>
                     <div class="flex flex-wrap gap-2">
                         {% set amenity_icons = {'wifi': '📶', 'parking': '🅿️', 'aircon': '❄️', 'pool': '🏊', 'tv': '📺', 'kitchen': '🍳', 'pet_friendly': '🐕', 'wheelchair': '♿'} %}
                         {% for a in establishment.amenities %}
-                        <span class="text-sm bg-emerald-50 text-emerald-800 border border-emerald-950/5 px-3 py-1.5 rounded-xl font-medium">
+                        <span class="text-sm bg-sky-50 text-sky-800 border border-sky-950/5 px-3 py-1.5 rounded-xl font-medium">
                             {{ amenity_icons.get(a, '✓') }} {{ a|replace('_', ' ')|title }}
                         </span>
                         {% endfor %}
@@ -283,14 +283,14 @@
 
                 <!-- Operating Hours -->
                 {% if establishment.operating_hours %}
-                <div class="bg-white border border-emerald-900/5 rounded-3xl p-6 shadow-sm">
-                    <h2 class="text-lg font-bold text-forest-black mb-4 font-display">Hours</h2>
+                <div class="bg-white border border-sky-900/5 rounded-3xl p-6 shadow-sm">
+                    <h2 class="text-lg font-bold text-sapphire-black mb-4 font-display">Hours</h2>
                     <div class="space-y-2 text-sm">
                         {% set day_names = {'mon': 'Monday', 'tue': 'Tuesday', 'wed': 'Wednesday', 'thu': 'Thursday', 'fri': 'Friday', 'sat': 'Saturday', 'sun': 'Sunday'} %}
                         {% for day, hours in establishment.operating_hours.items() %}
                         <div class="flex justify-between">
                             <span class="text-teal-gray/70">{{ day_names.get(day, day) }}</span>
-                            <span class="text-forest-black font-medium">{{ hours }}</span>
+                            <span class="text-sapphire-black font-medium">{{ hours }}</span>
                         </div>
                         {% endfor %}
                     </div>
@@ -298,15 +298,15 @@
                 {% endif %}
 
                 <!-- Map -->
-                <div class="bg-white border border-emerald-900/5 rounded-3xl overflow-hidden shadow-sm">
+                <div class="bg-white border border-sky-900/5 rounded-3xl overflow-hidden shadow-sm">
                     <div id="establishment-map" 
                          class="h-48 w-full"
                          data-lng="{{ establishment.longitude }}"
                          data-lat="{{ establishment.latitude }}"
                          data-access-token="{{ config.get('MAPBOX_ACCESS_TOKEN', '') }}"></div>
-                    <div class="p-4 border-t border-emerald-900/5 bg-gray-50/50">
+                    <div class="p-4 border-t border-sky-900/5 bg-gray-50/50">
                         <a href="https://www.google.com/maps?q={{ establishment.latitude }},{{ establishment.longitude }}" target="_blank"
-                             class="text-emerald-800 hover:text-emerald-700 font-medium text-sm">
+                             class="text-sky-800 hover:text-sky-700 font-medium text-sm">
                              Open in Google Maps →
                         </a>
                     </div>

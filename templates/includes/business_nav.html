@@ -1,5 +1,5 @@
 <a href="{{ url_for('business.dashboard') }}"
-    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-emerald-400 font-bold' if request.endpoint == 'business.dashboard' else 'text-gray-300 hover:text-emerald-400' }}">
+    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-sky-400 font-bold' if request.endpoint == 'business.dashboard' else 'text-gray-300 hover:text-sky-400' }}">
     <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor"
         viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -10,7 +10,7 @@
 </a>
 
 <a href="{{ url_for('business.browse_peers') }}"
-    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-emerald-400 font-bold' if request.endpoint == 'business.browse_peers' else 'text-gray-300 hover:text-emerald-400' }}">
+    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-sky-400 font-bold' if request.endpoint == 'business.browse_peers' else 'text-gray-300 hover:text-sky-400' }}">
     <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor"
         viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -21,7 +21,7 @@
 </a>
 
 <a href="{{ url_for('business.index') }}"
-    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-emerald-400 font-bold' if request.endpoint == 'business.index' else 'text-gray-300 hover:text-emerald-400' }}">
+    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-sky-400 font-bold' if request.endpoint == 'business.index' else 'text-gray-300 hover:text-sky-400' }}">
     <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor"
         viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -32,7 +32,7 @@
 </a>
 
 <a href="{{ url_for('public.map_view') }}"
-    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-emerald-400 font-bold' if request.endpoint == 'public.map_view' else 'text-gray-300 hover:text-emerald-400' }}">
+    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-sky-400 font-bold' if request.endpoint == 'public.map_view' else 'text-gray-300 hover:text-sky-400' }}">
     <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor"
         viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -43,7 +43,7 @@
 </a>
 
 <div class="flex items-center gap-4 ml-4 pl-4 border-l border-gray-700">
-    <span class="text-emerald-400 text-xs font-bold uppercase tracking-wider">
+    <span class="text-sky-400 text-xs font-bold uppercase tracking-wider">
         {{ current_user.username }}
     </span>
     <a href="{{ url_for('auth.logout') }}"

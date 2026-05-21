@@ -13,8 +13,8 @@
         <div>
             <div class="flex items-center gap-2 mb-2">
                 <a href="{{ url_for('admin.admin_dashboard') }}"
-                   class="text-slate-400 hover:text-dark-green flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors">
-                    <svg class="w-4 h-4 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="text-slate-400 hover:text-royal-blue flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors">
+                    <svg class="w-4 h-4 text-premium-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                     Back to Hub
@@ -52,7 +52,7 @@
                     <input type="date" name="end_date" value="{{ end_date or '' }}" class="bg-transparent text-xs font-bold text-slate-800 outline-none w-32 border-none focus:ring-0 p-0">
                 </div>
                 <div class="flex gap-2 w-full sm:w-auto">
-                    <button type="submit" class="flex-1 sm:flex-initial bg-dark-green hover:bg-emerald-900 text-white font-black text-[10px] uppercase tracking-wider px-6 py-3.5 rounded-2xl transition-all shadow-md active:scale-95 cursor-pointer">
+                    <button type="submit" class="flex-1 sm:flex-initial bg-royal-blue hover:bg-sky-900 text-white font-black text-[10px] uppercase tracking-wider px-6 py-3.5 rounded-2xl transition-all shadow-md active:scale-95 cursor-pointer">
                         Apply
                     </button>
                     {% if start_date or end_date %}
@@ -70,13 +70,13 @@
         <!-- Stats Card 1 -->
         <div class="glass-card p-6 rounded-3xl flex flex-col justify-between group hover:scale-[1.02] transition-all duration-300">
             <div class="flex justify-between items-start">
-                <div class="p-3 bg-emerald-50 text-dark-green rounded-2xl group-hover:scale-110 transition-transform">
+                <div class="p-3 bg-sky-50 text-royal-blue rounded-2xl group-hover:scale-110 transition-transform">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 01-9-3.812M13.712 11.288a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0z" />
                     </svg>
                 </div>
                 <a href="{{ url_for('admin.export_visits', target_type=current_type, target_id=current_id, start_date=start_date, end_date=end_date) }}"
-                   class="text-[9px] font-black text-emerald-600 bg-emerald-50 border border-emerald-100 px-3 py-1 rounded-full uppercase tracking-wider hover:bg-emerald-600 hover:text-white transition-all">
+                   class="text-[9px] font-black text-sky-600 bg-sky-50 border border-sky-100 px-3 py-1 rounded-full uppercase tracking-wider hover:bg-sky-600 hover:text-white transition-all">
                     Export CSV
                 </a>
             </div>
@@ -128,7 +128,7 @@
                         <h3 class="text-base font-black text-slate-800 tracking-tight">Landmark Popularity Index</h3>
                         <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Explorer interest vs. Physical check-ins</p>
                     </div>
-                    <span class="bg-emerald-50 text-emerald-700 text-[9px] font-black uppercase px-3 py-1 rounded-full border border-emerald-100 tracking-wider">Top 5 Places</span>
+                    <span class="bg-sky-50 text-sky-700 text-[9px] font-black uppercase px-3 py-1 rounded-full border border-sky-100 tracking-wider">Top 5 Places</span>
                 </div>
                 
                 <div class="w-full relative h-[320px]">
@@ -146,48 +146,48 @@
                 <div class="space-y-4">
                     <!-- Export 1: Visitor Logs -->
                     <a href="{{ url_for('admin.export_visits', target_type=current_type, target_id=current_id, start_date=start_date, end_date=end_date) }}"
-                       class="flex items-center justify-between p-4 bg-slate-50 hover:bg-emerald-50/50 rounded-2xl border border-slate-200 group hover:border-emerald-600/20 hover:scale-[1.01] transition-all">
+                       class="flex items-center justify-between p-4 bg-slate-50 hover:bg-sky-50/50 rounded-2xl border border-slate-200 group hover:border-sky-600/20 hover:scale-[1.01] transition-all">
                         <div class="flex items-center gap-3">
-                            <div class="p-2.5 bg-emerald-50 text-dark-green rounded-xl group-hover:scale-105 transition-transform">
+                            <div class="p-2.5 bg-sky-50 text-royal-blue rounded-xl group-hover:scale-105 transition-transform">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 01-9-3.812M13.712 11.288a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0z" stroke-width="2"/></svg>
                             </div>
                             <div class="text-left">
-                                <p class="text-xs font-black text-slate-800 group-hover:text-emerald-700 transition-colors">Visitor Registry Logs</p>
+                                <p class="text-xs font-black text-slate-800 group-hover:text-sky-700 transition-colors">Visitor Registry Logs</p>
                                 <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-0.5">{% if start_date or end_date %}Filtered Period{% else %}All-time record{% endif %}</p>
                             </div>
                         </div>
-                        <svg class="w-5 h-5 text-slate-300 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg class="w-5 h-5 text-slate-300 group-hover:text-sky-600 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </a>
 
                     {% if current_user.role == 'admin' %}
                     <!-- Export 2: Page Views Traffic -->
                     <a href="{{ url_for('admin.export_page_views', start_date=start_date, end_date=end_date) }}"
-                       class="flex items-center justify-between p-4 bg-slate-50 hover:bg-emerald-50/50 rounded-2xl border border-slate-200 group hover:border-emerald-600/20 hover:scale-[1.01] transition-all">
+                       class="flex items-center justify-between p-4 bg-slate-50 hover:bg-sky-50/50 rounded-2xl border border-slate-200 group hover:border-sky-600/20 hover:scale-[1.01] transition-all">
                         <div class="flex items-center gap-3">
                             <div class="p-2.5 bg-blue-50 text-blue-700 rounded-xl group-hover:scale-105 transition-transform">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" stroke-width="2"/><path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" stroke-width="2"/></svg>
                             </div>
                             <div class="text-left">
-                                <p class="text-xs font-black text-slate-800 group-hover:text-emerald-700 transition-colors">Web Traffic Analytics</p>
+                                <p class="text-xs font-black text-slate-800 group-hover:text-sky-700 transition-colors">Web Traffic Analytics</p>
                                 <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-0.5">{% if start_date or end_date %}Filtered Period{% else %}All-time record{% endif %}</p>
                             </div>
                         </div>
-                        <svg class="w-5 h-5 text-slate-300 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg class="w-5 h-5 text-slate-300 group-hover:text-sky-600 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </a>
 
                     <!-- Export 3: Destination Insights -->
                     <a href="{{ url_for('admin.export_destination_insights') }}"
-                       class="flex items-center justify-between p-4 bg-slate-50 hover:bg-emerald-50/50 rounded-2xl border border-slate-200 group hover:border-emerald-600/20 hover:scale-[1.01] transition-all">
+                       class="flex items-center justify-between p-4 bg-slate-50 hover:bg-sky-50/50 rounded-2xl border border-slate-200 group hover:border-sky-600/20 hover:scale-[1.01] transition-all">
                         <div class="flex items-center gap-3">
                             <div class="p-2.5 bg-amber-50 text-amber-700 rounded-xl group-hover:scale-105 transition-transform">
                                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-width="2"/></svg>
                             </div>
                             <div class="text-left">
-                                <p class="text-xs font-black text-slate-800 group-hover:text-emerald-700 transition-colors">Destination Performance</p>
+                                <p class="text-xs font-black text-slate-800 group-hover:text-sky-700 transition-colors">Destination Performance</p>
                                 <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-0.5">Aggregated tourism metrics</p>
                             </div>
                         </div>
-                        <svg class="w-5 h-5 text-slate-300 group-hover:text-emerald-600 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        <svg class="w-5 h-5 text-slate-300 group-hover:text-sky-600 group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </a>
                     {% else %}
                     <div class="p-4 bg-slate-50 rounded-2xl text-center border border-dashed border-slate-200">
@@ -205,7 +205,7 @@
         {% if current_user.role in ['contributor', 'business_owner', 'admin'] %}
         <div class="lg:col-span-1 glass-card p-6 md:p-8 rounded-[2rem] h-fit">
             <h3 class="text-lg font-black text-slate-800 mb-6 flex items-center">
-                <span class="w-8 h-8 rounded-lg bg-emerald-50 text-dark-green border border-emerald-100 flex items-center justify-center mr-3">
+                <span class="w-8 h-8 rounded-lg bg-sky-50 text-royal-blue border border-sky-100 flex items-center justify-center mr-3">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </span>
                 <span>Log New Check-in</span>
@@ -216,7 +216,7 @@
                 {% if attractions and establishments %}
                 <div>
                     <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Target Type</label>
-                    <select name="target_type" id="target_type" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-dark-green focus:ring-1 focus:ring-dark-green outline-none transition-all cursor-pointer" required>
+                    <select name="target_type" id="target_type" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all cursor-pointer" required>
                         <option value="attraction">Attraction</option>
                         <option value="establishment">Establishment</option>
                     </select>
@@ -229,7 +229,7 @@
 
                 <div>
                     <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Select Location</label>
-                    <select name="target_id" id="target_id" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-dark-green focus:ring-1 focus:ring-dark-green outline-none transition-all cursor-pointer" required>
+                    <select name="target_id" id="target_id" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all cursor-pointer" required>
                         {% if attractions %}
                         <optgroup label="Attractions" id="opt-attractions">
                             {% for item in attractions %}
@@ -250,11 +250,11 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Visitors</label>
-                        <input type="number" name="visitor_count" value="1" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-dark-green focus:ring-1 focus:ring-dark-green outline-none transition-all" required>
+                        <input type="number" name="visitor_count" value="1" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all" required>
                     </div>
                     <div>
                         <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Date</label>
-                        <input type="date" name="visit_date" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-dark-green focus:ring-1 focus:ring-dark-green outline-none transition-all">
+                        <input type="date" name="visit_date" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all">
                     </div>
                 </div>
 
@@ -262,31 +262,31 @@
 
                 <div>
                     <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Visitor Name (Lead)</label>
-                    <input type="text" name="visitor_name" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-dark-green focus:ring-1 focus:ring-dark-green outline-none transition-all" placeholder="Enter lead name">
+                    <input type="text" name="visitor_name" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all" placeholder="Enter lead name">
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Age</label>
-                        <input type="number" name="visitor_age" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-dark-green focus:ring-1 focus:ring-dark-green outline-none transition-all" placeholder="Age">
+                        <input type="number" name="visitor_age" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all" placeholder="Age">
                     </div>
                     <div class="flex items-center space-x-2.5 h-full pt-6">
-                        <input type="checkbox" name="is_system_user" value="true" class="w-4 h-4 rounded border-slate-300 text-dark-green focus:ring-dark-green">
+                        <input type="checkbox" name="is_system_user" value="true" class="w-4 h-4 rounded border-slate-300 text-royal-blue focus:ring-royal-blue">
                         <label class="text-[9px] font-black text-slate-400 uppercase tracking-wider cursor-pointer select-none">App User?</label>
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Address</label>
-                    <input type="text" name="visitor_address" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-dark-green focus:ring-1 focus:ring-dark-green outline-none transition-all" placeholder="City/Barangay">
+                    <input type="text" name="visitor_address" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all" placeholder="City/Barangay">
                 </div>
 
                 <div>
                     <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Notes (Optional)</label>
-                    <textarea name="notes" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-dark-green focus:ring-1 focus:ring-dark-green outline-none transition-all" placeholder="Special event, holiday, etc."></textarea>
+                    <textarea name="notes" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all" placeholder="Special event, holiday, etc."></textarea>
                 </div>
 
-                <button type="submit" class="w-full bg-dark-green text-white font-black py-4 rounded-2xl hover:bg-emerald-900 transition-all shadow-md active:scale-95 cursor-pointer uppercase tracking-wider text-xs">
+                <button type="submit" class="w-full bg-royal-blue text-white font-black py-4 rounded-2xl hover:bg-sky-900 transition-all shadow-md active:scale-95 cursor-pointer uppercase tracking-wider text-xs">
                     Save Check-in
                 </button>
             </form>
@@ -308,12 +308,12 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </span>
                         <input type="text" id="locationSearch" placeholder="Search location..."
-                               class="w-full bg-white border border-slate-200 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-bold text-slate-800 focus:border-dark-green focus:ring-1 focus:ring-dark-green outline-none transition-all shadow-sm">
+                               class="w-full bg-white border border-slate-200 rounded-2xl pl-10 pr-4 py-2.5 text-xs font-bold text-slate-800 focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all shadow-sm">
                     </div>
 
                     <a href="{{ url_for('admin.visitor_registry') }}"
-                       class="w-full sm:w-auto bg-emerald-50 text-dark-green border border-emerald-100 font-black text-[9px] uppercase tracking-wider px-5 py-3 rounded-2xl hover:bg-emerald-600 hover:text-white transition-all flex items-center justify-center">
-                        <svg class="w-3.5 h-3.5 mr-1.5 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                       class="w-full sm:w-auto bg-sky-50 text-royal-blue border border-sky-100 font-black text-[9px] uppercase tracking-wider px-5 py-3 rounded-2xl hover:bg-sky-600 hover:text-white transition-all flex items-center justify-center">
+                        <svg class="w-3.5 h-3.5 mr-1.5 text-premium-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         <span>Master Registry</span>
                     </a>
                 </div>
@@ -326,9 +326,9 @@
                         <!-- Location Type Icon/Badge -->
                         <div class="w-11 h-11 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-500 group-hover:scale-105 transition-transform duration-300">
                             {% if loc.type == 'attraction' %}
-                            <svg class="w-5 h-5 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-width="2"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-width="2"/></svg>
+                            <svg class="w-5 h-5 text-premium-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" stroke-width="2"/><path d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" stroke-width="2"/></svg>
                             {% else %}
-                            <svg class="w-5 h-5 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-width="2"/></svg>
+                            <svg class="w-5 h-5 text-premium-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-width="2"/></svg>
                             {% endif %}
                         </div>
                         
@@ -346,9 +346,9 @@
                         </div>
 
                         <a href="{{ url_for('admin.visitor_registry', target_type=loc.type, target_id=loc.id, start_date=start_date, end_date=end_date) }}"
-                           class="bg-dark-green text-white font-black text-[9px] uppercase tracking-wider px-5 py-3 rounded-xl hover:bg-emerald-900 transition-all shadow-sm flex items-center group-hover:translate-x-0.5">
+                           class="bg-royal-blue text-white font-black text-[9px] uppercase tracking-wider px-5 py-3 rounded-xl hover:bg-sky-900 transition-all shadow-sm flex items-center group-hover:translate-x-0.5">
                             <span>Logs</span>
-                            <svg class="w-3.5 h-3.5 ml-1.5 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 5l7 7-7 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                            <svg class="w-3.5 h-3.5 ml-1.5 text-premium-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M14 5l7 7-7 7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                         </a>
                     </div>
                 </div>
@@ -370,7 +370,7 @@
                 <h3 class="text-base font-black text-slate-800">Recent Logs</h3>
                 <p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider mt-1">Live timeline of recent tourist check-ins</p>
             </div>
-            <span class="bg-emerald-50 text-dark-green text-[9px] font-black border border-emerald-100 uppercase px-3 py-1 rounded-full tracking-wider">
+            <span class="bg-sky-50 text-royal-blue text-[9px] font-black border border-sky-100 uppercase px-3 py-1 rounded-full tracking-wider">
                 {{ logs|length }} Entries
             </span>
         </div>
@@ -419,7 +419,7 @@
                         <!-- App User Status -->
                         <td class="px-6 py-5 text-center align-middle">
                             {% if log.is_system_user %}
-                            <span class="bg-emerald-50 text-emerald-600 border border-emerald-100 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider inline-flex items-center" title="System User">
+                            <span class="bg-sky-50 text-sky-600 border border-sky-100 px-2.5 py-1 rounded-full text-[9px] font-black uppercase tracking-wider inline-flex items-center" title="System User">
                                 <svg class="w-3.5 h-3.5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
                                 </svg>
@@ -440,7 +440,7 @@
                         <!-- Actions -->
                         <td class="px-8 py-5 text-right align-middle">
                             <a href="{{ url_for('admin.visitor_registry', target_type=log.target_type, target_id=log.target_id, start_date=start_date, end_date=end_date) }}"
-                               class="p-2.5 bg-white border border-slate-200 text-slate-500 hover:text-dark-green hover:border-dark-green/30 rounded-xl transition-all shadow-sm inline-block admin-action-btn"
+                               class="p-2.5 bg-white border border-slate-200 text-slate-500 hover:text-royal-blue hover:border-royal-blue/30 rounded-xl transition-all shadow-sm inline-block admin-action-btn"
                                title="View Detailed Registry">
                                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />

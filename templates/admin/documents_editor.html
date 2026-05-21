@@ -5,33 +5,33 @@
     <!-- Header -->
     <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center mb-10 gap-8">
         <div class="space-y-2">
-            <h1 class="text-4xl md:text-5xl font-black text-emerald-950 tracking-tight">
-                Editor: <span class="text-emerald-600">{{ meta.label }}</span>
+            <h1 class="text-4xl md:text-5xl font-black text-sky-950 tracking-tight">
+                Editor: <span class="text-sky-600">{{ meta.label }}</span>
             </h1>
-            <p class="text-emerald-900/40 max-w-2xl text-lg font-bold uppercase tracking-wider">
+            <p class="text-sky-900/40 max-w-2xl text-lg font-bold uppercase tracking-wider">
                 Live document architecture tuning and structural modification.
             </p>
         </div>
         
         <div class="hidden lg:flex gap-4">
             <a href="{{ url_for('admin.admin_document_files', slug=slug) }}" 
-               class="px-8 py-3 bg-white border border-emerald-100 text-emerald-700 font-bold rounded-2xl transition-all duration-300 hover:bg-emerald-50 shadow-sm">
+               class="px-8 py-3 bg-white border border-sky-100 text-sky-700 font-bold rounded-2xl transition-all duration-300 hover:bg-sky-50 shadow-sm">
                 Exit Architecture
             </a>
         </div>
     </div>
 
     <!-- Document Canvas Container -->
-    <div class="flex justify-center bg-emerald-950/5 rounded-[3rem] p-16 mb-12 border border-emerald-100/50 overflow-x-auto shadow-inner">
+    <div class="flex justify-center bg-sky-950/5 rounded-[3rem] p-16 mb-12 border border-sky-100/50 overflow-x-auto shadow-inner">
         <!-- Physical Document View (A4 ish) -->
         <div id="document-canvas" class="w-[816px] min-h-[1056px] bg-white text-gray-900 shadow-[0_40px_100px_rgba(6,78,59,0.1),0_0_100px_rgba(16,185,129,0.05)] p-[0.75in] pb-[1in] font-serif leading-relaxed text-[13px] relative">
-            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500/20 via-emerald-500 to-emerald-500/20"></div>
+            <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-500/20 via-sky-500 to-sky-500/20"></div>
             
             {% for para in data.paragraphs %}
-            <div class="paragraph-container relative group mb-8 px-4 py-2 hover:bg-emerald-50/50 rounded-lg border border-transparent hover:border-emerald-100 transition-all">
+            <div class="paragraph-container relative group mb-8 px-4 py-2 hover:bg-sky-50/50 rounded-lg border border-transparent hover:border-sky-100 transition-all">
                 <div class="absolute -left-12 top-2 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center">
-                    <span class="text-[9px] font-black font-sans text-emerald-500/40 uppercase tracking-tighter">Para</span>
-                    <span class="text-[12px] font-black font-sans text-emerald-500">{{ para.index }}</span>
+                    <span class="text-[9px] font-black font-sans text-sky-500/40 uppercase tracking-tighter">Para</span>
+                    <span class="text-[12px] font-black font-sans text-sky-500">{{ para.index }}</span>
                 </div>
                 <div contenteditable="true" class="document-para focus:outline-none min-h-[1em]" data-index="{{ para.index }}">
                     {{ para.text }}
@@ -40,16 +40,16 @@
             {% endfor %}
 
             {% for table in data.tables %}
-            <div class="table-container relative group mb-12 mt-10 border-2 border-transparent hover:border-emerald-100 rounded-xl transition-all p-4 hover:bg-emerald-50/30">
+            <div class="table-container relative group mb-12 mt-10 border-2 border-transparent hover:border-sky-100 rounded-xl transition-all p-4 hover:bg-sky-50/30">
                 <div class="absolute -left-12 top-4 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center">
-                    <span class="text-[9px] font-black font-sans text-emerald-500/40 uppercase tracking-tighter">Table</span>
-                    <span class="text-[12px] font-black font-sans text-emerald-500">{{ table.table_index }}</span>
+                    <span class="text-[9px] font-black font-sans text-sky-500/40 uppercase tracking-tighter">Table</span>
+                    <span class="text-[12px] font-black font-sans text-sky-500">{{ table.table_index }}</span>
                 </div>
                 <table class="w-full border-collapse border border-gray-400 text-[12px] document-table" data-index="{{ table.table_index }}">
                     {% for row in table.content %}
                     <tr>
                         {% for cell in row %}
-                        <td contenteditable="true" class="border border-gray-400 p-4 focus:bg-emerald-50 focus:outline-none transition-colors align-top min-w-[50px]">
+                        <td contenteditable="true" class="border border-gray-400 p-4 focus:bg-sky-50 focus:outline-none transition-colors align-top min-w-[50px]">
                             {{ cell }}
                         </td>
                         {% endfor %}
@@ -73,13 +73,13 @@
 
     <!-- Floating Action Bar (Sticky Bottom) -->
     <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-[100] w-full max-w-md px-6">
-        <div class="bg-emerald-950/90 backdrop-blur-xl border border-white/10 p-4 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center gap-4">
+        <div class="bg-sky-950/90 backdrop-blur-xl border border-white/10 p-4 rounded-[2.5rem] shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex items-center gap-4">
             <a href="{{ url_for('admin.admin_document_files', slug=slug) }}" 
                class="flex-1 text-center py-4 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white text-xs font-black rounded-2xl uppercase tracking-widest transition-all">
                 Cancel
             </a>
             <button data-action="save-document"
-                    class="flex-[2] py-4 bg-emerald-500 hover:bg-emerald-400 text-white text-xs font-black rounded-2xl uppercase tracking-[0.2em] transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-3">
+                    class="flex-[2] py-4 bg-sky-500 hover:bg-sky-400 text-white text-xs font-black rounded-2xl uppercase tracking-[0.2em] transition-all shadow-lg shadow-sky-500/20 flex items-center justify-center gap-3">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path>
                 </svg>

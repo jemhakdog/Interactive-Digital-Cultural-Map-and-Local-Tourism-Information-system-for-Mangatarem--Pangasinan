@@ -130,39 +130,39 @@
 /* 7. Structural Layout, Theme Colors, Sidebar & Desktop Responsiveness */
 
 /* Color Tokens & Utility Classes Override */
-.bg-forest-black {
+.bg-sapphire-black {
     background-color: #001e2b !important;
 }
 
-.bg-dark-green {
+.bg-royal-blue {
     background-color: #00684a !important;
 }
 
-.text-mongodb-green {
+.text-premium-blue {
     color: #00ed64 !important;
 }
 
-.bg-mongodb-green\/15 {
+.bg-premium-blue\/15 {
     background-color: rgba(0, 237, 100, 0.15) !important;
 }
 
-.border-mongodb-green\/20 {
+.border-premium-blue\/20 {
     border-color: rgba(0, 237, 100, 0.2) !important;
 }
 
-.bg-emerald-950\/40 {
+.bg-sky-950\/40 {
     background-color: rgba(4, 47, 31, 0.4) !important;
 }
 
-.border-emerald-900\/30 {
-    border-color: rgba(6, 78, 59, 0.3) !important;
+.border-sky-900\/30 {
+    border-color: rgba(15, 23, 42, 0.3) !important;
 }
 
-.border-emerald-950\/20 {
+.border-sky-950\/20 {
     border-color: rgba(4, 47, 31, 0.2) !important;
 }
 
-.border-emerald-950\/30 {
+.border-sky-950\/30 {
     border-color: rgba(4, 47, 31, 0.3) !important;
 }
 
@@ -181,7 +181,7 @@
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
-    border-right: 1px solid rgba(4, 47, 31, 0.2) !important; /* border-emerald-950/20 */
+    border-right: 1px solid rgba(4, 47, 31, 0.2) !important; /* border-sky-950/20 */
 }
 
 /* When sidebar drawer is pulled open (mobile toggle) */
@@ -199,7 +199,7 @@
     color: #ffffff !important;
 }
 
-#admin-sidebar nav a.bg-dark-green {
+#admin-sidebar nav a.bg-royal-blue {
     background-color: #00684a !important;
     color: #00ed64 !important;
     border: 1px solid rgba(0, 237, 100, 0.1) !important;
@@ -214,7 +214,7 @@
     bottom: 0 !important;
     left: 0 !important;
     z-index: 30 !important;
-    background-color: rgba(0, 30, 43, 0.4) !important; /* bg-forest-black/40 */
+    background-color: rgba(0, 30, 43, 0.4) !important; /* bg-sapphire-black/40 */
     backdrop-filter: blur(4px) !important;
     -webkit-backdrop-filter: blur(4px) !important;
     transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;

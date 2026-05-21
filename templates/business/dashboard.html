@@ -16,14 +16,14 @@
     {% set fill_icon = 'bg-orange-500/15 text-orange-400' %}
 {% else %}
     {% set theme_color = 'green' %}
-    {% set primary_text = 'text-mongodb-green' %}
-    {% set border_accent = 'border-mongodb-green/10' %}
-    {% set bg_card = 'bg-emerald-950/15' %}
-    {% set hover_card = 'hover:bg-emerald-950/25' %}
-    {% set accent_badge = 'bg-mongodb-green/10 text-mongodb-green border border-mongodb-green/20' %}
-    {% set fill_btn = 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/40' %}
-    {% set text_btn = 'text-mongodb-green bg-emerald-950/40 hover:bg-emerald-950/60 border border-mongodb-green/20' %}
-    {% set fill_icon = 'bg-mongodb-green/15 text-mongodb-green' %}
+    {% set primary_text = 'text-premium-blue' %}
+    {% set border_accent = 'border-premium-blue/10' %}
+    {% set bg_card = 'bg-sky-950/15' %}
+    {% set hover_card = 'hover:bg-sky-950/25' %}
+    {% set accent_badge = 'bg-premium-blue/10 text-premium-blue border border-premium-blue/20' %}
+    {% set fill_btn = 'bg-sky-600 hover:bg-sky-500 text-white shadow-lg shadow-sky-900/40' %}
+    {% set text_btn = 'text-premium-blue bg-sky-950/40 hover:bg-sky-950/60 border border-premium-blue/20' %}
+    {% set fill_icon = 'bg-premium-blue/15 text-premium-blue' %}
 {% endif %}
 
 <div class="max-w-6xl mx-auto space-y-8 py-4">
@@ -203,7 +203,7 @@
             <div class="space-y-4">
                 <!-- Action 1: Room/Menu Management -->
                 {% if establishment.type == 'inn' %}
-                    <a href="{{ url_for('business.manage_rooms') }}" class="block bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:border-emerald-500/20 hover:shadow-md hover:shadow-emerald-950/[0.02] transition-all group">
+                    <a href="{{ url_for('business.manage_rooms') }}" class="block bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:border-sky-500/20 hover:shadow-md hover:shadow-sky-950/[0.02] transition-all group">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-4">
                                 <div class="w-12 h-12 rounded-xl {{ fill_icon }} flex items-center justify-center transition-colors">
@@ -212,7 +212,7 @@
                                     </svg>
                                 </div>
                                 <div>
-                                    <h3 class="text-sm font-black text-slate-800 group-hover:text-emerald-600 transition-colors">Manage Rooms</h3>
+                                    <h3 class="text-sm font-black text-slate-800 group-hover:text-sky-600 transition-colors">Manage Rooms</h3>
                                     <p class="text-xs font-bold text-slate-400 mt-0.5">{{ stats.room_count }} Rooms Configured</p>
                                 </div>
                             </div>
@@ -264,7 +264,7 @@
 
                 <!-- Action 3: Guest Log Registry (Operations) -->
                 {% if establishment.status == 'approved' %}
-                    <a href="{{ url_for('admin.visitor_registry') }}?business_id={{ establishment.id }}" class="block bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:border-emerald-500/20 hover:shadow-md hover:shadow-emerald-950/[0.02] transition-all group">
+                    <a href="{{ url_for('admin.visitor_registry') }}?business_id={{ establishment.id }}" class="block bg-white border border-slate-100 rounded-2xl p-6 shadow-sm hover:border-sky-500/20 hover:shadow-md hover:shadow-sky-950/[0.02] transition-all group">
                         <div class="flex items-center justify-between">
                             <div class="flex items-center gap-4">
                                 <div class="w-12 h-12 rounded-xl bg-teal-50 text-teal-600 flex items-center justify-center transition-colors">
@@ -288,7 +288,7 @@
     {% else %}
         <!-- Premium Onboarding Flow Empty State -->
         <div class="max-w-3xl mx-auto py-12 px-6 bg-white border border-slate-100 rounded-3xl shadow-sm text-center">
-            <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-emerald-50 text-emerald-600 mb-6">
+            <div class="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-sky-50 text-sky-600 mb-6">
                 <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                 </svg>
@@ -299,7 +299,7 @@
             
             <!-- Dynamic Prefilled Mock Draft Card -->
             <div class="mt-8 p-6 bg-slate-50 rounded-2xl border border-slate-100 text-left space-y-4 max-w-md mx-auto">
-                <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[8px] font-black uppercase bg-emerald-100 text-emerald-700 rounded tracking-wider select-none">
+                <span class="inline-flex items-center gap-1 px-2.5 py-1 text-[8px] font-black uppercase bg-sky-100 text-sky-700 rounded tracking-wider select-none">
                     💡 Prefilled Onboarding Draft
                 </span>
                 
@@ -326,7 +326,7 @@
                     🍽️ Setup Culinary Spot
                 </a>
                 <a href="{{ url_for('business.create_establishment') }}?type=inn&name={{ current_user.username | capitalize }}'s Lodge&email={{ current_user.email }}" 
-                   class="w-full sm:w-auto px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-500 shadow-md shadow-emerald-950/20 transition-all hover:scale-[1.02] flex items-center justify-center gap-2">
+                   class="w-full sm:w-auto px-6 py-3 rounded-xl text-xs font-black uppercase tracking-wider text-white bg-sky-600 hover:bg-sky-500 shadow-md shadow-sky-950/20 transition-all hover:scale-[1.02] flex items-center justify-center gap-2">
                     🏨 Setup Accommodation
                 </a>
             </div>

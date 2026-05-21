@@ -19,7 +19,7 @@
                 <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                     <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
                         <h2 class="text-lg font-semibold text-gray-800">Your Active Conversations</h2>
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-sky-100 text-sky-800">
                             {{ rooms|length }} Rooms
                         </span>
                     </div>
@@ -32,8 +32,8 @@
                                     <div class="flex items-center">
                                         <div class="flex-shrink-0">
                                             {% if room.type == 'barangay' %}
-                                            <div class="h-12 w-12 rounded-full bg-emerald-100 flex items-center justify-center border-2 border-emerald-50">
-                                                <i class="fas fa-landmark text-emerald-600 text-lg"></i>
+                                            <div class="h-12 w-12 rounded-full bg-sky-100 flex items-center justify-center border-2 border-sky-50">
+                                                <i class="fas fa-landmark text-sky-600 text-lg"></i>
                                             </div>
                                             {% elif room.type == 'business' %}
                                             <div class="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center border-2 border-amber-50">
@@ -62,7 +62,7 @@
                                         </div>
                                     </div>
                                     <div class="flex-shrink-0 flex items-center">
-                                        <i class="fas fa-chevron-right text-gray-400 group-hover:text-emerald-500 transition-colors"></i>
+                                        <i class="fas fa-chevron-right text-gray-400 group-hover:text-sky-500 transition-colors"></i>
                                     </div>
                                 </div>
                             </a>
@@ -82,12 +82,12 @@
 
             <!-- Sidebar Info -->
             <div class="md:col-span-1">
-                <div class="bg-emerald-700 rounded-2xl shadow-md p-6 text-white relative overflow-hidden">
+                <div class="bg-sky-700 rounded-2xl shadow-md p-6 text-white relative overflow-hidden">
                     <div class="absolute -right-4 -top-4 opacity-10">
                         <i class="fas fa-shield-alt text-9xl"></i>
                     </div>
                     <h3 class="text-xl font-bold mb-3 relative z-10">Safe Communities</h3>
-                    <p class="text-emerald-50 text-sm mb-4 relative z-10 leading-relaxed">
+                    <p class="text-sky-50 text-sm mb-4 relative z-10 leading-relaxed">
                         Our chat channels are moderated by verified Barangay Stewards. Please ensure all communications remain respectful and relevant to local tourism and culture.
                     </p>
                     <div class="relative z-10">

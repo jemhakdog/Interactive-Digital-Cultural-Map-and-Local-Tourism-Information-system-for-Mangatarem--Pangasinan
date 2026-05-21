@@ -9,7 +9,7 @@
 
 .barangay-card-refined:hover {
     transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(6, 78, 59, 0.12);
+    box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
     border-color: var(--heritage-gold);
 }
 
@@ -50,7 +50,7 @@
 }
 
 .view-toggle-btn.inactive:hover {
-    background-color: rgba(6, 78, 59, 0.05);
+    background-color: rgba(15, 23, 42, 0.05);
 }
 
 /* Leaflet popup customization */

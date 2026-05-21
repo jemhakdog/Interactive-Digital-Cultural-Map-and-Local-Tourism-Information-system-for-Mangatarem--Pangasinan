@@ -13,8 +13,8 @@
         <div>
             <div class="flex items-center gap-2 mb-2">
                 <a href="{{ url_for('admin.admin_dashboard') }}"
-                   class="text-slate-400 hover:text-dark-green flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors">
-                    <svg class="w-4 h-4 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="text-slate-400 hover:text-royal-blue flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors">
+                    <svg class="w-4 h-4 text-premium-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                     Back to Hub
@@ -33,7 +33,7 @@
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Stats Card -->
         <div class="glass-card p-6 rounded-3xl flex flex-col justify-between group hover:scale-[1.02] transition-all duration-300">
-            <div class="p-3 bg-emerald-50 text-dark-green rounded-2xl w-fit group-hover:scale-110 transition-transform">
+            <div class="p-3 bg-sky-50 text-royal-blue rounded-2xl w-fit group-hover:scale-110 transition-transform">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 01-9-3.812M13.712 11.288a3.375 3.375 0 116.75 0 3.375 3.375 0 01-6.75 0z" />
                 </svg>
@@ -46,8 +46,8 @@
 
         <!-- Action Card 1: Compose -->
         <a href="{{ url_for('newsletter_admin.compose') }}"
-           class="glass-card p-6 rounded-3xl flex flex-col justify-between group hover:scale-[1.02] transition-all duration-300 border border-emerald-500/10 hover:border-emerald-500/20 bg-gradient-to-br from-white to-emerald-50/20">
-            <div class="p-3 bg-emerald-50 text-dark-green rounded-2xl w-fit group-hover:rotate-12 transition-transform duration-300">
+           class="glass-card p-6 rounded-3xl flex flex-col justify-between group hover:scale-[1.02] transition-all duration-300 border border-sky-500/10 hover:border-sky-500/20 bg-gradient-to-br from-white to-sky-50/20">
+            <div class="p-3 bg-sky-50 text-royal-blue rounded-2xl w-fit group-hover:rotate-12 transition-transform duration-300">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
@@ -113,7 +113,7 @@
                         <!-- Status Badge -->
                         <td class="px-6 py-5 align-middle">
                             {% if sub.is_active %}
-                            <span class="inline-block bg-emerald-50 text-emerald-600 text-[8px] font-black uppercase px-2.5 py-1 rounded-full border border-emerald-200 tracking-wider">
+                            <span class="inline-block bg-sky-50 text-sky-600 text-[8px] font-black uppercase px-2.5 py-1 rounded-full border border-sky-200 tracking-wider">
                                 Active
                             </span>
                             {% else %}

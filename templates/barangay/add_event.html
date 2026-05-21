@@ -9,7 +9,7 @@
         <div>
             <h1 class="text-3xl font-black text-slate-800 font-heading tracking-tight leading-tight flex items-center gap-2">
                 <span>Publish Local Event</span>
-                <span class="w-2.5 h-2.5 rounded-full bg-mongodb-green inline-block animate-pulse"></span>
+                <span class="w-2.5 h-2.5 rounded-full bg-premium-blue inline-block animate-pulse"></span>
             </h1>
             <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider mt-1">
                 Barangay {{ current_user.barangay.name }} CBIS Tourism Events
@@ -33,7 +33,7 @@
                 <div class="space-y-2">
                     <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Event Title</label>
                     <input type="text" name="name" required minlength="1" maxlength="200" placeholder="e.g. Barangay Patronal Fiesta"
-                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300">
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-premium-blue/20 focus:border-premium-blue transition-all duration-300">
                     <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Maximum 200 characters.</p>
                 </div>
 
@@ -41,7 +41,7 @@
                 <div class="space-y-2">
                     <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Category</label>
                     <select name="category" required
-                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300 cursor-pointer">
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-premium-blue/20 focus:border-premium-blue transition-all duration-300 cursor-pointer">
                         <option value="Civic">Civic</option>
                         <option value="Religious">Religious</option>
                         <option value="Entertainment">Entertainment</option>
@@ -52,33 +52,33 @@
                 <div class="space-y-2">
                     <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Date</label>
                     <input type="date" name="date" required
-                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300">
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-premium-blue/20 focus:border-premium-blue transition-all duration-300">
                 </div>
 
                 <!-- Location -->
                 <div class="space-y-2">
                     <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Location</label>
                     <input type="text" name="location" required placeholder="e.g. Barangay Multi-Purpose Hall"
-                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300">
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-premium-blue/20 focus:border-premium-blue transition-all duration-300">
                 </div>
 
                 <!-- Coordinates -->
                 <div class="space-y-2">
                     <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Latitude (Optional)</label>
                     <input type="number" step="any" name="latitude" placeholder="15.xxxx"
-                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300">
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-premium-blue/20 focus:border-premium-blue transition-all duration-300">
                 </div>
                 <div class="space-y-2">
                     <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Longitude (Optional)</label>
                     <input type="number" step="any" name="longitude" placeholder="120.xxxx"
-                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300">
+                        class="w-full bg-slate-50 border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-premium-blue/20 focus:border-premium-blue transition-all duration-300">
                 </div>
 
                 <!-- Description -->
                 <div class="md:col-span-2 space-y-2">
                     <label class="block text-xs font-black text-slate-600 uppercase tracking-widest">Event Description</label>
                     <textarea name="description" rows="5" required maxlength="2000" placeholder="Detail the activities, schedules, objectives, or participation instructions for this event..."
-                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs p-4 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300 resize-none"></textarea>
+                        class="w-full bg-slate-50 border border-slate-200 rounded-2xl text-xs p-4 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 focus:ring-premium-blue/20 focus:border-premium-blue transition-all duration-300 resize-none"></textarea>
                     <p class="text-[9px] font-bold text-slate-400 uppercase tracking-wide">Maximum 2000 characters.</p>
                 </div>
 
@@ -101,7 +101,7 @@
                         <div class="space-y-2">
                             <label class="block text-[10px] font-black text-slate-500 uppercase tracking-widest">Or Provide Remote URL</label>
                             <input type="url" name="image_url" placeholder="https://domain.com/image.jpg"
-                                class="w-full bg-white border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-mongodb-green/20 focus:border-mongodb-green transition-all duration-300">
+                                class="w-full bg-white border border-slate-200 rounded-xl text-xs px-4 py-3 text-slate-800 focus:outline-none focus:ring-2 focus:ring-premium-blue/20 focus:border-premium-blue transition-all duration-300">
                         </div>
                     </div>
                 </div>
@@ -114,7 +114,7 @@
                     Discard
                 </a>
                 <button type="submit"
-                    class="px-5 py-2.5 bg-mongodb-green text-dark-green rounded-xl text-xs font-black uppercase hover:bg-emerald-300 transition-all shadow-md shadow-dark-green/10">
+                    class="px-5 py-2.5 bg-premium-blue text-royal-blue rounded-xl text-xs font-black uppercase hover:bg-sky-300 transition-all shadow-md shadow-royal-blue/10">
                     Save Event
                 </button>
             </div>

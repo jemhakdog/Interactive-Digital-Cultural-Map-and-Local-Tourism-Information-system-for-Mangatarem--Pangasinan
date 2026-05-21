@@ -1,6 +1,6 @@
 
 <a href="{{ url_for('user.dashboard') }}"
-    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-mongodb-green font-bold' if request.endpoint == 'user.dashboard' else 'text-gray-300 hover:text-mongodb-green' }}">
+    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-premium-blue font-bold' if request.endpoint == 'user.dashboard' else 'text-gray-300 hover:text-premium-blue' }}">
     <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor"
         viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -10,7 +10,7 @@
 </a>
 
 <a href="{{ url_for('user.favorites') }}"
-    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-mongodb-green font-bold' if request.endpoint == 'user.favorites' else 'text-gray-300 hover:text-mongodb-green' }}">
+    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-premium-blue font-bold' if request.endpoint == 'user.favorites' else 'text-gray-300 hover:text-premium-blue' }}">
     <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor"
         viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -20,7 +20,7 @@
 </a>
 
 <a href="{{ url_for('user.visits') }}"
-    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-mongodb-green font-bold' if request.endpoint == 'user.visits' else 'text-gray-300 hover:text-mongodb-green' }}">
+    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-premium-blue font-bold' if request.endpoint == 'user.visits' else 'text-gray-300 hover:text-premium-blue' }}">
     <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor"
         viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -32,7 +32,7 @@
 <!-- More Dropdown -->
 <div class="relative user-more-dropdown" id="user-more-dropdown">
     <button type="button"
-        class="flex items-center gap-2 transition-all duration-300 group text-gray-300 hover:text-mongodb-green user-more-toggle"
+        class="flex items-center gap-2 transition-all duration-300 group text-gray-300 hover:text-premium-blue user-more-toggle"
         id="user-more-toggle">
         <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor"
             viewBox="0 0 24 24">
@@ -49,10 +49,10 @@
     
     <!-- Dropdown Menu -->
     <div id="user-more-menu"
-        class="hidden absolute top-full right-0 mt-2 w-56 bg-emerald-950 border border-white/10 rounded-lg shadow-2xl backdrop-blur-xl z-50 user-more-menu">
+        class="hidden absolute top-full right-0 mt-2 w-56 bg-sky-950 border border-white/10 rounded-lg shadow-2xl backdrop-blur-xl z-50 user-more-menu">
         <div class="py-2">
             <a href="{{ url_for('public.map_view') }}"
-                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-emerald-900/50 hover:text-mongodb-green transition-all {{ 'text-mongodb-green font-bold' if request.endpoint == 'public.map_view' else '' }}">
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-sky-900/50 hover:text-premium-blue transition-all {{ 'text-premium-blue font-bold' if request.endpoint == 'public.map_view' else '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7l5-2.5 5.553 2.776a1 1 0 01.447.894v10.764a1 1 0 01-1.447.894L15 17l-6 3z">
@@ -62,7 +62,7 @@
             </a>
 
             <a href="{{ url_for('barangay.index') }}"
-                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-emerald-900/50 hover:text-mongodb-green transition-all {{ 'text-mongodb-green font-bold' if request.endpoint == 'barangay.index' else '' }}">
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-sky-900/50 hover:text-premium-blue transition-all {{ 'text-premium-blue font-bold' if request.endpoint == 'barangay.index' else '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
@@ -72,7 +72,7 @@
             </a>
 
             <a href="{{ url_for('events.index') }}"
-                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-emerald-900/50 hover:text-mongodb-green transition-all {{ 'text-mongodb-green font-bold' if request.endpoint == 'events.index' else '' }}">
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-sky-900/50 hover:text-premium-blue transition-all {{ 'text-premium-blue font-bold' if request.endpoint == 'events.index' else '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
@@ -81,7 +81,7 @@
             </a>
 
             <a href="{{ url_for('gallery.index') }}"
-                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-emerald-900/50 hover:text-mongodb-green transition-all {{ 'text-mongodb-green font-bold' if request.endpoint == 'gallery.index' else '' }}">
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-sky-900/50 hover:text-premium-blue transition-all {{ 'text-premium-blue font-bold' if request.endpoint == 'gallery.index' else '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
@@ -93,7 +93,7 @@
             <div class="h-px bg-white/5 my-1"></div>
 
             <a href="{{ url_for('business.index') }}"
-                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-emerald-900/50 hover:text-mongodb-green transition-all {{ 'text-mongodb-green font-bold' if request.endpoint == 'business.index' else '' }}">
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-sky-900/50 hover:text-premium-blue transition-all {{ 'text-premium-blue font-bold' if request.endpoint == 'business.index' else '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
@@ -102,7 +102,7 @@
             </a>
 
             <a href="{{ url_for('public.routes') }}"
-                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-emerald-900/50 hover:text-mongodb-green transition-all {{ 'text-mongodb-green font-bold' if request.endpoint == 'public.routes' else '' }}">
+                class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-300 hover:bg-sky-900/50 hover:text-premium-blue transition-all {{ 'text-premium-blue font-bold' if request.endpoint == 'public.routes' else '' }}">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
@@ -121,4 +121,4 @@
         class="btn-pill-secondary !px-6 !py-2.5 !text-xs">Logout</a>
 </div>
 
-<script src="{{ url_for('static', filename='js/components/user-nav.js') }}" defer></script>
+<script src="{{ url_for('static', filename='js/components/user-nav.js') }}" defer></script>

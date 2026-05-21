@@ -1,28 +1,48 @@
 {% macro render_pagination(pagination, endpoint) %}
-<nav aria-label="Page navigation" class="mt-4">
-  <ul class="pagination justify-content-center">
+<nav aria-label="Page navigation" class="flex justify-center mt-12 mb-8">
+  <ul class="inline-flex items-center -space-x-px rounded-2xl bg-white shadow-sm ring-1 ring-gray-200 p-1">
     {# Previous Page #}
-    <li class="page-item {{ 'disabled' if not pagination.has_prev }}">
-      <a class="page-link" href="{{ url_for(endpoint, page=pagination.prev_num, **kwargs) if pagination.has_prev else '#' }}" tabindex="-1">
-        <i class="fas fa-chevron-left"></i> Previous
+    <li>
+      <a href="{{ url_for(endpoint, page=pagination.prev_num, **kwargs) if pagination.has_prev else '#' }}" 
+         class="inline-flex items-center px-4 py-2.5 text-sm font-bold rounded-xl transition-all duration-300
+                {{ 'text-gray-300 pointer-events-none' if not pagination.has_prev else 'text-gray-500 hover:text-sky-800 hover:bg-gray-100' }}"
+         {{ 'tabindex="-1" aria-disabled="true"' if not pagination.has_prev else '' }}>
+        <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Previous
       </a>
     </li>
 
     {# Page Numbers #}
     {% for page_num in pagination.iter_pages(left_edge=1, left_current=2, right_current=3, right_edge=1) %}
       {% if page_num %}
-        <li class="page-item {{ 'active' if page_num == pagination.page }}">
-          <a class="page-link" href="{{ url_for(endpoint, page=page_num, **kwargs) }}">{{ page_num }}</a>
+        <li>
+          <a href="{{ url_for(endpoint, page=page_num, **kwargs) }}" 
+             class="inline-flex items-center px-4 py-2.5 text-sm font-bold rounded-xl transition-all duration-300 mx-0.5
+                    {{ 'bg-white text-sky-900 shadow-sm border border-gray-100 pointer-events-none' if page_num == pagination.page else 'text-gray-500 hover:text-sky-800 hover:bg-gray-100' }}">
+            {{ page_num }}
+          </a>
         </li>
       {% else %}
-        <li class="page-item disabled"><span class="page-link">...</span></li>
+        <li>
+          <span class="inline-flex items-center px-3 py-2.5 text-sm font-bold text-gray-400">
+            ...
+          </span>
+        </li>
       {% endif %}
     {% endfor %}
 
     {# Next Page #}
-    <li class="page-item {{ 'disabled' if not pagination.has_next }}">
-      <a class="page-link" href="{{ url_for(endpoint, page=pagination.next_num, **kwargs) if pagination.has_next else '#' }}">
-        Next <i class="fas fa-chevron-right"></i>
+    <li>
+      <a href="{{ url_for(endpoint, page=pagination.next_num, **kwargs) if pagination.has_next else '#' }}" 
+         class="inline-flex items-center px-4 py-2.5 text-sm font-bold rounded-xl transition-all duration-300
+                {{ 'text-gray-300 pointer-events-none' if not pagination.has_next else 'text-gray-500 hover:text-sky-800 hover:bg-gray-100' }}"
+         {{ 'tabindex="-1" aria-disabled="true"' if not pagination.has_next else '' }}>
+        Next
+        <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+        </svg>
       </a>
     </li>
   </ul>

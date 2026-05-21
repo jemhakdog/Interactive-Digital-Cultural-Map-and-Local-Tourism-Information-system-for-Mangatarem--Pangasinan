@@ -46,7 +46,7 @@
     </div>
     <div class="flex bg-gray-100 p-1 rounded-full" id="view-toggle">
         <button class="toggle-btn px-4 py-1.5 text-xs font-bold rounded-full text-gray-500" data-view="today">Today</button>
-        <button class="toggle-btn px-4 py-1.5 text-xs font-bold rounded-full text-white shadow-sm active" data-view="upcoming" style="background-color: #00E25F;">Upcoming</button>
+        <button class="toggle-btn px-4 py-1.5 text-xs font-bold rounded-full text-white shadow-sm active" data-view="upcoming" style="background-color: #0ea5e9;">Upcoming</button>
         <button class="toggle-btn px-4 py-1.5 text-xs font-bold rounded-full text-gray-500" data-view="calendar">Calendar</button>
     </div>
     <!-- Spacer to keep the view toggle centered in the header -->
@@ -96,7 +96,7 @@
 
     <!-- Category Chips -->
     <div class="flex gap-3 mb-8 overflow-x-auto no-scrollbar pb-2" id="category-filters">
-        <button class="category-chip px-5 py-2.5 rounded-2xl text-white text-sm font-bold shadow-lg shadow-black/10 active" data-filter="all" style="background-color: #00E25F;">All</button>
+        <button class="category-chip px-5 py-2.5 rounded-2xl text-white text-sm font-bold shadow-lg shadow-black/10 active" data-filter="all" style="background-color: #0ea5e9;">All</button>
         <button class="category-chip px-5 py-2.5 rounded-2xl bg-white text-gray-500 text-sm font-bold border border-gray-100" data-filter="religious">Religious</button>
         <button class="category-chip px-5 py-2.5 rounded-2xl bg-white text-gray-500 text-sm font-bold border border-gray-100" data-filter="entertainment">Entertainment</button>
         <button class="category-chip px-5 py-2.5 rounded-2xl bg-white text-gray-500 text-sm font-bold border border-gray-100" data-filter="civic">Civic</button>
@@ -106,7 +106,7 @@
     <div class="space-y-6" id="events-container">
         {% if events %}
             {% for event in events %}
-                {% set colors = ['purple', 'pink', 'teal', 'gold'] %}
+                {% set colors = ['cyan', 'pink', 'teal', 'gold'] %}
                 {% set color = colors[loop.index0 % 4] %}
                 <div class="event-item-v2 event-card-{{ color }} rounded-[32px] p-8 flex gap-6 relative overflow-hidden group active:scale-[0.98] transition-transform shadow-sm"
                      data-category="{{ event.category|lower }}"
@@ -140,13 +140,11 @@
                         <h3 class="text-{{ color }}-dark font-extrabold text-2xl leading-tight mb-2">{{ event.name }}</h3>
                         <p class="text-{{ color }}-dark opacity-70 text-sm line-clamp-2 mb-6">{{ event.description }}</p>
                         
-                        <div class="flex items-center justify-between mt-auto">
-                            <div class="flex -space-x-2">
-                                <img src="https://i.pravatar.cc/150?u=1" class="w-8 h-8 rounded-full border-2 border-white" alt="user">
-                                <img src="https://i.pravatar.cc/150?u=2" class="w-8 h-8 rounded-full border-2 border-white" alt="user">
-                                <div class="w-8 h-8 rounded-full bg-white/40 flex items-center justify-center text-[10px] font-bold text-{{ color }}-dark border-2 border-white">+12</div>
-                            </div>
-                            <button class="bg-{{ color }}-dark text-white px-5 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-{{ color }}-dark/20">Remind Me</button>
+                        <div class="flex items-center justify-end mt-auto">
+                            {% set location = event.barangay.name ~ ', Mangatarem, Pangasinan' if event.barangay else 'Mangatarem, Pangasinan' %}
+                            <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text={{ event.name | urlencode }}&dates={{ event.date.strftime('%Y%m%dT%H%M%S') }}/{{ event.date.strftime('%Y%m%dT%H%M%S') }}&details={{ event.description | urlencode }}&location={{ location | urlencode }}" target="_blank" rel="noopener noreferrer" class="bg-{{ color }}-dark text-white px-5 py-2 rounded-2xl text-xs font-bold shadow-lg shadow-{{ color }}-dark/20 hover:opacity-90 transition-opacity">
+                                Remind Me
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -253,7 +251,7 @@
                     dayEvents.forEach(evt => {
                         const dot = document.createElement('div');
                         dot.className = 'w-1.5 h-1.5 rounded-full';
-                        if (evt.classList.contains('event-card-purple')) dot.classList.add('bg-purple-500');
+                        if (evt.classList.contains('event-card-cyan')) dot.classList.add('bg-cyan-500');
                         else if (evt.classList.contains('event-card-pink')) dot.classList.add('bg-pink-500');
                         else if (evt.classList.contains('event-card-teal')) dot.classList.add('bg-teal-500');
                         else if (evt.classList.contains('event-card-gold')) dot.classList.add('bg-yellow-500');
@@ -340,7 +338,7 @@
                 });
                 btn.classList.remove('bg-white', 'text-gray-500');
                 btn.classList.add('text-white', 'active');
-                btn.style.backgroundColor = '#00E25F';
+                btn.style.backgroundColor = '#0ea5e9';
                 applyFilters();
             });
         });
@@ -354,7 +352,7 @@
                 });
                 btn.classList.remove('text-gray-500');
                 btn.classList.add('text-white', 'shadow-sm', 'active');
-                btn.style.backgroundColor = '#00E25F';
+                btn.style.backgroundColor = '#0ea5e9';
                 
                 const view = btn.getAttribute('data-view');
                 const categoryFilters = document.getElementById('category-filters');
@@ -387,7 +385,7 @@
                 });
                 btn.classList.remove('text-gray-300', 'opacity-50');
                 btn.classList.add('opacity-100', 'text-xl', 'active');
-                btn.style.color = '#00E25F';
+                btn.style.color = '#0ea5e9';
                 activeMonth = btn.dataset.month;
                 applyFilters();
             });

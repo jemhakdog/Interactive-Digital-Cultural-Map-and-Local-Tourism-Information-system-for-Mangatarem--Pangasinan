@@ -13,8 +13,8 @@
         <div>
             <div class="flex items-center gap-2 mb-2">
                 <a href="{{ url_for('newsletter_admin.index') }}"
-                   class="text-slate-400 hover:text-dark-green flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors">
-                    <svg class="w-4 h-4 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="text-slate-400 hover:text-royal-blue flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors">
+                    <svg class="w-4 h-4 text-premium-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
                     Back to Directory
@@ -31,8 +31,8 @@
         <!-- Compose Action Shortcut -->
         <div class="flex items-center gap-4">
             <a href="{{ url_for('newsletter_admin.compose') }}"
-               class="bg-dark-green hover:bg-emerald-900 text-white px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-wider shadow-md shadow-dark-green/10 flex items-center gap-2 transition-all duration-300 transform hover:-translate-y-0.5">
-                <svg class="w-4 h-4 text-mongodb-green" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+               class="bg-royal-blue hover:bg-sky-900 text-white px-5 py-3 rounded-2xl font-black text-xs uppercase tracking-wider shadow-md shadow-royal-blue/10 flex items-center gap-2 transition-all duration-300 transform hover:-translate-y-0.5">
+                <svg class="w-4 h-4 text-premium-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4v16m8-8H4" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 <span>Compose Newsletter</span>
             </a>
         </div>
@@ -66,7 +66,7 @@
                         </td>
                         <!-- Recipients Count Badge -->
                         <td class="px-6 py-5 align-middle">
-                            <span class="inline-block bg-emerald-50 text-emerald-600 text-[8px] font-black uppercase px-2.5 py-1 rounded-full border border-emerald-200 tracking-wider">
+                            <span class="inline-block bg-sky-50 text-sky-600 text-[8px] font-black uppercase px-2.5 py-1 rounded-full border border-sky-200 tracking-wider">
                                 {{ item.recipient_count }} {% if item.recipient_count == 1 %}sub{% else %}subs{% endif %}
                             </span>
                         </td>
@@ -126,7 +126,7 @@
         <!-- Modal Meta Stats -->
         <div class="px-8 py-4 bg-slate-50 border-b border-slate-100 flex justify-between items-center">
             <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider">Payload Details</span>
-            <span class="bg-emerald-50 text-dark-green text-[9px] font-black px-3 py-1 rounded-full border border-emerald-100" id="modalRecipientCount">0 Recipient(s)</span>
+            <span class="bg-sky-50 text-royal-blue text-[9px] font-black px-3 py-1 rounded-full border border-sky-100" id="modalRecipientCount">0 Recipient(s)</span>
         </div>
 
         <!-- Modal Body Content -->
@@ -138,7 +138,7 @@
 
         <!-- Modal Footer -->
         <div class="px-8 py-4 bg-slate-50 border-t border-slate-100 flex justify-end">
-            <button onclick="closeNewsletterPreview()" class="px-6 py-3 bg-dark-green hover:bg-emerald-900 text-white rounded-xl font-black text-[9px] uppercase tracking-wider shadow-sm transition-all cursor-pointer">
+            <button onclick="closeNewsletterPreview()" class="px-6 py-3 bg-royal-blue hover:bg-sky-900 text-white rounded-xl font-black text-[9px] uppercase tracking-wider shadow-sm transition-all cursor-pointer">
                 Dismiss Inspector
             </button>
         </div>
@@ -171,7 +171,7 @@
                                 padding: 24px;
                                 margin: 0;
                             }
-                            a { color: #022c22; font-weight: 700; text-decoration: underline; }
+                            a { color: #020617; font-weight: 700; text-decoration: underline; }
                         </style>
                     </head>
                     <body>

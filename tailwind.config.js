@@ -5,22 +5,22 @@ module.exports = {
         extend: {
             colors: {
                 primary: {
-                    50: '#f0fdf4',
-                    100: '#dcfce7',
-                    200: '#bbf7d0',
-                    300: '#86efac',
-                    400: '#4ade80',
-                    500: '#22c55e',
-                    600: '#16a34a',
-                    700: '#15803d',
-                    800: '#166534',
-                    900: '#14532d',
-                    950: '#052e16',
+                    50: '#f0f9ff',
+                    100: '#e0f2fe',
+                    200: '#bae6fd',
+                    300: '#7dd3fc',
+                    400: '#38bdf8',
+                    500: '#0ea5e9',
+                    600: '#0284c7',
+                    700: '#0369a1',
+                    800: '#075985',
+                    900: '#0c4a6e',
+                    950: '#082f49',
                 },
-                accent: '#EAB308', // Gold/Yellow
-                'forest-black': '#001e2b',
-                'mongodb-green': '#00ed64',
-                'dark-green': '#00684a',
+                accent: '#D4AF37', // Antique Heritage Gold
+                'sapphire-black': '#0f172a', // Deep sapphire/slate (slate-900)
+                'premium-blue': '#38bdf8', // Premium Sky Blue (sky-400)
+                'royal-blue': '#1d4ed8', // Professional Royal Blue (blue-700)
                 'action-blue': '#006cfa',
                 'hover-blue': '#3860be',
                 'teal-active': '#1eaedb',
