@@ -31,6 +31,10 @@ document.addEventListener('DOMContentLoaded', function () {
             attractions: [],
             establishments: []
         },
+        arrivedPlaceIds: {
+            attractions: [],
+            establishments: []
+        },
         currentRouteLayer: null, // Track Leaflet route layer
         selectedCoords: null // Track currently selected alternative/primary coordinates
     };
@@ -705,14 +709,26 @@ document.addEventListener('DOMContentLoaded', function () {
         
         if (!overlay || !closeBtn) return;
 
-        closeBtn.onclick = () => overlay.classList.remove('active');
+        const closeModal = () => {
+            overlay.classList.remove('active');
+            
+            // Clear selected place and hide stats panel when modal is closed
+            state.selectedPlace = null;
+            state.selectedCoords = null;
+            const statsEl = document.getElementById('place-stats');
+            if (statsEl) {
+                statsEl.classList.add('hidden');
+            }
+        };
+
+        closeBtn.onclick = closeModal;
         overlay.onclick = (e) => {
-            if (e.target === overlay) overlay.classList.remove('active');
+            if (e.target === overlay) closeModal();
         };
 
         // Close on Escape
         window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') overlay.classList.remove('active');
+            if (e.key === 'Escape') closeModal();
         });
     }
 
@@ -853,6 +869,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (state.currentRouteLayer) {
                     map.removeLayer(state.currentRouteLayer);
                 }
+                if (state.traveledRouteLayer) {
+                    map.removeLayer(state.traveledRouteLayer);
+                    state.traveledRouteLayer = null;
+                }
+                if (state.routeStepsLayer) {
+                    map.removeLayer(state.routeStepsLayer);
+                    state.routeStepsLayer = null;
+                }
 
                 // Convert [lng, lat] to [lat, lng] for Leaflet
                 const leafletCoords = routeCoords.map(coord => [coord[1], coord[0]]);
@@ -868,6 +892,39 @@ document.addEventListener('DOMContentLoaded', function () {
                 map.fitBounds(state.currentRouteLayer.getBounds(), {
                     padding: [50, 50]
                 });
+
+                // Add step markers for Leaflet
+                const stepMarkers = [];
+                data.legs[0].steps.forEach((step, index) => {
+                    let coords = null;
+                    if (step.geometry && step.geometry.coordinates && step.geometry.coordinates.length > 0) {
+                        coords = step.geometry.coordinates[0]; // [lng, lat]
+                    } else if (step.maneuver && step.maneuver.location) {
+                        coords = step.maneuver.location; // [lng, lat]
+                    }
+                    if (coords) {
+                        const circle = L.circleMarker([coords[1], coords[0]], {
+                            radius: 8,
+                            fillColor: '#ffffff',
+                            color: '#0ea5e9',
+                            weight: 3,
+                            opacity: 1,
+                            fillOpacity: 1
+                        });
+                        circle.on('click', () => {
+                            highlightTraveledRoute(index, data);
+                            const instructionsEl = document.getElementById('nav-instructions');
+                            if (instructionsEl) {
+                                const stepEls = instructionsEl.querySelectorAll('.instruction-step');
+                                stepEls.forEach(s => s.classList.remove('bg-red-50', 'border-red-200'));
+                                if (stepEls[index]) stepEls[index].classList.add('bg-red-50', 'border-red-200');
+                                if (stepEls[index]) stepEls[index].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                            }
+                        });
+                        stepMarkers.push(circle);
+                    }
+                });
+                state.routeStepsLayer = L.featureGroup(stepMarkers).addTo(map);
 
                 // Update Side Panel
                 updateNavigationUI(data);
@@ -922,6 +979,8 @@ document.addEventListener('DOMContentLoaded', function () {
             // Remove existing route if any
             if (map.getLayer('route')) map.removeLayer('route');
             if (map.getSource('route')) map.removeSource('route');
+            if (map.getLayer('route-traveled')) map.removeLayer('route-traveled');
+            if (map.getSource('route-traveled')) map.removeSource('route-traveled');
 
             map.addSource('route', {
                 type: 'geojson',
@@ -942,6 +1001,64 @@ document.addEventListener('DOMContentLoaded', function () {
                     'line-opacity': 0.8
                 }
             });
+
+            // Add step points for Mapbox
+            const stepPoints = data.legs[0].steps.map((step, index) => {
+                let coords = null;
+                if (step.geometry && step.geometry.coordinates && step.geometry.coordinates.length > 0) {
+                    coords = step.geometry.coordinates[0];
+                } else if (step.maneuver && step.maneuver.location) {
+                    coords = step.maneuver.location;
+                }
+                
+                if (coords) {
+                    return {
+                        type: 'Feature',
+                        properties: { stepIndex: index },
+                        geometry: { type: 'Point', coordinates: coords }
+                    };
+                }
+                return null;
+            }).filter(f => f !== null);
+
+            if (map.getLayer('route-steps-points')) map.removeLayer('route-steps-points');
+            if (map.getSource('route-steps')) map.removeSource('route-steps');
+
+            map.addSource('route-steps', {
+                type: 'geojson',
+                data: {
+                    type: 'FeatureCollection',
+                    features: stepPoints
+                }
+            });
+
+            map.addLayer({
+                id: 'route-steps-points',
+                type: 'circle',
+                source: 'route-steps',
+                paint: {
+                    'circle-radius': 8,
+                    'circle-color': '#ffffff',
+                    'circle-stroke-width': 3,
+                    'circle-stroke-color': '#0ea5e9'
+                }
+            });
+
+            map.on('click', 'route-steps-points', (e) => {
+                if (e.features.length > 0) {
+                    const idx = e.features[0].properties.stepIndex;
+                    highlightTraveledRoute(idx, data);
+                    const instructionsEl = document.getElementById('nav-instructions');
+                    if (instructionsEl) {
+                        const stepEls = instructionsEl.querySelectorAll('.instruction-step');
+                        stepEls.forEach(s => s.classList.remove('bg-red-50', 'border-red-200'));
+                        if (stepEls[idx]) stepEls[idx].classList.add('bg-red-50', 'border-red-200');
+                        if (stepEls[idx]) stepEls[idx].scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                }
+            });
+            map.on('mouseenter', 'route-steps-points', () => { map.getCanvas().style.cursor = 'pointer'; });
+            map.on('mouseleave', 'route-steps-points', () => { map.getCanvas().style.cursor = ''; });
 
             // Zoom to fit the route
             const bounds = new mapboxgl.LngLatBounds();
@@ -980,12 +1097,24 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!isLeafletMode) {
                     if (map.getLayer('route')) map.removeLayer('route');
                     if (map.getSource('route')) map.removeSource('route');
+                    if (map.getLayer('route-traveled')) map.removeLayer('route-traveled');
+                    if (map.getSource('route-traveled')) map.removeSource('route-traveled');
+                    if (map.getLayer('route-steps-points')) map.removeLayer('route-steps-points');
+                    if (map.getSource('route-steps')) map.removeSource('route-steps');
                 } 
                 
                 // Clear Leaflet Route
                 if (state.currentRouteLayer) {
                     map.removeLayer(state.currentRouteLayer);
                     state.currentRouteLayer = null;
+                }
+                if (state.traveledRouteLayer) {
+                    map.removeLayer(state.traveledRouteLayer);
+                    state.traveledRouteLayer = null;
+                }
+                if (state.routeStepsLayer) {
+                    map.removeLayer(state.routeStepsLayer);
+                    state.routeStepsLayer = null;
                 }
                 
                 state.isNavigating = false;
@@ -1020,7 +1149,7 @@ document.addEventListener('DOMContentLoaded', function () {
             // Populate Instructions
             const instructionsEl = document.getElementById('nav-instructions');
             if (instructionsEl) {
-                instructionsEl.innerHTML = data.legs[0].steps.map(step => {
+                instructionsEl.innerHTML = data.legs[0].steps.map((step, index) => {
                     const type = step.maneuver.type || '';
                     const modifier = step.maneuver.modifier || '';
                     const name = step.name || '';
@@ -1065,7 +1194,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                     return `
-                        <div class="instruction-step">
+                        <div class="instruction-step flex items-center gap-3 p-2 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors border border-transparent hover:border-gray-100" data-step-index="${index}">
                             <div class="w-6 h-6 flex items-center justify-center bg-[#00ED64]/10 rounded-lg shrink-0 text-[#00ED64] text-[10px] font-bold">
                                 ${icon}
                             </div>
@@ -1076,6 +1205,22 @@ document.addEventListener('DOMContentLoaded', function () {
                         </div>
                     `;
                 }).join('');
+
+                const stepEls = instructionsEl.querySelectorAll('.instruction-step');
+                stepEls.forEach(el => {
+                    el.onclick = () => {
+                        const idx = parseInt(el.dataset.stepIndex);
+                        console.log(`[Navigation] Step ${idx} clicked`);
+                        highlightTraveledRoute(idx, data);
+                        
+                        // Visual feedback on the list
+                        stepEls.forEach(s => s.classList.remove('bg-red-50', 'border-red-200'));
+                        if (stepEls[idx]) stepEls[idx].classList.add('bg-red-50', 'border-red-200');
+                        
+                        // Scroll selected item into view if it was clicked
+                        el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    };
+                });
             }
         }
 
@@ -1085,6 +1230,135 @@ document.addEventListener('DOMContentLoaded', function () {
         if (distEl && timeEl) {
             distEl.textContent = `${(data.distance / 1000).toFixed(1)} KM`;
             timeEl.textContent = `${Math.round(data.duration / 60)} Min`;
+        }
+    }
+
+    function highlightTraveledRoute(stepIndex, data) {
+        try {
+            console.log(`[Navigation] Highlighting route up to step ${stepIndex}`);
+            if (!data || !data.legs || !data.legs[0].steps) {
+                console.log("[Navigation] Missing data or steps");
+                return;
+            }
+            
+            // Extract a subset of the exact main route geometry to ensure perfect overlap
+            let traveledCoords = [];
+            if (data.geometry && data.geometry.coordinates) {
+                const fullRoute = data.geometry.coordinates;
+                
+                if (stepIndex >= data.legs[0].steps.length - 1) {
+                    traveledCoords = [...fullRoute];
+                } else {
+                    let targetCoord = data.legs[0].steps[stepIndex + 1].maneuver.location;
+                    if (!targetCoord && data.legs[0].steps[stepIndex].geometry) {
+                        const stepGeom = data.legs[0].steps[stepIndex].geometry.coordinates;
+                        targetCoord = stepGeom[stepGeom.length - 1];
+                    }
+                    
+                    if (targetCoord) {
+                        let minIdx = -1;
+                        let minDist = Infinity;
+                        for (let i = 0; i < fullRoute.length; i++) {
+                            const dx = fullRoute[i][0] - targetCoord[0];
+                            const dy = fullRoute[i][1] - targetCoord[1];
+                            const dist = dx*dx + dy*dy;
+                            if (dist < minDist) {
+                                minDist = dist;
+                                minIdx = i;
+                            }
+                        }
+                        if (minIdx !== -1) {
+                            traveledCoords = fullRoute.slice(0, minIdx + 1);
+                        }
+                    }
+                }
+            }
+
+            console.log(`[Navigation] Accumulated ${traveledCoords.length} coordinates`);
+
+            // Mapbox LineString needs at least 2 points
+            if (traveledCoords.length < 2) {
+                console.log("[Navigation] Not enough coordinates to draw a line");
+                return;
+            }
+
+            if (isLeafletMode) {
+                if (state.traveledRouteLayer) {
+                    map.removeLayer(state.traveledRouteLayer);
+                }
+                
+                const leafletCoords = traveledCoords.map(coord => [coord[1], coord[0]]);
+                
+                state.traveledRouteLayer = L.polyline(leafletCoords, {
+                    color: '#EF4444',
+                    weight: 8,
+                    opacity: 1.0,
+                    lineJoin: 'round',
+                    className: 'traveled-route-layer'
+                }).addTo(map);
+
+                if (traveledCoords.length > 0) {
+                    const lastCoord = traveledCoords[traveledCoords.length - 1];
+                    map.flyTo([lastCoord[1], lastCoord[0]], 15, { duration: 1.5 });
+                }
+
+            } else {
+                const geojson = {
+                    type: 'FeatureCollection',
+                    features: [{
+                        type: 'Feature',
+                        properties: {},
+                        geometry: {
+                            type: 'LineString',
+                            coordinates: traveledCoords
+                        }
+                    }]
+                };
+
+                console.log("[Navigation] Drawing traveled geojson:", geojson);
+
+                if (map.getSource('route-traveled')) {
+                    map.getSource('route-traveled').setData(geojson);
+                    if (!map.getLayer('route-traveled')) {
+                        map.addLayer({
+                            id: 'route-traveled',
+                            type: 'line',
+                            source: 'route-traveled',
+                            layout: { 'line-join': 'round', 'line-cap': 'round' },
+                            paint: { 'line-color': '#EF4444', 'line-width': 8, 'line-opacity': 1.0 }
+                        });
+                        // Ensure it appears right below points if they exist
+                        if (map.getLayer('route-steps-points')) {
+                            map.moveLayer('route-traveled', 'route-steps-points');
+                        }
+                    }
+                } else {
+                    map.addSource('route-traveled', {
+                        type: 'geojson',
+                        data: geojson
+                    });
+
+                    map.addLayer({
+                        id: 'route-traveled',
+                        type: 'line',
+                        source: 'route-traveled',
+                        layout: { 'line-join': 'round', 'line-cap': 'round' },
+                        paint: { 'line-color': '#EF4444', 'line-width': 8, 'line-opacity': 1.0 }
+                    });
+                    
+                    // Ensure it appears right below points if they exist
+                    if (map.getLayer('route-steps-points')) {
+                        map.moveLayer('route-traveled', 'route-steps-points');
+                    }
+                }
+
+                if (traveledCoords.length > 0) {
+                    const lastCoord = traveledCoords[traveledCoords.length - 1];
+                    map.flyTo({ center: lastCoord, zoom: 15, duration: 1500 });
+                }
+            }
+        } catch (error) {
+            console.error("Error highlighting traveled route:", error);
         }
     }
 
@@ -1242,6 +1516,175 @@ document.addEventListener('DOMContentLoaded', function () {
         }, 300);
     }
 
+    let lastArrivalCheckTime = 0;
+
+    function checkArrivalProximity(lat, lng) {
+        const now = Date.now();
+        // Throttle check to at most once every 20 seconds to preserve device battery life
+        if (now - lastArrivalCheckTime < 20000) {
+            return;
+        }
+        lastArrivalCheckTime = now;
+
+        const payload = {
+            latitude: lat,
+            longitude: lng
+        };
+
+        // If navigating, include navigated target detail to automatically log navigation arrivals
+        if (state.isNavigating && state.selectedPlace) {
+            const type = state.selectedPlace.category === 'hotel' || state.selectedPlace.category === 'restaurant' ? 'establishment' : 'attraction';
+            // Verify if we already arrived at this specific place during the current session
+            if (state.arrivedPlaceIds[type + 's'] && state.arrivedPlaceIds[type + 's'].includes(state.selectedPlace.id)) {
+                // Already processed, do nothing
+            } else {
+                payload.navigated_target_id = state.selectedPlace.id;
+                payload.navigated_target_type = type;
+            }
+        }
+
+        console.log("📡 [Arrival] Verifying physical proximity boundaries with Mangatarem server...", payload);
+
+        fetch('/booking/api/verify-arrival', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCsrfToken()
+            },
+            body: JSON.stringify(payload)
+        })
+        .then(res => {
+            if (!res.ok) throw new Error('Arrival verification request failed');
+            return res.json();
+        })
+        .then(data => {
+            if (data.success) {
+                // 1. Handle automatic today's booking check-in success
+                if (data.booking_attended) {
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 5000,
+                        timerProgressBar: true,
+                        didOpen: (toast) => {
+                            toast.addEventListener('mouseenter', Swal.stopTimer);
+                            toast.addEventListener('mouseleave', Swal.resumeTimer);
+                        }
+                    });
+                    Toast.fire({
+                        icon: 'success',
+                        iconColor: '#15803d',
+                        background: '#f0fdf4',
+                        title: `<span style="color: #166534; font-weight: 700;">Arrived & Checked In!</span>`,
+                        html: `<p style="color: #1b5e20; margin: 0; font-size: 0.875rem;">Your reservation at <strong>${data.place_name}</strong> is verified and logged automatically.</p>`
+                    });
+                }
+
+                // 2. Handle navigated target arrival success
+                if (data.navigated_arrived && data.target_id && data.target_type) {
+                    const type = data.target_type;
+                    const id = data.target_id;
+                    
+                    // Prevent duplicate triggers
+                    if (!state.arrivedPlaceIds[type + 's'].includes(id)) {
+                        state.arrivedPlaceIds[type + 's'].push(id);
+                    }
+
+                    // Stop map navigation by programmatically triggering close-nav click
+                    const closeNavBtn = document.getElementById('close-nav');
+                    if (closeNavBtn) {
+                        closeNavBtn.click();
+                    }
+
+                    const placeName = data.place_name || 'Landmark';
+                    
+                    // Show a gorgeous, custom-styled Emerald and Gold welcome modal
+                    Swal.fire({
+                        title: `<div class="flex flex-col items-center gap-2">
+                                    <div class="w-16 h-16 bg-emerald-100 rounded-full flex items-center justify-center animate-bounce mb-2">
+                                        <svg class="w-10 h-10 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+                                        </svg>
+                                    </div>
+                                    <span class="text-emerald-800 font-extrabold text-2xl tracking-tight">Welcome to ${placeName}!</span>
+                                </div>`,
+                        html: `
+                            <div class="px-2 text-center">
+                                <p class="text-gray-600 mb-6 text-sm leading-relaxed">
+                                    You have physically arrived at <strong class="text-gray-800">${placeName}</strong>! 
+                                    We have safely registered and logged your visit to your Mangatarem tourist journey.
+                                </p>
+                                <div class="flex flex-col gap-3">
+                                    <button id="swal-review-btn" class="w-full py-3 bg-emerald-700 hover:bg-emerald-800 text-white rounded-xl font-bold transition-all shadow-md flex items-center justify-center gap-2 border border-emerald-800 cursor-pointer">
+                                        ✍️ Log Journey & Leave Review
+                                    </button>
+                                    <a href="/attractions/${id}" id="swal-explore-btn" class="w-full py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-xl font-bold transition-all shadow-md flex items-center justify-center gap-2 border border-amber-600 text-center text-sm no-underline block cursor-pointer">
+                                        🏛️ Explore Historical Heritage
+                                    </a>
+                                    <button id="swal-close-btn" class="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-bold transition-all text-sm border border-gray-200 cursor-pointer">
+                                        Dismiss
+                                    </button>
+                                </div>
+                            </div>
+                        `,
+                        showConfirmButton: false,
+                        allowOutsideClick: false,
+                        customClass: {
+                            popup: 'rounded-3xl border border-emerald-100 shadow-2xl p-6 bg-white',
+                        },
+                        didOpen: () => {
+                            const rBtn = document.getElementById('swal-review-btn');
+                            const xBtn = document.getElementById('swal-explore-btn');
+                            const cBtn = document.getElementById('swal-close-btn');
+                            
+                            if (rBtn) {
+                                rBtn.onclick = () => {
+                                    Swal.close();
+                                    
+                                    // Smoothly pop standard visit modal from user-actions
+                                    const visitModal = document.getElementById('visit-modal');
+                                    if (visitModal) {
+                                        visitModal.classList.remove('hidden');
+                                        setTimeout(() => {
+                                            visitModal.classList.add('active');
+                                        }, 10);
+                                        document.body.style.overflow = 'hidden';
+                                        
+                                        const tIdEl = document.getElementById('visit-target-id');
+                                        const tTyEl = document.getElementById('visit-target-type');
+                                        const tDtEl = document.getElementById('visit-date');
+                                        
+                                        if (tIdEl) tIdEl.value = id;
+                                        if (tTyEl) tTyEl.value = type;
+                                        if (tDtEl) tDtEl.valueAsDate = new Date();
+                                    }
+                                };
+                            }
+                            
+                            if (xBtn) {
+                                if (type === 'establishment') {
+                                    xBtn.href = `/business/establishments/${id}`;
+                                } else {
+                                    xBtn.href = `/attractions/${id}`;
+                                }
+                            }
+
+                            if (cBtn) {
+                                cBtn.onclick = () => {
+                                    Swal.close();
+                                };
+                            }
+                        }
+                    });
+                }
+            }
+        })
+        .catch(err => {
+            console.error("❌ [Arrival Verification Error]:", err);
+        });
+    }
+
     function initNearMe() {
         const locateMeBtn = document.getElementById('locate-me-btn');
         const searchLocateBtn = document.getElementById('search-locate-btn');
@@ -1329,6 +1772,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     
                     flyToCoords([coords.lng, coords.lat], 15, 45);
 
+                    // Verify arrival proximity immediately on finding initial location
+                    checkArrivalProximity(coords.lat, coords.lng);
+
                     // Start watching position for "navigation" feel
                     if (!window.positionWatcher) {
                         window.positionWatcher = navigator.geolocation.watchPosition(
@@ -1346,6 +1792,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                 if (state.selectedPlace) {
                                     updateStats(state.selectedPlace);
                                 }
+                                // Continuously verify physical proximity limits
+                                checkArrivalProximity(p.coords.latitude, p.coords.longitude);
                             },
                             (err) => console.error('Watch error:', err),
                             { enableHighAccuracy: true }

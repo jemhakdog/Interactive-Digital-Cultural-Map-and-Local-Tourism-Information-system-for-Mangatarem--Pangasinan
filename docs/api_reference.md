@@ -200,6 +200,37 @@ Returns the full profile and specialized details for a specific heritage entry.
 
 ---
 
+## Booking & Proximity API
+
+Proximity-based physical arrival verification and check-in endpoints.
+
+### 10. Verify Arrival & Proximity
+`POST /booking/api/verify-arrival`
+
+Accepts current GPS coordinates of the authenticated user to automatically check in today's active reservations and log physical destination arrivals.
+
+**Authentication Required:** Yes (requires session cookie)
+
+**Request Body (JSON):**
+* `latitude` (required): Current decimal latitude coordinate (float).
+* `longitude` (required): Current decimal longitude coordinate (float).
+* `navigated_target_id` (optional): ID of the landmark/asset the user is actively navigating towards (integer).
+* `navigated_target_type` (optional): Type of active navigation target (`"attraction"` or `"establishment"`).
+
+**Response (JSON):**
+```json
+{
+  "success": true,
+  "booking_attended": true,
+  "place_name": "Mangatarem Holy Family Parish",
+  "navigated_arrived": true,
+  "target_id": 1,
+  "target_type": "attraction"
+}
+```
+
+---
+
 ## Rate Limiting
 
 The API is rate-limited to ensure system stability:

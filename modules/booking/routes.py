@@ -159,3 +159,164 @@ def update_status():
     db.session.commit()
     
     return jsonify({'success': True, 'new_status': new_status})
+
+
+import math
+
+def calculate_haversine_distance(lat1, lon1, lat2, lon2):
+    """Calculate distance between two coordinates in meters."""
+    R = 6371000  # radius of Earth in meters
+    phi1 = math.radians(lat1)
+    phi2 = math.radians(lat2)
+    delta_phi = math.radians(lat2 - lat1)
+    delta_lambda = math.radians(lon2 - lon1)
+    
+    a = math.sin(delta_phi / 2)**2 + math.cos(phi1) * math.cos(phi2) * math.sin(delta_lambda / 2)**2
+    c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+    return R * c
+
+@booking_bp.route('/api/verify-arrival', methods=['POST'])
+@login_required
+def verify_arrival():
+    """Unified physical arrival verification and check-in endpoint."""
+    data = request.get_json(silent=True)
+    if not data:
+        return jsonify({'error': 'Missing JSON body'}), 400
+        
+    user_lat = data.get('latitude')
+    user_lng = data.get('longitude')
+    nav_target_id = data.get('navigated_target_id')
+    nav_target_type = data.get('navigated_target_type')  # 'attraction' or 'establishment'
+    
+    if user_lat is None or user_lng is None:
+        return jsonify({'error': 'Latitude and Longitude are required'}), 400
+        
+    try:
+        user_lat = float(user_lat)
+        user_lng = float(user_lng)
+    except ValueError:
+        return jsonify({'error': 'Invalid coordinate values'}), 400
+
+    # 100 meters default threshold
+    THRESHOLD_METERS = 100.0
+    current_date = datetime.utcnow().date()
+    
+    booking_attended = False
+    navigated_arrived = False
+    place_name = ""
+    arrived_target_id = None
+    arrived_target_type = None
+
+    # Step 1: Check today's confirmed reservations
+    today_reservations = Reservation.query.join(BookingSlot).filter(
+        Reservation.user_id == current_user.id,
+        Reservation.status == 'confirmed',
+        BookingSlot.date == current_date
+    ).all()
+
+    from models import Attraction, Establishment, VisitorLog
+    
+    for reservation in today_reservations:
+        asset = reservation.slot.bookable_asset
+        if not asset or not asset.attraction_id:
+            continue
+            
+        attraction = Attraction.query.get(asset.attraction_id)
+        if not attraction:
+            continue
+            
+        distance = calculate_haversine_distance(user_lat, user_lng, attraction.latitude, attraction.longitude)
+        if distance <= THRESHOLD_METERS:
+            # User has physically arrived at their booking location!
+            reservation.status = 'attended'
+            booking_attended = True
+            place_name = attraction.name
+            
+            # Log visitor automatically if not logged already today
+            existing_log = VisitorLog.query.filter_by(
+                visitor_user_id=current_user.id,
+                target_type='attraction',
+                target_id=attraction.id,
+                visit_date=current_date
+            ).first()
+            
+            if not existing_log:
+                new_log = VisitorLog(
+                    target_type='attraction',
+                    target_id=attraction.id,
+                    visitor_count=reservation.party_size,
+                    visitor_name=current_user.username,
+                    is_system_user=True,
+                    visitor_user_id=current_user.id,
+                    logged_by=current_user.id,
+                    visit_date=current_date,
+                    notes=f"Auto check-in verified via GPS arrival (party size: {reservation.party_size})."
+                )
+                db.session.add(new_log)
+
+    # Step 2: Check active navigation target (if provided)
+    if nav_target_id and nav_target_type:
+        try:
+            nav_target_id = int(nav_target_id)
+        except ValueError:
+            return jsonify({'error': 'Invalid target ID'}), 400
+            
+        target_lat = None
+        target_lng = None
+        target_name = ""
+        
+        if nav_target_type == 'attraction':
+            target_obj = Attraction.query.get(nav_target_id)
+            if target_obj:
+                target_lat = target_obj.latitude
+                target_lng = target_obj.longitude
+                target_name = target_obj.name
+        elif nav_target_type == 'establishment':
+            target_obj = Establishment.query.get(nav_target_id)
+            if target_obj:
+                target_lat = target_obj.latitude
+                target_lng = target_obj.longitude
+                target_name = target_obj.name
+                
+        if target_lat is not None and target_lng is not None:
+            distance = calculate_haversine_distance(user_lat, user_lng, target_lat, target_lng)
+            if distance <= THRESHOLD_METERS:
+                navigated_arrived = True
+                place_name = target_name
+                arrived_target_id = nav_target_id
+                arrived_target_type = nav_target_type
+                
+                # Automatically log this visit as well
+                existing_log = VisitorLog.query.filter_by(
+                    visitor_user_id=current_user.id,
+                    target_type=nav_target_type,
+                    target_id=nav_target_id,
+                    visit_date=current_date
+                ).first()
+                
+                if not existing_log:
+                    new_log = VisitorLog(
+                        target_type=nav_target_type,
+                        target_id=nav_target_id,
+                        visitor_count=1,
+                        visitor_name=current_user.username,
+                        is_system_user=True,
+                        visitor_user_id=current_user.id,
+                        logged_by=current_user.id,
+                        visit_date=current_date,
+                        notes="Logged automatically via GPS arrival at navigated destination."
+                    )
+                    db.session.add(new_log)
+
+    # Commit any DB updates in transaction
+    if booking_attended or navigated_arrived:
+        db.session.commit()
+        
+    return jsonify({
+        'success': True,
+        'booking_attended': booking_attended,
+        'navigated_arrived': navigated_arrived,
+        'place_name': place_name,
+        'target_id': arrived_target_id,
+        'target_type': arrived_target_type
+    })

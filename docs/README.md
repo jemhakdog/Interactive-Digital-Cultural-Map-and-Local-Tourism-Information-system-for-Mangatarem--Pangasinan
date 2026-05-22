@@ -108,6 +108,7 @@ The application will be available at `http://127.0.0.1:5000`.
 
 ### Technical Documentation
 - [MVT Implementation](MVT_IMPLEMENTATION.md) - Mapbox Vector Tiles implementation
+- [Real-Time Routing & Navigation](ROUTING_NAVIGATION.md) - Directions API and Car Icon Integration
 - [Testing Guide](TESTING_GUIDE.md) - Testing procedures and test coverage
 - [Bug Fix: LngLat NaN Error](BUGFIX_lnglat_nan_error.md) - Bug fix documentation
 

@@ -32,6 +32,11 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     let map;
+    let isNavigating = false;
+    let customUserMarker = null;
+    let currentDestination = null;
+    let realTimeRouteLayer = null;
+    let realTimeRouteSource = null;
     if (!isLeafletMode) {
         map = new mapboxgl.Map({
             container: 'map',
@@ -719,6 +724,11 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateCard(attraction) {
         if (!placeCard) return;
 
+        currentDestination = {
+            lat: attraction.lat || attraction.latitude,
+            lng: attraction.lng || attraction.longitude
+        };
+
         cardTitle.textContent = attraction.name;
         cardAddress.textContent = attraction.barangay ? `${attraction.barangay}, Mangatarem` : 'Mangatarem, Pangasinan';
         cardDescription.textContent = attraction.description;
@@ -730,6 +740,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     function updateEstablishmentCard(est) {
         if (!placeCard) return;
+
+        currentDestination = {
+            lat: est.lat || est.latitude,
+            lng: est.lng || est.longitude
+        };
 
         cardTitle.textContent = est.name;
         cardAddress.textContent = est.address || (est.barangay ? `${est.barangay}, Mangatarem` : 'Mangatarem, Pangasinan');
@@ -1397,7 +1412,46 @@ document.addEventListener('DOMContentLoaded', function () {
             locateBtn.classList.remove('animate-pulse');
             locateBtn.classList.add('bg-green-100'); // Indicate tracking is active
 
-            const { latitude, longitude } = position.coords;
+            const { latitude, longitude, heading } = position.coords;
+
+            // Handle custom car marker for navigation
+            if (isNavigating) {
+                // Hide default dot
+                const defaultDot = document.querySelector('.mapboxgl-user-location-dot');
+                if (defaultDot) defaultDot.style.display = 'none';
+
+                if (!customUserMarker) {
+                    const el = document.createElement('div');
+                    el.className = 'custom-user-car-marker';
+                    el.style.width = '40px';
+                    el.style.height = '40px';
+                    el.style.backgroundImage = 'url("/static/img/car-icon.png")';
+                    el.style.backgroundSize = 'contain';
+                    el.style.backgroundRepeat = 'no-repeat';
+                    el.style.backgroundPosition = 'center';
+                    el.style.transition = 'transform 0.5s ease';
+                    
+                    customUserMarker = new mapboxgl.Marker({ element: el, rotationAlignment: 'map' })
+                        .setLngLat([longitude, latitude])
+                        .addTo(map);
+                } else {
+                    customUserMarker.setLngLat([longitude, latitude]);
+                }
+                
+                // Rotate based on heading if available
+                if (heading !== null && !isNaN(heading)) {
+                    customUserMarker.setRotation(heading);
+                }
+            } else {
+                // Not navigating, remove car marker if exists
+                if (customUserMarker) {
+                    customUserMarker.remove();
+                    customUserMarker = null;
+                }
+                // Show default dot
+                const defaultDot = document.querySelector('.mapboxgl-user-location-dot');
+                if (defaultDot) defaultDot.style.display = 'block';
+            }
 
             // Store for establishment searches
             estUserLat = latitude;
@@ -1487,6 +1541,124 @@ document.addEventListener('DOMContentLoaded', function () {
             locateBtn.classList.remove('animate-pulse');
             Swal.fire('Location Access', 'Enable GPS to find nearest spots.', 'warning');
         });
+    }
+
+    // ========================================
+    // 13.5 REAL-TIME ROUTING LOGIC
+    // ========================================
+    const startRouteBtn = document.getElementById('start-route-btn');
+    if (startRouteBtn) {
+        startRouteBtn.addEventListener('click', () => {
+            if (!currentDestination) {
+                if (typeof Swal !== 'undefined') Swal.fire('Error', 'Please select a destination first.', 'error');
+                return;
+            }
+            if (!navigator.geolocation) {
+                if (typeof Swal !== 'undefined') Swal.fire('Not Supported', 'Geolocation is not supported by your browser.', 'error');
+                return;
+            }
+            
+            const btnText = startRouteBtn.querySelector('span');
+            if (isNavigating) {
+                // Stop navigation
+                isNavigating = false;
+                if (btnText) btnText.textContent = 'Start Route';
+                startRouteBtn.classList.remove('bg-red-600', 'hover:bg-red-700', 'text-white');
+                
+                // Clear route
+                if (map.getSource('real-time-route')) {
+                    map.removeLayer('real-time-route');
+                    map.removeSource('real-time-route');
+                }
+                
+                if (customUserMarker) {
+                    customUserMarker.remove();
+                    customUserMarker = null;
+                }
+                const defaultDot = document.querySelector('.mapboxgl-user-location-dot');
+                if (defaultDot) defaultDot.style.display = 'block';
+                return;
+            }
+            
+            // Get user location to start route
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const { latitude, longitude } = position.coords;
+                    isNavigating = true;
+                    
+                    if (btnText) btnText.textContent = 'Stop Navigation';
+                    startRouteBtn.classList.add('bg-red-600', 'hover:bg-red-700', 'text-white');
+                    
+                    if (!isLeafletMode && typeof geolocate !== 'undefined') {
+                        geolocate.trigger(); // Ensure tracking is active
+                    }
+                    
+                    drawRealTimeRoute(latitude, longitude, currentDestination.lat, currentDestination.lng);
+                    
+                    // Hide place card after starting route
+                    if (placeCard) placeCard.classList.add('hidden');
+                },
+                (error) => {
+                    if (typeof Swal !== 'undefined') Swal.fire('Location Error', 'Unable to get your location for routing.', 'error');
+                },
+                { enableHighAccuracy: true, timeout: 10000 }
+            );
+        });
+    }
+
+    async function drawRealTimeRoute(startLat, startLng, destLat, destLng) {
+        if (isLeafletMode) return;
+        
+        try {
+            const query = await fetch(
+                `https://api.mapbox.com/directions/v5/mapbox/driving/${startLng},${startLat};${destLng},${destLat}?geometries=geojson&access_token=${mapboxgl.accessToken}`
+            );
+            const json = await query.json();
+            if (!json.routes || json.routes.length === 0) return;
+            
+            const data = json.routes[0];
+            const route = data.geometry.coordinates;
+            const geojson = {
+                type: 'Feature',
+                properties: {},
+                geometry: {
+                    type: 'LineString',
+                    coordinates: route
+                }
+            };
+            
+            if (map.getSource('real-time-route')) {
+                map.getSource('real-time-route').setData(geojson);
+            } else {
+                map.addSource('real-time-route', {
+                    type: 'geojson',
+                    data: geojson
+                });
+                map.addLayer({
+                    id: 'real-time-route',
+                    type: 'line',
+                    source: 'real-time-route',
+                    layout: {
+                        'line-join': 'round',
+                        'line-cap': 'round'
+                    },
+                    paint: {
+                        'line-color': '#3b82f6',
+                        'line-width': 6,
+                        'line-opacity': 0.8
+                    }
+                });
+            }
+            
+            // Fit bounds to route
+            const bounds = route.reduce((bounds, coord) => {
+                return bounds.extend(coord);
+            }, new mapboxgl.LngLatBounds(route[0], route[0]));
+            
+            map.fitBounds(bounds, { padding: 60 });
+        } catch (error) {
+            console.error('Error fetching directions', error);
+        }
     }
 
     // ========================================
