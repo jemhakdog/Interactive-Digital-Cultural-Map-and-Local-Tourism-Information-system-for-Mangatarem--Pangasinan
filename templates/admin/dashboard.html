@@ -189,9 +189,25 @@
                                             Representative: {{ user.barangay.name if user.barangay else 'General' }}
                                         </span>
                                         {% elif user.role == 'business_owner' %}
-                                        <span class="inline-block bg-amber-50 text-amber-600 text-[9px] font-black uppercase px-2 py-0.5 rounded-md border border-amber-100 tracking-wider">
-                                            Business Owner
-                                        </span>
+                                        <div class="flex flex-col gap-1">
+                                            <span class="inline-block bg-amber-50 text-amber-600 text-[9px] font-black uppercase px-2 py-0.5 rounded-md border border-amber-100 tracking-wider w-max">
+                                                Business Owner
+                                            </span>
+                                            {% if user.business_verification %}
+                                            <div class="flex gap-2 mt-1">
+                                                <a href="{{ user.business_verification.permit_document_url }}" target="_blank" class="text-[9px] font-bold text-sky-600 hover:text-sky-800 underline flex items-center gap-1">
+                                                    <i class="fas fa-file-alt"></i> Permit
+                                                </a>
+                                                {% if user.business_verification.other_document_url %}
+                                                <a href="{{ user.business_verification.other_document_url }}" target="_blank" class="text-[9px] font-bold text-sky-600 hover:text-sky-800 underline flex items-center gap-1">
+                                                    <i class="fas fa-file"></i> Other
+                                                </a>
+                                                {% endif %}
+                                            </div>
+                                            {% else %}
+                                            <span class="text-[9px] text-slate-400 italic">No documents submitted</span>
+                                            {% endif %}
+                                        </div>
                                         {% else %}
                                         <span class="inline-block bg-slate-50 text-slate-500 text-[9px] font-black uppercase px-2 py-0.5 rounded-md border border-slate-200 tracking-wider">
                                             {{ user.role }}

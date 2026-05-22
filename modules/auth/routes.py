@@ -58,8 +58,9 @@ def _authenticate_user(username: str, password: str) -> Optional[User]:
 def _check_approval_status(user: User) -> bool:
     """
     Check if user is approved.
+    Business owners are now allowed to log in while unapproved to upload verification documents.
     """
-    if user.role in ["contributor", "business_owner"] and not user.is_approved:
+    if user.role == "contributor" and not user.is_approved:
         log_logic("auth", "login", f"User '{user.username}' with role '{user.role}' pending approval")
         return False
     return True

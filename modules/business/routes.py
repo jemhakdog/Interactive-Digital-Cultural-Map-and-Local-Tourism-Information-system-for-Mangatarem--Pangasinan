@@ -40,6 +40,19 @@ def business_owner_required(f):
         return f(*args, **kwargs)
     return decorated
 
+def approved_business_owner_required(f):
+    """Decorator to restrict access to APPROVED business_owner role."""
+    @wraps(f)
+    def decorated(*args, **kwargs):
+        if not current_user.is_authenticated or current_user.role != "business_owner":
+            flash("Access denied. Business owner account required.", "error")
+            return redirect(url_for("public.index"))
+        if not current_user.is_approved:
+            flash("Your business account is pending approval.", "warning")
+            return redirect(url_for("business.dashboard"))
+        return f(*args, **kwargs)
+    return decorated
+
 def _get_owner_establishment():
     """Get the current business owner's establishment."""
     return Establishment.query.filter_by(owner_id=current_user.id).first()
@@ -199,6 +212,11 @@ def submit_review(id):
 @business_owner_required
 def dashboard():
     """Business owner dashboard overview."""
+    if not current_user.is_approved:
+        from modules.business.models import BusinessVerification
+        verification = BusinessVerification.query.filter_by(user_id=current_user.id).first()
+        return render_template("business/verify.html", verification=verification)
+        
     establishment = _get_owner_establishment()
     
     stats = {}
@@ -222,9 +240,46 @@ def dashboard():
         stats=stats,
     )
 
-@business_bp.route("/establishment/create", methods=["GET", "POST"])
+@business_bp.route("/verify", methods=["POST"])
 @login_required
 @business_owner_required
+def submit_verification():
+    """Submit business verification documents."""
+    if current_user.is_approved:
+        flash("Your account is already approved.", "info")
+        return redirect(url_for("business.dashboard"))
+
+    from modules.business.models import BusinessVerification
+    verification = BusinessVerification.query.filter_by(user_id=current_user.id).first()
+    
+    permit_url = request.form.get("permit_document_url", "").strip()
+    other_url = request.form.get("other_document_url", "").strip()
+    
+    if not permit_url:
+        flash("Business permit document is required.", "error")
+        return redirect(url_for("business.dashboard"))
+        
+    if not verification:
+        verification = BusinessVerification(
+            user_id=current_user.id,
+            permit_document_url=permit_url,
+            other_document_url=other_url,
+            status="pending"
+        )
+        db.session.add(verification)
+    else:
+        verification.permit_document_url = permit_url
+        verification.other_document_url = other_url
+        verification.status = "pending"
+        verification.submitted_at = datetime.utcnow()
+        
+    db.session.commit()
+    flash("Verification documents submitted successfully. Please wait for admin approval.", "success")
+    return redirect(url_for("business.dashboard"))
+
+@business_bp.route("/establishment/create", methods=["GET", "POST"])
+@login_required
+@approved_business_owner_required
 @validate_form_data({
     "name": {"type": "string", "required": True, "min_length": 1, "max_length": 200},
     "description": {"type": "string", "max_length": 2000},
@@ -302,7 +357,7 @@ def create_establishment():
 
 @business_bp.route("/establishment/edit", methods=["GET", "POST"])
 @login_required
-@business_owner_required
+@approved_business_owner_required
 def edit_establishment():
     """Edit existing establishment."""
     establishment = _get_owner_establishment()
@@ -405,7 +460,7 @@ def edit_establishment():
 
 @business_bp.route("/rooms")
 @login_required
-@business_owner_required
+@approved_business_owner_required
 def manage_rooms():
     """List and manage rooms for inn/hotel."""
     establishment = _get_owner_establishment()
@@ -418,7 +473,7 @@ def manage_rooms():
 
 @business_bp.route("/rooms/add", methods=["POST"])
 @login_required
-@business_owner_required
+@approved_business_owner_required
 @validate_form_data({
     "name": {"type": "string", "required": True, "min_length": 1, "max_length": 200},
     "description": {"type": "string", "max_length": 1000},
@@ -461,7 +516,7 @@ def add_room():
 
 @business_bp.route("/rooms/<int:room_id>/edit", methods=["POST"])
 @login_required
-@business_owner_required
+@approved_business_owner_required
 def edit_room(room_id):
     """Edit an existing room."""
     establishment = _get_owner_establishment()
@@ -518,7 +573,7 @@ def edit_room(room_id):
 
 @business_bp.route("/rooms/<int:room_id>/delete", methods=["POST"])
 @login_required
-@business_owner_required
+@approved_business_owner_required
 def delete_room(room_id):
     """Delete a room."""
     establishment = _get_owner_establishment()
@@ -535,7 +590,7 @@ def delete_room(room_id):
 
 @business_bp.route("/menu")
 @login_required
-@business_owner_required
+@approved_business_owner_required
 def manage_menu():
     """List and manage menu items for restaurant/cafe."""
     establishment = _get_owner_establishment()
@@ -561,7 +616,7 @@ def manage_menu():
 
 @business_bp.route("/menu/add", methods=["POST"])
 @login_required
-@business_owner_required
+@approved_business_owner_required
 def add_menu_item():
     """Add a new menu item."""
     establishment = _get_owner_establishment()
@@ -615,7 +670,7 @@ def add_menu_item():
 
 @business_bp.route("/menu/<int:item_id>/edit", methods=["POST"])
 @login_required
-@business_owner_required
+@approved_business_owner_required
 def edit_menu_item(item_id):
     """Edit an existing menu item."""
     establishment = _get_owner_establishment()
@@ -667,7 +722,7 @@ def edit_menu_item(item_id):
 
 @business_bp.route("/menu/<int:item_id>/delete", methods=["POST"])
 @login_required
-@business_owner_required
+@approved_business_owner_required
 def delete_menu_item(item_id):
     """Delete a menu item."""
     establishment = _get_owner_establishment()
@@ -684,7 +739,7 @@ def delete_menu_item(item_id):
 
 @business_bp.route("/reviews")
 @login_required
-@business_owner_required
+@approved_business_owner_required
 def view_reviews():
     """View reviews for the business owner's establishment."""
     establishment = _get_owner_establishment()
@@ -705,7 +760,7 @@ def view_reviews():
 
 @business_bp.route("/reviews/reply/<int:review_id>", methods=["POST"])
 @login_required
-@business_owner_required
+@approved_business_owner_required
 @limiter.limit("10 per minute")
 def reply_to_review(review_id):
     establishment = _get_owner_establishment()
@@ -745,7 +800,7 @@ def reply_to_review(review_id):
 
 @business_bp.route("/browse")
 @login_required
-@business_owner_required
+@approved_business_owner_required
 def browse_peers():
     """Browse other approved establishments of the same type."""
     establishment = _get_owner_establishment()

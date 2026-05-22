@@ -125,3 +125,16 @@ class UserFavoriteEstablishment(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=False)
     establishment_id = db.Column(db.Integer, db.ForeignKey("ESTABLISHMENT.id"), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+
+class BusinessVerification(db.Model):
+    __tablename__ = 'BUSINESS_VERIFICATION'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=False, index=True)
+    permit_document_url = db.Column(db.String(500), nullable=False)
+    other_document_url = db.Column(db.String(500), nullable=True)
+    status = db.Column(db.String(20), default='pending')  # pending, approved, rejected
+    submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    user = db.relationship("User", backref=db.backref("business_verification", uselist=False))
+

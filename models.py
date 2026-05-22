@@ -18,7 +18,7 @@ from modules.events.models import Event, UserEventInterest
 from modules.barangay.models import BarangayInfo
 
 # === Business Module Models ===
-from modules.business.models import Establishment, EstablishmentRoom, EstablishmentMenuItem, EstablishmentReview, UserFavoriteEstablishment
+from modules.business.models import Establishment, EstablishmentRoom, EstablishmentMenuItem, EstablishmentReview, UserFavoriteEstablishment, BusinessVerification
 
 # === Heritage Module Models ===
 from modules.heritage.models import HeritageProfile
