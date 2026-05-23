@@ -77,6 +77,21 @@ def create_app(config_name=None):
     def load_user(user_id):
         from models import User
         return User.query.get(int(user_id))
+
+    @login_manager.unauthorized_handler
+    def unauthorized():
+        from flask import request, jsonify, flash, redirect, url_for
+        # Handle AJAX/fetch requests by returning 401 JSON instead of 302 Redirect
+        if request.is_json or request.path.startswith('/api/') or request.headers.get('X-Requested-With') == 'XMLHttpRequest' or 'application/json' in request.accept_mimetypes.values() or request.path.startswith('/user/') or request.path.startswith('/booking/'):
+            return jsonify({
+                "success": False,
+                "status": "error",
+                "message": "Please log in to access this resource.",
+                "redirect_url": url_for("auth.login")
+            }), 401
+            
+        flash(login_manager.login_message, login_manager.login_message_category)
+        return redirect(url_for(login_manager.login_view, next=request.url))
     
     if not is_vercel:
         from flask_migrate import Migrate

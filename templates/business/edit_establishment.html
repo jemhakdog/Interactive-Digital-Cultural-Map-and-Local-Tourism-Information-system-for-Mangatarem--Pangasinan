@@ -41,7 +41,7 @@
     </div>
 
     <!-- Setup Form Container -->
-    <form method="POST" action="{{ url_for('business.edit_establishment') if establishment else url_for('business.create_establishment') }}" class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm space-y-8">
+    <form method="POST" enctype="multipart/form-data" action="{{ url_for('business.edit_establishment') if establishment else url_for('business.create_establishment') }}" class="bg-white border border-slate-100 rounded-3xl p-8 shadow-sm space-y-8">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
         <!-- Block 1: Basic Classification -->
@@ -201,19 +201,27 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div class="space-y-1.5">
-                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-wider">Cover Banner Image URL</label>
-                    <input type="url" name="cover_image_url" 
-                           value="{{ establishment.cover_image_url if establishment else '' }}"
-                           placeholder="https://images.unsplash.com/photo-..."
+                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-wider">Cover Banner Image</label>
+                    {% if establishment and establishment.cover_image_url %}
+                        <div class="mb-2">
+                            <img src="{{ establishment.cover_image_url }}" alt="Cover preview" class="h-16 w-auto rounded border">
+                        </div>
+                    {% endif %}
+                    <input type="file" name="cover_image_file" accept="image/*"
                            class="w-full bg-slate-50 border border-slate-200 text-xs font-bold rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 {{ focus_ring }} transition-all duration-300">
+                    <p class="text-[9px] text-slate-400 mt-1">Upload a new image to replace the current one.</p>
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-wider">Brand Logo URL</label>
-                    <input type="url" name="logo_url" 
-                           value="{{ establishment.logo_url if establishment else '' }}"
-                           placeholder="https://images.unsplash.com/photo-..."
+                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-wider">Brand Logo Image</label>
+                    {% if establishment and establishment.logo_url %}
+                        <div class="mb-2">
+                            <img src="{{ establishment.logo_url }}" alt="Logo preview" class="h-16 w-auto rounded border">
+                        </div>
+                    {% endif %}
+                    <input type="file" name="logo_file" accept="image/*"
                            class="w-full bg-slate-50 border border-slate-200 text-xs font-bold rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 {{ focus_ring }} transition-all duration-300">
+                    <p class="text-[9px] text-slate-400 mt-1">Upload a new logo to replace the current one.</p>
                 </div>
             </div>
         </div>

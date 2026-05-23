@@ -24,6 +24,7 @@ from utils.security import (
     validate_phone,
     sanitize_url,
 )
+from utils.file_helpers import save_uploaded_file
 
 business_bp = Blueprint("business", __name__, url_prefix="/business")
 logger = logging.getLogger(__name__)
@@ -316,6 +317,14 @@ def create_establishment():
             db.session.add(barangay)
             db.session.flush()
 
+        cover_image_url = None
+        if "cover_image_file" in request.files and request.files["cover_image_file"].filename:
+            cover_image_url = save_uploaded_file(request.files["cover_image_file"])
+
+        logo_url = None
+        if "logo_file" in request.files and request.files["logo_file"].filename:
+            logo_url = save_uploaded_file(request.files["logo_file"])
+
         establishment = Establishment(
             name=name,
             type=request.form.get("type"),
@@ -328,8 +337,8 @@ def create_establishment():
             email=email,
             website=website,
             price_range=price_range,
-            cover_image_url=request.form.get("cover_image_url"),
-            logo_url=request.form.get("logo_url"),
+            cover_image_url=cover_image_url,
+            logo_url=logo_url,
             owner_id=current_user.id,
             status="pending",
         )
@@ -436,8 +445,11 @@ def edit_establishment():
         establishment.email = email
         establishment.website = website
         establishment.price_range = price_range
-        establishment.cover_image_url = request.form.get("cover_image_url")
-        establishment.logo_url = request.form.get("logo_url")
+        if "cover_image_file" in request.files and request.files["cover_image_file"].filename:
+            establishment.cover_image_url = save_uploaded_file(request.files["cover_image_file"])
+
+        if "logo_file" in request.files and request.files["logo_file"].filename:
+            establishment.logo_url = save_uploaded_file(request.files["logo_file"])
 
         amenities = request.form.getlist("amenities")
         establishment.amenities = amenities if amenities else None
@@ -652,13 +664,17 @@ def add_menu_item():
         flash(f"Invalid category: {err}", "error")
         return redirect(url_for("business.manage_menu"))
 
+    image_url = None
+    if "image_file" in request.files and request.files["image_file"].filename:
+        image_url = save_uploaded_file(request.files["image_file"])
+
     item = EstablishmentMenuItem(
         establishment_id=establishment.id,
         name=name,
         description=description,
         price=price_val,
         category=category,
-        image_url=request.form.get("image_url"),
+        image_url=image_url,
         is_available=request.form.get("is_available") == "on",
         is_bestseller=request.form.get("is_bestseller") == "on",
     )
@@ -712,7 +728,10 @@ def edit_menu_item(item_id):
     item.description = description
     item.price = price_val
     item.category = category
-    item.image_url = request.form.get("image_url")
+    
+    if "image_file" in request.files and request.files["image_file"].filename:
+        item.image_url = save_uploaded_file(request.files["image_file"])
+        
     item.is_available = request.form.get("is_available") == "on"
     item.is_bestseller = request.form.get("is_bestseller") == "on"
 

@@ -23,6 +23,11 @@ STROKE_DECISION = "#fbc02d"
 
 # (id, label, type, cx, cy, w, h, color, stroke)
 NODES = [
+    # Starts for each lane
+    ("START_V", "Start", "start", 200, 20, 80, 40, "#D5E8D4", "#82B366"),
+    ("START_C", "Start", "start", 600, 20, 80, 40, "#D5E8D4", "#82B366"),
+    ("START_A", "Start", "start", 1000, 20, 80, 40, "#D5E8D4", "#82B366"),
+    
     # Visitor
     ("V1", "Access Web Portal", "process", 200, 100, 180, 60, COLOR_VISITOR, STROKE_VISITOR),
     ("V2", "Search & Filter Categories", "process", 200, 250, 180, 60, COLOR_VISITOR, STROKE_VISITOR),
@@ -51,6 +56,11 @@ NODES = [
 
 # (src, tgt, label)
 EDGES = [
+    # Start Connections
+    ("START_V", "V1", ""),
+    ("START_C", "C1", ""),
+    ("START_A", "A1", ""),
+
     # Visitor
     ("V1", "V2", ""),
     ("V2", "V3", ""),
@@ -92,7 +102,9 @@ def create_flowchart():
         x = cx - w // 2
         y = cy - h // 2
         style = ""
-        if ntype == "process":
+        if ntype == "start":
+            style = f"ellipse;whiteSpace=wrap;html=1;fillColor={bg_color};strokeColor={stroke_color};strokeWidth=2;fontColor=#111111;"
+        elif ntype == "process":
             style = f"rounded=1;whiteSpace=wrap;html=1;fillColor={bg_color};strokeColor={stroke_color};strokeWidth=2;arcSize=10;fontColor=#111111;"
         elif ntype == "decision":
             style = f"rhombus;whiteSpace=wrap;html=1;fillColor={bg_color};strokeColor={stroke_color};strokeWidth=2;fontColor=#111111;"

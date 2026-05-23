@@ -83,6 +83,277 @@ FORM_MAPPING = {
 v1_docs_bp = Blueprint("v1_docs", __name__, url_prefix="/admin")
 
 
+def _parse_docx_file(stream):
+    """
+    Parses a docx file stream and extracts key-value pairs.
+    Returns (heritage_slug, extracted_data).
+    """
+    try:
+        import docx
+        from datetime import datetime
+        import re
+        
+        doc = docx.Document(stream)
+        
+        # Extract paragraphs
+        paragraphs_text = []
+        for p in doc.paragraphs:
+            if p.text.strip():
+                paragraphs_text.append(p.text.strip())
+                
+        # Extract tables
+        table_cells = []
+        for table in doc.tables:
+            for row in table.rows:
+                row_text = [cell.text.strip() for cell in row.cells]
+                table_cells.append(row_text)
+                
+        # Combine text for auto-detection
+        full_text_lower = (" ".join(paragraphs_text) + " " + " ".join([" ".join(row) for row in table_cells])).lower()
+        
+        # Detect slug based on key phrases matching forms 01-07
+        slug = None
+        
+        # Check first few paragraphs for explicit form prefix to avoid keyword leakage
+        first_few_text = " ".join(paragraphs_text[:10]).lower()
+        if "form 01" in first_few_text or "form 01a" in first_few_text:
+            slug = "natural"
+        elif "form 02" in first_few_text or "form 02a" in first_few_text:
+            slug = "built"
+        elif "form 03" in first_few_text or "form 03a" in first_few_text:
+            slug = "movable"
+        elif "form 04" in first_few_text or "form 04a" in first_few_text:
+            slug = "intangible"
+        elif "form 05" in first_few_text:
+            slug = "personality"
+        elif "form 06" in first_few_text:
+            slug = "institution"
+        elif "form 07" in first_few_text or "matrix of local government" in first_few_text or "lgu programs" in first_few_text:
+            slug = "program"
+            
+        if not slug:
+            # Fallback to reordered global keyword check to avoid leakage (check specific templates first)
+            if "lgu programs" in full_text_lower or "local government unit programs" in full_text_lower or "form 07" in full_text_lower or "matrix of local government" in full_text_lower:
+                slug = "program"
+            elif "cultural institutions" in full_text_lower or "cultural institution" in full_text_lower or "form 06" in full_text_lower:
+                slug = "institution"
+            elif "significant personalities" in full_text_lower or "personalities" in full_text_lower or "form 05" in full_text_lower:
+                slug = "personality"
+            elif "oral tradition" in full_text_lower or "intangible cultural" in full_text_lower or "form 04a" in full_text_lower:
+                slug = "intangible"
+            elif "tangible movable" in full_text_lower or "archaeological" in full_text_lower or "form 03a" in full_text_lower:
+                slug = "movable"
+            elif "tangible immovable" in full_text_lower or "govt and commercial" in full_text_lower or "form 02a" in full_text_lower:
+                slug = "built"
+            elif "natural resources" in full_text_lower or "land formation" in full_text_lower or "form 01a" in full_text_lower:
+                slug = "natural"
+            else:
+                slug = "natural" # default fallback
+            
+        extracted = {}
+        
+        def clean_val(v):
+            return v.strip().strip(":").strip().replace("\xa0", " ")
+            
+        def match_label(line, labels):
+            for label in labels:
+                if label.upper() in line.upper():
+                    if ":" in line:
+                        parts = line.split(":", 1)
+                        val = clean_val(parts[1])
+                        if val:
+                            return val
+            return None
+
+        # Parse paragraphs for core values
+        for i, line in enumerate(paragraphs_text):
+            # Name of asset / site / object / program
+            name_val = match_label(line, ["NAME OF NATURAL HERITAGE", "NAME OF THE SITE", "NAME OF HERITAGE", "NAME OF OBJECT", "NAME OF THE HERITAGE", "NAME OF IMMOVABLE HERITAGE", "NAME OF THE ELEMENT", "NAME OF INSTITUTION", "NAME OF PERSONALITY", "NAME", "MUNICIPALITY/CITY", "MUNICIPALITY"])
+            if name_val and "name" not in extracted:
+                extracted["name"] = name_val
+                extracted["name_of_asset"] = name_val
+                if "MUNICIPALITY" in line.upper():
+                    extracted["program_name"] = name_val + " Cultural Registry Program"
+                    extracted["lgu_name"] = name_val
+                else:
+                    extracted["program_name"] = name_val
+                
+            # Control number
+            ctrl_val = match_label(line, ["CONTROL NUMBER", "CONTROL NO"])
+            if ctrl_val and "form_control_number" not in extracted:
+                extracted["form_control_number"] = ctrl_val
+                
+            # Location/Address
+            loc_val = match_label(line, ["B. LOCATION", "C. ADDRESS", "C. ADDRESS/LOCATION/COORDINATES", "GEOGRAPHICAL LOCATION", "LOCATION/ADDRESS", "PRESENT ADDRESS", "MUNICIPALITY/CITY"])
+            if loc_val:
+                if "address" not in extracted: extracted["address"] = loc_val
+                if "location" not in extracted: extracted["location"] = loc_val
+                if "geographical_range" not in extracted: extracted["geographical_range"] = loc_val
+                
+            # Birth place
+            bp_val = match_label(line, ["BIRTH PLACE"])
+            if bp_val and "address" not in extracted:
+                extracted["address"] = bp_val
+                
+            # Prominence/Sub-category
+            prom_val = match_label(line, ["PROMINENCE", "TYPE OF CULTURAL INSTITUTION", "CATEGORY", "A. TYPE", "A. SUB-CATEGORY"])
+            if prom_val:
+                if "category" not in extracted: extracted["category"] = prom_val
+                if "prominence_field" not in extracted: extracted["prominence_field"] = prom_val
+                if "type_of_natural_heritage" not in extracted: extracted["type_of_natural_heritage"] = prom_val
+                if "type_of_object" not in extracted: extracted["type_of_object"] = prom_val
+                if "type_of_institution" not in extracted: extracted["type_of_institution"] = prom_val
+
+            # Dates
+            dates_val = match_label(line, ["YEAR CONSTRUCTED", "ESTIMATED AGE", "DATE FOUND", "DATE OF BIRTH", "DATE OF DEATH", "DATE CREATED"])
+            if dates_val:
+                if "dates" not in extracted: extracted["dates"] = dates_val
+                if "date_produced" not in extracted: extracted["date_produced"] = dates_val
+                if "dates_of_birth_death" not in extracted: extracted["dates_of_birth_death"] = dates_val
+                if "date_created" not in extracted: extracted["date_created"] = dates_val
+                
+            # Ownership
+            own_val = match_label(line, ["OWNERSHIP/ JURISDICTION", "OWNERSHIP/JURISDICTION", "OWNERSHIP", "NAME OF OWNER"])
+            if own_val and "ownership" not in extracted:
+                extracted["ownership"] = own_val
+                
+            # Look-ahead parser for multi-line descriptive headings
+            def look_ahead_text(index, limit=3):
+                text_blocks = []
+                for j in range(index + 1, min(index + 1 + limit, len(paragraphs_text))):
+                    next_line = paragraphs_text[j]
+                    
+                    # Break if it looks like a new main section header
+                    upper_next = next_line.upper().strip()
+                    is_new_section = False
+                    
+                    # Check for roman numerals or alphabet prefixes
+                    for prefix in ["I.", "II.", "III.", "IV.", "V.", "VI.", "VII.", "A.", "B.", "C.", "D.", "E.", "F.", "G."]:
+                        if upper_next.startswith(prefix):
+                            is_new_section = True
+                            break
+                            
+                    # Check for exact header words or standard standalone heading titles
+                    for hdr in ["BACKGROUND", "DESCRIPTION", "STORIES", "SIGNIFICANCE", "CONSERVATION MEASURES", "SAFEGUARDING MEASURES", "REFERENCES", "ATTACHMENTS", "LIST OF", "LGU VISION", "LGU MISSION", "LGU GOAL"]:
+                        if upper_next == hdr or upper_next.startswith(hdr + " ") or (hdr in upper_next and len(upper_next) < len(hdr) + 5):
+                            is_new_section = True
+                            break
+                            
+                    if is_new_section:
+                        break
+                        
+                    if next_line.strip().startswith("(") and next_line.strip().endswith(")"):
+                        continue
+                    if next_line.strip().startswith("[") and next_line.strip().endswith("]"):
+                        continue
+                    text_blocks.append(next_line)
+                return " ".join(text_blocks).strip()
+
+            if ("II. DESCRIPTION" in line.upper() or "A. PHYSICAL DESCRIPTION" in line.upper() or "A. PHYSICAL FEATURES" in line.upper()) and "description" not in extracted:
+                desc = look_ahead_text(i, limit=4)
+                if desc: extracted["description"] = desc
+            elif ("STORIES ASSOCIATED" in line.upper() or "STORIES/NARRATIVES" in line.upper() or "STORIES AND NARRATIVES" in line.upper()) and "stories" not in extracted:
+                stories = look_ahead_text(i, limit=4)
+                if stories: extracted["stories"] = stories
+            elif ("IV. SIGNIFICANCE" in line.upper() or "BIODIVERSITY SIGNIFICANCE" in line.upper()) and "significance" not in extracted:
+                sig = look_ahead_text(i, limit=4)
+                if sig: extracted["significance"] = sig
+            elif ("CONSTRAINTS/THREATS" in line.upper() or "ISSUES/CHALLENGES" in line.upper()) and "constraints_threats" not in extracted:
+                con = look_ahead_text(i, limit=4)
+                if con: extracted["constraints_threats"] = con
+            elif ("CONSERVATION MEASURES" in line.upper() or "SAFEGUARDING MEASURES" in line.upper()) and "conservation_measures" not in extracted:
+                cons_m = look_ahead_text(i, limit=4)
+                if cons_m: 
+                    extracted["conservation_measures"] = cons_m
+                    extracted["safeguarding_description"] = cons_m
+            elif "LGU VISION STATEMENT" in line.upper() and "vision" not in extracted:
+                vision = look_ahead_text(i, limit=4)
+                if vision: extracted["vision"] = vision
+            elif "LGU MISSION STATEMENT" in line.upper() and "mission" not in extracted:
+                mission = look_ahead_text(i, limit=4)
+                if mission: extracted["mission"] = mission
+            elif "LGU GOAL STATEMENTS" in line.upper() and "goals" not in extracted:
+                goals = look_ahead_text(i, limit=4)
+                if goals: extracted["goals"] = goals
+            elif "B. BRIEF HISTORY OF THE LGU" in line.upper() and "history" not in extracted:
+                history = look_ahead_text(i, limit=4)
+                if history:
+                    extracted["history"] = history
+                    extracted["description"] = history
+            elif "G. LGU PROGRAMS ON CULTURE, ARTS, AND HERITAGE" in line.upper() and "strategies" not in extracted:
+                strat = look_ahead_text(i, limit=4)
+                if strat: extracted["strategies"] = strat
+
+        # Parse tables for details like informants, mapper name, references, profiling date
+        for row in table_cells:
+            for idx, cell in enumerate(row):
+                cell_upper = cell.upper()
+                if "KEY INFORMANT/S" in cell_upper or "KEY INFORMANT" in cell_upper:
+                    val = ""
+                    if ":" in cell:
+                        val = clean_val(cell.split(":", 1)[1])
+                    if not val and idx + 1 < len(row):
+                        val = clean_val(row[idx + 1])
+                    if val:
+                        extracted["key_informants"] = [val] if slug in ["built", "natural", "movable", "intangible", "personality", "institution", "program"] else val
+                        
+                elif "REFERENCE/S" in cell_upper or "REFERENCES" in cell_upper or "REFERENCE AND OTHER RESOURCES" in cell_upper:
+                    val = ""
+                    if ":" in cell:
+                        val = clean_val(cell.split(":", 1)[1])
+                    if not val and idx + 1 < len(row):
+                        val = clean_val(row[idx + 1])
+                    if val:
+                        extracted["reference_sources"] = val
+                        
+                elif "NAME OF MAPPER/S" in cell_upper or "NAME OF MAPPER" in cell_upper or "MAPPER" in cell_upper:
+                    val = ""
+                    if ":" in cell:
+                        val = clean_val(cell.split(":", 1)[1])
+                    if not val and idx + 1 < len(row):
+                        val = clean_val(row[idx + 1])
+                    if val:
+                        extracted["mapper_name"] = val
+                        
+                elif "DATE PROFILED" in cell_upper or "DATE OF PROFILE" in cell_upper:
+                    val = ""
+                    if ":" in cell:
+                        val = clean_val(cell.split(":", 1)[1])
+                    if not val and idx + 1 < len(row):
+                        val = clean_val(row[idx + 1])
+                    if val:
+                        extracted["date_profiled"] = val
+                        
+                elif "CONTROL NUMBER" in cell_upper:
+                    val = ""
+                    if ":" in cell:
+                        val = clean_val(cell.split(":", 1)[1])
+                    if not val and idx + 1 < len(row):
+                        val = clean_val(row[idx + 1])
+                    if val:
+                        extracted["form_control_number"] = val
+                        
+                # Check for checkboxes inside table content
+                for cell_item in row:
+                    if "[x]" in cell_item.lower() or "[ ]" in cell_item:
+                        matches = re.findall(r'\[\s*[xX]\s*\]\s*([A-Za-z0-9\s/]+)', cell_item)
+                        if matches:
+                            checked_val = " ".join([m.strip() for m in matches if m.strip()])
+                            if checked_val:
+                                if "category" not in extracted or not extracted["category"]:
+                                    extracted["category"] = checked_val
+                                    extracted["type_of_natural_heritage"] = checked_val
+                                    extracted["type_of_object"] = checked_val
+                                    extracted["type_of_institution"] = checked_val
+                                    
+        return slug, extracted
+    except Exception as e:
+        logger.error(f"Error parsing docx file: {e}")
+        import traceback
+        traceback.print_exc()
+        return None, None
+
+
 def _require_admin():
     """Abort with 403 if current user is not admin."""
     if current_user.role != "admin":
@@ -542,7 +813,7 @@ def v1_documents_export_all():
 @v1_docs_bp.route("/v1/documents/import", methods=["POST"])
 @login_required
 def v1_document_import():
-    """Import a DOCX file and update its structure in JSON."""
+    """Import a DOCX file, auto-detect the form category, parse fields, and pre-fill creator."""
     admin_check = _require_admin()
     if admin_check:
         return admin_check
@@ -564,8 +835,22 @@ def v1_document_import():
         flash("File size exceeds maximum allowed size (10MB).")
         return redirect(url_for("v1_docs.v1_documents_view"))
 
-    flash("Import feature logic is being finalized. Contact support for updates.")
-    return redirect(url_for("v1_docs.v1_documents_view"))
+    try:
+        from flask import session
+        slug, extracted = _parse_docx_file(file.stream)
+        if not slug or not extracted:
+            flash("Could not parse docx file. Ensure it is a valid Form 01-07 document.", "error")
+            return redirect(url_for("v1_docs.v1_documents_view"))
+
+        session["prefilled_heritage_data"] = extracted
+        session["prefilled_heritage_slug"] = slug
+        
+        flash(f"Successfully parsed {FORM_MAPPING.get(slug, {}).get('label', slug)} document! Please review and save.", "success")
+        return redirect(url_for("v1_docs.v1_document_create", slug=slug, prefilled=1))
+    except Exception as e:
+        logger.error(f"Error importing document: {e}")
+        flash(f"An error occurred during import: {str(e)}", "error")
+        return redirect(url_for("v1_docs.v1_documents_view"))
 
 
 @v1_docs_bp.route("/v1/documents/create/<slug>", methods=["GET", "POST"])
@@ -586,6 +871,13 @@ def v1_document_create(slug):
     
     all_forms_data = _load_all_forms()
     template_structure = all_forms_data.get(meta["key"])
+    
+    # Check if we should load pre-filled data from session
+    from flask import session
+    prefilled_data = None
+    if request.method == "GET" and request.args.get("prefilled") == "1" and session.get("prefilled_heritage_slug") == slug:
+        prefilled_data = session.pop("prefilled_heritage_data", None)
+        session.pop("prefilled_heritage_slug", None)
     
     if request.method == "POST":
         from models import HeritageProfile
@@ -638,6 +930,7 @@ def v1_document_create(slug):
                            meta=meta, 
                            template=template_structure,
                            config=heritage_config,
+                           prefilled_data=prefilled_data,
                            is_edit=False)
 
 

@@ -86,3 +86,35 @@ def api_attractions():
     response = jsonify(payload)
     response.headers["X-Cache"] = "MISS"
     return response
+
+@api_bp.route("/map-feedback", methods=["POST"])
+def submit_map_feedback():
+    """
+    Accepts feedback from the interactive map.
+    """
+    try:
+        data = request.get_json()
+        if not data or not data.get("message") or not data.get("type"):
+            return jsonify({"error": "Missing required fields"}), 400
+            
+        from models import MapFeedback
+        from extensions import db
+        
+        attraction_id = data.get("attraction_id")
+        if not attraction_id or attraction_id == "":
+            attraction_id = None
+            
+        new_feedback = MapFeedback(
+            attraction_id=attraction_id,
+            feedback_type=data.get("type"),
+            message=data.get("message")
+        )
+        
+        db.session.add(new_feedback)
+        db.session.commit()
+        
+        return jsonify({"message": "Feedback submitted successfully"}), 201
+        
+    except Exception as e:
+        logger.error(f"Error submitting map feedback: {str(e)}")
+        return jsonify({"error": "An internal error occurred"}), 500

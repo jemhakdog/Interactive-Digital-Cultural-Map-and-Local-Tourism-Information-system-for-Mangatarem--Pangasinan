@@ -315,6 +315,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 barangay: feature.properties.barangay_id,
                 description: feature.properties.description || '',
                 image: feature.properties.image_url || '',
+                opening_hours: feature.properties.opening_hours || '',
+                entrance_fee: feature.properties.entrance_fee || '',
+                contact_info: feature.properties.contact_info || '',
+                facilities: feature.properties.facilities || '',
+                advisory_message: feature.properties.advisory_message || '',
+                advisory_status: feature.properties.advisory_status || '',
                 lat: e.lngLat.lat,
                 lng: e.lngLat.lng
             };
@@ -718,8 +724,13 @@ document.addEventListener('DOMContentLoaded', function () {
     const cardAddress = document.getElementById('card-address');
     const cardRating = document.getElementById('card-rating');
     const cardHours = document.getElementById('card-hours');
-    const cardDistance = document.getElementById('card-distance');
+    const cardFee = document.getElementById('card-fee');
+    const cardContact = document.getElementById('card-contact');
+    const cardFacilities = document.getElementById('card-facilities');
+    const cardAdvisoryBanner = document.getElementById('card-advisory-banner');
+    const cardAdvisoryText = document.getElementById('card-advisory-text');
     const cardDescription = document.getElementById('card-description');
+    const feedbackAttractionId = document.getElementById('feedback-attraction-id');
 
     function updateCard(attraction) {
         if (!placeCard) return;
@@ -733,6 +744,33 @@ document.addEventListener('DOMContentLoaded', function () {
         cardAddress.textContent = attraction.barangay ? `${attraction.barangay}, Mangatarem` : 'Mangatarem, Pangasinan';
         cardDescription.textContent = attraction.description;
         cardRating.textContent = (Math.random() * (5.0 - 4.0) + 4.0).toFixed(1);
+
+        // New Practical Fields
+        if (cardHours) cardHours.textContent = attraction.opening_hours || 'N/A';
+        if (cardFee) cardFee.textContent = attraction.entrance_fee || 'Free';
+        if (cardContact) cardContact.textContent = attraction.contact_info || 'N/A';
+        if (cardFacilities) cardFacilities.textContent = attraction.facilities || 'N/A';
+        if (feedbackAttractionId) feedbackAttractionId.value = attraction.id || '';
+
+        // Advisory Handling
+        if (cardAdvisoryBanner && cardAdvisoryText) {
+            if (attraction.advisory_message) {
+                cardAdvisoryText.textContent = attraction.advisory_message;
+                cardAdvisoryBanner.classList.remove('hidden');
+                
+                // Styling based on status
+                cardAdvisoryBanner.className = 'mb-3 mt-1 p-2 rounded-lg text-xs font-bold border flex items-center gap-2 ';
+                if (attraction.advisory_status === 'Danger') {
+                    cardAdvisoryBanner.className += 'bg-red-50 border-red-200 text-red-700';
+                } else if (attraction.advisory_status === 'Warning') {
+                    cardAdvisoryBanner.className += 'bg-amber-50 border-amber-200 text-amber-700';
+                } else {
+                    cardAdvisoryBanner.className += 'bg-sky-50 border-sky-200 text-sky-700';
+                }
+            } else {
+                cardAdvisoryBanner.classList.add('hidden');
+            }
+        }
 
         placeCard.classList.remove('hidden');
         placeCard.classList.remove('translate-y-full');
@@ -2429,6 +2467,52 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.speechSynthesis.speak(speechUtterance);
             } else {
                 Swal.fire("Paumanhin / Sorry", "Hindi suportado ng iyong browser ang pagbasa ng kuwento. / Speech synthesis not supported by your device browser.", "warning");
+            }
+        });
+    }
+
+    // Feedback Event Listeners
+    const feedbackBtn = document.getElementById('feedback-btn');
+    const feedbackModal = document.getElementById('map-feedback-modal');
+    const feedbackForm = document.getElementById('map-feedback-form');
+
+    if (feedbackBtn && feedbackModal) {
+        feedbackBtn.addEventListener('click', () => {
+            feedbackModal.classList.remove('hidden');
+        });
+    }
+
+    if (feedbackForm) {
+        feedbackForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const attractionId = document.getElementById('feedback-attraction-id').value;
+            const type = document.getElementById('feedback-type').value;
+            const message = document.getElementById('feedback-message').value;
+
+            try {
+                const response = await fetch('/api/map-feedback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        attraction_id: attractionId,
+                        type: type,
+                        message: message
+                    })
+                });
+
+                if (response.ok) {
+                    Swal.fire("Thank You!", "Your feedback has been submitted successfully.", "success");
+                    feedbackModal.classList.add('hidden');
+                    feedbackForm.reset();
+                } else {
+                    Swal.fire("Error", "Could not submit feedback at this time.", "error");
+                }
+            } catch (error) {
+                console.error("Feedback error:", error);
+                Swal.fire("Error", "An unexpected error occurred.", "error");
             }
         });
     }

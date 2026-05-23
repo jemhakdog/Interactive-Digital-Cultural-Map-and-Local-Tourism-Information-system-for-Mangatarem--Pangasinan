@@ -175,6 +175,17 @@
                         </div>
                     </div>
                 </div>
+
+                <div>
+                    <button onclick="triggerImport()" class="btn-action shadow-sm bg-emerald-600 !text-white !border-emerald-500 hover:!bg-emerald-700 cursor-pointer">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                        Import Filled Form (.docx)
+                    </button>
+                    <form id="import-form" action="{{ url_for('v1_docs.v1_document_import') }}" method="POST" enctype="multipart/form-data" class="hidden">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                        <input type="file" id="docx_file_input" name="docx_file" accept=".docx" onchange="submitImportForm()">
+                    </form>
+                </div>
                 
                 <button class="btn-action shadow-sm">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
@@ -343,7 +354,35 @@
         </div>
     </div>
 </div>
+
+<!-- Full-screen blur loading overlay -->
+<div id="loading-overlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[9999] flex flex-col items-center justify-center hidden">
+    <div class="bg-white p-8 rounded-2xl border border-white/20 shadow-2xl flex flex-col items-center max-w-sm text-center">
+        <!-- Spinner -->
+        <div class="relative w-16 h-16 mb-4">
+            <div class="absolute inset-0 rounded-full border-4 border-emerald-100"></div>
+            <div class="absolute inset-0 rounded-full border-4 border-emerald-600 border-t-transparent animate-spin"></div>
+        </div>
+        <h3 class="text-lg font-semibold text-slate-800 mb-2">Parsing Document</h3>
+        <p class="text-sm text-slate-500">Extracting fields, checkboxes, and table data from your Word file. Please wait...</p>
+    </div>
+</div>
+
 <script>
+    function triggerImport() {
+        document.getElementById('docx_file_input').click();
+    }
+
+    function submitImportForm() {
+        const fileInput = document.getElementById('docx_file_input');
+        if (fileInput.files.length > 0) {
+            // Show loading spinner
+            document.getElementById('loading-overlay').classList.remove('hidden');
+            // Submit form
+            document.getElementById('import-form').submit();
+        }
+    }
+
     function copyDocName(name) {
         navigator.clipboard.writeText(name).then(() => {
             alert('Filename copied to clipboard: ' + name);

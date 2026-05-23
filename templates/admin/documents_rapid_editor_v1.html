@@ -108,7 +108,7 @@
                             <div class="mt-2 bg-indigo-50/30 p-4 rounded-2xl border border-indigo-100 flex items-center gap-3">
                                 <span class="text-[10px] font-sans font-black text-indigo-600 uppercase w-20">{{ field_label }}:</span>
                                 <input type="text" name="{{ field_key }}" 
-                                       value="{{ (record[field_key] if record else (detail[field_key] if detail else "")) }}"
+                                       value="{{ record[field_key] if record else (detail[field_key] if detail else (prefilled_data.get(field_key, '') if prefilled_data else '')) }}"
                                        placeholder="Enter {{ field_label }}..."
                                        class="flex-1 bg-transparent border-none focus:ring-0 text-sm text-slate-800 border-b border-indigo-200 focus:border-indigo-500 py-1 transition-colors">
                             </div>
@@ -133,6 +133,12 @@
                                         {% set val = detail[f_key] %}
                                     {% elif detail and detail.meta_data and f_key in detail.meta_data %}
                                         {% set val = detail.meta_data[f_key] %}
+                                    {% elif prefilled_data and f_key in prefilled_data %}
+                                        {% set val = prefilled_data[f_key] %}
+                                    {% endif %}
+
+                                    {% if val is iterable and val is not string %}
+                                        {% set val = val | join(', ') %}
                                     {% endif %}
 
                                     {% if f_type == 'textarea' %}

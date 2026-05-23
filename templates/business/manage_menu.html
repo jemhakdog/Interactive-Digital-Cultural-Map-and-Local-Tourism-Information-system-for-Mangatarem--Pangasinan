@@ -44,7 +44,7 @@
                 <h2 class="text-xs font-black uppercase text-slate-700 tracking-wider">Add New Dish</h2>
             </div>
 
-            <form method="POST" action="{{ url_for('business.add_menu_item') }}" class="space-y-4">
+            <form method="POST" action="{{ url_for('business.add_menu_item') }}" enctype="multipart/form-data" class="space-y-4">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                 <div class="space-y-1.5">
@@ -80,8 +80,8 @@
                 </div>
 
                 <div class="space-y-1.5">
-                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-wider">Dish Image URL</label>
-                    <input type="url" name="image_url" placeholder="https://..."
+                    <label class="block text-[10px] font-black uppercase text-slate-400 tracking-wider">Dish Image</label>
+                    <input type="file" name="image_file" accept="image/*"
                            class="w-full bg-slate-50 border border-slate-200 text-xs font-bold rounded-xl px-4 py-3 text-slate-800 focus:outline-none focus:bg-white focus:ring-2 {{ focus_ring }} transition-all duration-300">
                 </div>
 

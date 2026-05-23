@@ -66,6 +66,12 @@ LAYER_CONFIG = {
             "barangay_id",
             "image_url",
             "status",
+            "opening_hours",
+            "entrance_fee",
+            "contact_info",
+            "facilities",
+            "advisory_message",
+            "advisory_status",
         ],
     },
     "natural_heritage": {

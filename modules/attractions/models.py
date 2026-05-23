@@ -23,6 +23,17 @@ class Attraction(db.Model):
     is_featured = db.Column(db.Boolean, default=False)
     physical_status = db.Column(db.String(50), default="Open Public", nullable=True)
     is_verified = db.Column(db.Boolean, default=True, nullable=True)
+    
+    # Practical Details
+    opening_hours = db.Column(db.String(100), nullable=True)
+    entrance_fee = db.Column(db.String(100), nullable=True)
+    contact_info = db.Column(db.String(100), nullable=True)
+    facilities = db.Column(db.Text, nullable=True)
+    
+    # Safety and Environmental Advisories
+    advisory_message = db.Column(db.Text, nullable=True)
+    advisory_status = db.Column(db.String(20), nullable=True, default="Normal")
+    
     # Linked to User (steward) who manages this attraction
     user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=True, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, index=True)
@@ -59,6 +70,12 @@ class Attraction(db.Model):
             'status': self.status,
             'physical_status': self.physical_status,
             'is_verified': self.is_verified,
+            'opening_hours': self.opening_hours,
+            'entrance_fee': self.entrance_fee,
+            'contact_info': self.contact_info,
+            'facilities': self.facilities,
+            'advisory_message': self.advisory_message,
+            'advisory_status': self.advisory_status,
             'created_at': self.created_at.isoformat() if self.created_at else None,
             'osm_alternatives': self.osm_alternatives
         }
@@ -125,3 +142,15 @@ class UserFavoriteAttraction(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=False)
     attraction_id = db.Column(db.Integer, db.ForeignKey("ATTRACTION.id"), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+class MapFeedback(db.Model):
+    """Anonymous or logged-in feedback submitted directly from the map."""
+    __tablename__ = 'MAP_FEEDBACK'
+    id = db.Column(db.Integer, primary_key=True)
+    attraction_id = db.Column(db.Integer, db.ForeignKey("ATTRACTION.id"), nullable=True)
+    feedback_type = db.Column(db.String(50), nullable=False) # 'review', 'correction', 'safety'
+    message = db.Column(db.Text, nullable=False)
+    status = db.Column(db.String(20), default="pending") # pending, resolved, dismissed
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    attraction = db.relationship('Attraction', backref='map_feedbacks')

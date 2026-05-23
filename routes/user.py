@@ -70,6 +70,33 @@ def dashboard():
         .all()
     )
 
+    # Badges Calculation
+    total_visits = VisitorLog.query.filter_by(visitor_user_id=current_user.id).count()
+    badges = [
+        {"id": "first_steps", "unlocked": total_visits >= 1, "name": "First Steps", "desc": "Logged your first visit", "icon": "🥉"},
+        {"id": "explorer", "unlocked": total_visits >= 5, "name": "Explorer", "desc": "Logged 5+ visits", "icon": "🎒"}
+    ]
+    
+    # Heritage Scholar Badge
+    heritage_visits_count = db.session.query(VisitorLog).join(
+        Attraction, VisitorLog.target_id == Attraction.id
+    ).filter(
+        VisitorLog.visitor_user_id == current_user.id,
+        VisitorLog.target_type == 'attraction',
+        Attraction.category.in_(['Historical', 'Religious'])
+    ).count()
+    badges.append({"id": "heritage_scholar", "unlocked": heritage_visits_count >= 3, "name": "Heritage Scholar", "desc": "Visited 3+ Historical/Religious sites", "icon": "📜"})
+        
+    # Foodie Badge
+    foodie_visits_count = db.session.query(VisitorLog).join(
+        Establishment, VisitorLog.target_id == Establishment.id
+    ).filter(
+        VisitorLog.visitor_user_id == current_user.id,
+        VisitorLog.target_type == 'establishment',
+        Establishment.type.in_(['restaurant', 'cafe'])
+    ).count()
+    badges.append({"id": "foodie", "unlocked": foodie_visits_count >= 3, "name": "Foodie", "desc": "Visited 3+ dining establishments", "icon": "🍽️"})
+
     stats = {
         "favorites": favorite_count,
         "events": event_interest_count,
@@ -82,7 +109,8 @@ def dashboard():
         stats=stats, 
         recent_favorites=recent_favorites,
         recent_fav_establishments=recent_fav_establishments,
-        recent_visits=recent_visits
+        recent_visits=recent_visits,
+        badges=badges
     )
 
 
