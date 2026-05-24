@@ -113,12 +113,12 @@
                         All Stories
                     </button>
                     <button
-                        class="filter-btn px-6 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 text-gray-500 hover:text-sky-800"
+                        class="filter-btn px-6 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 text-gray-700 hover:text-sky-800"
                         data-filter="photo">
                         Heritage Photos
                     </button>
                     <button
-                        class="filter-btn px-6 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 text-gray-500 hover:text-sky-800"
+                        class="filter-btn px-6 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 text-gray-700 hover:text-sky-800"
                         data-filter="video">
                         Documentaries
                     </button>
@@ -128,13 +128,13 @@
                 <div class="flex flex-col sm:flex-row items-center gap-4 w-full xl:w-auto">
                     <div class="relative w-full sm:w-64 group">
                         <select id="barangay-filter"
-                            class="appearance-none w-full bg-white px-5 py-3 rounded-xl border border-gray-200 text-sm font-semibold focus:ring-4 focus:ring-sky-500/5 focus:border-sky-500 outline-none transition-all cursor-pointer">
+                            class="appearance-none w-full bg-white px-5 py-3 rounded-xl border border-gray-300 text-sm font-semibold focus:ring-4 focus:ring-sky-500/5 focus:border-sky-500 outline-none transition-all cursor-pointer">
                             <option value="all">Everywhere in Mangatarem</option>
                             {% for barangay in barangays %}
                             <option value="{{ barangay }}">{{ barangay }}</option>
                             {% endfor %}
                         </select>
-                        <svg class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-sky-500 transition-colors"
+                        <svg class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none group-hover:text-sky-500 transition-colors"
                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path d="M19 9l-7 7-7-7" stroke-width="2.5" stroke-linecap="round"
                                 stroke-linejoin="round" />
@@ -143,11 +143,11 @@
 
                     <div class="relative w-full sm:w-56 group">
                         <select id="sort-filter"
-                            class="appearance-none w-full bg-white px-5 py-3 rounded-xl border border-gray-200 text-sm font-semibold focus:ring-4 focus:ring-sky-500/5 focus:border-sky-500 outline-none transition-all cursor-pointer">
+                            class="appearance-none w-full bg-white px-5 py-3 rounded-xl border border-gray-300 text-sm font-semibold focus:ring-4 focus:ring-sky-500/5 focus:border-sky-500 outline-none transition-all cursor-pointer">
                             <option value="newest">Latest Uploads</option>
                             <option value="oldest">Time Capsule</option>
                         </select>
-                        <svg class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none group-hover:text-sky-500 transition-colors"
+                        <svg class="w-4 h-4 absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 pointer-events-none group-hover:text-sky-500 transition-colors"
                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path d="M19 9l-7 7-7-7" stroke-width="2.5" stroke-linecap="round"
                                 stroke-linejoin="round" />
@@ -233,7 +233,7 @@
                 </svg>
             </div>
             <h3 class="text-3xl font-cultural font-bold text-gray-900 mb-4">Capturing our History</h3>
-            <p class="text-gray-500 mb-10 leading-relaxed font-medium">There are currently no media entries. Be the
+            <p class="text-gray-700 mb-10 leading-relaxed font-medium">There are currently no media entries. Be the
                 first to immortalize our heritage by contributing your photos or videos.</p>
             <button data-action="open-modal" data-modal-id="upload-modal"
                 class="bg-sky-950 text-white px-10 py-3.5 rounded-full font-bold hover:shadow-xl hover:shadow-sky-950/20 transition-all duration-300">
@@ -314,7 +314,7 @@
     <div
         class="bg-white rounded-[2.5rem] p-12 max-w-md w-full mx-4 shadow-[0_32px_64px_-16px_rgba(0,0,0,0.2)] transform transition-all relative">
         <button data-action="close-modal" data-modal-id="upload-modal"
-            class="absolute top-8 right-8 p-2 text-gray-400 hover:text-sky-950 transition-colors">
+            class="absolute top-8 right-8 p-2 text-gray-600 hover:text-sky-950 transition-colors">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -330,7 +330,7 @@
                 </svg>
             </div>
             <h3 class="text-3xl font-cultural font-bold text-gray-900 mb-2">Preserve History</h3>
-            <p class="text-gray-500 font-medium">Verification Required</p>
+            <p class="text-gray-700 font-medium">Verification Required</p>
         </div>
 
         <div class="bg-sky-50/50 rounded-3xl p-6 mb-10 border border-sky-100 flex items-start gap-4">

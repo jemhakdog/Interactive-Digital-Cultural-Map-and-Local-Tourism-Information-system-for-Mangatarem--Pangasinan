@@ -753,6 +753,16 @@ document.addEventListener('DOMContentLoaded', function () {
         updateStats(place);
     }
 
+    // ========================================
+    // GEMINI LIVE API INTERFACE
+    // ========================================
+    window.geminiPanMap = function(lat, lng, zoom = 16) {
+        console.log(`[Gemini] Panning map to ${lat}, ${lng} at zoom ${zoom}`);
+        // Map_v2 uses [lng, lat] for flyToCoords regardless of engine because 
+        // flyToCoords internally swaps them for Leaflet
+        flyToCoords([lng, lat], zoom, 0);
+    };
+
     function flyToCoords(coords, zoom, pitch = 0) {
         if (!isLeafletMode) {
             map.flyTo({
@@ -836,7 +846,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     lat: state.selectedPlace.latitude || state.selectedPlace.lat, 
                     lng: state.selectedPlace.longitude || state.selectedPlace.lng 
                 };
-                getRoute(state.userLocation, destination);
+                
+                // Store the fixed origin and destination for mode switches
+                state.navOrigin = { lat: state.userLocation.lat, lng: state.userLocation.lng };
+                state.navDestination = destination;
+                
+                getRoute(state.navOrigin, state.navDestination);
+
+                // Hide the bottom sheet so that the Directions panel is the only thing visible
+                if (window.sheetManager) {
+                    window.sheetManager.snapTo('hidden');
+                }
             };
         }
     }
@@ -951,8 +971,10 @@ document.addEventListener('DOMContentLoaded', function () {
             
             const query = await fetch(url, { method: 'GET' });
             const json = await query.json();
-            if (!json.routes || json.routes.length === 0) {
-                Swal.fire('Route Not Found', 'No route found for this destination.', 'warning');
+            
+            if (json.code !== 'Ok' || !json.routes || json.routes.length === 0) {
+                const errorMsg = json.message || `No ${mode} route found. It might be too far.`;
+                Swal.fire('Route Not Found', errorMsg, 'warning');
                 return;
             }
 
@@ -1118,21 +1140,41 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 
                 state.isNavigating = false;
+
+                // Hide the place stats so "Start Navigation" button disappears
+                const statsEl = document.getElementById('place-stats');
+                if (statsEl) {
+                    statsEl.classList.add('hidden');
+                }
+                
+                // Clear selected place state to reset the UI fully
+                state.selectedPlace = null;
+                state.selectedCoords = null;
+                
+                if (window.sheetManager) {
+                    window.sheetManager.snapTo('bottom');
+                }
             };
         }
 
         modeBtns.forEach(btn => {
-            btn.onclick = () => {
+            btn.onclick = (e) => {
+                e.stopPropagation();
                 modeBtns.forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
                 state.currentNavMode = btn.dataset.mode;
                 
-                if (state.userLocation && state.selectedPlace) {
+                // Use fixed navOrigin and navDestination if available
+                if (state.navOrigin && state.navDestination) {
+                    getRoute(state.navOrigin, state.navDestination, state.currentNavMode);
+                } else if (state.userLocation && state.selectedPlace) {
                     const destination = state.selectedCoords || {
                         lat: state.selectedPlace.latitude || state.selectedPlace.lat,
                         lng: state.selectedPlace.longitude || state.selectedPlace.lng
                     };
-                    getRoute(state.userLocation, destination, state.currentNavMode);
+                    state.navOrigin = { lat: state.userLocation.lat, lng: state.userLocation.lng };
+                    state.navDestination = destination;
+                    getRoute(state.navOrigin, state.navDestination, state.currentNavMode);
                 }
             };
         });

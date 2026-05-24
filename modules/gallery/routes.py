@@ -15,7 +15,7 @@ def record_view(view_type, item_id=None, page_name=None):
     """
     Shim for record_view (should ideally be moved to a shared service).
     """
-    from routes.public import record_view as public_record_view
+    from modules.core.public_routes import record_view as public_record_view
     public_record_view(view_type, item_id, page_name)
 
 @gallery_bp.route("/")

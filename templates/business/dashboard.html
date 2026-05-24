@@ -6,24 +6,24 @@
 {% set is_dining = establishment and establishment.type in ['restaurant', 'cafe', 'fastfood'] %}
 {% if is_dining %}
     {% set theme_color = 'orange' %}
-    {% set primary_text = 'text-orange-500' %}
-    {% set border_accent = 'border-orange-500/20' %}
-    {% set bg_card = 'bg-orange-950/20' %}
-    {% set hover_card = 'hover:bg-orange-950/30' %}
-    {% set accent_badge = 'bg-orange-500/10 text-orange-400 border border-orange-500/20' %}
-    {% set fill_btn = 'bg-orange-600 hover:bg-orange-500 text-white shadow-lg shadow-orange-900/40' %}
-    {% set text_btn = 'text-orange-400 bg-orange-950/40 hover:bg-orange-950/60 border border-orange-500/20' %}
-    {% set fill_icon = 'bg-orange-500/15 text-orange-400' %}
+    {% set primary_text = 'text-orange-700' %}
+    {% set border_accent = 'border-orange-500/30' %}
+    {% set bg_card = 'bg-orange-50' %}
+    {% set hover_card = 'hover:bg-orange-100' %}
+    {% set accent_badge = 'bg-orange-100 text-orange-800 border border-orange-200' %}
+    {% set fill_btn = 'bg-orange-600 hover:bg-orange-700 text-white shadow-md shadow-orange-600/20' %}
+    {% set text_btn = 'text-orange-700 bg-orange-50 hover:bg-orange-100 border border-orange-200' %}
+    {% set fill_icon = 'bg-orange-100 text-orange-600' %}
 {% else %}
-    {% set theme_color = 'green' %}
-    {% set primary_text = 'text-premium-blue' %}
-    {% set border_accent = 'border-premium-blue/10' %}
-    {% set bg_card = 'bg-sky-950/15' %}
-    {% set hover_card = 'hover:bg-sky-950/25' %}
-    {% set accent_badge = 'bg-premium-blue/10 text-premium-blue border border-premium-blue/20' %}
-    {% set fill_btn = 'bg-sky-600 hover:bg-sky-500 text-white shadow-lg shadow-sky-900/40' %}
-    {% set text_btn = 'text-premium-blue bg-sky-950/40 hover:bg-sky-950/60 border border-premium-blue/20' %}
-    {% set fill_icon = 'bg-premium-blue/15 text-premium-blue' %}
+    {% set theme_color = 'sky' %}
+    {% set primary_text = 'text-sky-700' %}
+    {% set border_accent = 'border-sky-500/30' %}
+    {% set bg_card = 'bg-sky-50' %}
+    {% set hover_card = 'hover:bg-sky-100' %}
+    {% set accent_badge = 'bg-sky-100 text-sky-800 border border-sky-200' %}
+    {% set fill_btn = 'bg-sky-600 hover:bg-sky-700 text-white shadow-md shadow-sky-600/20' %}
+    {% set text_btn = 'text-sky-700 bg-sky-50 hover:bg-sky-100 border border-sky-200' %}
+    {% set fill_icon = 'bg-sky-100 text-sky-600' %}
 {% endif %}
 
 <div class="max-w-6xl mx-auto space-y-8 py-4">
@@ -33,7 +33,7 @@
             <h1 class="text-2xl font-black text-slate-800 tracking-tight font-display">
                 {% if is_dining %}🍽️ Culinary Management Hub{% elif establishment and establishment.type == 'inn' %}🏨 Hospitality Partner Command{% else %}💼 Business Partner Portal{% endif %}
             </h1>
-            <p class="text-xs font-bold text-slate-400 mt-1 uppercase tracking-wider">
+            <p class="text-xs font-bold text-slate-500 mt-1 uppercase tracking-wider">
                 {% if is_dining %}Promote menu listings, operating hours, and track customer reviews{% else %}Steward accommodation listings, room capacities, and track local visitor metrics{% endif %}
             </p>
         </div>
@@ -81,7 +81,7 @@
         <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <!-- Metric 1: Rating -->
             <div class="bg-white border border-slate-100 p-5 rounded-2xl shadow-sm flex flex-col justify-between group hover:border-slate-200 transition-all duration-300">
-                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">Average Rating</span>
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-500">Average Rating</span>
                 <div class="flex items-baseline gap-2 mt-4">
                     <span class="text-3xl font-black text-slate-800">
                         {% if establishment.rating_avg > 0 %}
@@ -90,7 +90,7 @@
                             0.0
                         {% endif %}
                     </span>
-                    <span class="text-xs font-bold text-amber-500">
+                    <span class="text-xs font-bold text-amber-600">
                         {% if establishment.rating_avg > 0 %}
                             ★ Rating
                         {% else %}
@@ -102,7 +102,7 @@
 
             <!-- Metric 2: Content Item Counts -->
             <div class="bg-white border border-slate-100 p-5 rounded-2xl shadow-sm flex flex-col justify-between group hover:border-slate-200 transition-all duration-300">
-                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-500">
                     {% if establishment.type == 'inn' %}Rooms / Lodgings{% else %}Active Menu Dishes{% endif %}
                 </span>
                 <div class="flex items-baseline gap-2 mt-4">
@@ -115,19 +115,19 @@
 
             <!-- Metric 3: Customer Feedbacks -->
             <div class="bg-white border border-slate-100 p-5 rounded-2xl shadow-sm flex flex-col justify-between group hover:border-slate-200 transition-all duration-300">
-                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">Total Reviews</span>
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-500">Total Reviews</span>
                 <div class="flex items-baseline gap-2 mt-4">
                     <span class="text-3xl font-black text-slate-800">{{ stats.total_reviews }}</span>
-                    <span class="text-xs font-bold text-blue-500">Visitor Feedbacks</span>
+                    <span class="text-xs font-bold text-blue-600">Visitor Feedbacks</span>
                 </div>
             </div>
 
             <!-- Metric 4: Direct Page Views -->
             <div class="bg-white border border-slate-100 p-5 rounded-2xl shadow-sm flex flex-col justify-between group hover:border-slate-200 transition-all duration-300">
-                <span class="text-[9px] font-black uppercase tracking-wider text-slate-400">Verification Integrity</span>
+                <span class="text-[9px] font-black uppercase tracking-wider text-slate-500">Verification Integrity</span>
                 <div class="flex items-baseline gap-2 mt-4">
                     <span class="text-md font-black uppercase text-green-600">Approved</span>
-                    <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Active State</span>
+                    <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Active State</span>
                 </div>
             </div>
         </div>
@@ -162,7 +162,7 @@
                                 </span>
                                 <h2 class="text-lg font-black text-slate-800 mt-1 font-display tracking-tight">{{ establishment.name }}</h2>
                                 {% if establishment.address %}
-                                    <p class="text-xs font-semibold text-slate-400 mt-1 flex items-center gap-1">📍 {{ establishment.address }}</p>
+                                    <p class="text-xs font-semibold text-slate-500 mt-1 flex items-center gap-1">📍 {{ establishment.address }}</p>
                                 {% endif %}
                             </div>
                             <a href="{{ url_for('business.edit_establishment') }}" class="px-3.5 py-2 text-[10px] font-black uppercase rounded {{ text_btn }} shrink-0 flex items-center gap-1 hover:scale-[1.02] transition-transform">
@@ -181,20 +181,20 @@
 
                 <div class="bg-slate-50 border-t border-slate-100 p-6 grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
                     <div>
-                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Contact Phone</p>
+                        <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest">Contact Phone</p>
                         <p class="text-xs font-bold text-slate-700 mt-1 truncate">{{ establishment.contact_number or 'Not Specified' }}</p>
                     </div>
                     <div>
-                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Contact Email</p>
+                        <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest">Contact Email</p>
                         <p class="text-xs font-bold text-slate-700 mt-1 truncate">{{ establishment.email or 'Not Specified' }}</p>
                     </div>
                     <div>
-                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Price Range</p>
+                        <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest">Price Range</p>
                         <p class="text-xs font-bold text-slate-700 mt-1 uppercase">{{ establishment.price_range or '₱₱' }}</p>
                     </div>
                     <div>
-                        <p class="text-[8px] font-black text-slate-400 uppercase tracking-widest">Map Coordinates</p>
-                        <p class="text-xs font-mono font-bold text-slate-600 mt-1 truncate">{{ "%.4f"|format(establishment.latitude) }}, {{ "%.4f"|format(establishment.longitude) }}</p>
+                        <p class="text-[8px] font-black text-slate-500 uppercase tracking-widest">Map Coordinates</p>
+                        <p class="text-xs font-mono font-bold text-slate-700 mt-1 truncate">{{ "%.4f"|format(establishment.latitude) }}, {{ "%.4f"|format(establishment.longitude) }}</p>
                     </div>
                 </div>
             </div>
@@ -213,7 +213,7 @@
                                 </div>
                                 <div>
                                     <h3 class="text-sm font-black text-slate-800 group-hover:text-sky-600 transition-colors">Manage Rooms</h3>
-                                    <p class="text-xs font-bold text-slate-400 mt-0.5">{{ stats.room_count }} Rooms Configured</p>
+                                    <p class="text-xs font-bold text-slate-500 mt-0.5">{{ stats.room_count }} Rooms Configured</p>
                                 </div>
                             </div>
                             <svg class="w-4 h-4 text-slate-300 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -232,7 +232,7 @@
                                 </div>
                                 <div>
                                     <h3 class="text-sm font-black text-slate-800 group-hover:text-orange-600 transition-colors">Manage Menu</h3>
-                                    <p class="text-xs font-bold text-slate-400 mt-0.5">{{ stats.menu_count }} Dishes Configured</p>
+                                    <p class="text-xs font-bold text-slate-500 mt-0.5">{{ stats.menu_count }} Dishes Configured</p>
                                 </div>
                             </div>
                             <svg class="w-4 h-4 text-slate-300 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -253,7 +253,7 @@
                             </div>
                             <div>
                                 <h3 class="text-sm font-black text-slate-800 group-hover:text-blue-600 transition-colors">Customer Feedbacks</h3>
-                                <p class="text-xs font-bold text-slate-400 mt-0.5">{{ stats.total_reviews }} Active Reviews</p>
+                                <p class="text-xs font-bold text-slate-500 mt-0.5">{{ stats.total_reviews }} Active Reviews</p>
                             </div>
                         </div>
                         <svg class="w-4 h-4 text-slate-300 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -274,7 +274,7 @@
                                 </div>
                                 <div>
                                     <h3 class="text-sm font-black text-slate-800 group-hover:text-teal-600 transition-colors">Log Visitor</h3>
-                                    <p class="text-xs font-bold text-slate-400 mt-0.5">Record Physical Walk-ins</p>
+                                    <p class="text-xs font-bold text-slate-500 mt-0.5">Record Physical Walk-ins</p>
                                 </div>
                             </div>
                             <svg class="w-4 h-4 text-slate-300 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">

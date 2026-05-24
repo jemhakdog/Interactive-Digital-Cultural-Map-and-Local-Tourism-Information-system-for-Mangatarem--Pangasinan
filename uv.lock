@@ -819,6 +819,7 @@ dependencies = [
     { name = "gunicorn" },
     { name = "httpx" },
     { name = "pillow" },
+    { name = "polyline" },
     { name = "psycopg2-binary" },
     { name = "python-docx" },
     { name = "python-dotenv" },
@@ -845,6 +846,7 @@ requires-dist = [
     { name = "gunicorn" },
     { name = "httpx" },
     { name = "pillow" },
+    { name = "polyline", specifier = ">=2.0.4" },
     { name = "psycopg2-binary" },
     { name = "python-docx" },
     { name = "python-dotenv" },
@@ -1265,6 +1267,15 @@ wheels = [
     { url = "https://files.pythonhosted.org/packages/5a/74/fe2ac378e4e202e56d50540d92e1ef4ff34ed687f3c60f6a121bcf99437e/pillow-12.1.0-pp311-pypy311_pp73-manylinux_2_27_aarch64.manylinux_2_28_aarch64.whl", hash = "sha256:53d8b764726d3af1a138dd353116f774e3862ec7e3794e0c8781e30db0f35dfc", size = 5313824, upload-time = "2026-01-02T09:13:22.405Z" },
     { url = "https://files.pythonhosted.org/packages/f3/77/2a60dee1adee4e2655ac328dd05c02a955c1cd683b9f1b82ec3feb44727c/pillow-12.1.0-pp311-pypy311_pp73-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl", hash = "sha256:5da841d81b1a05ef940a8567da92decaa15bc4d7dedb540a8c219ad83d91808a", size = 5963278, upload-time = "2026-01-02T09:13:24.706Z" },
     { url = "https://files.pythonhosted.org/packages/2d/71/64e9b1c7f04ae0027f788a248e6297d7fcc29571371fe7d45495a78172c0/pillow-12.1.0-pp311-pypy311_pp73-win_amd64.whl", hash = "sha256:75af0b4c229ac519b155028fa1be632d812a519abba9b46b20e50c6caa184f19", size = 7029809, upload-time = "2026-01-02T09:13:26.541Z" },
+]
+
+[[package]]
+name = "polyline"
+version = "2.0.4"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/2c/c1/1a6ee4f9f02a55b2a9241bbadd342970160f7e42423307f21ee8f5530d4e/polyline-2.0.4.tar.gz", hash = "sha256:f05ade694522bf1720febebe1672f820f43a13c6a1664751e7769d47e8ca9b1b", size = 8261, upload-time = "2025-12-02T17:55:22.735Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/34/a8/4ebd3cb31d380e018efb1c8bf92664b196a41aba19506015b682af2587b9/polyline-2.0.4-py3-none-any.whl", hash = "sha256:a4e0c15b8ecb32915559f8cf210f1f8c2f5cc53d3cd32c91d7c1668d6e936e10", size = 7167, upload-time = "2025-12-02T17:55:20.323Z" },
 ]
 
 [[package]]

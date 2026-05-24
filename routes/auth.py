@@ -297,6 +297,7 @@ def login():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
+        remember = request.form.get("remember") == "on"
         
         user = _authenticate_user(username, password)
         
@@ -307,7 +308,7 @@ def login():
             
             log_success("auth", "login", f"User '{username}' logged in")
             logger.info(f"User '{username}' with role '{user.role}' logged in successfully")
-            login_user(user, remember=True)
+            login_user(user, remember=remember)
             
             if user.role == "admin":
                 return redirect(url_for("admin.admin_dashboard"))
@@ -484,6 +485,7 @@ def register_business():
 
 
 @auth_bp.route("/google-login", methods=["POST"])
+@limiter.limit("5 per minute")
 def google_login():
     """
     Handle Google Sign-In (clean refactored version).
@@ -519,7 +521,7 @@ def google_login():
             return redirect(url_for("auth.login"))
         
         log_success("auth", "google_login", f"Logged in NEW user '{user.username}' (ID: {user.id})")
-        login_user(user, remember=True)
+        login_user(user, remember=False)
         flash(f"Welcome to GoMangatarem, {name or user.username}!", "success")
         return redirect(url_for("user.dashboard"))
     
@@ -532,7 +534,7 @@ def google_login():
         return redirect(url_for("auth.login"))
     
     log_success("auth", "google_login", f"Logging in existing user {email} (ID: {user.id})")
-    login_user(user, remember=True)
+    login_user(user, remember=False)
     
     if user.role == "admin":
         return redirect(url_for("admin.admin_dashboard"))
@@ -619,6 +621,7 @@ def _validate_reset_token(token_str: str) -> "PasswordResetToken | None":
 
 
 @auth_bp.route("/reset-password/<token>", methods=["GET", "POST"])
+@limiter.limit("5 per minute")
 def reset_password(token: str):
     """
     Handle password reset via token.

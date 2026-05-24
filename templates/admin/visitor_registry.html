@@ -9,11 +9,11 @@
 {% block admin_content %}
 <div class="space-y-8 animate-fade-in font-body">
     <!-- Header Section -->
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-2 border-b border-slate-100">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 pb-2 border-b border-slate-200">
         <div>
             <div class="flex items-center gap-2 mb-2">
                 <a href="{{ url_for('admin.visits_index') }}"
-                   class="text-slate-400 hover:text-royal-blue flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors">
+                   class="text-slate-500 hover:text-royal-blue flex items-center gap-1 text-[10px] font-black uppercase tracking-wider transition-colors">
                     <svg class="w-4 h-4 text-premium-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                     </svg>
@@ -30,7 +30,7 @@
                 <span class="text-royal-blue font-black">{{ target_location.name }}</span>
             </p>
             {% else %}
-            <p class="text-slate-400 text-xs font-semibold uppercase tracking-wider mt-1">
+            <p class="text-slate-500 text-xs font-semibold uppercase tracking-wider mt-1">
                 Master database of all identified tourism momentum
             </p>
             {% endif %}
@@ -58,15 +58,15 @@
         <form method="GET" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 items-end">
             <!-- Target Type Selector -->
             <div class="lg:col-span-1 space-y-2">
-                <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider">Target Type</label>
+                <label class="block text-[9px] font-black text-slate-500 uppercase tracking-wider">Target Type</label>
                 <div class="relative">
                     <select name="target_type" onchange="this.form.submit()"
-                            class="w-full appearance-none bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 pr-10 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all cursor-pointer">
+                            class="w-full appearance-none bg-slate-50 border border-slate-300 rounded-2xl px-4 py-3 pr-10 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all cursor-pointer">
                         <option value="">All Types</option>
                         <option value="attraction" {% if target_type == 'attraction' %}selected{% endif %}>Attractions</option>
                         <option value="business" {% if target_type == 'business' %}selected{% endif %}>Businesses</option>
                     </select>
-                    <div class="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                    <div class="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </div>
                 </div>
@@ -74,10 +74,10 @@
 
             <!-- Target Location Selector -->
             <div class="lg:col-span-2 space-y-2">
-                <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider">Specific Destination</label>
+                <label class="block text-[9px] font-black text-slate-500 uppercase tracking-wider">Specific Destination</label>
                 <div class="relative">
                     <select name="target_id" onchange="this.form.submit()"
-                            class="w-full appearance-none bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 pr-10 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all cursor-pointer">
+                            class="w-full appearance-none bg-slate-50 border border-slate-300 rounded-2xl px-4 py-3 pr-10 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all cursor-pointer">
                         <option value="">All Locations</option>
                         {% if target_type == 'attraction' or not target_type %}
                         <optgroup label="Attractions">
@@ -94,7 +94,7 @@
                         </optgroup>
                         {% endif %}
                     </select>
-                    <div class="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
+                    <div class="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </div>
                 </div>
@@ -102,27 +102,27 @@
 
             <!-- Date From -->
             <div class="lg:col-span-1 space-y-2">
-                <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider">Date From</label>
+                <label class="block text-[9px] font-black text-slate-500 uppercase tracking-wider">Date From</label>
                 <input type="date" name="start_date" value="{{ start_date or '' }}"
-                       class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all">
+                       class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all">
             </div>
 
             <!-- Date To -->
             <div class="lg:col-span-1 space-y-2">
-                <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider">Date To</label>
+                <label class="block text-[9px] font-black text-slate-500 uppercase tracking-wider">Date To</label>
                 <input type="date" name="end_date" value="{{ end_date or '' }}"
-                       class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all">
+                       class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all">
             </div>
 
             <!-- Search by Name -->
             <div class="lg:col-span-1 space-y-2">
-                <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider">Visitor Name</label>
+                <label class="block text-[9px] font-black text-slate-500 uppercase tracking-wider">Visitor Name</label>
                 <div class="relative">
                     <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-300">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </span>
                     <input type="text" name="search" value="{{ search or '' }}" placeholder="Search name..."
-                           class="w-full bg-slate-50 border border-slate-200 rounded-2xl pl-10 pr-4 py-3 text-xs font-bold text-slate-800 focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all shadow-sm">
+                           class="w-full bg-slate-50 border border-slate-300 rounded-2xl pl-10 pr-4 py-3 text-xs font-bold text-slate-800 focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all shadow-sm">
                 </div>
             </div>
 
@@ -146,10 +146,10 @@
 
     <!-- Registry Table List -->
     <div class="glass-card rounded-[2rem] overflow-hidden">
-        <div class="px-8 py-6 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+        <div class="px-8 py-6 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
             <div>
                 <h3 class="text-base font-black text-slate-800">Master Record Set</h3>
-                <p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider mt-1">Detailed list of tourist entries</p>
+                <p class="text-slate-500 text-[10px] font-bold uppercase tracking-wider mt-1">Detailed list of tourist entries</p>
             </div>
             <span class="bg-sky-50 text-royal-blue text-[9px] font-black border border-sky-100 uppercase px-3 py-1 rounded-full tracking-wider">
                 {{ logs|length }} Logs found
@@ -158,16 +158,16 @@
         <div class="overflow-x-auto admin-scrollbar">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-slate-50 border-b border-slate-100">
-                        <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Visitor Identity</th>
-                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Age</th>
-                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Origin / Address</th>
-                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center">System Status</th>
+                    <tr class="bg-slate-50 border-b border-slate-200">
+                        <th class="px-8 py-5 text-[9px] font-black text-slate-500 uppercase tracking-widest">Visitor Identity</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-500 uppercase tracking-widest">Age</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-500 uppercase tracking-widest">Origin / Address</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-500 uppercase tracking-widest text-center">System Status</th>
                         {% if not target_location %}
-                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Location Visited</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-500 uppercase tracking-widest">Location Visited</th>
                         {% endif %}
-                        <th class="px-6 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Date</th>
-                        <th class="px-8 py-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Logged By</th>
+                        <th class="px-6 py-5 text-[9px] font-black text-slate-500 uppercase tracking-widest">Date</th>
+                        <th class="px-8 py-5 text-[9px] font-black text-slate-500 uppercase tracking-widest">Logged By</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -181,7 +181,7 @@
                                 </div>
                                 <div>
                                     <p class="text-slate-800 font-black text-xs leading-none">{{ log.visitor_name or "Anonymous Lead" }}</p>
-                                    <span class="inline-block text-[8px] font-black text-slate-400 uppercase tracking-wider mt-1.5 bg-slate-100 px-2 py-0.5 rounded">
+                                    <span class="inline-block text-[8px] font-black text-slate-500 uppercase tracking-wider mt-1.5 bg-slate-100 px-2 py-0.5 rounded">
                                         {{ log.visitor_count }} in party
                                     </span>
                                 </div>
@@ -205,7 +205,7 @@
                                 <span>Digital</span>
                             </span>
                             {% else %}
-                            <span class="text-slate-400 text-[9px] font-black uppercase tracking-wider bg-slate-100 px-2.5 py-1 rounded-full border border-slate-200">
+                            <span class="text-slate-500 text-[9px] font-black uppercase tracking-wider bg-slate-100 px-2.5 py-1 rounded-full border border-slate-300">
                                 Manual Entry
                             </span>
                             {% endif %}
@@ -222,12 +222,12 @@
                         </td>
                         {% endif %}
                         <!-- Date -->
-                        <td class="px-6 py-5 text-slate-400 text-xs font-bold align-middle">
+                        <td class="px-6 py-5 text-slate-500 text-xs font-bold align-middle">
                             {{ log.visit_date.strftime('%b %d, %Y') }}
                         </td>
                         <!-- Logged By steward -->
                         <td class="px-8 py-5 align-middle">
-                            <span class="text-slate-400 text-[9px] font-black uppercase tracking-wider">{{ log.steward.username }}</span>
+                            <span class="text-slate-500 text-[9px] font-black uppercase tracking-wider">{{ log.steward.username }}</span>
                         </td>
                     </tr>
                     {% else %}
@@ -240,7 +240,7 @@
                                     </svg>
                                 </div>
                                 <p class="font-black text-slate-800">No Detailed Records Found</p>
-                                <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">Detailed logs will appear here as check-ins are recorded</p>
+                                <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Detailed logs will appear here as check-ins are recorded</p>
                                 <a href="{{ url_for('admin.visits_index') }}" class="mt-4 bg-royal-blue text-white font-black text-[9px] uppercase tracking-wider px-6 py-3 rounded-2xl hover:bg-sky-900 transition-all shadow-md active:scale-95">
                                     Go back to Tourism Analytics
                                 </a>
@@ -263,17 +263,17 @@
     <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
         <div class="relative transform overflow-hidden rounded-[2rem] bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg glass-card border border-white/20">
             <!-- Modal Header -->
-            <div class="px-6 pt-6 pb-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+            <div class="px-6 pt-6 pb-4 border-b border-slate-200 flex justify-between items-center bg-slate-50/50">
                 <div class="flex items-center gap-3">
                     <span class="w-8 h-8 rounded-xl bg-sky-50 text-royal-blue border border-sky-100 flex items-center justify-center">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                     </span>
                     <div>
                         <h3 class="text-base font-black text-slate-800">Log Guest Walk-in</h3>
-                        <p class="text-[9px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Record visitor physical check-in</p>
+                        <p class="text-[9px] text-slate-500 font-bold uppercase tracking-wider mt-0.5">Record visitor physical check-in</p>
                     </div>
                 </div>
-                <button onclick="toggleLogModal(false)" class="text-slate-400 hover:text-slate-600 focus:outline-none cursor-pointer">
+                <button onclick="toggleLogModal(false)" class="text-slate-500 hover:text-slate-600 focus:outline-none cursor-pointer">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
                 </button>
             </div>
@@ -285,8 +285,8 @@
                 
                 {% if attractions and establishments %}
                 <div>
-                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Target Type</label>
-                    <select name="target_type" id="modal_target_type" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all cursor-pointer" required>
+                    <label class="block text-[9px] font-black text-slate-500 uppercase tracking-wider mb-2">Target Type</label>
+                    <select name="target_type" id="modal_target_type" class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all cursor-pointer" required>
                         <option value="attraction">Attraction</option>
                         <option value="establishment">Establishment</option>
                     </select>
@@ -298,8 +298,8 @@
                 {% endif %}
 
                 <div>
-                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Select Location</label>
-                    <select name="target_id" id="modal_target_id" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all cursor-pointer" required>
+                    <label class="block text-[9px] font-black text-slate-500 uppercase tracking-wider mb-2">Select Location</label>
+                    <select name="target_id" id="modal_target_id" class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all cursor-pointer" required>
                         {% if attractions %}
                         <optgroup label="Attractions" id="modal-opt-attractions">
                             {% for item in attractions %}
@@ -319,44 +319,44 @@
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Visitors</label>
-                        <input type="number" name="visitor_count" value="1" min="1" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all" required>
+                        <label class="block text-[9px] font-black text-slate-500 uppercase tracking-wider mb-2">Visitors</label>
+                        <input type="number" name="visitor_count" value="1" min="1" class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all" required>
                     </div>
                     <div>
-                        <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Date</label>
-                        <input type="date" name="visit_date" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all">
+                        <label class="block text-[9px] font-black text-slate-500 uppercase tracking-wider mb-2">Date</label>
+                        <input type="date" name="visit_date" class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all">
                     </div>
                 </div>
 
-                <hr class="border-slate-100 my-4">
+                <hr class="border-slate-200 my-4">
 
                 <div>
-                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Visitor Name (Lead)</label>
-                    <input type="text" name="visitor_name" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all" placeholder="Enter lead name" required>
+                    <label class="block text-[9px] font-black text-slate-500 uppercase tracking-wider mb-2">Visitor Name (Lead)</label>
+                    <input type="text" name="visitor_name" class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all" placeholder="Enter lead name" required>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Age</label>
-                        <input type="number" name="visitor_age" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all" placeholder="Age">
+                        <label class="block text-[9px] font-black text-slate-500 uppercase tracking-wider mb-2">Age</label>
+                        <input type="number" name="visitor_age" class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all" placeholder="Age">
                     </div>
                     <div class="flex items-center space-x-2.5 h-full pt-6">
                         <input type="checkbox" name="is_system_user" id="modal_is_system_user" value="true" class="w-4 h-4 rounded border-slate-300 text-royal-blue focus:ring-royal-blue">
-                        <label for="modal_is_system_user" class="text-[9px] font-black text-slate-400 uppercase tracking-wider cursor-pointer select-none">App User?</label>
+                        <label for="modal_is_system_user" class="text-[9px] font-black text-slate-500 uppercase tracking-wider cursor-pointer select-none">App User?</label>
                     </div>
                 </div>
 
                 <div>
-                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Address</label>
-                    <input type="text" name="visitor_address" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all" placeholder="City/Barangay">
+                    <label class="block text-[9px] font-black text-slate-500 uppercase tracking-wider mb-2">Address</label>
+                    <input type="text" name="visitor_address" class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all" placeholder="City/Barangay">
                 </div>
 
                 <div>
-                    <label class="block text-[9px] font-black text-slate-400 uppercase tracking-wider mb-2">Notes (Optional)</label>
-                    <textarea name="notes" rows="2" class="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all" placeholder="Special event, holiday, etc."></textarea>
+                    <label class="block text-[9px] font-black text-slate-500 uppercase tracking-wider mb-2">Notes (Optional)</label>
+                    <textarea name="notes" rows="2" class="w-full bg-slate-50 border border-slate-300 rounded-2xl px-4 py-3 text-slate-800 text-xs font-bold focus:border-royal-blue focus:ring-1 focus:ring-royal-blue outline-none transition-all" placeholder="Special event, holiday, etc."></textarea>
                 </div>
 
-                <div class="flex gap-3 justify-end pt-4 border-t border-slate-100">
+                <div class="flex gap-3 justify-end pt-4 border-t border-slate-200">
                     <button type="button" onclick="toggleLogModal(false)" class="bg-slate-100 hover:bg-slate-200 text-slate-600 font-black text-[10px] uppercase tracking-wider px-5 py-3.5 rounded-2xl transition-all cursor-pointer">
                         Cancel
                     </button>

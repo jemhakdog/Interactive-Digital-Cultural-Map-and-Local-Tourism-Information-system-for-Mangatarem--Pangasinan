@@ -104,17 +104,19 @@ def type_list(heritage_type):
 def detail(heritage_type, item_id):
     """Display detailed view of a single approved heritage item."""
     from utils.heritage_registry import get_heritage_config, get_display_name
+    from modules.heritage.admin_routes import ProxyItem
 
     config = get_heritage_config(heritage_type)
     if not config:
         abort(404)
 
     model = config["model"]
-    item = model.query.get_or_404(item_id)
+    profile = model.query.get_or_404(item_id)
 
-    if item.status != "approved":
+    if profile.status != "approved":
         abort(404)
 
+    item = ProxyItem(profile)
     display_name = get_display_name(item, heritage_type)
     log_entry("heritage", "detail", heritage_type=heritage_type, id=item_id)
     logger.info(f"Heritage detail page for '{display_name}' (type: {heritage_type}, id: {item_id})")
@@ -199,25 +201,27 @@ def api_detail(heritage_type, item_id):
     """API endpoint to retrieve a single approved heritage item."""
     from datetime import date as date_type
     from utils.heritage_registry import get_heritage_config
+    from modules.heritage.admin_routes import ProxyItem
 
     config = get_heritage_config(heritage_type)
     if not config:
         return jsonify({"error": "Invalid heritage type"}), 404
 
     model = config["model"]
-    item = model.query.get_or_404(item_id)
+    profile = model.query.get_or_404(item_id)
 
-    if item.status != "approved":
+    if profile.status != "approved":
         return jsonify({"error": "Item not found"}), 404
 
-    result = {"id": item.id, "heritage_type": heritage_type}
+    item = ProxyItem(profile)
+    result = {"id": profile.id, "heritage_type": heritage_type}
     for field_name, label, field_type, required in config["fields"]:
         value = getattr(item, field_name, None)
         if isinstance(value, (date_type, datetime)):
             value = value.isoformat()
         result[field_name] = value
 
-    result["created_at"] = item.created_at.isoformat() if item.created_at else None
+    result["created_at"] = profile.created_at.isoformat() if profile.created_at else None
 
     response = make_response(jsonify(result))
     response.headers["Cache-Control"] = "public, max-age=300"

@@ -52,17 +52,13 @@ def test_admin_history_routes(app, client):
     assert response.status_code == 302 # Redirect to login
 
     # 2. Regular user (non-admin) should fail with permissions error
-    with client.session_transaction() as sess:
-        sess['_user_id'] = str(user_id)
-        sess['_fresh'] = True
-    
+    client.post("/auth/login", data={"username": "normal_steward", "password": "user_pass"}, follow_redirects=True)
     response = client.get("/admin/newsletter/history")
     assert response.status_code == 302 # Redirect to index due to admin_required decorator
+    client.get("/auth/logout")
     
     # 3. Admin user should succeed
-    with client.session_transaction() as sess:
-        sess['_user_id'] = str(admin_id)
-        sess['_fresh'] = True
+    client.post("/auth/login", data={"username": "history_admin", "password": "admin_pass"}, follow_redirects=True)
         
     response = client.get("/admin/newsletter/history")
     assert response.status_code == 200

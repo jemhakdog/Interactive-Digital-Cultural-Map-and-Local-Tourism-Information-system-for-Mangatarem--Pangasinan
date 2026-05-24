@@ -888,32 +888,15 @@ def v1_document_create(slug):
                 asset_type=meta["heritage_type"],
                 template_slug=slug,
                 status="approved", # Admin entries are auto-approved
-                user_id=current_user.id
+                user_id=current_user.id,
+                form_data={}
             )
+            
+            # Import and use the unified populate logic
+            from modules.heritage.admin_routes import _populate_item_from_form
+            _populate_item_from_form(profile, heritage_config, request.form)
+            
             db.session.add(profile)
-            db.session.flush()
-            
-            # Create detail record
-            detail_model = heritage_config["model"]
-            detail = detail_model(heritage_profile_id=profile.id)
-            
-            # Populate fields from form
-            extra_data = {}
-            for field_name, value in request.form.items():
-                if field_name == "csrf_token":
-                    continue
-                
-                # Check if it's a standard field in HeritageProfile or Detail
-                if hasattr(profile, field_name):
-                    setattr(profile, field_name, value)
-                elif hasattr(detail, field_name):
-                    setattr(detail, field_name, value)
-                else:
-                    # Store everything else in meta_data
-                    extra_data[field_name] = value
-            
-            detail.meta_data = extra_data
-            db.session.add(detail)
             db.session.commit()
             
             log_success("admin", "document_create", f"Created {slug} record for {profile.name_of_asset}")
@@ -961,26 +944,15 @@ def v1_document_record_edit(record_id):
     
     from utils.heritage_registry import get_heritage_config
     heritage_config = get_heritage_config(meta["heritage_type"])
-    detail = heritage_config["model"].query.get_or_404(record_id)
     
     all_forms_data = _load_all_forms()
     template_structure = all_forms_data.get(meta["key"])
     
     if request.method == "POST":
         try:
-            extra_data = detail.meta_data or {}
-            for field_name, value in request.form.items():
-                if field_name == "csrf_token":
-                    continue
-                
-                if hasattr(profile, field_name):
-                    setattr(profile, field_name, value)
-                elif hasattr(detail, field_name):
-                    setattr(detail, field_name, value)
-                else:
-                    extra_data[field_name] = value
+            from modules.heritage.admin_routes import _populate_item_from_form
+            _populate_item_from_form(profile, heritage_config, request.form)
             
-            detail.meta_data = extra_data
             db.session.commit()
             
             log_success("admin", "document_edit", f"Updated {slug} record {record_id}")
@@ -990,11 +962,15 @@ def v1_document_record_edit(record_id):
             db.session.rollback()
             flash(f"Error: {str(e)}")
             
+    # For compatibility with template, pass ProxyItem
+    from modules.heritage.admin_routes import ProxyItem
+    proxy_item = ProxyItem(profile)
+            
     return render_template("admin/documents_rapid_editor_v1.html", 
                            slug=slug, 
                            meta=meta, 
                            template=template_structure,
                            config=heritage_config,
-                           record=profile,
-                           detail=detail,
+                           record=proxy_item,
+                           detail=proxy_item,
                            is_edit=True)

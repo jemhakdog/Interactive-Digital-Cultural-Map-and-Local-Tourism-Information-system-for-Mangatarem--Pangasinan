@@ -62,7 +62,7 @@
                     </div>
                     
                     <h2 class="text-3xl font-cultural font-bold text-sky-950 mb-8 border-l-4 border-sky-500 pl-6">Physical Description & Identity</h2>
-                    <div class="prose prose-sky max-w-none text-gray-600 leading-relaxed text-lg">
+                    <div class="prose prose-sky max-w-none text-gray-800 leading-relaxed text-lg">
                         {{ item.description or item.biography or item.vision_statement or 'Formal documentation for this entry is currently being prepared for electronic publication.' }}
                     </div>
                 </div>
@@ -76,7 +76,7 @@
                         </svg>
                         Cultural & Historical Significance
                     </h2>
-                    <div class="text-gray-700 leading-relaxed">
+                    <div class="text-gray-900 leading-relaxed">
                         {{ item.significance }}
                     </div>
                 </div>
@@ -86,7 +86,7 @@
                 {% if item.stories or item.stories_associated or item.peoples_stories or item.milestones %}
                 <div class="space-y-8" data-aos="fade-up">
                     <h2 class="text-2xl font-cultural font-bold text-sky-950 border-b border-sky-900/10 pb-4">Archives & Narratives</h2>
-                    <div class="text-gray-600 italic leading-loose text-lg font-cultural">
+                    <div class="text-gray-800 italic leading-loose text-lg font-cultural">
                         {{ item.stories or item.stories_associated or item.peoples_stories or item.milestones }}
                     </div>
                 </div>
@@ -103,7 +103,7 @@
                          class="h-64 rounded-xl mb-4 grayscale"
                          data-lat="{{ item.lat }}"
                          data-lng="{{ item.lng }}"></div>
-                    <div class="flex justify-between items-center text-xs font-mono text-gray-500">
+                    <div class="flex justify-between items-center text-xs font-mono text-gray-700">
                         <span>LAT: {{ item.lat }}</span>
                         <span>LNG: {{ item.lng }}</span>
                     </div>
@@ -130,7 +130,7 @@
                 {% if item.reference_sources %}
                 <div class="p-8 rounded-3xl border-2 border-dashed border-sky-950/10" data-aos="fade-left" data-aos-delay="200">
                     <h3 class="text-xs font-bold uppercase tracking-widest text-sky-950 mb-4">Scholarly Sources</h3>
-                    <div class="text-[11px] text-gray-500 font-serif leading-relaxed italic">
+                    <div class="text-[11px] text-gray-700 font-serif leading-relaxed italic">
                         {{ item.reference_sources }}
                     </div>
                 </div>

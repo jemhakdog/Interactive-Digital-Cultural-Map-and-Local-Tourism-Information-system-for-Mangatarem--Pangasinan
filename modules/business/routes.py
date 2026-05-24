@@ -256,8 +256,21 @@ def submit_verification():
     permit_url = request.form.get("permit_document_url", "").strip()
     other_url = request.form.get("other_document_url", "").strip()
     
+    permit_file = request.files.get("permit_document_file")
+    other_file = request.files.get("other_document_file")
+    
+    if permit_file and permit_file.filename:
+        uploaded_url = save_uploaded_file(permit_file, allowed_extensions={"png", "jpg", "jpeg", "pdf"})
+        if uploaded_url:
+            permit_url = uploaded_url
+            
+    if other_file and other_file.filename:
+        uploaded_url = save_uploaded_file(other_file, allowed_extensions={"png", "jpg", "jpeg", "pdf"})
+        if uploaded_url:
+            other_url = uploaded_url
+    
     if not permit_url:
-        flash("Business permit document is required.", "error")
+        flash("Business permit document is required (URL or file upload).", "error")
         return redirect(url_for("business.dashboard"))
         
     if not verification:

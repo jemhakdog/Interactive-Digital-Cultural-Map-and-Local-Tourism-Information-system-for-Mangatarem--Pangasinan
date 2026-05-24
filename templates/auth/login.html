@@ -119,6 +119,14 @@
                             </button>
                         </div>
                     </div>
+                    <!-- Remember Me -->
+                    <div class="flex items-center ml-1 pt-1">
+                        <input id="remember" name="remember" type="checkbox"
+                            class="h-4 w-4 rounded border-gray-400 text-sky-600 focus:ring-sky-500 bg-white/20 lg:bg-white border lg:border-slate-300 cursor-pointer">
+                        <label for="remember" class="ml-2 block text-sm text-sky-100/90 lg:text-slate-600 cursor-pointer">
+                            Remember me on this device
+                        </label>
+                    </div>
 
                     <!-- Flask Flash Messages -->
                     {% with messages = get_flashed_messages() %}

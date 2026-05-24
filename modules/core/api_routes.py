@@ -118,3 +118,38 @@ def submit_map_feedback():
     except Exception as e:
         logger.error(f"Error submitting map feedback: {str(e)}")
         return jsonify({"error": "An internal error occurred"}), 500
+
+# === Gemini Live API Endpoints ===
+
+@api_bp.route("/gemini/config")
+def gemini_config():
+    """
+    Securely provide the Gemini API key to the frontend client.
+    In a production environment with strict security, this would be tied to user session
+    or heavily rate-limited to prevent abuse.
+    """
+    import os
+    key = os.environ.get("GEMINI_API_KEY")
+    if not key:
+        return jsonify({"error": "Gemini API key not configured"}), 500
+    return jsonify({"api_key": key})
+
+@api_bp.route("/gemini/context")
+def gemini_context():
+    """
+    Provide dynamic context about Mangatarem to inject into Gemini's system instructions.
+    """
+    from models import Attraction
+    
+    # Just fetch top attractions for context
+    top_attractions = Attraction.query.filter_by(status="approved").limit(10).all()
+    
+    context_text = "You are a friendly, knowledgeable virtual tour guide for Mangatarem, Pangasinan. "
+    context_text += "Here are some top attractions you can mention:\n"
+    for attr in top_attractions:
+        context_text += f"- {attr.name} ({attr.category}): {attr.description[:100]}...\n"
+        
+    context_text += "\nYou can use the pan_map(lat, lng) tool to show users these places on the map if they ask."
+    
+    return jsonify({"system_instruction": context_text})
+

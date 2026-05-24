@@ -3,7 +3,7 @@
 from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_required
 from models import db, Establishment, EstablishmentReview
-from . import admin_bp
+from modules.admin_core import admin_bp
 import logging
 
 logger = logging.getLogger(__name__)

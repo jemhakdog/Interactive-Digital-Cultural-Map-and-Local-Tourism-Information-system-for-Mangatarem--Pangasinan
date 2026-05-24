@@ -683,6 +683,24 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    // ========================================
+    // GEMINI LIVE API INTERFACE
+    // ========================================
+    window.geminiPanMap = function(lat, lng, zoom = 16) {
+        console.log(`[Gemini] Panning map to ${lat}, ${lng} at zoom ${zoom}`);
+        if (!isLeafletMode) {
+            map.flyTo({
+                center: [lng, lat],
+                zoom: zoom,
+                duration: 2000
+            });
+        } else {
+            map.flyTo([lat, lng], zoom, {
+                duration: 2
+            });
+        }
+    };
+
     // Style Switcher Logic
     window.changeMapStyle = function(styleId) {
         if (!isLeafletMode) {
@@ -1824,110 +1842,268 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ========================================
-    // 15. SUGGESTED ROUTES (POLYLINES)
+    // 15. ROUTE OPTIMIZATION ENGINE
     // ========================================
-    const routeData = {
-        nature: [
-            [120.2833, 15.6667], // Manleluag Spring
-            [120.2200, 15.6500], // Timmanguyob Falls
-            [120.2500, 15.7000]  // Daang Kalikasan
-        ],
-        heritage: [
-            [120.2986, 15.7889], // St. Raymund Church
-            [120.2990, 15.7895], // Town Plaza
-            [120.3000, 15.7900]  // Old Municipal Hall
-        ]
-    };
+    let routeWaypoints = [];
+    let optimizedRouteData = null;
+    let selectedProfile = 'driving-car';
+    let routeLayerId = null;
+    let routeSourceId = null;
+    let waypointMarkers = [];
 
-    let currentRouteLayer = null;
-    let currentRouteSource = null;
+    // DOM Elements
+    const optimizeBtn = document.getElementById('optimize-route-btn');
+    const clearRouteBtn = document.getElementById('clear-route-btn');
+    const waypointListEl = document.getElementById('waypoint-list');
+    const emptyWaypointMsg = document.getElementById('empty-waypoint-msg');
+    const waypointCountEl = document.getElementById('waypoint-count');
+    const routeSummaryEl = document.getElementById('route-summary');
+    const routeItineraryEl = document.getElementById('route-itinerary');
+    const profileBtns = document.querySelectorAll('.route-profile-btn');
+    
+    // Add to Route button in place card
+    const addToRouteBtn = document.getElementById('add-to-route-btn');
+    if (addToRouteBtn) {
+        addToRouteBtn.addEventListener('click', () => {
+            if (!currentDestination) return;
+            
+            // Check if already in route
+            if (routeWaypoints.find(w => w.id === currentDestination.id)) {
+                if (typeof Swal !== 'undefined') Swal.fire('Already Added', 'This place is already in your itinerary.', 'info');
+                return;
+            }
+            
+            // Add waypoint
+            routeWaypoints.push({
+                id: currentDestination.id,
+                name: document.getElementById('card-title').textContent,
+                lat: currentDestination.lat,
+                lng: currentDestination.lng
+            });
+            
+            updateWaypointUI();
+            
+            // Show routes tab
+            switchTab('routes');
+        });
+    }
 
-    window.drawRoute = function (type) {
-        if (isLeafletMode) {
-            // Remove existing route
-            if (window.currentLeafletRoute) map.removeLayer(window.currentLeafletRoute);
-            
-            const path = routeData[type];
-            if (!path) return;
-            
-            const latlngs = path.map(coord => [coord[1], coord[0]]);
-            const color = type === 'nature' ? '#10b981' : '#f59e0b';
-            
-            window.currentLeafletRoute = L.polyline(latlngs, {
-                color: color,
-                weight: 5,
-                opacity: 0.8,
-                dashArray: '5, 5'
-            }).addTo(map);
-            
-            map.fitBounds(window.currentLeafletRoute.getBounds());
+    // Profile selection
+    profileBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            profileBtns.forEach(b => {
+                b.classList.remove('bg-emerald-100', 'text-emerald-800', 'border-emerald-500');
+                b.classList.add('bg-white', 'text-gray-600', 'border-gray-100');
+            });
+            btn.classList.remove('bg-white', 'text-gray-600', 'border-gray-100');
+            btn.classList.add('bg-emerald-100', 'text-emerald-800', 'border-emerald-500');
+            selectedProfile = btn.dataset.profile;
+        });
+    });
+
+    function updateWaypointUI() {
+        if (!waypointCountEl) return;
+        waypointCountEl.textContent = `${routeWaypoints.length} stops`;
+        
+        if (routeWaypoints.length === 0) {
+            waypointListEl.innerHTML = '';
+            waypointListEl.appendChild(emptyWaypointMsg);
+            emptyWaypointMsg.classList.remove('hidden');
+            optimizeBtn.disabled = true;
             return;
         }
+        
+        emptyWaypointMsg.classList.add('hidden');
+        waypointListEl.innerHTML = '';
+        
+        routeWaypoints.forEach((wp, index) => {
+            const el = document.createElement('div');
+            el.className = 'flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg shadow-sm';
+            el.innerHTML = `
+                <div class="flex items-center gap-2 overflow-hidden">
+                    <span class="flex-shrink-0 w-6 h-6 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-xs font-bold border border-gray-300">${index + 1}</span>
+                    <span class="text-sm font-bold text-gray-800 truncate">${wp.name}</span>
+                </div>
+                <button class="remove-waypoint-btn text-gray-400 hover:text-red-500 transition-colors p-1" data-index="${index}">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            `;
+            waypointListEl.appendChild(el);
+        });
+        
+        // Add remove listeners
+        document.querySelectorAll('.remove-waypoint-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const idx = parseInt(e.currentTarget.dataset.index);
+                routeWaypoints.splice(idx, 1);
+                updateWaypointUI();
+            });
+        });
+        
+        optimizeBtn.disabled = routeWaypoints.length < 2;
+    }
 
-        // Remove existing route
-        if (currentRouteLayer && map.getLayer(currentRouteLayer)) {
-            map.removeLayer(currentRouteLayer);
-        }
-        if (currentRouteSource && map.getSource(currentRouteSource)) {
-            map.removeSource(currentRouteSource);
-        }
-
-        const path = routeData[type];
-        if (!path) return;
-
-        const sourceId = `route-${type}`;
-        const layerId = `route-line-${type}`;
-        const color = type === 'nature' ? '#10b981' : '#f59e0b';
-
-        map.addSource(sourceId, {
-            type: 'geojson',
-            data: {
-                type: 'Feature',
-                properties: {},
-                geometry: {
-                    type: 'LineString',
-                    coordinates: path
+    if (optimizeBtn) {
+        optimizeBtn.addEventListener('click', async () => {
+            if (routeWaypoints.length < 2) return;
+            
+            optimizeBtn.disabled = true;
+            optimizeBtn.innerHTML = '<svg class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Optimizing...';
+            
+            try {
+                // Determine start coords (using first waypoint for now, or geolocation if available)
+                let startCoords = { lng: routeWaypoints[0].lng, lat: routeWaypoints[0].lat };
+                
+                // Get current location if possible, otherwise just use first waypoint
+                if (navigator.geolocation) {
+                    try {
+                        const pos = await new Promise((resolve, reject) => {
+                            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 3000 });
+                        });
+                        startCoords = { lng: pos.coords.longitude, lat: pos.coords.latitude };
+                    } catch (e) {
+                        console.log("Could not get GPS for start, using first waypoint.");
+                    }
                 }
+
+                const response = await fetch('/api/v1/routing/optimize', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        attraction_ids: routeWaypoints.map(w => w.id),
+                        start: startCoords,
+                        profile: selectedProfile,
+                        round_trip: true
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Optimization failed');
+                }
+                
+                optimizedRouteData = result;
+                renderOptimizedRoute(result);
+                
+                clearRouteBtn.classList.remove('hidden');
+                
+            } catch (error) {
+                console.error(error);
+                if (typeof Swal !== 'undefined') Swal.fire('Routing Error', error.message, 'error');
+            } finally {
+                optimizeBtn.disabled = false;
+                optimizeBtn.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg> Optimize Route';
             }
         });
+    }
+    
+    if (clearRouteBtn) {
+        clearRouteBtn.addEventListener('click', () => window.clearRoutes());
+    }
 
-        map.addLayer({
-            id: layerId,
-            type: 'line',
-            source: sourceId,
-            layout: {
-                'line-join': 'round',
-                'line-cap': 'round'
-            },
-            paint: {
-                'line-color': color,
-                'line-width': 5,
-                'line-opacity': 0.8,
-                'line-dasharray': [2, 2]
-            }
+    function renderOptimizedRoute(data) {
+        if (isLeafletMode) return; // Basic support or separate implementation for Leaflet
+        
+        window.clearRoutes();
+        
+        const sourceId = `route-opt-source-${Date.now()}`;
+        const layerId = `route-opt-layer-${Date.now()}`;
+        
+        // Add Route Line
+        if (data.geometry) {
+            map.addSource(sourceId, {
+                type: 'geojson',
+                data: data.geometry
+            });
+            
+            map.addLayer({
+                id: layerId,
+                type: 'line',
+                source: sourceId,
+                layout: {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                paint: {
+                    'line-color': '#10b981',
+                    'line-width': 5,
+                    'line-opacity': 0.8,
+                    'line-dasharray': [2, 2]
+                }
+            });
+            
+            routeLayerId = layerId;
+            routeSourceId = sourceId;
+            
+            // Fit bounds
+            const bounds = data.geometry.coordinates.reduce((b, coord) => {
+                return b.extend(coord);
+            }, new mapboxgl.LngLatBounds(data.geometry.coordinates[0], data.geometry.coordinates[0]));
+            
+            map.fitBounds(bounds, { padding: 50 });
+        }
+        
+        // Add numbered markers
+        data.optimized_order.forEach((stop, index) => {
+            const el = document.createElement('div');
+            el.className = 'w-8 h-8 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center border-2 border-white shadow-lg z-10';
+            el.textContent = index + 1;
+            
+            const marker = new mapboxgl.Marker({ element: el })
+                .setLngLat([stop.longitude, stop.latitude])
+                .addTo(map);
+                
+            waypointMarkers.push(marker);
         });
-
-        currentRouteLayer = layerId;
-        currentRouteSource = sourceId;
-
-        // Fit bounds to route
-        const bounds = path.reduce((bounds, coord) => {
-            return bounds.extend(coord);
-        }, new mapboxgl.LngLatBounds(path[0], path[0]));
-
-        map.fitBounds(bounds, { padding: 50 });
-    };
+        
+        // Update UI
+        document.getElementById('route-distance').textContent = data.summary.distance_km;
+        document.getElementById('route-duration').textContent = data.summary.duration_minutes;
+        document.getElementById('route-stops').textContent = data.summary.stops;
+        routeSummaryEl.classList.remove('hidden');
+        
+        // Build Itinerary
+        routeItineraryEl.innerHTML = '<h4 class="text-xs font-bold text-gray-500 uppercase mt-4 mb-2 px-1">Itinerary Details</h4>';
+        data.optimized_order.forEach((stop, index) => {
+            const div = document.createElement('div');
+            div.className = 'flex gap-3 bg-white p-3 rounded-xl border border-gray-100 shadow-sm';
+            div.innerHTML = `
+                <div class="flex flex-col items-center">
+                    <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-800 flex items-center justify-center text-xs font-bold">${index + 1}</div>
+                    ${index < data.optimized_order.length - 1 ? '<div class="w-0.5 h-full bg-gray-200 my-1"></div>' : ''}
+                </div>
+                <div class="flex-1 pb-2">
+                    <div class="font-bold text-sm text-gray-900">${stop.name}</div>
+                    <div class="text-xs text-gray-500 flex justify-between mt-1">
+                        <span>Arrival: +${stop.arrival_minutes} min</span>
+                    </div>
+                </div>
+            `;
+            routeItineraryEl.appendChild(div);
+        });
+        routeItineraryEl.classList.remove('hidden');
+    }
 
     window.clearRoutes = function () {
-        if (currentRouteLayer && map.getLayer(currentRouteLayer)) {
-            map.removeLayer(currentRouteLayer);
+        if (routeLayerId && map.getLayer(routeLayerId)) {
+            map.removeLayer(routeLayerId);
         }
-        if (currentRouteSource && map.getSource(currentRouteSource)) {
-            map.removeSource(currentRouteSource);
+        if (routeSourceId && map.getSource(routeSourceId)) {
+            map.removeSource(routeSourceId);
         }
-        currentRouteLayer = null;
-        currentRouteSource = null;
-
+        
+        waypointMarkers.forEach(m => m.remove());
+        waypointMarkers = [];
+        
+        routeLayerId = null;
+        routeSourceId = null;
+        optimizedRouteData = null;
+        
+        if (routeSummaryEl) routeSummaryEl.classList.add('hidden');
+        if (routeItineraryEl) routeItineraryEl.classList.add('hidden');
+        if (clearRouteBtn) clearRouteBtn.classList.add('hidden');
+        
         // Reset view
         map.flyTo({
             center: [120.2986, 15.7889],
@@ -1935,6 +2111,68 @@ document.addEventListener('DOMContentLoaded', function () {
             duration: 1500
         });
     };
+
+    // Load Suggested Routes
+    async function loadSuggestedRoutes() {
+        try {
+            const res = await fetch('/api/v1/routing/suggested');
+            const data = await res.json();
+            if (data.success && data.routes) {
+                const list = document.getElementById('suggested-routes-list');
+                if (!list) return;
+                
+                list.innerHTML = '';
+                data.routes.forEach(route => {
+                    const el = document.createElement('div');
+                    el.className = 'p-4 bg-white border border-gray-100 rounded-xl shadow-sm hover:shadow-md cursor-pointer transition-all';
+                    el.innerHTML = `
+                        <div class="flex items-start gap-3">
+                            <div class="text-2xl">${route.icon}</div>
+                            <div>
+                                <h5 class="font-bold text-gray-900 text-sm">${route.name}</h5>
+                                <p class="text-xs text-gray-500 mt-1">${route.description}</p>
+                                <div class="flex gap-2 mt-2">
+                                    <span class="text-[10px] font-bold bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">${route.estimated_duration_min} min</span>
+                                    <span class="text-[10px] font-bold bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">${route.estimated_distance_km} km</span>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    el.addEventListener('click', () => {
+                        if (route.attractions && route.attractions.length > 0) {
+                            routeWaypoints = route.attractions.map(a => ({
+                                id: a.id,
+                                name: a.name,
+                                lat: a.latitude,
+                                lng: a.longitude
+                            }));
+                            selectedProfile = route.profile;
+                            
+                            // Update profile buttons
+                            profileBtns.forEach(b => {
+                                if (b.dataset.profile === selectedProfile) {
+                                    b.classList.remove('bg-white', 'text-gray-600', 'border-gray-100');
+                                    b.classList.add('bg-emerald-100', 'text-emerald-800', 'border-emerald-500');
+                                } else {
+                                    b.classList.remove('bg-emerald-100', 'text-emerald-800', 'border-emerald-500');
+                                    b.classList.add('bg-white', 'text-gray-600', 'border-gray-100');
+                                }
+                            });
+                            
+                            updateWaypointUI();
+                            optimizeBtn.click();
+                        }
+                    });
+                    list.appendChild(el);
+                });
+            }
+        } catch (e) {
+            console.error("Failed to load suggested routes:", e);
+        }
+    }
+    
+    // Call on load
+    loadSuggestedRoutes();
 
     // ========================================
     // 16. OFFLINE MAP DOWNLOAD LOGIC

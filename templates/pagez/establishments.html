@@ -22,12 +22,12 @@
                 <div class="flex-1 min-w-[200px]">
                     <label class="block text-xs font-bold text-sky-800 mb-2 uppercase tracking-wider">Search</label>
                     <input type="text" name="q" value="{{ request.args.get('q', '') }}" placeholder="Search by name..."
-                        class="w-full bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sapphire-black placeholder-gray-400 text-sm focus:outline-none focus:ring-2 focus:ring-sky-600/20 focus:border-sky-600">
+                        class="w-full bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sapphire-black placeholder-gray-600 text-sm focus:outline-none focus:ring-2 focus:ring-sky-600/20 focus:border-sky-600">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-sky-800 mb-2 uppercase tracking-wider">Type</label>
                     <select name="type"
-                        class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sapphire-black text-sm focus:outline-none focus:ring-2 focus:ring-sky-600/20 focus:border-sky-600">
+                        class="bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sapphire-black text-sm focus:outline-none focus:ring-2 focus:ring-sky-600/20 focus:border-sky-600">
                         <option value="">All Types</option>
                         <option value="inn" {{ 'selected' if request.args.get('type') == 'inn' }}>🏨 Inn / Lodge</option>
                         <option value="restaurant" {{ 'selected' if request.args.get('type') == 'restaurant' }}>🍽️ Restaurant</option>
@@ -38,7 +38,7 @@
                 <div>
                     <label class="block text-xs font-bold text-sky-800 mb-2 uppercase tracking-wider">Price</label>
                     <select name="price_range"
-                        class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sapphire-black text-sm focus:outline-none focus:ring-2 focus:ring-sky-600/20 focus:border-sky-600">
+                        class="bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sapphire-black text-sm focus:outline-none focus:ring-2 focus:ring-sky-600/20 focus:border-sky-600">
                         <option value="">All Prices</option>
                         <option value="budget" {{ 'selected' if request.args.get('price_range') == 'budget' }}>💚 Budget</option>
                         <option value="moderate" {{ 'selected' if request.args.get('price_range') == 'moderate' }}>💛 Moderate</option>
@@ -48,7 +48,7 @@
                 <div>
                     <label class="block text-xs font-bold text-sky-800 mb-2 uppercase tracking-wider">Barangay</label>
                     <select name="barangay"
-                        class="bg-gray-50 border border-gray-200 rounded-xl px-4 py-2.5 text-sapphire-black text-sm focus:outline-none focus:ring-2 focus:ring-sky-600/20 focus:border-sky-600">
+                        class="bg-gray-50 border border-gray-300 rounded-xl px-4 py-2.5 text-sapphire-black text-sm focus:outline-none focus:ring-2 focus:ring-sky-600/20 focus:border-sky-600">
                         <option value="">All Barangays</option>
                         {% for b in barangays %}
                         <option value="{{ b.name }}" {{ 'selected' if request.args.get('barangay') == b.name }}>{{ b.name }}</option>

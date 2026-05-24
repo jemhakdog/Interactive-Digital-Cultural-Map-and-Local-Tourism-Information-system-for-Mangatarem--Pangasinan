@@ -13,7 +13,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 import models
 from extensions import db, login_manager, limiter, csrf, socketio
 from config import config_by_name
-from routes import register_blueprints
+from modules.registry import register_blueprints
 from utils.template_filters import register_filters
 from dotenv import load_dotenv
 
@@ -291,7 +291,7 @@ def _register_request_hooks(app: Flask) -> None:
 
         # Permissions Policy (restrict browser features)
         response.headers["Permissions-Policy"] = (
-            "camera=(), microphone=(), geolocation=(self), payment=()"
+            "camera=(), microphone=(self), geolocation=(self), payment=()"
         )
 
         # Cross-Origin protection (only meaningful with HTTPS)

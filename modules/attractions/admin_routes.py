@@ -6,7 +6,7 @@ from models import Attraction, BarangayInfo
 from utils.logger_helper import log_entry, log_success, log_error
 from utils.file_helpers import save_uploaded_file
 from utils.security import validate_string_input, validate_float, validate_coordinates, sanitize_html_input, validate_integer
-from . import admin_bp
+from modules.admin_core import admin_bp
 
 logger = logging.getLogger(__name__)
 

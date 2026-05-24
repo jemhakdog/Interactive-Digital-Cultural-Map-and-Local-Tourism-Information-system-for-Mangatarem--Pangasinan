@@ -1,8 +1,8 @@
-{% extends "admin/base.html" %}
+{% extends "admin/admin_base.html" %}
 
 {% block title %}Booking Management - Admin{% endblock %}
 
-{% block content %}
+{% block admin_content %}
 <div class="container mx-auto px-4 py-8">
     <div class="flex justify-between items-center mb-6">
         <h1 class="text-3xl font-bold text-gray-800">Booking Management</h1>
@@ -14,12 +14,12 @@
             <table class="min-w-full divide-y divide-gray-200">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Asset</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tourist</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Party Size</th>
-                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Date</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Asset</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Tourist</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Party Size</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-700 uppercase tracking-wider">Status</th>
+                        <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-700 uppercase tracking-wider">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
@@ -28,18 +28,18 @@
                         <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                             {{ res.slot.date.strftime('%b %d, %Y') }}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                             {% if res.slot.bookable_asset.attraction %}
                                 {{ res.slot.bookable_asset.attraction.name }} (Attraction)
                             {% elif res.slot.bookable_asset.heritage_profile %}
                                 {{ res.slot.bookable_asset.heritage_profile.name_of_asset }} (Heritage)
                             {% endif %}
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                             {{ res.user.username }}<br>
-                            <span class="text-xs text-gray-400">{{ res.primary_contact }}</span>
+                            <span class="text-xs text-gray-600">{{ res.primary_contact }}</span>
                         </td>
-                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                             {{ res.party_size }}
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
@@ -53,7 +53,7 @@
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                            <select class="status-dropdown text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500" data-id="{{ res.id }}">
+                            <select class="status-dropdown text-sm border-gray-400 rounded-md focus:ring-blue-500 focus:border-blue-500" data-id="{{ res.id }}">
                                 <option value="pending" {% if res.status == 'pending' %}selected{% endif %}>Pending</option>
                                 <option value="confirmed" {% if res.status == 'confirmed' %}selected{% endif %}>Confirmed</option>
                                 <option value="attended" {% if res.status == 'attended' %}selected{% endif %}>Attended (Check-in)</option>
@@ -64,7 +64,7 @@
                     </tr>
                     {% else %}
                     <tr>
-                        <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
+                        <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-700">
                             No reservations found.
                         </td>
                     </tr>

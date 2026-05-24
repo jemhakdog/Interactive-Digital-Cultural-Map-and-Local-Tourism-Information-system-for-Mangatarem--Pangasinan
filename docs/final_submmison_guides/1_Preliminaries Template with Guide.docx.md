@@ -59,7 +59,21 @@ The tourism landscape in Mangatarem, Pangasinan is undergoing a digital transfor
 
 **Acknowledgement**
 
-*(Insert personal acknowledgments here. Be sure to acknowledge your partner: Rachelle T. Cabornay, Senior Tourism Operations Officer, Municipal Economic Enterprise Office (M.E.O.), as well as your adviser, panelists, institution, and families.)*
+The completion of this capstone project would not have been possible without the support, guidance, and contributions of several individuals and institutions. The researchers would like to express their deepest gratitude to the following:
+
+**Rachelle T. Cabornay**, Senior Tourism Operations Officer of the Municipal Economic Enterprise Office (M.E.O.), Mangatarem, for her invaluable insights, cooperation, and provision of essential data regarding the municipality’s cultural and tourism spots.
+
+**[INSERT ADVISER NAME]**, our esteemed capstone adviser, for [his/her] continuous guidance, constructive feedback, and unwavering patience throughout the development of this project.
+
+**The Panel of Examiners**, for their thorough evaluation, critical suggestions, and recommendations that significantly improved the quality of our system.
+
+**The Faculty and Staff of the Information Technology Department** at **Binalatongan Community College**, for equipping us with the technical skills, knowledge, and foundation necessary to undertake and complete this endeavor.
+
+**Our Families and Loved Ones**, for their endless moral and financial support, encouragement, and understanding during the long hours spent conceptualizing and developing this platform.
+
+**Above all, to the Almighty God**, for the wisdom, strength, and blessings He bestowed upon us, making all of this possible.
+
+**- The Researchers**
 
 ---
 

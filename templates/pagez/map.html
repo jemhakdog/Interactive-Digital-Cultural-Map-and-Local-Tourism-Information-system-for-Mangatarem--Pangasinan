@@ -61,6 +61,16 @@
         0%, 100% { opacity: 1; transform: scale(1); }
         50% { opacity: 0.85; transform: scale(0.98); }
     }
+    
+    /* Gemini Live Recording State */
+    #gemini-mic-btn.recording-active {
+        background-color: #ef4444 !important;
+        animation: pulseRecord 1.5s infinite ease-in-out;
+    }
+    @keyframes pulseRecord {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50% { opacity: 0.9; transform: scale(0.98); }
+    }
 </style>
 {% endblock %}
 
@@ -84,19 +94,19 @@
             <div class="flex justify-between items-start pt-2 md:pt-0">
                 <div>
                     <h2 class="text-2xl font-bold map-card-title">Explore Mangatarem</h2>
-                    <p class="text-xs text-gray-400 font-medium tracking-wide mt-0.5">82 Barangays & Hidden Gems</p>
+                    <p class="text-xs text-gray-600 font-medium tracking-wide mt-0.5">82 Barangays & Hidden Gems</p>
                 </div>
                 
                 <div class="flex items-center gap-1">
                     <!-- Layout Toggle Button -->
-                    <button class="layout-toggle-btn md:hidden p-2 text-gray-400 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all" title="Change Layout">
+                    <button class="layout-toggle-btn md:hidden p-2 text-gray-600 hover:text-sky-600 hover:bg-sky-50 rounded-lg transition-all" title="Change Layout">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
                         </svg>
                     </button>
                     
                     <!-- Close Button -->
-                    <button id="close-sidebar" class="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Close Panel">
+                    <button id="close-sidebar" class="p-2 text-gray-600 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all" title="Close Panel">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
@@ -107,8 +117,8 @@
             <!-- Search Bar (with margin-top) -->
             <div class="relative mt-5">
                 <input type="text" id="search-input" placeholder="Find a spot, eatery, or trail..."
-                    class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-600 focus:bg-white transition-all text-sm">
-                <svg class="w-5 h-5 text-gray-400 absolute left-3 top-3.5" fill="none" stroke="currentColor"
+                    class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-600 focus:bg-white transition-all text-sm">
+                <svg class="w-5 h-5 text-gray-600 absolute left-3 top-3.5" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
@@ -117,17 +127,17 @@
         </div>
 
         <!-- Tab System -->
-        <div class="flex border-b border-gray-200">
+        <div class="flex border-b border-gray-300">
             <button id="tab-places"
                 class="tab-btn flex-1 py-3 text-sm font-semibold text-green-700 border-b-2 border-green-700 bg-green-50 transition">
                 Places
             </button>
             <button id="tab-recommended"
-                class="tab-btn flex-1 py-3 text-sm font-medium text-gray-500 hover:text-green-700 hover:bg-gray-50 transition">
+                class="tab-btn flex-1 py-3 text-sm font-medium text-gray-700 hover:text-green-700 hover:bg-gray-50 transition">
                 Recommended
             </button>
             <button id="tab-routes"
-                class="tab-btn flex-1 py-3 text-sm font-medium text-gray-500 hover:text-green-700 hover:bg-gray-50 transition">
+                class="tab-btn flex-1 py-3 text-sm font-medium text-gray-700 hover:text-green-700 hover:bg-gray-50 transition">
                 Routes
             </button>
         </div>
@@ -136,10 +146,10 @@
         <div
             class="px-5 py-3 flex gap-2 overflow-x-auto no-scrollbar border-b border-gray-100 bg-white/50 backdrop-blur-md">
             <button
-                class="filter-btn active px-4 py-1.5 text-xs font-semibold bg-white border border-gray-200 text-gray-600 rounded-full shadow-sm transition-all hover:border-sky-500 hover:text-sky-700 hover:bg-sky-50 active:scale-95"
+                class="filter-btn active px-4 py-1.5 text-xs font-semibold bg-white border border-gray-300 text-gray-800 rounded-full shadow-sm transition-all hover:border-sky-500 hover:text-sky-700 hover:bg-sky-50 active:scale-95"
                 data-category="all">All</button>
             <button
-                class="filter-btn px-4 py-1.5 text-xs font-semibold bg-white/80 border border-gray-200 text-gray-600 rounded-full hover:border-sky-500 hover:text-sky-700 hover:bg-sky-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
+                class="filter-btn px-4 py-1.5 text-xs font-semibold bg-white/80 border border-gray-300 text-gray-800 rounded-full hover:border-sky-500 hover:text-sky-700 hover:bg-sky-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
                 data-category="Nature">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -149,7 +159,7 @@
                 Nature
             </button>
             <button
-                class="filter-btn px-4 py-1.5 text-xs font-semibold bg-white/80 border border-gray-200 text-gray-600 rounded-full hover:border-sky-500 hover:text-sky-700 hover:bg-sky-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
+                class="filter-btn px-4 py-1.5 text-xs font-semibold bg-white/80 border border-gray-300 text-gray-800 rounded-full hover:border-sky-500 hover:text-sky-700 hover:bg-sky-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
                 data-category="Historical">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -159,7 +169,7 @@
                 Heritage
             </button>
             <button
-                class="filter-btn px-4 py-1.5 text-xs font-semibold bg-white/80 border border-gray-200 text-gray-600 rounded-full hover:border-sky-500 hover:text-sky-700 hover:bg-sky-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
+                class="filter-btn px-4 py-1.5 text-xs font-semibold bg-white/80 border border-gray-300 text-gray-800 rounded-full hover:border-sky-500 hover:text-sky-700 hover:bg-sky-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
                 data-category="Religious">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -168,7 +178,7 @@
                 Religious
             </button>
             <button
-                class="filter-btn px-4 py-1.5 text-xs font-semibold bg-white/80 border border-gray-200 text-gray-600 rounded-full hover:border-sky-500 hover:text-sky-700 hover:bg-sky-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
+                class="filter-btn px-4 py-1.5 text-xs font-semibold bg-white/80 border border-gray-300 text-gray-800 rounded-full hover:border-sky-500 hover:text-sky-700 hover:bg-sky-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm"
                 data-category="Food">
                 <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -181,7 +191,7 @@
 
         <!-- Quick Search Chips -->
         <div class="px-5 py-3 flex gap-2 overflow-x-auto no-scrollbar border-b border-gray-100 bg-white">
-            <span class="text-[10px] font-bold text-gray-400 uppercase tracking-wider self-center mr-1 flex-shrink-0">Quick Find:</span>
+            <span class="text-[10px] font-bold text-gray-600 uppercase tracking-wider self-center mr-1 flex-shrink-0">Quick Find:</span>
             <button onclick="findNearest('cafe')"
                 class="px-3 py-1.5 text-xs font-semibold bg-orange-50 text-orange-700 border border-orange-100 rounded-full hover:bg-orange-100 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm flex-shrink-0">
                 ☕ Coffee
@@ -203,22 +213,22 @@
         <!-- Establishment Filters -->
         <div class="px-5 py-3 flex gap-2 overflow-x-auto no-scrollbar border-b border-gray-100 bg-white">
             <button
-                class="est-filter-btn px-3 py-1.5 text-xs font-semibold bg-white/80 border border-gray-200 text-gray-600 rounded-full hover:border-orange-500 hover:text-orange-700 hover:bg-orange-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm flex-shrink-0"
+                class="est-filter-btn px-3 py-1.5 text-xs font-semibold bg-white/80 border border-gray-300 text-gray-800 rounded-full hover:border-orange-500 hover:text-orange-700 hover:bg-orange-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm flex-shrink-0"
                 data-est-type="restaurant">
                 🍽️ Restaurants
             </button>
             <button
-                class="est-filter-btn px-3 py-1.5 text-xs font-semibold bg-white/80 border border-gray-200 text-gray-600 rounded-full hover:border-amber-500 hover:text-amber-700 hover:bg-amber-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm flex-shrink-0"
+                class="est-filter-btn px-3 py-1.5 text-xs font-semibold bg-white/80 border border-gray-300 text-gray-800 rounded-full hover:border-amber-500 hover:text-amber-700 hover:bg-amber-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm flex-shrink-0"
                 data-est-type="cafe">
                 ☕ Cafés
             </button>
             <button
-                class="est-filter-btn px-3 py-1.5 text-xs font-semibold bg-white/80 border border-gray-200 text-gray-600 rounded-full hover:border-red-500 hover:text-red-700 hover:bg-red-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm flex-shrink-0"
+                class="est-filter-btn px-3 py-1.5 text-xs font-semibold bg-white/80 border border-gray-300 text-gray-800 rounded-full hover:border-red-500 hover:text-red-700 hover:bg-red-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm flex-shrink-0"
                 data-est-type="fastfood">
                 🍔 Fast Food
             </button>
             <button
-                class="est-filter-btn px-3 py-1.5 text-xs font-semibold bg-white/80 border border-gray-200 text-gray-600 rounded-full hover:border-blue-500 hover:text-blue-700 hover:bg-blue-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm flex-shrink-0"
+                class="est-filter-btn px-3 py-1.5 text-xs font-semibold bg-white/80 border border-gray-300 text-gray-800 rounded-full hover:border-blue-500 hover:text-blue-700 hover:bg-blue-50 transition-all flex items-center gap-1.5 active:scale-95 shadow-sm flex-shrink-0"
                 data-est-type="inn">
                 🏨 Inns
             </button>
@@ -238,7 +248,7 @@
         <!-- Barangay Filter -->
         <div class="px-5 py-2 border-b border-gray-100 bg-white">
             <select id="barangay-filter"
-                class="w-full px-3 py-2 text-sm bg-gray-50 text-gray-700 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer hover:bg-gray-100 transition">
+                class="w-full px-3 py-2 text-sm bg-gray-50 text-gray-900 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer hover:bg-gray-100 transition">
                 <option value="all">All Barangays</option>
                 {% for barangay in barangays %}
                 <option value="{{ barangay }}">{{ barangay }}</option>
@@ -250,7 +260,7 @@
         <div id="content-area" class="flex-1 overflow-y-auto bg-gray-50">
             <!-- Places Tab Content -->
             <div id="places-content" class="p-4 space-y-4">
-                <div class="text-center text-gray-500 py-4">Loading attractions...</div>
+                <div class="text-center text-gray-700 py-4">Loading attractions...</div>
             </div>
 
             <!-- Loading indicator for infinite scroll -->
@@ -263,57 +273,61 @@
 
             <!-- Routes Tab Content (Hidden by default) -->
             <div id="routes-content" class="p-4 space-y-4 hidden">
-                <div class="space-y-4">
-                    <div class="group p-5 bg-white border border-sky-100 rounded-2xl shadow-sm hover:shadow-xl hover:border-sky-200 transition-all cursor-pointer relative overflow-hidden active:scale-[0.98]"
-                        data-action="draw-route" data-route-type="nature">
-                        <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <svg class="w-12 h-12 text-sky-600" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                    d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z">
-                                </path>
-                            </svg>
+                <!-- Profile Selector -->
+                <div class="flex gap-2 mb-3">
+                    <button data-profile="driving-car" class="route-profile-btn flex-1 py-2 px-3 bg-emerald-100 text-emerald-800 border-2 border-emerald-500 rounded-xl font-bold text-sm transition-all shadow-sm active">🚗 Drive</button>
+                    <button data-profile="foot-walking" class="route-profile-btn flex-1 py-2 px-3 bg-white text-gray-600 border-2 border-gray-100 rounded-xl font-bold text-sm transition-all hover:border-gray-300">🚶 Walk</button>
+                </div>
+                
+                <!-- Waypoint List -->
+                <div class="bg-gray-50 rounded-xl p-3 border border-gray-100">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase mb-3 px-1 flex justify-between items-center">
+                        Your Itinerary
+                        <span id="waypoint-count" class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded-full text-[10px]">0 stops</span>
+                    </h4>
+                    
+                    <div id="waypoint-list" class="space-y-2 min-h-[60px]">
+                        <div id="empty-waypoint-msg" class="text-center text-gray-400 py-4 text-sm">
+                            Click 'Add to Route' on places to build your itinerary
                         </div>
-                        <h3 class="font-bold text-sky-900 text-lg mb-1">The Nature Lover's Trail</h3>
-                        <p class="text-xs text-sky-600/70 font-medium tracking-wide items-center flex gap-1">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                </path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            Manleluag • Timmanguyob • Daang Kalikasan
-                        </p>
                     </div>
-
-                    <div class="group p-5 bg-white border border-orange-100 rounded-2xl shadow-sm hover:shadow-xl hover:border-orange-200 transition-all cursor-pointer relative overflow-hidden active:scale-[0.98]"
-                        data-action="draw-route" data-route-type="heritage">
-                        <div class="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
-                            <svg class="w-12 h-12 text-orange-600" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
-                                    d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4">
-                                </path>
-                            </svg>
-                        </div>
-                        <h3 class="font-bold text-orange-900 text-lg mb-1">Historical Heritage Walk</h3>
-                        <p class="text-xs text-orange-600/70 font-medium tracking-wide items-center flex gap-1">
-                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                </path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            St. Raymund Church • Municipal Hall • Plaza
-                        </p>
-                    </div>
-
-                    <button data-action="clear-routes"
-                        class="w-full py-2 px-4 bg-gray-100 hover:bg-gray-200 text-gray-500 text-xs font-bold rounded-xl transition-all uppercase tracking-widest">
-                        Clear Map Lines
+                </div>
+                
+                <!-- Action Buttons -->
+                <div class="flex gap-2 pt-2">
+                    <button id="optimize-route-btn" class="flex-1 py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl shadow-md shadow-emerald-200 transition-all active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2" disabled>
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        Optimize Route
                     </button>
+                    <button id="clear-route-btn" class="py-3 px-4 bg-white hover:bg-red-50 text-red-500 border border-red-100 rounded-xl font-bold transition-all active:scale-95 hidden" title="Clear Route">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                </div>
+                
+                <!-- Route Summary (hidden until optimized) -->
+                <div id="route-summary" class="hidden bg-emerald-50 rounded-xl p-4 border border-emerald-100">
+                    <div class="grid grid-cols-3 gap-2 text-center divide-x divide-emerald-200/50">
+                        <div><div id="route-distance" class="text-lg font-black text-emerald-800">—</div><div class="text-[10px] uppercase font-bold text-emerald-600/70 mt-1">Distance</div></div>
+                        <div><div id="route-duration" class="text-lg font-black text-emerald-800">—</div><div class="text-[10px] uppercase font-bold text-emerald-600/70 mt-1">Duration</div></div>
+                        <div><div id="route-stops" class="text-lg font-black text-emerald-800">—</div><div class="text-[10px] uppercase font-bold text-emerald-600/70 mt-1">Stops</div></div>
+                    </div>
+                </div>
+                
+                <!-- Step-by-Step Itinerary (hidden until optimized) -->
+                <div id="route-itinerary" class="hidden space-y-3 pt-2"></div>
+                
+                <!-- Suggested Routes -->
+                <div id="suggested-routes-container" class="pt-6 mt-4 border-t border-gray-100">
+                    <h4 class="text-xs font-bold text-gray-500 uppercase mb-3 px-1">Suggested Routes</h4>
+                    <div id="suggested-routes-list" class="space-y-3">
+                        <div class="animate-pulse flex space-x-4 p-4 rounded-xl border border-gray-100">
+                            <div class="rounded-full bg-gray-200 h-10 w-10"></div>
+                            <div class="flex-1 space-y-4 py-1">
+                                <div class="h-4 bg-gray-200 rounded w-3/4"></div>
+                                <div class="h-3 bg-gray-200 rounded w-5/6"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -325,7 +339,7 @@
 
         <!-- Place Details Card (Floating) -->
         <div id="place-card"
-            class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] md:w-96 max-w-md rounded-2xl shadow-2xl p-6 z-[999] transition-all duration-300 transform translate-y-0 border border-gray-100 map-card-bg">
+            class="hidden absolute bottom-4 left-1/2 -translate-x-1/2 w-[calc(100%-2rem)] md:w-96 max-w-md rounded-2xl shadow-2xl p-6 z-[999] transition-all duration-300 transform translate-y-0 border border-gray-100 map-card-bg max-h-[calc(100vh-100px)] overflow-y-auto">
             <!-- Close Button -->
             <button data-action="close-modal" data-modal-id="place-card"
                 class="absolute top-4 right-4 transition map-card-subtitle">
@@ -358,20 +372,20 @@
             </div>
 
             <div class="grid grid-cols-2 gap-2 mb-4 mt-3">
-                <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium border border-gray-100 bg-gray-50 text-gray-700">
-                    <span class="text-gray-400">🕒</span>
+                <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium border border-gray-100 bg-gray-50 text-gray-900">
+                    <span class="text-gray-600">🕒</span>
                     <span id="card-hours" class="truncate">Open 9am-8pm</span>
                 </div>
-                <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium border border-gray-100 bg-gray-50 text-gray-700">
-                    <span class="text-gray-400">🎟️</span>
+                <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium border border-gray-100 bg-gray-50 text-gray-900">
+                    <span class="text-gray-600">🎟️</span>
                     <span id="card-fee" class="truncate">Free</span>
                 </div>
-                <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium border border-gray-100 bg-gray-50 text-gray-700">
-                    <span class="text-gray-400">📞</span>
+                <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium border border-gray-100 bg-gray-50 text-gray-900">
+                    <span class="text-gray-600">📞</span>
                     <span id="card-contact" class="truncate">N/A</span>
                 </div>
-                <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium border border-gray-100 bg-gray-50 text-gray-700">
-                    <span class="text-gray-400">🚿</span>
+                <div class="flex items-center gap-2 px-2 py-1.5 rounded-lg text-xs font-medium border border-gray-100 bg-gray-50 text-gray-900">
+                    <span class="text-gray-600">🚿</span>
                     <span id="card-facilities" class="truncate">N/A</span>
                 </div>
             </div>
@@ -380,14 +394,21 @@
                 Official outlet featuring performance gear. Located right across the Municipal Hall.
             </p>
 
+            <div class="flex gap-2 mb-2">
+                <button id="add-to-route-btn"
+                    class="flex-1 font-bold py-3 rounded-xl transition shadow flex items-center justify-center gap-2 active:scale-95 transform duration-150 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 text-sm border-2 border-emerald-500">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+                    <span>Add to Route</span>
+                </button>
+            </div>
             <div class="flex gap-2">
                 <button id="start-route-btn"
-                    class="flex-1 font-bold py-3 rounded-xl transition shadow-lg flex items-center justify-center gap-2 active:scale-95 transform duration-150 bg-green-600 hover:bg-green-700 text-white text-sm">
+                    class="flex-1 font-bold py-3 rounded-xl transition shadow flex items-center justify-center gap-2 active:scale-95 transform duration-150 bg-green-600 hover:bg-green-700 text-white text-sm">
                     <span>Directions</span>
                 </button>
                 <button id="feedback-btn"
-                    class="flex-1 font-bold py-3 rounded-xl transition shadow border border-gray-200 flex items-center justify-center gap-2 active:scale-95 transform duration-150 bg-white hover:bg-gray-50 text-gray-700 text-sm">
-                    <span>📝 Review/Suggest</span>
+                    class="flex-1 font-bold py-3 rounded-xl transition shadow border border-gray-300 flex items-center justify-center gap-2 active:scale-95 transform duration-150 bg-white hover:bg-gray-50 text-gray-900 text-sm">
+                    <span>📝 Review</span>
                 </button>
             </div>
         </div>
@@ -395,25 +416,25 @@
         <!-- Feedback Modal -->
         <div id="map-feedback-modal" class="hidden fixed inset-0 z-[1000] bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
             <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 relative">
-                <button onclick="document.getElementById('map-feedback-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <button onclick="document.getElementById('map-feedback-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-600 hover:text-gray-800">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
                 <h3 class="text-xl font-bold mb-1">Suggest an Edit or Review</h3>
-                <p class="text-sm text-gray-500 mb-4">Help us keep the map updated. Leave a review or report an issue (e.g. closed road, wrong hours, safety concern).</p>
+                <p class="text-sm text-gray-700 mb-4">Help us keep the map updated. Leave a review or report an issue (e.g. closed road, wrong hours, safety concern).</p>
                 
                 <form id="map-feedback-form">
                     <input type="hidden" id="feedback-attraction-id">
                     <div class="mb-4">
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Feedback Type</label>
-                        <select id="feedback-type" class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
+                        <label class="block text-sm font-bold text-gray-900 mb-1">Feedback Type</label>
+                        <select id="feedback-type" class="w-full border-gray-400 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500">
                             <option value="review">General Review</option>
                             <option value="correction">Suggest Correction (Hours/Fee/Details)</option>
                             <option value="safety">Report Safety/Environmental Issue</option>
                         </select>
                     </div>
                     <div class="mb-4">
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Message</label>
-                        <textarea id="feedback-message" rows="4" required class="w-full border-gray-300 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500" placeholder="Tell us more..."></textarea>
+                        <label class="block text-sm font-bold text-gray-900 mb-1">Message</label>
+                        <textarea id="feedback-message" rows="4" required class="w-full border-gray-400 rounded-lg shadow-sm focus:ring-green-500 focus:border-green-500" placeholder="Tell us more..."></textarea>
                     </div>
                     <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl transition shadow-md active:scale-95">
                         Submit Feedback
@@ -427,6 +448,14 @@
             <button id="easy-mode-toggle" class="bg-[#C25A3F] hover:bg-[#a64830] text-[#FAF9F6] font-bold px-4 py-2.5 rounded-xl shadow-[3px_3px_0px_0px_#1C1C1C] flex items-center gap-2 border-2 border-[#1C1C1C] active:translate-y-0.5 active:shadow-none transition-all text-xs tracking-wider animate-pulse uppercase">
                 <span class="inline-block w-2.5 h-2.5 bg-[#2D5A27] border border-white rounded-full animate-ping"></span>
                 👴 MADALING GAMITIN / EASY MAP
+            </button>
+        </div>
+
+        <!-- Gemini Live UI -->
+        <div class="absolute top-16 right-4 z-[400] mt-2">
+            <button id="gemini-mic-btn" style="display: none;" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-4 py-2.5 rounded-xl shadow-md flex items-center gap-2 border border-indigo-800 transition-all text-xs tracking-wider">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M7 4a3 3 0 016 0v4a3 3 0 11-6 0V4zm4 10.93A7.001 7.001 0 0017 8h-2a5 5 0 01-10 0H3a7.001 7.001 0 006 6.93V17H6v2h8v-2h-3v-2.07z" clip-rule="evenodd"></path></svg>
+                <span id="gemini-status">Live Audio Guide</span>
             </button>
         </div>
 
@@ -445,7 +474,7 @@
             <button id="routes-toggle"
                 class="bg-white rounded-lg shadow-md p-2 cursor-pointer hover:bg-gray-50 transition"
                 title="View suggested routes">
-                <svg class="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-6 h-6 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 01-.447-.894L15 7m0 13V7">
                     </path>
@@ -467,15 +496,15 @@
             <div id="style-switcher" class="bg-white rounded-lg shadow-md p-1 flex flex-col gap-1 border border-gray-100">
                 <button data-action="change-map-style" data-map-style="streets-v12" class="style-btn active p-2 rounded hover:bg-green-50 transition flex flex-col items-center gap-1 group" title="Streets">
                     <div class="w-8 h-8 rounded bg-blue-100 border border-blue-200 group-hover:border-green-500 transition shadow-sm"></div>
-                    <span class="text-[9px] font-bold text-gray-500 uppercase">Map</span>
+                    <span class="text-[9px] font-bold text-gray-700 uppercase">Map</span>
                 </button>
                 <button data-action="change-map-style" data-map-style="satellite-streets-v12" class="style-btn p-2 rounded hover:bg-green-50 transition flex flex-col items-center gap-1 group" title="3D Satellite">
                     <div class="w-8 h-8 rounded bg-green-800 border border-green-900 group-hover:border-green-500 transition shadow-sm"></div>
-                    <span class="text-[9px] font-bold text-gray-500 uppercase">3D Sat</span>
+                    <span class="text-[9px] font-bold text-gray-700 uppercase">3D Sat</span>
                 </button>
                 <button data-action="change-map-style" data-map-style="outdoors-v12" class="style-btn p-2 rounded hover:bg-green-50 transition flex flex-col items-center gap-1 group" title="Outdoors">
                     <div class="w-8 h-8 rounded bg-sky-100 border border-sky-200 group-hover:border-green-500 transition shadow-sm"></div>
-                    <span class="text-[9px] font-bold text-gray-500 uppercase">Trail</span>
+                    <span class="text-[9px] font-bold text-gray-700 uppercase">Trail</span>
                 </button>
                 <div class="border-t border-gray-100 my-1"></div>
                 <button id="offline-download-btn" class="p-2 rounded hover:bg-blue-50 transition flex flex-col items-center gap-1 group" title="Download Offline Map">
@@ -484,7 +513,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                         </svg>
                     </div>
-                    <span class="text-[9px] font-bold text-gray-500 uppercase">Offline</span>
+                    <span class="text-[9px] font-bold text-gray-700 uppercase">Offline</span>
                 </button>
             </div>
         </div>
@@ -492,17 +521,17 @@
         <!-- Offline Download Progress Card -->
         <div id="download-card" class="hidden absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 bg-white rounded-2xl shadow-2xl p-6 z-[500] border border-gray-100">
             <h3 class="text-lg font-bold text-gray-900 mb-2">Offline Map</h3>
-            <p class="text-sm text-gray-500 mb-4">Downloading Mangatarem map tiles for offline use. This area is approximately 213 sq km.</p>
+            <p class="text-sm text-gray-700 mb-4">Downloading Mangatarem map tiles for offline use. This area is approximately 213 sq km.</p>
             
             <div class="w-full bg-gray-100 rounded-full h-2.5 mb-1">
                 <div id="download-progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
             </div>
-            <div class="flex justify-between text-[10px] text-gray-400 font-bold uppercase mb-6">
+            <div class="flex justify-between text-[10px] text-gray-600 font-bold uppercase mb-6">
                 <span id="download-status">Initializing...</span>
                 <span id="download-percentage">0%</span>
             </div>
 
-            <button id="cancel-download-btn" class="w-full py-2 text-sm font-bold text-gray-500 hover:text-gray-700 transition">
+            <button id="cancel-download-btn" class="w-full py-2 text-sm font-bold text-gray-700 hover:text-gray-900 transition">
                 Close
             </button>
         </div>
@@ -576,7 +605,7 @@
                 <!-- Text Details -->
                 <div class="flex-1 min-h-0 flex flex-col gap-1.5 overflow-y-auto">
                     <h3 id="easy-spot-title" class="text-xl font-bold text-[#1C1C1C] font-serif leading-tight">Saint Bartholomew Church</h3>
-                    <p id="easy-spot-subtitle" class="text-xs text-gray-500 font-bold tracking-wider">Poblacion, Mangatarem</p>
+                    <p id="easy-spot-subtitle" class="text-xs text-gray-700 font-bold tracking-wider">Poblacion, Mangatarem</p>
                     <p id="easy-spot-desc" class="text-sm leading-relaxed text-[#1C1C1C] font-sans pr-1">Loading description...</p>
                 </div>
                 
@@ -625,4 +654,5 @@
 </script>
 
 <script src="{{ url_for('static', filename='js/pages/map.js') }}?v=1.1.0"></script>
+<script src="{{ url_for('static', filename='js/pages/gemini_live.js') }}?v=1.0.0"></script>
 {% endblock %}

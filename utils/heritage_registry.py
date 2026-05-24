@@ -4,18 +4,11 @@ Heritage Type Registry — single source of truth for heritage route handlers.
 Maps URL slugs to models, labels, and field definitions. Used by admin routes,
 API routes, and public routes to avoid duplicating type logic.
 """
-from heritage_models.built_heritage import BUILT_HERITAGE_DETAIL as BuiltHeritage
-from heritage_models.natural_heritage import NATURAL_HERITAGE_DETAIL as NaturalHeritage
-from heritage_models.movable_heritage import MOVABLE_HERITAGE_DETAIL as MovableHeritage
-from heritage_models.intangible_heritage import INTANGIBLE_HERITAGE_DETAIL as IntangibleHeritage
-from heritage_models.personality_profile import PERSONALITY_DETAIL as PersonalityProfile
-from heritage_models.cultural_institution import INSTITUTION_DETAIL as CulturalInstitution
-from heritage_models.lgu_culture_program import LGU_PROGRAM_DETAIL as LGUCultureProgram
-
+from models import HeritageProfile
 
 HERITAGE_TYPES = {
     "built": {
-        "model": BuiltHeritage,
+        "model": HeritageProfile,
         "label": "Built Heritage",
         "label_plural": "Built Heritage Sites",
         "form": "02",
@@ -44,7 +37,7 @@ HERITAGE_TYPES = {
         ],
     },
     "natural": {
-        "model": NaturalHeritage,
+        "model": HeritageProfile,
         "label": "Natural Heritage",
         "label_plural": "Natural Heritage Sites",
         "form": "01A",
@@ -73,7 +66,7 @@ HERITAGE_TYPES = {
         ],
     },
     "movable": {
-        "model": MovableHeritage,
+        "model": HeritageProfile,
         "label": "Movable Heritage",
         "label_plural": "Movable Heritage Items",
         "form": "03",
@@ -105,7 +98,7 @@ HERITAGE_TYPES = {
         ],
     },
     "intangible": {
-        "model": IntangibleHeritage,
+        "model": HeritageProfile,
         "label": "Intangible Heritage",
         "label_plural": "Intangible Heritage Items",
         "form": "04A",
@@ -135,7 +128,7 @@ HERITAGE_TYPES = {
         ],
     },
     "personality": {
-        "model": PersonalityProfile,
+        "model": HeritageProfile,
         "label": "Significant Personality",
         "label_plural": "Significant Personalities",
         "form": "05",
@@ -158,7 +151,7 @@ HERITAGE_TYPES = {
         ],
     },
     "institution": {
-        "model": CulturalInstitution,
+        "model": HeritageProfile,
         "label": "Cultural Institution",
         "label_plural": "Cultural Institutions",
         "form": "06",
@@ -186,7 +179,7 @@ HERITAGE_TYPES = {
         ],
     },
     "program": {
-        "model": LGUCultureProgram,
+        "model": HeritageProfile,
         "label": "LGU Culture Program",
         "label_plural": "LGU Culture Programs",
         "form": "07",

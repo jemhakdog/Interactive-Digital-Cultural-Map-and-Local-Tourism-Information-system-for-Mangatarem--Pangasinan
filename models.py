@@ -33,13 +33,7 @@ from modules.analytics.models import AnalyticsPageView, DatabaseAuditLog, Visito
 from modules.notifications.models import NewsletterSubscriber, NewsletterHistory
 
 # === Heritage Models (Forms 01-07) ===
-from heritage_models.built_heritage import BuiltHeritage
-from heritage_models.movable_heritage import MovableHeritage
-from heritage_models.natural_heritage import NaturalHeritage
-from heritage_models.intangible_heritage import IntangibleHeritage
-from heritage_models.personality_profile import PersonalityProfile
-from heritage_models.cultural_institution import CulturalInstitution
-from heritage_models.lgu_culture_program import LGUCultureProgram
+# These are now merged into HeritageProfile.form_data
 
 # === Chat Module Models ===
 from modules.chat.models import ChatRoom, ChatParticipant, ChatMessage

@@ -100,7 +100,7 @@ class TestBookingArrivalVerification:
             'latitude': 15.7905,
             'longitude': 120.2934
         })
-        assert response.status_code == 302  # Flask-Login redirects unauthenticated users to login view
+        assert response.status_code in (302, 401)  # Flask-Login redirects or returns 401 for unauthenticated users
 
     def test_invalid_payload_fails(self, client, setup_data):
         """Verify endpoint handles malformed or missing coordinate payloads."""

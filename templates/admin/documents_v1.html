@@ -148,7 +148,7 @@
         <div class="flex-1">
             <div class="mb-6">
                 <h1 class="text-2xl font-bold text-gray-900">Document Management</h1>
-                <p class="text-gray-500 text-sm">Manage heritage records and DOCX templates.</p>
+                <p class="text-gray-700 text-sm">Manage heritage records and DOCX templates.</p>
             </div>
             <!-- Action Buttons Header -->
             <div class="flex flex-wrap gap-4 mb-8">
@@ -158,17 +158,17 @@
                         Rapid Create
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
                     </button>
-                    <div id="rapid-create-dropdown" class="absolute left-0 top-full mt-2 w-64 bg-white border border-gray-200 rounded-xl shadow-xl z-50 hidden animate-fade-in">
+                    <div id="rapid-create-dropdown" class="absolute left-0 top-full mt-2 w-64 bg-white border border-gray-300 rounded-xl shadow-xl z-50 hidden animate-fade-in">
                         <div class="p-2">
-                            <div class="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-3 py-2">Select Template</div>
+                            <div class="text-[10px] font-bold text-gray-600 uppercase tracking-widest px-3 py-2">Select Template</div>
                             {% for slug, meta in form_mapping.items() %}
                             <a href="{{ url_for('v1_docs.v1_document_create', slug=slug) }}" class="flex items-center gap-3 px-3 py-2 hover:bg-sky-50 rounded-lg transition-colors group/item">
-                                <div class="p-1.5 bg-gray-100 rounded-md text-gray-400 group-hover/item:bg-sky-100 group-hover/item:text-sky-600">
+                                <div class="p-1.5 bg-gray-100 rounded-md text-gray-600 group-hover/item:bg-sky-100 group-hover/item:text-sky-600">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                                 </div>
                                 <div>
-                                    <div class="text-sm font-medium text-gray-700">{{ meta.label }}</div>
-                                    <div class="text-[10px] text-gray-400">{{ meta.category }}</div>
+                                    <div class="text-sm font-medium text-gray-900">{{ meta.label }}</div>
+                                    <div class="text-[10px] text-gray-600">{{ meta.category }}</div>
                                 </div>
                             </a>
                             {% endfor %}
@@ -207,13 +207,13 @@
             </div>
 
             <!-- Documents Table -->
-            <div class="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm">
+            <div class="bg-white rounded-2xl border border-gray-300 overflow-hidden shadow-sm">
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-100">
-                            <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Modified</th>
-                            <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider">Access</th>
-                            <th class="px-6 py-4 text-xs font-semibold text-gray-500 uppercase tracking-wider text-right">Actions</th>
+                            <th class="px-6 py-4 text-xs font-semibold text-gray-700 uppercase tracking-wider">Modified</th>
+                            <th class="px-6 py-4 text-xs font-semibold text-gray-700 uppercase tracking-wider">Access</th>
+                            <th class="px-6 py-4 text-xs font-semibold text-gray-700 uppercase tracking-wider text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -221,19 +221,19 @@
                         <tr class="hover:bg-gray-50 transition-colors group">
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="p-2 rounded-lg bg-gray-100 text-gray-500">
+                                    <div class="p-2 rounded-lg bg-gray-100 text-gray-700">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
                                     </div>
                                     <div>
                                         <div class="text-sm font-medium text-gray-900">{{ doc.name }}</div>
-                                        <div class="text-xs text-gray-400">{{ doc.modified }}</div>
+                                        <div class="text-xs text-gray-600">{{ doc.modified }}</div>
                                     </div>
                                 </div>
                             </td>
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-2">
                                     {% if doc.access == "Only you" %}
-                                    <div class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-gray-100 text-gray-600 text-xs font-medium">
+                                    <div class="flex items-center gap-1.5 px-2 py-1 rounded-full bg-gray-100 text-gray-800 text-xs font-medium">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                                         Only you
                                     </div>
@@ -270,7 +270,7 @@
                                     </button>
                                     
                                     <!-- Popover Menu -->
-                                    <div id="menu-{{ loop.index }}" class="context-menu text-left shadow-xl border-gray-200">
+                                    <div id="menu-{{ loop.index }}" class="context-menu text-left shadow-xl border-gray-300">
                                         {% if doc.slug %}
                                         <a href="{{ url_for('v1_docs.v1_document_create', slug=doc.slug) }}" class="context-menu-item text-sky-600 font-bold bg-sky-50/50">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -310,14 +310,14 @@
             <!-- Search Area -->
             <form action="{{ url_for('v1_docs.v1_documents_view') }}" method="GET" class="relative">
                 <input type="text" name="q" value="{{ search_query or '' }}" class="search-input shadow-sm focus:ring-1 focus:ring-sky-500 transition-all" placeholder="Search documents...">
-                <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-sky-500 transition-colors">
+                <button type="submit" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600 hover:text-sky-500 transition-colors">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </button>
             </form>
 
             <!-- Folders Details -->
-            <div class="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-6">Folders Details</h3>
+            <div class="bg-white rounded-2xl border border-gray-300 p-6 shadow-sm">
+                <h3 class="text-xs font-bold text-gray-600 uppercase tracking-widest mb-6">Folders Details</h3>
                 <div class="space-y-6">
                     {% for folder in folders %}
                     <div class="space-y-3">
@@ -345,7 +345,7 @@
 
                         <div class="flex justify-between text-xs font-medium">
                             <span class="text-sky-600 bg-sky-50 px-2 py-0.5 rounded-md">{{ folder.entries }} entries mapped</span>
-                            <span class="text-gray-400">{{ folder.count }} templates</span>
+                            <span class="text-gray-600">{{ folder.count }} templates</span>
                         </div>
                     </div>
                     {% endfor %}

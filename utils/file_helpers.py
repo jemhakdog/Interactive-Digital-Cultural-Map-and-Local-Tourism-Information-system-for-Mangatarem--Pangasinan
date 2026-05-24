@@ -38,6 +38,7 @@ def allowed_file(filename: str, allowed_extensions: Optional[set] = None) -> boo
 def save_uploaded_file(
     file,
     upload_folder: Optional[str] = None,
+    allowed_extensions: Optional[set] = None
 ) -> Optional[str]:
     """Save an uploaded file and return its static URL.
 
@@ -48,12 +49,13 @@ def save_uploaded_file(
     Args:
         file: Werkzeug FileStorage object from request.files.
         upload_folder: Override path; defaults to app config UPLOAD_FOLDER.
+        allowed_extensions: Optional set of allowed extensions.
 
     Returns:
         Static URL string for the saved file, or None if the file was
         invalid or empty.
     """
-    if not file or not file.filename or not allowed_file(file.filename):
+    if not file or not file.filename or not allowed_file(file.filename, allowed_extensions):
         return None
 
     folder = upload_folder or current_app.config["UPLOAD_FOLDER"]
@@ -62,7 +64,7 @@ def save_uploaded_file(
     filename = secure_filename(sanitize_filename(file.filename))
     
     # Additional validation after sanitization
-    if not filename or not allowed_file(filename):
+    if not filename or not allowed_file(filename, allowed_extensions):
         logger.warning("Rejected uploaded file with invalid name: %s", file.filename)
         return None
     

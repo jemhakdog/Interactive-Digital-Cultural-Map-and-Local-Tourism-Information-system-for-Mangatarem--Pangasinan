@@ -5,7 +5,7 @@ Unit and integration tests for the docx ingestion parser and import routes.
 import io
 import pytest
 from io import BytesIO
-from routes.v1.documents import _parse_docx_file, FORM_MAPPING
+from modules.api_v1.documents import _parse_docx_file, FORM_MAPPING
 
 try:
     from docx import Document

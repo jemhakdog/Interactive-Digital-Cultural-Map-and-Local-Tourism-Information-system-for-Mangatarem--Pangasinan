@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, flash, redirect, url_for, jsonify, current_app
 from flask_login import login_required, current_user
+from modules.admin_core import admin_bp
 from models import db, NewsletterSubscriber, NewsletterHistory
 from utils.email_sender import send_email
 from utils.security import validate_string_input, sanitize_html_input

@@ -20,7 +20,7 @@ from utils.heritage_registry import (
 )
 from utils.logger_helper import log_entry, log_success, log_error
 from utils.security import detect_sql_injection_attempt, validate_string_input
-from . import admin_bp
+from modules.admin_core import admin_bp
 
 logger = logging.getLogger(__name__)
 
@@ -69,21 +69,24 @@ def _parse_form_value(value, field_type):
         return stripped
 
 
-def _populate_item_from_form(profile, detail, config, form_data):
-    """Populate both profile and detail models from form data."""
+def _populate_item_from_form(profile, config, form_data):
+    """Populate profile fields and form_data from form input."""
+    if not profile.form_data:
+        profile.form_data = {}
+        
     for field_name, label, field_type, required in config["fields"]:
         raw_value = form_data.get(field_name, "")
         parsed = _parse_form_value(raw_value, field_type)
         
-        # Determine whether the field belongs to HeritageProfile or the detail model
-        if hasattr(HeritageProfile, field_name) and field_name not in ["id"]:
+        # Determine whether the field belongs to HeritageProfile main columns or form_data JSON
+        if hasattr(HeritageProfile, field_name) and field_name not in ["id", "form_data"]:
             setattr(profile, field_name, parsed)
         else:
-            setattr(detail, field_name, parsed)
+            profile.form_data[field_name] = parsed
 
 
-def _item_to_dict(profile, detail, config):
-    """Convert a heritage item (profile + detail) to a serializable dictionary."""
+def _item_to_dict(profile, config):
+    """Convert a heritage profile to a serializable dictionary."""
     result = {
         "id": profile.id,
         "status": profile.status,
@@ -93,11 +96,12 @@ def _item_to_dict(profile, detail, config):
         "asset_type": profile.asset_type
     }
 
+    form_data = profile.form_data or {}
     for field_name, label, field_type, required in config["fields"]:
-        if hasattr(HeritageProfile, field_name) and field_name not in ["id"]:
+        if hasattr(HeritageProfile, field_name) and field_name not in ["id", "form_data"]:
             value = getattr(profile, field_name, None)
         else:
-            value = getattr(detail, field_name, None)
+            value = form_data.get(field_name)
             
         if isinstance(value, (date, datetime)):
             value = value.isoformat()
@@ -107,17 +111,16 @@ def _item_to_dict(profile, detail, config):
 
 
 class ProxyItem:
-    """A proxy object to allow templates to access fields seamlessly whether they are on profile or detail."""
-    def __init__(self, profile, detail):
+    """A proxy object to allow templates to access fields from profile or form_data."""
+    def __init__(self, profile):
         self.profile = profile
-        self.detail = detail
         
     def __getattr__(self, name):
-        if hasattr(self.detail, name):
-            return getattr(self.detail, name)
-        elif hasattr(self.profile, name):
+        if hasattr(self.profile, name):
             return getattr(self.profile, name)
-        raise AttributeError(f"ProxyItem has no attribute '{name}'")
+        elif self.profile.form_data and name in self.profile.form_data:
+            return self.profile.form_data[name]
+        return None
 
 
 # === Dashboard ===
@@ -172,15 +175,14 @@ def admin_heritage_list(heritage_type):
     # Get all profiles of this type, join with detail, order by profile's created_at
     # We use a joined query to avoid N+1 problem
     paginated = (
-        db.session.query(HeritageProfile, model)
-        .outerjoin(model, HeritageProfile.id == model.heritage_profile_id)
+        db.session.query(HeritageProfile)
         .filter(HeritageProfile.asset_type == heritage_type)
         .order_by(HeritageProfile.created_at.desc())
         .paginate(page=page, per_page=per_page, error_out=False)
     )
     
     # Map results to ProxyItem for template compatibility
-    items = [ProxyItem(p, d) for p, d in paginated.items if d]
+    items = [ProxyItem(p) for p in paginated.items]
 
     log_success("admin", "heritage_list", f"Loaded {len(items)} {config['label']} entries (Page {page})")
     return render_template(
@@ -207,25 +209,20 @@ def admin_heritage_add(heritage_type):
         abort(404)
 
     if request.method == "POST":
-        model = config["model"]
-        
         # Create base profile
         profile = HeritageProfile(
             asset_type=heritage_type,
             status="approved",
-            user_id=current_user.id
+            user_id=current_user.id,
+            form_data={}
         )
+        _populate_item_from_form(profile, config, request.form)
+        
         db.session.add(profile)
-        db.session.flush() # To get the profile.id
-        
-        # Create detail model
-        detail = model(heritage_profile_id=profile.id)
-        _populate_item_from_form(profile, detail, config, request.form)
-        
-        db.session.add(detail)
         db.session.commit()
 
-        display_name = get_display_name(detail, heritage_type)
+        proxy_item = ProxyItem(profile)
+        display_name = get_display_name(proxy_item, heritage_type)
         log_success("admin", "heritage_add", f"Created {config['label']}: '{display_name}'")
         flash(f'{config["label"]} "{display_name}" created successfully!')
         return redirect(url_for("admin.admin_heritage_list", heritage_type=heritage_type))
@@ -253,19 +250,17 @@ def admin_heritage_edit(heritage_type, item_id):
     if not config:
         abort(404)
 
-    model = config["model"]
     profile = HeritageProfile.query.get_or_404(item_id)
     if profile.asset_type != heritage_type:
         abort(404)
         
-    detail = model.query.get_or_404(item_id)
-    proxy_item = ProxyItem(profile, detail)
+    proxy_item = ProxyItem(profile)
 
     if request.method == "POST":
-        _populate_item_from_form(profile, detail, config, request.form)
+        _populate_item_from_form(profile, config, request.form)
         db.session.commit()
 
-        display_name = get_display_name(detail, heritage_type)
+        display_name = get_display_name(proxy_item, heritage_type)
         log_success("admin", "heritage_edit", f"Updated {config['label']}: '{display_name}'")
         flash(f'{config["label"]} "{display_name}" updated successfully!')
         return redirect(url_for("admin.admin_heritage_list", heritage_type=heritage_type))
@@ -293,14 +288,10 @@ def admin_heritage_delete(heritage_type, item_id):
     if not config:
         abort(404)
 
-    model = config["model"]
     profile = HeritageProfile.query.get_or_404(item_id)
-    detail = model.query.get(item_id)
-    
-    display_name = get_display_name(detail, heritage_type) if detail else f"Profile {item_id}"
+    proxy_item = ProxyItem(profile)
+    display_name = get_display_name(proxy_item, heritage_type)
 
-    if detail:
-        db.session.delete(detail)
     db.session.delete(profile)
     db.session.commit()
 
@@ -326,14 +317,13 @@ def admin_heritage_json(heritage_type):
     per_page = request.args.get('per_page', 50, type=int)
 
     paginated = (
-        db.session.query(HeritageProfile, model)
-        .outerjoin(model, HeritageProfile.id == model.heritage_profile_id)
+        db.session.query(HeritageProfile)
         .filter(HeritageProfile.asset_type == heritage_type)
         .order_by(HeritageProfile.created_at.desc())
         .paginate(page=page, per_page=per_page, error_out=False)
     )
     
-    json_items = [_item_to_dict(p, d, config) for p, d in paginated.items if d]
+    json_items = [_item_to_dict(p, config) for p in paginated.items]
 
     return jsonify({
         "heritage_type": heritage_type,
@@ -365,10 +355,10 @@ def admin_heritage_export_docx(profile_id):
 
     profile = HeritageProfile.query.get_or_404(profile_id)
     config = get_heritage_config(profile.asset_type)
-    detail = config["model"].query.get_or_404(profile_id)
+    proxy_item = ProxyItem(profile)
     
     # Find template path
-    from routes.admin.documents import GATHERED_DIR, FORM_MAPPING
+    from modules.admin_core.documents import GATHERED_DIR, FORM_MAPPING
     template_slug = profile.template_slug or profile.asset_type
     meta = FORM_MAPPING.get(template_slug)
     if not meta:
@@ -388,12 +378,8 @@ def admin_heritage_export_docx(profile_id):
         # We also look for specific tags if any were added
         
         def _get_val(key):
-            if hasattr(profile, key) and getattr(profile, key):
-                return str(getattr(profile, key))
-            if hasattr(detail, key) and getattr(detail, key):
-                return str(getattr(detail, key))
-            if detail.meta_data and key in detail.meta_data:
-                return str(detail.meta_data[key])
+            if hasattr(proxy_item, key) and getattr(proxy_item, key):
+                return str(getattr(proxy_item, key))
             return ""
 
         # Map labels to field keys

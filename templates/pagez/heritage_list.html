@@ -21,7 +21,7 @@
                 <h1 class="text-5xl md:text-7xl font-cultural font-bold text-sky-950 mb-6 leading-tight">
                     {{ config.label_plural }}
                 </h1>
-                <p class="text-gray-600 text-lg leading-relaxed">
+                <p class="text-gray-800 text-lg leading-relaxed">
                     A curated collection of documentation for {{ config.label_plural|lower }} found across Mangatarem's barangays.
                 </p>
             </div>
@@ -57,7 +57,7 @@
                         {{ item.name or item.municipality }}
                     </h3>
                     
-                    <p class="text-gray-500 text-sm line-clamp-2 leading-relaxed mb-4">
+                    <p class="text-gray-700 text-sm line-clamp-2 leading-relaxed mb-4">
                         {{ item.description or item.biography or item.vision_statement or 'No description available for this registry entry.' }}
                     </p>
                     
@@ -73,7 +73,7 @@
         </div>
         {% else %}
         <div class="py-32 text-center border-2 border-dashed border-sky-900/5 rounded-3xl">
-            <p class="text-gray-400 italic font-cultural text-xl">The archive for this category is currently being digitized.</p>
+            <p class="text-gray-600 italic font-cultural text-xl">The archive for this category is currently being digitized.</p>
         </div>
         {% endif %}
     </section>

@@ -9,6 +9,7 @@ class HeritageProfile(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     asset_type = db.Column(db.String(50), nullable=False, index=True) # 'built', 'natural', etc.
     form_control_number = db.Column(db.String(100), unique=True, nullable=True) # Link to manual form
+    form_data = db.Column(db.JSON, nullable=True) # Unified JSON storage for specific form fields
     
     # ERD Fields
     name_of_asset = db.Column(db.String(200), nullable=True)

@@ -15,7 +15,7 @@
                 Back to Dashboard
             </a>
             <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Record Visitor</h1>
-            <p class="text-gray-600 dark:text-gray-400 mt-2">Logging visit for: <span class="font-semibold text-blue-600">{{ target_name }}</span></p>
+            <p class="text-gray-800 dark:text-gray-600 mt-2">Logging visit for: <span class="font-semibold text-blue-600">{{ target_name }}</span></p>
         </div>
 
         <!-- Form Card -->
@@ -31,15 +31,15 @@
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="systemUserToggle" name="is_system_user" value="true" class="sr-only peer">
-                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:width-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
+                        <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-400 after:border after:rounded-full after:h-5 after:width-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
                     </label>
                 </div>
 
                 <!-- User Search (Visible only if System User is ON) -->
                 <div id="userSearchSection" class="hidden space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                    <label for="userSearch" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Search User (Username or Email)</label>
+                    <label for="userSearch" class="block text-sm font-medium text-gray-900 dark:text-gray-300">Search User (Username or Email)</label>
                     <div class="relative">
-                        <input type="text" id="userSearch" class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Type at least 2 characters...">
+                        <input type="text" id="userSearch" class="w-full px-4 py-3 rounded-xl border border-gray-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Type at least 2 characters...">
                         <div id="searchResults" class="absolute z-10 w-full mt-2 bg-white dark:bg-gray-800 rounded-xl shadow-2xl border border-gray-100 dark:border-gray-700 hidden">
                             <!-- Results will be injected here -->
                         </div>
@@ -49,48 +49,48 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Name -->
                     <div class="space-y-2">
-                        <label for="visitor_name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Visitor Full Name</label>
+                        <label for="visitor_name" class="block text-sm font-medium text-gray-900 dark:text-gray-300">Visitor Full Name</label>
                         <input type="text" name="visitor_name" id="visitor_name" required 
-                               class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all">
+                               class="w-full px-4 py-3 rounded-xl border border-gray-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all">
                     </div>
 
                     <!-- Age -->
                     <div class="space-y-2">
-                        <label for="visitor_age" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Age</label>
+                        <label for="visitor_age" class="block text-sm font-medium text-gray-900 dark:text-gray-300">Age</label>
                         <input type="number" name="visitor_age" id="visitor_age" 
-                               class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all">
+                               class="w-full px-4 py-3 rounded-xl border border-gray-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all">
                     </div>
                 </div>
 
                 <!-- Origin/Address -->
                 <div class="space-y-2">
-                    <label for="visitor_address" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Origin / Address</label>
+                    <label for="visitor_address" class="block text-sm font-medium text-gray-900 dark:text-gray-300">Origin / Address</label>
                     <input type="text" name="visitor_address" id="visitor_address" 
-                           class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all" 
+                           class="w-full px-4 py-3 rounded-xl border border-gray-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all" 
                            placeholder="e.g., Barangay Pob, Mangatarem">
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Visitor Count -->
                     <div class="space-y-2">
-                        <label for="visitor_count" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Visitor Count (Group Size)</label>
+                        <label for="visitor_count" class="block text-sm font-medium text-gray-900 dark:text-gray-300">Visitor Count (Group Size)</label>
                         <input type="number" name="visitor_count" id="visitor_count" value="1" min="1" 
-                               class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all">
+                               class="w-full px-4 py-3 rounded-xl border border-gray-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all">
                     </div>
                     
                     <!-- Date (Readonly for record accuracy) -->
                     <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Record Date</label>
+                        <label class="block text-sm font-medium text-gray-900 dark:text-gray-300">Record Date</label>
                         <input type="text" value="{{ now().strftime('%B %d, %Y') }}" readonly 
-                               class="w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-gray-500 cursor-not-allowed">
+                               class="w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900 text-gray-700 cursor-not-allowed">
                     </div>
                 </div>
 
                 <!-- Notes -->
                 <div class="space-y-2">
-                    <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Additional Notes</label>
+                    <label for="notes" class="block text-sm font-medium text-gray-900 dark:text-gray-300">Additional Notes</label>
                     <textarea name="notes" id="notes" rows="3" 
-                              class="w-full px-4 py-3 rounded-xl border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all" 
+                              class="w-full px-4 py-3 rounded-xl border border-gray-400 dark:border-gray-600 dark:bg-gray-700 dark:text-white focus:ring-2 focus:ring-blue-500 transition-all" 
                               placeholder="Any specific comments or observations..."></textarea>
                 </div>
 
@@ -146,7 +146,7 @@ document.addEventListener('DOMContentLoaded', function() {
                             div.className = 'p-4 hover:bg-blue-50 dark:hover:bg-blue-900/30 cursor-pointer border-b border-gray-100 dark:border-gray-700 last:border-0 transition-colors';
                             div.innerHTML = `
                                 <div class="font-bold dark:text-white">${user.username}</div>
-                                <div class="text-xs text-gray-500 dark:text-gray-400">${user.email} • ${user.barangay}</div>
+                                <div class="text-xs text-gray-700 dark:text-gray-600">${user.email} • ${user.barangay}</div>
                             `;
                             div.addEventListener('click', () => {
                                 nameInput.value = user.username;
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         });
                         resultsDiv.classList.remove('hidden');
                     } else {
-                        resultsDiv.innerHTML = '<div class="p-4 text-gray-500 text-sm italic">No users found.</div>';
+                        resultsDiv.innerHTML = '<div class="p-4 text-gray-700 text-sm italic">No users found.</div>';
                         resultsDiv.classList.remove('hidden');
                     }
                 });
