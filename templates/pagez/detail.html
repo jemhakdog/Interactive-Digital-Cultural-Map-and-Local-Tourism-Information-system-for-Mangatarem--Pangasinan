@@ -15,6 +15,48 @@
 <meta name="description" content="{{ attraction.description[:155] }}...">
 {% endblock %}
 
+{% block og_tags %}
+<meta property="og:type" content="place">
+<meta property="og:url" content="{{ request.url }}">
+<meta property="og:title" content="{{ attraction.name }} - GoMangatarem">
+<meta property="og:description" content="{{ attraction.description[:160] }}...">
+<meta property="og:image" content="{{ attraction.image_url or url_for('static', filename='img/hero.webp', _external=True) }}">
+<meta property="og:site_name" content="GoMangatarem">
+{% endblock %}
+
+{% block twitter_tags %}
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="{{ request.url }}">
+<meta property="twitter:title" content="{{ attraction.name }} - GoMangatarem">
+<meta property="twitter:description" content="{{ attraction.description[:160] }}...">
+<meta property="twitter:image" content="{{ attraction.image_url or url_for('static', filename='img/hero.webp', _external=True) }}">
+{% endblock %}
+
+{% block json_ld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "TouristAttraction",
+  "name": "{{ attraction.name | replace('"', '\\"') }}",
+  "description": "{{ attraction.description | replace('"', '\\"') | replace('\n', ' ') | replace('\r', '') }}",
+  "url": "{{ request.url }}",
+  "image": "{{ attraction.image_url or url_for('static', filename='img/hero.webp', _external=True) }}",
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": {{ attraction.lat }},
+    "longitude": {{ attraction.lng }}
+  }
+  {% if attraction.rating %}
+  ,"aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ attraction.rating }}",
+    "bestRating": "5"
+  }
+  {% endif %}
+}
+</script>
+{% endblock %}
+
 {% block head %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/home-heritage.css') }}">
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/detail.css') }}">
@@ -143,7 +185,7 @@
                             </div>
 
                             {# Review Cards Feed #}
-                            <div class="space-y-6" id="reviews-feed">
+                            <div class="space-y-0" id="reviews-feed">
                                 <div class="flex justify-center py-10" id="reviews-loading">
                                     <div class="w-8 h-8 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin"></div>
                                 </div>

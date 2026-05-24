@@ -7,13 +7,24 @@
     content="Explore {{ barangay_name }}, Mangatarem - discover local attractions, cultural heritage, events, and traditions in this Pangasinan barangay.">
 {% endblock %}
 
-{% block head %}
-<!-- Open Graph for Barangay Profile -->
+{% block og_tags %}
+<meta property="og:type" content="place">
+<meta property="og:url" content="{{ request.url }}">
 <meta property="og:title" content="{{ barangay_name }} | Cultural Map of Mangatarem">
-<meta property="og:description"
-    content="Explore the heritage, tourism spots, and community stories of Barangay {{ barangay_name }} in Mangatarem, Pangasinan.">
+<meta property="og:description" content="Explore the heritage, tourism spots, and community stories of Barangay {{ barangay_name }} in Mangatarem, Pangasinan.">
+<meta property="og:image" content="{{ url_for('static', filename='img/hero.webp', _external=True) }}">
+<meta property="og:site_name" content="GoMangatarem">
+{% endblock %}
 
-<!-- JSON-LD Structured Data for Place -->
+{% block twitter_tags %}
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="{{ request.url }}">
+<meta property="twitter:title" content="{{ barangay_name }} | Cultural Map of Mangatarem">
+<meta property="twitter:description" content="Explore the heritage, tourism spots, and community stories of Barangay {{ barangay_name }} in Mangatarem, Pangasinan.">
+<meta property="twitter:image" content="{{ url_for('static', filename='img/hero.webp', _external=True) }}">
+{% endblock %}
+
+{% block json_ld %}
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -38,6 +49,7 @@
   }
 }
 </script>
+{% endblock %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/barangay_profile.css') }}">
 {% endblock %}
 

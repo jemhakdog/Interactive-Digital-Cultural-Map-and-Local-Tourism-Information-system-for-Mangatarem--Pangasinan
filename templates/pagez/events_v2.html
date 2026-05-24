@@ -2,6 +2,62 @@
 
 {% block title %}Explore Events - GoMangatarem{% endblock %}
 
+{% block meta_description %}
+<meta name="description" content="Discover cultural events, festivals, and civic gatherings happening in Mangatarem, Pangasinan. Explore the vibrant community life.">
+{% endblock %}
+
+{% block og_tags %}
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ request.url }}">
+<meta property="og:title" content="Explore Events - GoMangatarem">
+<meta property="og:description" content="Discover cultural events, festivals, and civic gatherings happening in Mangatarem, Pangasinan. Explore the vibrant community life.">
+<meta property="og:image" content="{{ url_for('static', filename='img/hero.webp', _external=True) }}">
+<meta property="og:site_name" content="GoMangatarem">
+{% endblock %}
+
+{% block twitter_tags %}
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="{{ request.url }}">
+<meta property="twitter:title" content="Explore Events - GoMangatarem">
+<meta property="twitter:description" content="Discover cultural events, festivals, and civic gatherings happening in Mangatarem, Pangasinan. Explore the vibrant community life.">
+<meta property="twitter:image" content="{{ url_for('static', filename='img/hero.webp', _external=True) }}">
+{% endblock %}
+
+{% block json_ld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  "itemListElement": [
+    {% for event in events %}
+    {
+      "@type": "ListItem",
+      "position": {{ loop.index }},
+      "item": {
+        "@type": "Event",
+        "name": "{{ event.name | replace('"', '\\"') }}",
+        "startDate": "{{ event.date.strftime('%Y-%m-%dT%H:%M:%S+08:00') if event.date else '' }}",
+        "eventAttendanceMode": "https://schema.org/OfflineEventAttendanceMode",
+        "eventStatus": "https://schema.org/EventScheduled",
+        "location": {
+          "@type": "Place",
+          "name": "{{ event.location | replace('"', '\\"') if event.location else 'Mangatarem' }}",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Mangatarem",
+            "addressRegion": "Pangasinan",
+            "addressCountry": "PH"
+          }
+        },
+        "description": "{{ event.description | replace('"', '\\"') | replace('\n', ' ') | replace('\r', '') if event.description else '' }}"
+      }
+    }{% if not loop.last %},{% endif %}
+    {% endfor %}
+  ]
+}
+</script>
+{% endblock %}
+
 {% block body_height %}bg-[#F8F9FA] min-h-screen{% endblock %}
 
 {% block navbar %}

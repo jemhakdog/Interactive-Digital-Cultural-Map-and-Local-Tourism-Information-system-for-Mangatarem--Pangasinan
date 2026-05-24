@@ -3,6 +3,56 @@
 {% block meta_description %}
 <meta name="description" content="{{ establishment.description[:160] if establishment.description else establishment.name ~ ' in Mangatarem, Pangasinan' }}">
 {% endblock %}
+
+{% block og_tags %}
+<meta property="og:type" content="business.business">
+<meta property="og:url" content="{{ request.url }}">
+<meta property="og:title" content="{{ establishment.name }} - GoMangatarem">
+<meta property="og:description" content="{{ establishment.description[:160] if establishment.description else establishment.name ~ ' in Mangatarem, Pangasinan' }}">
+<meta property="og:image" content="{{ establishment.cover_image_url or url_for('static', filename='img/hero.webp', _external=True) }}">
+<meta property="og:site_name" content="GoMangatarem">
+{% endblock %}
+
+{% block twitter_tags %}
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="{{ request.url }}">
+<meta property="twitter:title" content="{{ establishment.name }} - GoMangatarem">
+<meta property="twitter:description" content="{{ establishment.description[:160] if establishment.description else establishment.name ~ ' in Mangatarem, Pangasinan' }}">
+<meta property="twitter:image" content="{{ establishment.cover_image_url or url_for('static', filename='img/hero.webp', _external=True) }}">
+{% endblock %}
+
+{% block json_ld %}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "LocalBusiness",
+  "name": "{{ establishment.name | replace('"', '\\"') }}",
+  "description": "{{ establishment.description | replace('"', '\\"') | replace('\n', ' ') | replace('\r', '') if establishment.description else establishment.name ~ ' in Mangatarem, Pangasinan' }}",
+  "url": "{{ request.url }}",
+  "image": "{{ establishment.cover_image_url or url_for('static', filename='img/hero.webp', _external=True) }}",
+  "telephone": "{{ establishment.contact_number if establishment.contact_number else '' }}",
+  "address": {
+    "@type": "PostalAddress",
+    "streetAddress": "{{ establishment.address if establishment.address else '' }}",
+    "addressLocality": "Mangatarem",
+    "addressRegion": "Pangasinan",
+    "addressCountry": "PH"
+  },
+  "geo": {
+    "@type": "GeoCoordinates",
+    "latitude": {{ establishment.latitude }},
+    "longitude": {{ establishment.longitude }}
+  }
+  {% if establishment.rating_avg > 0 %}
+  ,"aggregateRating": {
+    "@type": "AggregateRating",
+    "ratingValue": "{{ establishment.rating_avg }}",
+    "reviewCount": "{{ establishment.review_count }}"
+  }
+  {% endif %}
+}
+</script>
+{% endblock %}
 {% block content %}
 <section class="min-h-screen bg-heritage-cream paper-texture pb-16">
     <!-- Hero -->
