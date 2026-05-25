@@ -1,222 +1,192 @@
 # Chapter 2: Methodology and Design
 
-This chapter details the development methods and design strategies we used to create the Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan. We want to provide a clear record of our technical decisions and the specific steps we took to deliver a functional tool for the LGU.
+This chapter presents the methodology and system design adopted in the development of the Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan. It outlines the Rapid Application Development (RAD) model combined with a Participatory GIS (PGIS) framework, chosen to guide the planning, prototyping, construction, and deployment of the platform. Additionally, it details the primary sources of data, the data gathering techniques employed, and the structural design of the system through architectural blueprints, process flowcharts, dataflow diagrams, and entity-relationship diagrams, culminating in a structured project timeline and implementation strategy.
 
 ## Software Development Methodology
 
-In software engineering, a Software Development Methodology (SDM) is like a clear roadmap for a project. Without it, a team can easily lose focus, miss deadlines, or build features that nobody actually needs. For our project in Mangatarem, having this structure helps us stay organized while we plan, code, and test the digital map. It makes sure we're actually building a tool that fits the LGU’s workflow and that the final product is impactful for the whole community.
+In software engineering, the use of a well-defined software development methodology (SDM) is crucial for ensuring a structured, efficient, and goal-oriented approach to system development. It serves as a comprehensive framework that guides developers in systematically planning, designing, implementing, testing, and maintaining a software application. For the proposed Interactive Digital Cultural Map and Local Tourism Information System, selecting an appropriate SDM is essential to align the project with the municipal government's specific administrative workflows, spatial data constraints, and development timeframe.
 
-We chose **Rapid Application Development (RAD)** and combined it with a **Participatory GIS (PGIS)** framework. We picked this because it focuses on building prototypes and getting feedback quickly rather than spending months just planning on paper. Since tourism data and the needs of our barangay leaders can change as they see the site evolve, RAD lets us adapt fast. By using PGIS, we also make sure the community has a say in how we represent their local culture on the map, which makes the data much more accurate.
+This study adopted the Rapid Application Development (RAD) methodology, integrated with a Participatory GIS (PGIS) framework. RAD was selected due to its iterative nature and strong focus on rapid prototyping and continuous stakeholder feedback over rigid, paper-based planning. Given the fragmented, manual, and delay-prone state of the current tourism reporting workflows in Mangatarem, the RAD model provides the developers with the flexibility to quickly build functional web prototypes (such as the interactive map and content moderation dashboard) and refine them in response to direct feedback from LGU staff. The PGIS framework ensures that local barangay representatives actively participate in defining how their cultural heritage is spatially represented, thereby increasing data accuracy and community ownership of the platform.
 
-RAD is an agile way of working that prioritizes quick delivery and user feedback. Instead of trying to get every detail perfect at the start, we build small, working versions of the system and refine them over and over. It's known for keeping the people who will actually use the system involved every step of the way. This method is perfect for projects where the look and feel of the site are vital and where we expect to make changes as users interact with our early designs.
+The RAD methodology is characterized by short development cycles and continuous user involvement, which minimizes the risk of structural misalignment and ensures that the final computing solution meets the exact needs of its beneficiaries. The development lifecycle is structured into four primary phases: Requirements Planning, User Design, Construction, and Cutover.
 
-
-We've broken down our work into these four RAD phases:
-
-1.  **Requirements Planning:** We started by meeting with the LGU Tourism Office staff to find the gaps in their current manual filing system. We identified the main goals and defined the two primary user categories: **Administrative and Stakeholder Users** (LGU staff and Barangay Contributors) and **General Public and Academic Users** (Tourists and Researchers). We used interviews and site visits to make sure we didn't miss any important cultural traditions or landmarks that the town wants to highlight.
-2.  **User Design (Prototyping):** Once we knew what the system needed, we used **Figma** to create mockups and wireframes. We built designs for the interactive map (Public/Academic interface) and the data management portals (Administrative/Stakeholder interface). We showed these to the LGU staff and barangay reps to see if they found the buttons and menus easy to navigate. We used their feedback to change the layout until it felt just right.
-3.  **Construction:** This is the phase where we did the actual coding. We used **HTML, Tailwind CSS, and JavaScript** for the parts you see on the screen, and **Python with Flask** for the logic and database work. We stored all the town's information in **Supabase**. We built the interactive map and created the "approve or reject" moderation workflow for the administrative users. We coded and tested in small cycles so we could catch and fix bugs early.
-4.  **Cutover (Testing and Deployment):** In this final stage, we perform functional, security, and usability tests to make sure the site is safe and fast. Once we resolve any issues, we’ll launch the system for the LGU. We’ll also hold training sessions for the Administrative and Stakeholder category (LGU staff and barangay leaders) and give them user manuals so they feel comfortable running the site on their own.
+1. **Requirements Planning** – During the Requirements Planning phase, the developers conducted consultations and interviews with LGU Tourism Office officers and Barangay Representatives to analyze the current manual communication workflow, define the project boundaries, and establish the core system requirements. The objective was to identify existing bottlenecks, determine the system's target users, and map out the necessary administrative and public modules.
+2. **User Design** – The User Design phase involved creating interactive client wireframes and user interface mockups using design tools such as Figma. These mockups—including the full-screen spatial map, barangay submission forms, and administrative moderation screens—were presented to stakeholders for iterative evaluations, ensuring that the navigation logic, layout, and visual accessibility aligned with user expectations.
+3. **Construction** – In the Construction phase, the developers converted approved Figma designs into a functional web application. The frontend interface was engineered using HTML5, CSS3 (utilizing the Tailwind CSS framework), Mapbox GL JS for spatial mapping, and JavaScript. The server-side logic was built in Python using the Flask micro-framework, with PostgreSQL serving as the primary relational database, hosted via Supabase Cloud. Unit testing and feature iterations were conducted continuously during this phase to ensure technical compliance.
+4. **Cutover** – The final phase, Cutover, involves performing comprehensive system testing, migrating historical cultural data from physical folders into the PostgreSQL database, conducting training seminars for LGU officers and Barangay Representatives, and deploying the completed platform to the live production server (Vercel) for public launch.
 
 ## Sources of Data
 
-The primary sources of data for this project are individuals, groups, and locations within the municipality of Mangatarem, Pangasinan that hold crucial tourism, cultural, and historical information relevant to the system. Key data sources include:
+The sources of data in this study are integral to understanding the operational challenges and user requirements related to managing municipal tourism and cultural data in Mangatarem, Pangasinan. These sources encompass individuals, administrative groups, and localized data archives that provide primary and secondary information:
 
-- **LGU Tourism Office Staff** — Municipal tourism officers who provide official tourism policies, existing manual records, promotional materials, and municipal-level tourism initiatives. They serve as the authoritative source for content moderation rules, user access policies, and platform governance requirements.
-- **Barangay Officials and Representatives** — Designated individuals from each barangay who serve as vital sources for localized cultural data, specific landmark descriptions, community event schedules, and grassroots heritage information that is not centrally documented at the municipal level.
-- **Manleluag Spring National Park and Other Tourist Sites** — Physical locations within Mangatarem that serve as points of reference for mapping coordinates, photographic documentation, and on-site observation of existing visitor information systems (e.g., signage, brochures).
-- **Municipal Archives and Physical Records** — Existing physical tourism brochures, printed municipal profiles, historical documents, and past tourism reports maintained by the LGU, which serve as secondary data sources to establish the initial database content of the system.
+- **LGU Tourism Office Staff** – Municipal tourism officers and IT staff who provide official tourism guidelines, municipal promotion policies, and administrative moderation rules. They serve as the primary source for content moderation standards and system access parameters.
+- **Barangay Officials and Representatives** – Authorized contributors from each barangay who act as vital sources of grassroots historical narratives, localized heritage sites, natural attractions, and community traditions that are not centrally documented.
+- **Municipal Archives and Physical Records** – Printed brochures, historical municipal profiles, local heritage reports, and physical document registries maintained by the LGU, which serve as secondary data sources to establish the database's initial cultural inventory.
+- **Tourism and Heritage Stakeholders** – Tourists, local residents, and academic researchers whose feedback during surveys and testing provided usability, navigational, and feature expectations for the public-facing interactive map and digital atlas.
 
 ## Data Gathering Techniques
-To make sure we built a system that actually solves the town's problems, we used several different ways to collect information. We didn't want to just guess what the LGU needed, so we went straight to the people who handle Mangatarem’s tourism every day.
 
-Interviews
-We sat down for face-to-face talks with the staff at the Municipal Tourism Office to get their firsthand stories.
+To gather comprehensive qualitative and quantitative data for system requirements and post-development evaluation, the developers implemented four distinct data gathering techniques:
 
-How: We used an interview guide with open-ended questions about their daily tasks, the problems they run into, and what features they wish they had. We met with them in person at the LGU office so they could show us exactly how they handle their current workload.
+**Surveys and Questionnaires**
+- *How*: The developers designed and distributed structured survey questionnaires to select tourist visitors, local residents, and academic researchers. The surveys utilized a 5-point Likert scale to assess user expectations regarding information accessibility, preferences for digital spatial mapping, and common difficulties encountered when searching for cultural data.
+- *When*: This technique was applied during the early stages of the Requirements Planning phase to establish a quantitative baseline of user needs, and subsequently during the Cutover phase to evaluate system usability.
+- *Why*: The quantitative data collected helped the development team prioritize critical public features—such as spatial category filtering and the Digital Cultural Atlas search engine—ensuring the system is highly responsive to public and academic requirements.
 
-When: We did this during the Requirements Planning phase. It was the very first thing we did before we even started sketching designs or writing code.
+**Interviews**
+- *How*: Semi-structured, face-to-face interviews were conducted with the central LGU Tourism Office staff and designated Barangay Representatives. The developers utilized an interview guide containing open-ended questions regarding their daily workflows, data submission habits, and system features.
+- *When*: Interviews were executed during the first phase of the development lifecycle (Requirements Planning) to gather deep qualitative insights directly from internal users.
+- *Why*: This method allowed the developers to analyze the procedural bottlenecks of the legacy manual system, providing the necessary workflow parameters to design the secure Barangay Portal and central Content Moderation Dashboard.
 
-Why: We used this technique to hear about the "pain points" that only a worker would know. It helped us understand their manual workflow so we could design a digital version that actually makes their lives easier.
+**Observation**
+- *How*: The developers conducted direct, non-participant observation of the daily operations at the Municipal Tourism Office, documenting how staff process tourist inquiries, verify incoming cultural updates, and physically catalog historical folders.
+- *When*: Direct observations were conducted concurrently with interviews during the Requirements Planning phase.
+- *Why*: Witnessing the manual operations firsthand enabled the developers to identify procedural delays, document security risks, and user frustrations that stakeholders might omit during interviews, thereby validating the need for automated moderation.
 
-Observation
-We spent time at the office just watching how the staff handles their work in real-time.
-
-How: We visited the LGU Tourism Office and took notes on how they answer tourist questions, how they organize their data, and where the "bottlenecks" are in their current system.
-
-When: We did this at the same time as our interviews. This allowed us to see if the work they described matched what they actually did on a busy day.
-
-Why: We applied this to catch small, confusing steps that people might forget to mention in an interview. It gave us an objective look at the gaps in their communication that our system needs to fill.
+**Document Analysis**
+- *How*: The developers analyzed physical tourism brochures, manual barangay profile folders, local historical documents, and official national heritage guidelines matching NCCA cultural registry forms (Form 01–07).
+- *When*: This technique was executed during the prototyping and initial construction stages.
+- *Why*: Document analysis provided the exact schema and data fields required for the SQL database, ensuring that the digital forms in the developed system collect accurate, standardized heritage data matching national registry guidelines.
 
 ## System Design
 
 ### System Architecture
 
-The System Architecture diagram provides a high-level structural overview of the Interactive Digital Cultural Map and Local Tourism Information System. It defines how the different technological components — from the user's device to the backend database — interact to deliver the system's services. A clear architecture is important because it establishes the blueprint for the system's technical structure, ensuring that all components are properly integrated, scalable, and secure.
+The System Architecture design represents the structural blueprint detailing the components, logical layers, and data transactions of the software system. It defines how users, network protocols, server instances, and data persistence engines are integrated to deliver a secure and highly responsive service.
 
-<put the image here>
 
-*(Figure 2: System Architecture Diagram. The diagram illustrates the client-server model with three logical layers.)*
 
-The architecture follows a modern three-tier cloud-native model. At the **Client Layer**, users — categorized as either **Administrative and Stakeholder Users** or **General Public and Academic Users** — interact with the system through standard web browsers. The user interface is built with HTML, CSS (utilizing the Tailwind CSS framework), and JavaScript, with **Mapbox GL JS** integrated for high-performance spatial visualization. When a user performs an action, the client sends HTTPS requests to the **Cloud Platform Layer**, hosted on **Vercel**. The backend application logic is implemented in **Python** using the **Flask** framework, running as optimized serverless functions. This layer processes requests such as user authentication, cultural heritage form validation, and content moderation workflows. The **Data Persistence Layer** leverages **Supabase** for its primary PostgreSQL database and object storage, and **Upstash** for Redis-based caching. This layer stores all persistent data, including user accounts, detailed heritage profiles, business establishment records, and system-wide audit logs. This cloud-native architecture ensures a highly available, secure, and performant separation between the interactive interface and the central data repositories.
+
+The architecture follows a modern three-tier client-server model, ensuring a secure and optimized separation of concerns. At the **Client Layer**, users access the system via modern web browsers on mobile phones or desktops. The public-facing interface utilizes HTML5, Tailwind CSS, and vanilla JavaScript, with **Mapbox GL JS** integrated for real-time spatial vector tile rendering. The **Cloud Platform Layer** is hosted on **Vercel**, serving the frontend static files and executing backend application logic written in **Python** using the **Flask** framework as serverless API routes. This layer is responsible for processing requests, managing user authentication via secure cookies, and conducting data validation. The **Data Persistence Layer** is anchored on **Supabase**, hosting the managed **PostgreSQL** database (containing users, heritage profiles, and audit log tables) and Object Storage for high-resolution photography uploads. Additionally, **Upstash Redis** is integrated within this layer to cache georeferenced spatial datasets, reducing database load and ensuring low-latency rendering of map pins on the client interface.
 
 ### Existing Process Flowchart
 
-A flowchart is a graphical representation of a process that uses standardized symbols — such as rectangles for actions, diamonds for decisions, and arrows for flow direction — to illustrate the sequence of steps, decision points, and outcomes. Flowcharts are important in system analysis because they provide a clear, visual understanding of the current (as-is) process, making it easier to identify bottle
+A process flowchart is a graphical representation that utilizes standardized symbols to illustrate the sequential steps, logic checkpoints, and data directions of an operational workflow. In system analysis, a flowchart is critical to visualize the "as-is" manual processes, facilitating the identification of bottlenecks, redundancies, and structural vulnerabilities.
 
-<put the image here>
 
-*(Figure 3: Existing Process Flowchart — Manual Tourism Information Management. The red nodes indicate problem areas; the yellow node indicates a delay-prone step.)*
+The flowchart delineates the two manual, inefficient workflows currently used in Mangatarem, revealing significant informational delays and data synchronization issues. The tourist inquiry workflow (Left Path) highlights that visitors seeking local information must either browse unverified, fragmented social media pages—which often contain conflicting or outdated details, causing tourist confusion—or travel physically to the Municipal Tourism Office. At the office, staff must manually search through physical binders and handwritten logs. If a document is misplaced or in use, the tourist is left without data, resulting in operational inefficiencies. 
 
-The flowchart illustrates the two primary manual processes currently used in Mangatarem, revealing significant gaps in information accessibility and data synchronization. The first process (Top Path) begins when a tourist seeks information. Currently, the tourist is forced to choose between searching unverified social media pages—which often harbor outdated or conflicting details leading to visitor confusion—or traveling physically to the Municipal Tourism Office. At the office, staff must manually browse through paper-bound records and physical files to answer inquiries. If the relevant file is missing or being used by another officer, the information remains unavailable, resulting in a poor visitor experience. 
-
-The second process (Bottom Path) describes the current information reporting workflow from the grassroots level. When a Barangay Representative has a new cultural event or attraction update, they must either prepare a physical report for delivery or send informal messages via text or social media. This non-standardized communication forces LGU Tourism staff to manually consolidate disparate data formats. Any missing information necessitates a repetitive cycle of phone calls and follow-ups, causing significant time lags. By the time the LGU updates its printed brochures or social media posts, the information is often already weeks old. This flowchart demonstrates that the current reliance on manual, physical-first documentation is the root cause of the municipality's fragmented and delay-prone tourism information ecosystem.
+The content reporting workflow (Right Path) illustrates that when a Barangay Representative seeks to update a cultural record or report an upcoming event, they submit physical documents or send unstandardized SMS text messages to the central Tourism Office. This forces central staff to manually sort and transcribe disparate data formats. Any missing details require a repetitive cycle of follow-up phone calls, creating severe time lags. By the time the LGU compiles, verifies, and publishes these updates via printed brochures or social media announcements, the information is often already outdated, highlighting the urgent need for digital automation.
 
 ### Dataflow Diagram (DFD)
 
-A Dataflow Diagram (DFD) is a graphical tool used to visualize how data moves through a system. It identifies where data originates (external entities), how it is processed (processes), where it is stored (data stores), and the paths it follows (data flows). DFDs are important in system design because they provide a clear, logical representation of the system's data handling without getting into implementation details, making it easier for both developers and stakeholders to validate that all data requirements are covered.
+A Dataflow Diagram (DFD) is a logical design tool used to visualize the flow of information through a system, mapping the inputs, processing routes, data storage components, and outputs. In system design, DFD notation utilizes specific geometric symbols to model data pathways: External Entities are represented as rectangles, Processes as rounded squares, Data Stores as open-ended rectangles, and Data Flows as labeled directional arrows.
 
-<put the image here>
+The Level-1 Dataflow Diagram details how information moves between external actors, processing modules, and data repositories. **General Public and Academic Users (EE1)** input search parameters and category filters into Process 1.0 (Browse & Spatial Map Search). This process queries Data Store D2 (Tourist Spots & Heritage Data Store) to retrieve georeferenced map coordinates and cultural atlas profiles, rendering them back to the client interface. 
 
-*(Figure 4: Dataflow Diagram (Level 1). External entities are shown as rectangles, processes as rounded squares, data stores as open-ended rectangles, and data flows as labeled arrows.)*
-
-The DFD details the interactions between the main external entities and the system processes. **General Public and Academic Users (EE1)**, including tourists and researchers, send search queries and browse requests to Process 1.0 (Search & Browse), which forwards these to the Main System. Process 4.0 (Data Retrieval & Display) retrieves map data, points of interest details, and cultural profiles from the system and returns them to the user. **Administrative and Stakeholder Users (EE2)** submit new content and manage system data. This entity encompasses Barangay Representatives who submit content through Process 2.0 (Content Submission) and LGU Tourism Admins who interact with Process 3.0 (Content Moderation) to review and approve submissions. Process 3.0 either commits the approved data to Data Store D2 (Tourist Spots & Cultural Data) or sends a rejection notice. The system also maintains Data Store D1 (User Accounts & Roles) for authentication and access control across all categories.
+For internal administrative data management, **Barangay Representatives and LGU Administrators (EE2)** interact with Process 2.0 (Content Submission & Moderation). Barangay representatives input structured cultural records and media assets through the secure submission dashboard, which writes temporary records to Data Store D2 in a pending status. The LGU Administrator retrieves these pending submissions, conducts qualitative reviews, and inputs moderation statuses (approve/reject). Once approved, Process 2.0 updates the record status in Data Store D2, making it immediately accessible to Process 1.0 for public rendering. Access permissions, logins, and session audit logs are validated by verifying user credentials against Data Store D1 (User Accounts & Roles Data Store).
 
 ### Entity-Relationship Diagram (ERD)
 
 #### 1. Definition, Importance, and Purpose of the ERD
 
-An Entity-Relationship Diagram (ERD) is a foundational database design tool that visually represents the logical and structural architecture of a relational database. It illustrates the system's data model by defining the key data objects (entities), the properties that characterize them (attributes), and the logical associations (relationships) that connect them.
-
-In database design, the ERD serves several critical functions:
-* **Conceptual Blueprint**: It acts as a clear visual mapping that bridges the gap between high-level business requirements and low-level physical database schemas, serving as a single source of truth for both developers and administrative stakeholders.
-* **Data Integrity and Normalization**: By defining primary keys and foreign keys, the ERD ensures that data integrity constraints are systematically planned, eliminating data redundancy and minimizing structural anomalies.
-* **Query Efficiency**: A well-structured ERD facilitates the writing of optimized SQL queries, as developers can easily trace foreign key paths and predict execution costs for multi-table joins.
-* **Scalability**: It establishes a clean, modular foundation that allows the system to scale smoothly, accommodating new features and entities without disrupting existing relationships.
+An Entity-Relationship Diagram (ERD) is a structural database design tool that visually maps the logical architecture of a relational database. It defines the core data tables (entities), the specific data fields that characterize them (attributes), and the referential integrity rules (relationships) that connect them. In database engineering, the ERD serves as a conceptual blueprint that bridges abstract user requirements and physical SQL schemas. It prevents data redundancy, guarantees referential integrity through primary and foreign keys, optimizes query join execution paths, and provides a scalable data framework that accommodates future system expansions without database corruption.
 
 #### 2. ERD Illustration
 
-<put the image here>
-
-*(Figure 5: Entity-Relationship Diagram. The diagram reflects the integrated heritage and tourism ecosystem models.)*
-
 #### 3. Comprehensive Discussion of ERD Content
 
-The system's database schema consists of fifteen highly integrated tables. To understand the operational flow and data governance, these components are analyzed below through their **Entities**, **Attributes**, and **Relationships**:
+The system's database schema consists of fifteen highly integrated, normalized tables designed to capture geographic coordinates, cultural records, user privileges, and security audit logs:
 
 ##### A. Entities (Uppercase, Singular Form)
-
-Each entity represents a distinct domain concept in the system. The 15 core entities are defined as follows:
-1. `USER`: A singular authenticated account representing system users across distinct roles (Admin, Barangay Contributor, Business Owner, Guard).
-2. `PASSWORD_RESET_TOKEN`: A short-lived, secure token used to facilitate self-service account recovery and security verification for a `USER`.
-3. `BARANGAY_INFO`: The geographic, spatial, and administrative anchor representing a specific barangay in Mangatarem, Pangasinan.
-4. `HERITAGE_PROFILE`: The official cultural heritage registry profile matching the national standards of documentation (Form 01-07) for tangible and intangible heritage.
-5. `ATTRACTION`: A visitor-facing profile of a local tourist destination or significant cultural asset.
-6. `EVENT`: A scheduled local cultural festival or calendar event.
-7. `ESTABLISHMENT`: A local business directory entry representing a hospitality or dining vendor (hotels, restaurants, etc.).
-8. `ESTABLISHMENT_ROOM`: A specific lodging unit or room type offered by an `ESTABLISHMENT`.
-9. `ESTABLISHMENT_MENU_ITEM`: A food or beverage offering provided by a dining-focused `ESTABLISHMENT`.
-10. `ESTABLISHMENT_REVIEW`: A customer-submitted rating and testimonial review for an `ESTABLISHMENT`.
-11. `REVIEW_PHOTO`: A multimedia upload (image/photo) linked to a specific `ESTABLISHMENT_REVIEW` to provide visual validation.
-12. `USER_FAVORITE_ESTABLISHMENT`: A joining entity managing the bookmarking/favoriting action of a `USER` for an `ESTABLISHMENT`.
-13. `VISITOR_LOG`: A physical check-in security entry representing an individual guest's entry and exit logs at local checkpoints (managed by the Guard role).
-14. `NEWSLETTER_SUBSCRIBER`: A visitor-submitted email subscription powering the public newsletter and tourism outreach system.
-15. `DATABASE_AUDIT_LOG`: A strict, immutable security log capturing chronological records of administrative modifications to ensure data stewardship accountability.
+1. `USER`: A singular authenticated user account holding a defined role (Admin, Contributor, Public, Guard).
+2. `PASSWORD_RESET_TOKEN`: A secure, short-lived verification token linked to a `USER` for password recovery.
+3. `BARANGAY_INFO`: The municipal administrative boundary acting as the geographic anchor for all spots and events.
+4. `HERITAGE_PROFILE`: The registry file matching national NCCA inventory standards (Form 01–07) for cultural assets.
+5. `ATTRACTION`: A georeferenced tourism destination or landmark within the municipality.
+6. `EVENT`: A scheduled local cultural festival, religious event, or municipal calendar announcement.
+7. `ESTABLISHMENT`: A local hospitality or dining business registered in the tourism directory.
+8. `ESTABLISHMENT_ROOM`: A room category or accommodation option offered by a lodging `ESTABLISHMENT`.
+9. `ESTABLISHMENT_MENU_ITEM`: A food or beverage selection provided by a dining `ESTABLISHMENT`.
+10. `ESTABLISHMENT_REVIEW`: An authenticated customer review, rating, and testimonial submitted for an `ESTABLISHMENT`.
+11. `REVIEW_PHOTO`: A multimedia photo upload linked to a specific `ESTABLISHMENT_REVIEW` for visual validation.
+12. `USER_FAVORITE_ESTABLISHMENT`: A joining table linking a `USER` to their bookmarked `ESTABLISHMENT` entries.
+13. `VISITOR_LOG`: A checkpoint security entry recording visitor entries and exits at landmarks (managed by Guards).
+14. `NEWSLETTER_SUBSCRIBER`: A visitor-submitted email subscription powering municipal tourism updates.
+15. `DATABASE_AUDIT_LOG`: An immutable chronological trail capturing all administrative changes to ensure accountability.
 
 ##### B. Attributes (Characteristics, Primary Keys, and Foreign Keys)
-
-Attributes define the specific characteristics or columns of each entity:
-* **Characteristics of Entities**: Represented within the entity box, these characteristics represent the properties of the entities.
-* **Primary Keys (PK)**: The unique identifier for each record in the entity. In this database schema, the Primary Key is represented first in the attribute box and is underlined (e.g., `id` or `uuid` fields) to enforce entity integrity.
-* **Foreign Keys (FK)**: Attributes that reference the Primary Key of another entity, establishing referential integrity and linking the entities dynamically.
-
-For example:
-* In the `USER` entity, the primary key `id` is underlined and placed first in the attribute box. The attribute `barangay_id` acts as a Foreign Key (FK) referencing the `id` of the `BARANGAY_INFO` entity, establishing a direct connection between users and their administrative barangay jurisdiction.
-* In the `HERITAGE_PROFILE` entity, the attribute `id` is the primary key (underlined and placed first). The attribute `attraction_id` acts as a Foreign Key referencing the `id` of `ATTRACTION`, allowing a cultural registry file to optionally point to its public tourism profile.
-* In the `ESTABLISHMENT_ROOM` entity, the primary key `id` is underlined, and the attribute `establishment_id` acts as a Foreign Key linking the room back to its parent `ESTABLISHMENT`.
+Attributes define the columns or properties characterizing each entity.
+* **Primary Keys (PK)**: System-wide unique identifiers that enforce entity integrity, represented first in the attribute list and visually *underlined* (e.g., `id` columns across all tables).
+* **Foreign Keys (FK)**: Relational fields referencing a PK in another table to enforce referential integrity.
+  * In the `USER` entity, `id` is the underlined PK. The attribute `barangay_id` is an FK referencing the PK of the `BARANGAY_INFO` table, linking the user to a specific jurisdiction.
+  * In the `HERITAGE_PROFILE` entity, the primary key `id` is underlined, and `barangay_id` is an FK referencing `BARANGAY_INFO`, while `attraction_id` is an optional FK referencing `ATTRACTION`.
+  * In the `ESTABLISHMENT_ROOM` entity, `id` is the underlined PK, and `establishment_id` is an FK referencing `ESTABLISHMENT`, linking room records directly to their business parent.
 
 ##### C. Relationships (Cardinality, Optionability, and Labels)
+The relational associations within the database are primarily characterized by **one-to-many (1:N)** cardinallity:
+1. **`USER` to `PASSWORD_RESET_TOKEN` (1:N)**: A one-to-many relationship where one `USER` can request multiple secure reset tokens. The relationship is *optional* for `USER` but *mandatory* for `PASSWORD_RESET_TOKEN`. **Label**: "requests".
+2. **`BARANGAY_INFO` to `USER` (1:N)**: A one-to-many relationship where a barangay can have multiple registered user accounts. The relationship is *optional* for the barangay (as some barangays may not have registered contributors yet) but *mandatory* for user profile association. **Label**: "stewards".
+3. **`BARANGAY_INFO` to `HERITAGE_PROFILE` (1:N)**: A one-to-many relationship mapping cultural records to geographic boundaries. It is *mandatory* for `HERITAGE_PROFILE`. **Label**: "contains".
+4. **`BARANGAY_INFO` to `ESTABLISHMENT` (1:N)**: A one-to-many relationship mapping local businesses to administrative locations. It is *mandatory* for `ESTABLISHMENT`. **Label**: "locates".
+5. **`BARANGAY_INFO` to `EVENT` (1:N)**: A one-to-many relationship where a barangay hosts multiple calendar events. It is *mandatory* for `EVENT`. **Label**: "hosts".
+6. **`HERITAGE_PROFILE` to `ATTRACTION` (1:1 / optional 1:N)**: A flexible link where a national heritage record can optionally be mapped to a tourist spot. It is *optional* for `HERITAGE_PROFILE`. **Label**: "promotes".
+7. **`ESTABLISHMENT` to `ESTABLISHMENT_ROOM` (1:N)**: A one-to-many relationship mapping rooms to lodging businesses. It is *mandatory* for the room record to point to a parent business. **Label**: "offers".
+8. **`ESTABLISHMENT` to `ESTABLISHMENT_MENU_ITEM` (1:N)**: A one-to-many relationship mapping dishes to restaurants. It is *mandatory* for the menu item. **Label**: "serves".
+9. **`ESTABLISHMENT` to `ESTABLISHMENT_REVIEW` (1:N)**: A one-to-many relationship mapping public reviews to business listings. It is *mandatory* for the review table. **Label**: "receives".
+10. **`ESTABLISHMENT_REVIEW` to `REVIEW_PHOTO` (1:N)**: A one-to-many relationship mapping uploaded images to reviews. It is *optional* for a review to contain a photo, but *mandatory* for the photo to link to a valid review. **Label**: "includes".
+11. **`USER` to `USER_FAVORITE_ESTABLISHMENT` (1:N)**: A one-to-many mapping representing bookmarks. It is *mandatory* for the favorite record to point to a valid user. **Label**: "favorites".
+12. **`ESTABLISHMENT` to `USER_FAVORITE_ESTABLISHMENT` (1:N)**: A one-to-many association mapping favorited listings back to the business. It is *mandatory*. **Label**: "is_favorited_by".
+13. **`USER` to `VISITOR_LOG` (1:N)**: A one-to-many security logging relationship. A verified guard (represented by `USER`) logs multiple guest entries. It is *mandatory* for `VISITOR_LOG`. **Label**: "logs".
+14. **`USER` to `DATABASE_AUDIT_LOG` (1:N)**: A one-to-many accountability mapping. Administrative modifications executed by an authenticated `USER` are chronologically audited. It is *mandatory* for `DATABASE_AUDIT_LOG`. **Label**: "audits".
 
-The connections between entities in this database are characterized primarily by **one-to-many (1:N)** relationships, which define how records in one table relate to multiple records in another. Each relationship has specific cardinality (mandatory or optional) and logical labels:
-1. **`USER` to `PASSWORD_RESET_TOKEN`**: A **1-to-many (1:N)** relationship where one `USER` can request multiple password resets. The relationship is *optional* for `USER` (as users may never request a reset) but *mandatory* for `PASSWORD_RESET_TOKEN` (every token must link back to a valid, existing user). **Label**: "requests".
-2. **`BARANGAY_INFO` to `USER`**: A **1-to-many (1:N)** relationship where one barangay can be associated with multiple administrative users. The relationship is *optional* (a barangay may not have a designated user registered yet). **Label**: "stewards".
-3. **`BARANGAY_INFO` to `HERITAGE_PROFILE`**: A **1-to-many (1:N)** relationship representing the geographic boundaries of cultural preservation. The relationship is *mandatory* for `HERITAGE_PROFILE` (every heritage profile must belong to a specific barangay). **Label**: "contains".
-4. **`BARANGAY_INFO` to `ESTABLISHMENT`**: A **1-to-many (1:N)** relationship where each local business must belong to a barangay. It is *mandatory* for `ESTABLISHMENT`. **Label**: "locates".
-5. **`BARANGAY_INFO` to `EVENT`**: A **1-to-many (1:N)** relationship where multiple festivals or events are anchored to a specific barangay. It is *mandatory* for `EVENT`. **Label**: "hosts".
-6. **`HERITAGE_PROFILE` to `ATTRACTION`**: A **1-to-1 or optional 1-to-many (1:N)** link. A registry profile can optionally associate with a public attraction entry. It is *optional* for `HERITAGE_PROFILE`. **Label**: "promotes".
-7. **`ESTABLISHMENT` to `ESTABLISHMENT_ROOM`**: A **1-to-many (1:N)** relationship where one establishment (hotel/lodge) can have multiple room listings. The relationship is *mandatory* for `ESTABLISHMENT_ROOM` (every room must map to a parent business). **Label**: "offers".
-8. **`ESTABLISHMENT` to `ESTABLISHMENT_MENU_ITEM`**: A **1-to-many (1:N)** relationship where a dining establishment features multiple dishes. It is *mandatory* for `ESTABLISHMENT_MENU_ITEM`. **Label**: "serves".
-9. **`ESTABLISHMENT` to `ESTABLISHMENT_REVIEW`**: A **1-to-many (1:N)** relationship where a business accumulates multiple guest testimonials. It is *mandatory* for `ESTABLISHMENT_REVIEW`. **Label**: "receives".
-10. **`ESTABLISHMENT_REVIEW` to `REVIEW_PHOTO`**: A **1-to-many (1:N)** relationship where a customer can upload multiple photos to validate their review. It is *optional* (a review doesn't require a photo) but *mandatory* for `REVIEW_PHOTO` to reference a valid review. **Label**: "includes".
-11. **`USER` to `USER_FAVORITE_ESTABLISHMENT`**: A **1-to-many (1:N)** relationship representing the bookmarking link. It is *mandatory* for the favorite join record to reference the `USER`. **Label**: "favorites".
-12. **`ESTABLISHMENT` to `USER_FAVORITE_ESTABLISHMENT`**: A **1-to-many (1:N)** relationship. It is *mandatory* for the favorite join record to point to a valid `ESTABLISHMENT`. **Label**: "is_favorited_by".
-13. **`USER` to `VISITOR_LOG`**: A **1-to-many (1:N)** relationship where a guard (represented by `USER`) records multiple tourist check-ins. It is *mandatory* for `VISITOR_LOG` (every check-in must be logged by an authorized user). **Label**: "logs".
-14. **`USER` to `DATABASE_AUDIT_LOG`**: A **1-to-many (1:N)** relationship where administrative actions taken by a `USER` are strictly audited. It is *mandatory* for `DATABASE_AUDIT_LOG` to link back to the responsible user. **Label**: "audits".
+## Implementation Plan
 
-This cohesive, normalized database structure ensures complete referential integrity, strong access controls, detailed security monitoring, and active tourist/commercial integration for the municipality of Mangatarem.
+### Project Timeline
 
-### Implementation Plan
+The development timeline is structured around the four distinct phases of the RAD methodology, spanning a total of 13 weeks. To align the project timeline with a realistic academic semester, the schedule is mapped from **June 3, 2024, to August 30, 2024**.
 
-The successful deployment of the Interactive Digital Cultural Map and Local Tourism Information System requires a structured implementation plan encompassing a project timeline, a deployment strategy, and a clear definition of resource requirements.
+```
+    Phase 1: Requirements Planning (Week 1 - Week 2: June 3 - June 14, 2024)
+    * Conduct interviews with LGU Tourism Office officers.
+    * Perform direct observation of manual workflows.
+    * Output: Approved Requirements Document.
 
-#### Project Timeline
+    Phase 2: User Design (Week 3 - Week 4: June 17 - June 28, 2024)
+    * Develop UI/UX mockups and wireframes in Figma.
+    * Conduct prototype reviews and feedback sessions with stakeholders.
+    * Milestone: Prototype Approval (June 28, 2024).
 
-The development schedule is organized around the four phases of the RAD methodology, with key milestones and expected completion dates for each phase.
+    Phase 3: Construction (Week 5 - Week 10: July 1 - August 9, 2024)
+    * Set up PostgreSQL database tables and Supabase cloud configurations.
+    * Code frontend mapping canvas (Mapbox GL JS) and backend APIs (Flask).
+    * Perform unit testing and incremental feature integrations.
+    * Milestone: Feature-Complete System Build (August 9, 2024).
 
-```mermaid
-gantt
-    title Project Timeline - Mangatarem Tourism System (RAD)
-    dateFormat  YYYY-MM-DD
-    axisFormat  Wk %W
-
-    section Requirements Planning
-    Interviews & Observation          :done,    req1, 2024-01-08, 14d
-
-    section User Design
-    UI/UX Prototyping (Figma)         :done,    des1, 2024-01-22, 14d
-    Prototype Approval (Week 4)       :milestone, m1, 2024-02-05, 0d
-
-    section Construction
-    Backend & DB Setup (Supabase)     :active,  con1, 2024-02-05, 21d
-    Frontend & Map Coding (Vercel)    :active,  con2, 2024-02-12, 35d
-    Feature-Complete Build (Week 10)  :milestone, m2, 2024-03-18, 0d
-
-    section Cutover
-    Testing (Pilot & UAT)             :         cut1, 2024-03-18, 14d
-    Deployment & Handover (Week 13)   :milestone, m3, 2024-04-08, 0d
+    Phase 4: Cutover (Week 11 - Week 13: August 12 - August 30, 2024)
+    * Execute system testing (functional, performance, security, usability).
+    * Migrate manual records from physical folders to database tables.
+    * Conduct user training for LGU staff and Barangay Representatives.
+    * Deployment & Public Launch: August 30, 2024.
 ```
 
-*(Figure 6: Gantt Chart — Project Timeline. Critical milestones include prototype approval at Week 4, feature-complete build at Week 10, and deployment at Week 13.)*
 
-#### Deployment Plan
+### Deployment Plan
 
-The deployment of the system will follow a phased approach to minimize risk and ensure a smooth transition for all stakeholders:
+The deployment strategy utilizes a phased release model to ensure system reliability and minimize operational risks:
 
-1. **Pilot Testing (Internal):** The system will first be deployed to a staging environment accessible only to the LGU Tourism Office staff and a select group of 3–5 Barangay Representatives. During this phase, the content moderation workflow will be validated end-to-end — from submission by a barangay representative, through admin review, to publication on the map. Feedback from pilot users will be collected and used to make final adjustments to the user interface, form fields, and notification messages.
+1. **Phased Pilot Launch (Staging)**: The system will initially be deployed to a secure staging environment. Staging access is restricted to the central LGU Tourism staff and a select pilot group of three (3) Barangay Representatives. This phase focuses on validating the multi-role submission and moderation workflow in real-world scenarios.
+2. **Production Migration**: Following the successful validation of the pilot test and resolution of user feedback, the software will be migrated to the production environment. Client-side static files and serverless Flask functions will be deployed on **Vercel** with optimized security headers. Relational data tables will be initialized on the production **Supabase (PostgreSQL)** database instance, with caching paths routed through **Upstash Redis**.
+3. **Stakeholder Training**: The development team will conduct comprehensive, localized training seminars at the municipal hall. Training will guide LGU administrators through moderation workflows and account management, while Barangay Representatives will learn to digitize NCCA profiles. Customized user manuals will be distributed.
+4. **Public Cutover**: Upon completion of training, the DNS records will be modified to point to the live Vercel domain, officially launching the "Interactive Digital Cultural Map" to the public.
 
-2. **Production Deployment:** Following successful pilot testing and resolution of identified issues, the system will be migrated to a live production environment. The production setup utilizes **Vercel** for frontend and serverless backend execution, and **Supabase** for the managed PostgreSQL database and asset storage. The environment will be configured with automated SSL/TLS certification, production-grade security headers, and an optimized caching strategy using **Upstash Redis**. DNS records will be configured to point to the Vercel deployment.
+### Resource Requirements
 
-3. **User Training and Launch:** A formal training session will be conducted for System Administrators, Barangay Representatives, and Business Owners. Training will cover account management, heritage profiling procedures, business listing updates, and moderation workflows. Printed and digital user manuals will be distributed. Following training, the system will be officially launched to the public via official municipal channels.
-
-4. **Post-Launch Support:** After the public launch, the development team will provide a defined support period (e.g., 30 days) during which bugs, user-reported issues, and minor adjustments will be addressed. A maintenance schedule will be established for regular database backups, software updates, and monitoring of system performance.
-
-#### Resource Requirements
-
-The following resources are essential for the successful implementation and operation of the system:
+The successful development, execution, and long-term operations of the system require the following technical and physical resources:
 
 **Hardware Resources:**
-- Development machines: A minimum of an Intel Core i5 or equivalent processor with 8GB RAM (16GB recommended) and SSD storage for the development team.
-- LGU operator workstation: A desktop or laptop with at least Intel Core i5, 8GB RAM, and a stable internet connection for the designated System Administrator at the Tourism Office.
-- End-user devices: Standard smartphones, tablets, or personal computers with web browser access for Public Users, Barangay Representatives, and Students/Researchers.
+- **Development Workstations**: Workstations equipped with at least an Intel Core i5/AMD Ryzen 5 processor, 16GB of RAM, and a 500GB SSD to run compilers and database tools.
+- **LGU Administrator Station**: An office desktop at the Municipal Tourism Office with at least an Intel Core i5, 8GB RAM, and a high-speed, stable internet connection.
+- **Client Devices**: Standard smartphones, laptops, or personal computers with modern browser access for public visitors, barangay contributors, and student researchers.
 
 **Software Resources:**
-- Development environment: Visual Studio Code, Python 3.12+, Git for version control, and the `uv` package manager for dependency management.
-- Design tools: Figma for UI/UX prototyping and wireframing.
-- Production environment: Vercel for web hosting and serverless compute, Supabase for PostgreSQL database and object storage, and Upstash for Redis caching.
-- End-user software: Updated standard web browsers (Google Chrome, Microsoft Edge, Mozilla Firefox, or Safari).
+- **Development Tools**: Visual Studio Code, Git Version Control, Python 3.12+, and the `uv` package manager for secure dependency handling.
+- **Prototyping Software**: Figma for UI/UX wireframing and design layouts.
+- **Hosting and Cloud Infrastructure**: **Vercel** (serverless hosting), **Supabase** (PostgreSQL relational database and asset storage), and **Upstash** (Redis database caching).
+- **Web Browser Support**: Modern, updated web browsers including Google Chrome, Microsoft Edge, Mozilla Firefox, or Apple Safari.
 
 **Human Resources:**
-- Development team: The capstone project developers responsible for system design, coding, testing, and deployment.
-- **Category 1: Administrative and Stakeholder Users**: Designated LGU Tourism Office staff (System Administrators) and Barangay Representatives (Contributors) responsible for content moderation, technical oversight, and local data submission.
-- **Category 2: General Public and Academic Users**: The intended end-users of the public map and digital atlas, including visitors and researchers.
-- Project advisor: The capstone project faculty advisor providing academic guidance and validation throughout the development process.
+- **Development Team**: Capstone developers responsible for frontend coding, backend API scripting, database engineering, and final deployment.
+- **LGU Administrators**: Tourism Office IT staff responsible for reviewing submissions, managing contributor credentials, and maintaining data validity.
+- **Barangay Contributors**: Designated representatives responsible for uploading historical facts, photography, and event details for their barangays.
+- **Academic Advisors**: The capstone project faculty advisor providing technical guidance and structural validation throughout the study.

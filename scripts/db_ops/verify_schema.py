@@ -36,7 +36,7 @@ EXPECTED_TABLES = {
         'id', 'user_id', 'token', 'expires_at', 'used', 'created_at'
     ],
     'HERITAGE_PROFILE': [
-        'id', 'asset_type', 'form_control_number', 'name_of_asset', 'common_name',
+        'id', 'asset_type', 'form_control_number', 'form_data', 'name_of_asset', 'common_name',
         'barangay_id', 'location_details', 'contact_person', 'contact_number',
         'ownership_type', 'owner_administrator', 'usage_status', 'latitude',
         'longitude', 'significance', 'conservation_status', 'mapper_name',
@@ -71,34 +71,6 @@ EXPECTED_TABLES = {
     ],
     'NEWSLETTER_SUBSCRIBER': [
         'id', 'email', 'is_active', 'created_at'
-    ],
-    'BUILT_HERITAGE_DETAIL': [
-        'heritage_profile_id', 'kind_of_structure', 'historical_significance',
-        'architectural_description', 'estimated_date_of_construction'
-    ],
-    'NATURAL_HERITAGE': [
-        'heritage_profile_id', 'scientific_name', 'common_name',
-        'conservation_status', 'description'
-    ],
-    'MOVABLE_HERITAGE_DETAIL': [
-        'heritage_profile_id', 'type_of_object', 'material', 'dimensions',
-        'current_location', 'state_of_conservation'
-    ],
-    'INTANGIBLE_HERITAGE_DETAIL': [
-        'heritage_profile_id', 'category', 'description', 'practitioners',
-        'transmission_mode'
-    ],
-    'PERSONALITY_DETAIL': [
-        'heritage_profile_id', 'full_name', 'dates_of_birth_death',
-        'place_of_birth', 'major_achievements'
-    ],
-    'INSTITUTION_DETAIL': [
-        'heritage_profile_id', 'type_of_institution', 'year_established',
-        'head_of_institution', 'activities_services'
-    ],
-    'LGU_PROGRAM_DETAIL': [
-        'heritage_profile_id', 'program_name', 'starting_year',
-        'description', 'culture_projects'
     ]
 }
 

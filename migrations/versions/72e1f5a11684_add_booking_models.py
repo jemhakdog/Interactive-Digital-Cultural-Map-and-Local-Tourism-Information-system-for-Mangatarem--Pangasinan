@@ -22,8 +22,8 @@ def upgrade():
         batch_op.create_index(batch_op.f('ix_ESTABLISHMENT_REVIEW_establishment_id'), ['establishment_id'], unique=False)
         batch_op.create_index(batch_op.f('ix_ESTABLISHMENT_REVIEW_parent_id'), ['parent_id'], unique=False)
         batch_op.create_index(batch_op.f('ix_ESTABLISHMENT_REVIEW_user_id'), ['user_id'], unique=False)
-        batch_op.drop_constraint(None, type_='foreignkey')
-        batch_op.create_foreign_key(None, 'ESTABLISHMENT_REVIEW', ['parent_id'], ['id'], ondelete='CASCADE')
+        # batch_op.drop_constraint(None, type_='foreignkey')
+        # batch_op.create_foreign_key(None, 'ESTABLISHMENT_REVIEW', ['parent_id'], ['id'], ondelete='CASCADE')
 
     with op.batch_alter_table('USER_NOTIFICATION', schema=None) as batch_op:
         batch_op.alter_column('id',

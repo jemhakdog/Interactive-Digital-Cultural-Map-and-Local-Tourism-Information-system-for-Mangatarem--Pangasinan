@@ -30,6 +30,37 @@ def map_v2_view():
     )
 
 
+@public_v1_bp.route("/map-dashboard")
+def map_dashboard_view():
+    """
+    Display the dark-themed desktop Map Dashboard (Map V3).
+    """
+    logger.info("Interactive Map Dashboard accessed")
+    record_view("page", page_name="map_dashboard")
+    
+    # Get data for widgets
+    from modules.heritage.models import HeritageProfile
+    from modules.business.models import Establishment
+    
+    attractions_count = Attraction.query.filter_by(status="approved").count()
+    heritage_count = HeritageProfile.query.filter_by(status="approved").count()
+    events_count = Event.query.filter_by(status="approved").count()
+    est_count = Establishment.query.filter_by(status="approved").count()
+    
+    # Recent elements
+    recent_attractions = Attraction.query.filter_by(status="approved").order_by(Attraction.created_at.desc()).limit(4).all()
+    
+    return render_template(
+        "pagez/map_dashboard.html",
+        attractions_count=attractions_count,
+        heritage_count=heritage_count,
+        events_count=events_count,
+        est_count=est_count,
+        recent_attractions=recent_attractions,
+        mapbox_token=os.environ.get("mapbox_token", "")
+    )
+
+
 @public_v1_bp.route("/events")
 def events_v2_view():
     """

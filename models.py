@@ -9,16 +9,23 @@ from extensions import db
 from modules.auth.models import User, PasswordResetToken
 
 # === Attractions Module Models ===
-from modules.attractions.models import Attraction, AttractionReview, ReviewPhoto, UserFavoriteAttraction
+from modules.attractions.models import Attraction, Review, ReviewPhoto, UserFavorite
 
 # === Events Module Models ===
-from modules.events.models import Event, UserEventInterest
+from modules.events.models import Event
 
 # === Barangay Module Models ===
 from modules.barangay.models import BarangayInfo
 
 # === Business Module Models ===
-from modules.business.models import Establishment, EstablishmentRoom, EstablishmentMenuItem, EstablishmentReview, UserFavoriteEstablishment, BusinessVerification
+from modules.business.models import Establishment, EstablishmentRoom, EstablishmentMenuItem, BusinessVerification
+
+# === Backward Compatibility Shims ===
+AttractionReview = Review
+EstablishmentReview = Review
+UserFavoriteAttraction = UserFavorite
+UserFavoriteEstablishment = UserFavorite
+UserEventInterest = UserFavorite
 
 # === Heritage Module Models ===
 from modules.heritage.models import HeritageProfile

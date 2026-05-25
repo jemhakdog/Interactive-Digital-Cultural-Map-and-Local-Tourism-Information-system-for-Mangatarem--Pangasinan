@@ -33,7 +33,7 @@ class Establishment(db.Model):
     owner = db.relationship('User', backref=db.backref('establishments', lazy=True))
     rooms = db.relationship('EstablishmentRoom', backref='establishment', lazy=True, cascade='all, delete-orphan')
     menu_items = db.relationship('EstablishmentMenuItem', backref='establishment', lazy=True, cascade='all, delete-orphan')
-    reviews = db.relationship('EstablishmentReview', backref='establishment', lazy=True, cascade='all, delete-orphan')
+    reviews = db.relationship('Review', backref='establishment', lazy=True, cascade='all, delete-orphan')
     
     def to_dict(self):
         """Convert Establishment to dictionary for JSON serialization."""
@@ -95,36 +95,8 @@ class EstablishmentMenuItem(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
-class EstablishmentReview(db.Model):
-    """User review for an establishment."""
-    __tablename__ = 'ESTABLISHMENT_REVIEW'
-
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('USER.id'), nullable=False, index=True)
-    establishment_id = db.Column(db.Integer, db.ForeignKey('ESTABLISHMENT.id', ondelete='CASCADE'), nullable=False, index=True)
-    rating = db.Column(db.Integer, nullable=True)  # rating is nullable for replies
-    comment = db.Column(db.Text, nullable=True)
-    status = db.Column(db.String(20), default='pending')
-    parent_id = db.Column(db.Integer, db.ForeignKey('ESTABLISHMENT_REVIEW.id', ondelete='CASCADE'), nullable=True, index=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    user = db.relationship('User', backref=db.backref('establishment_reviews', lazy='dynamic'))
-
-    # Self-referential relationship for nested comment replies
-    replies = db.relationship(
-        'EstablishmentReview',
-        backref=db.backref('parent', remote_side=[id]),
-        lazy='dynamic',
-        cascade='all, delete-orphan'
-    )
 
 
-class UserFavoriteEstablishment(db.Model):
-    __tablename__ = 'USER_FAVORITE_ESTABLISHMENT'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=False)
-    establishment_id = db.Column(db.Integer, db.ForeignKey("ESTABLISHMENT.id"), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
 class BusinessVerification(db.Model):
@@ -137,4 +109,9 @@ class BusinessVerification(db.Model):
     submitted_at = db.Column(db.DateTime, default=datetime.utcnow)
     
     user = db.relationship("User", backref=db.backref("business_verification", uselist=False))
+
+# Backward Compatibility Shims
+from modules.attractions.models import Review, UserFavorite
+EstablishmentReview = Review
+UserFavoriteEstablishment = UserFavorite
 

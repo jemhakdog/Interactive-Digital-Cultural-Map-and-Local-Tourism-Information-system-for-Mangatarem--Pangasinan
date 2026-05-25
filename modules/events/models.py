@@ -41,11 +41,9 @@ class Event(db.Model):
             'created_at': self.created_at.isoformat() if self.created_at else None
         }
 
+# Backward Compatibility Shims
+from modules.attractions.models import UserFavorite
+UserEventInterest = UserFavorite
 
-class UserEventInterest(db.Model):
-    __tablename__ = 'USER_EVENT_INTEREST'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("USER.id"), nullable=False)
-    event_id = db.Column(db.Integer, db.ForeignKey("EVENT.id"), nullable=False)
-    status = db.Column(db.String(20), default="interested")
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+

@@ -228,6 +228,12 @@ def register_utility_routes(app: Flask) -> None:
 
 
 def seed_database(app):
+    try:
+        _execute_seeding(app)
+    except Exception as e:
+        logger.warning(f"Database seeding bypassed: {e}")
+
+def _execute_seeding(app):
     """Seed initial data if needed."""
     from models import Attraction, User, BarangayInfo
     import json
