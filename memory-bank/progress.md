@@ -22,6 +22,7 @@
 - Eliminated all floating and overlaying edges in both DFD and ERD by purging absolute `sourcePoint`/`targetPoint` offsets and intermediate `mxPoint` arrays, enabling dynamic orthogonal auto-snapping in Draw.io.
 - Validated XML parse integrity and edge snapping of both `.drawio` files, returning 0 floating/jumbled edges.
 - Upgraded the Progressive Web App (PWA) system: configured rich native installation assets, built an elegant custom floating install HUD and SW update alerts, created a gorgeous high-fidelity offline fallback page with LGU emergency hotlines, and designed an offline-playable HTML5 canvas mini-game ("Mangatarem Heritage Catch").
+- Aligned project with Clean Code guidelines: synchronized Python virtual environment using `uv sync`, resolved missing dependencies, resolved E701 linter issues, and successfully verified the core codebase with `pytest` (142/144 tests passing).
  
 ## Current
  

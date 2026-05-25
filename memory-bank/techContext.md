@@ -16,12 +16,12 @@ uv sync # or standard pip install -r requirements.txt
 
 ### Run
 ```bash
-TBD
+python app.py
 ```
 
 ### Test
 ```bash
-TBD
+pytest # or .venv\Scripts\pytest within virtual environment
 ```
 
 ### Lint
@@ -30,9 +30,7 @@ uv run ruff check .
 ```
 
 ### Build
-```bash
-TBD
-```
+- CSS/Tailwind: `npm run build:css` or equivalent compiler setup.
 
 ## Environment variables
 

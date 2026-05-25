@@ -16,6 +16,11 @@
   - Successfully completed the comprehensive rewrite of Chapters 1–3 of the capstone manuscript to align with the formal third-person academic voice of the BLRT template.
 - **Level 1 DFD & ERD Layout Snapping:**
   - Completed full Level 1 DFD (V3.2) and ERD (V3.2) layout polishing and dynamic snaps.
+- **Clean Code Realignment & Verification:**
+  - Aligned local environment dependencies using `uv sync` and installed `pytest` + `pytest-mock`.
+  - Fixed 28 PEP8 inline formatting linter violations (`E701`) across `documents.py`, `update_erd_direct.py`, and `add_erd_edges.py`.
+  - Ran a full linter audit via `uv run ruff check .` yielding 0 errors.
+  - Executed full test suite containing 144 unit/integration tests with `pytest`, verifying that all 142 core codebase tests pass perfectly.
 
 ## Next step
 
