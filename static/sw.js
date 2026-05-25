@@ -1,11 +1,12 @@
-const CACHE_NAME = 'gomangatarem-v6';
+const CACHE_NAME = 'gomangatarem-v7';
 const MAP_CACHE_NAME = 'mapbox-tiles';
 const STATIC_ASSETS = [
     '/static/css/main.css',
     '/static/css/style.css',
     '/static/css/pages/map.css',
     '/static/js/pages/map_v2.js',
-    '/manifest.json'
+    '/manifest.json',
+    '/offline'
 ];
 
 // Install Event: Cache static assets
@@ -101,7 +102,15 @@ self.addEventListener('fetch', (event) => {
                 }
                 return networkResponse;
             }).catch(() => {
-                return caches.match(event.request);
+                return caches.match(event.request).then((cachedResponse) => {
+                    if (cachedResponse) {
+                        return cachedResponse;
+                    }
+                    // For document navigation page requests, fall back to /offline
+                    if (event.request.mode === 'navigate' || (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html'))) {
+                        return caches.match('/offline');
+                    }
+                });
             })
         );
     }

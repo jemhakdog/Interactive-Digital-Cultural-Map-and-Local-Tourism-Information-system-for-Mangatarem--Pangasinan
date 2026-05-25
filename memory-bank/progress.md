@@ -21,6 +21,7 @@
 - Fully polished and snapped ERD (V3.2) by injecting the missing active model `BUSINESS_VERIFICATION` and wiring its relationship edge.
 - Eliminated all floating and overlaying edges in both DFD and ERD by purging absolute `sourcePoint`/`targetPoint` offsets and intermediate `mxPoint` arrays, enabling dynamic orthogonal auto-snapping in Draw.io.
 - Validated XML parse integrity and edge snapping of both `.drawio` files, returning 0 floating/jumbled edges.
+- Upgraded the Progressive Web App (PWA) system: configured rich native installation assets, built an elegant custom floating install HUD and SW update alerts, created a gorgeous high-fidelity offline fallback page with LGU emergency hotlines, and designed an offline-playable HTML5 canvas mini-game ("Mangatarem Heritage Catch").
  
 ## Current
  

@@ -51,21 +51,26 @@ edges_to_add = []
 
 if visitor_log_table_id and user_table_id:
     row1 = find_row(visitor_log_table_id, 'logged_by_id')
-    if row1: edges_to_add.append((row1, user_table_id, 'logged_by_id'))
+    if row1:
+        edges_to_add.append((row1, user_table_id, 'logged_by_id'))
     row2 = find_row(visitor_log_table_id, 'visitor_user_id')
-    if row2: edges_to_add.append((row2, user_table_id, 'visitor_user_id'))
+    if row2:
+        edges_to_add.append((row2, user_table_id, 'visitor_user_id'))
 
 if review_photo_table_id and attraction_review_table_id:
     row = find_row(review_photo_table_id, 'review_id')
-    if row: edges_to_add.append((row, attraction_review_table_id, 'review_id'))
+    if row:
+        edges_to_add.append((row, attraction_review_table_id, 'review_id'))
 
 if pwd_reset_table_id and user_table_id:
     row = find_row(pwd_reset_table_id, 'user_id')
-    if row: edges_to_add.append((row, user_table_id, 'user_id'))
+    if row:
+        edges_to_add.append((row, user_table_id, 'user_id'))
 
 if audit_log_table_id and user_table_id:
     row = find_row(audit_log_table_id, 'user_id')
-    if row: edges_to_add.append((row, user_table_id, 'user_id'))
+    if row:
+        edges_to_add.append((row, user_table_id, 'user_id'))
 
 # Find the highest edge ID to avoid collision
 max_id = 0
@@ -74,7 +79,8 @@ for cell in mx_root.findall('mxCell'):
     if cid.startswith('erd_edge_'):
         try:
             num = int(cid.split('_')[-1])
-            if num > max_id: max_id = num
+            if num > max_id:
+                max_id = num
         except:
             pass
 

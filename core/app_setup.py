@@ -117,7 +117,7 @@ def register_context_processors(app: Flask) -> None:
 def _apply_cache_headers(response, path: str) -> None:
     """Applies Vercel Edge Cache headers based on path and type."""
     no_cache_prefixes = ("/admin", "/auth", "/user", "/barangay-admin")
-    if path in ("/sw.js", "/manifest.json") or any(path.startswith(p) for p in no_cache_prefixes):
+    if path in ("/sw.js", "/manifest.json", "/offline") or any(path.startswith(p) for p in no_cache_prefixes):
         response.headers["Cache-Control"] = "private, no-store, no-cache, must-revalidate, max-age=0"
     elif "text/html" in response.content_type:
         # Disable cache for HTML temporarily to force CSP update
@@ -225,6 +225,10 @@ def register_utility_routes(app: Flask) -> None:
     @app.route('/manifest.json')
     def serve_manifest():
         return send_from_directory(app.static_folder, 'manifest.json', mimetype='application/json')
+
+    @app.route('/offline')
+    def serve_offline():
+        return render_template('offline.html')
 
 
 def seed_database(app):

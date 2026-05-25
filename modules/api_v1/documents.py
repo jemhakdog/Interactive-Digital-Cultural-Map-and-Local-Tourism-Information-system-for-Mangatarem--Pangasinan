@@ -186,9 +186,12 @@ def _parse_docx_file(stream):
             # Location/Address
             loc_val = match_label(line, ["B. LOCATION", "C. ADDRESS", "C. ADDRESS/LOCATION/COORDINATES", "GEOGRAPHICAL LOCATION", "LOCATION/ADDRESS", "PRESENT ADDRESS", "MUNICIPALITY/CITY"])
             if loc_val:
-                if "address" not in extracted: extracted["address"] = loc_val
-                if "location" not in extracted: extracted["location"] = loc_val
-                if "geographical_range" not in extracted: extracted["geographical_range"] = loc_val
+                if "address" not in extracted:
+                    extracted["address"] = loc_val
+                if "location" not in extracted:
+                    extracted["location"] = loc_val
+                if "geographical_range" not in extracted:
+                    extracted["geographical_range"] = loc_val
                 
             # Birth place
             bp_val = match_label(line, ["BIRTH PLACE"])
@@ -198,19 +201,28 @@ def _parse_docx_file(stream):
             # Prominence/Sub-category
             prom_val = match_label(line, ["PROMINENCE", "TYPE OF CULTURAL INSTITUTION", "CATEGORY", "A. TYPE", "A. SUB-CATEGORY"])
             if prom_val:
-                if "category" not in extracted: extracted["category"] = prom_val
-                if "prominence_field" not in extracted: extracted["prominence_field"] = prom_val
-                if "type_of_natural_heritage" not in extracted: extracted["type_of_natural_heritage"] = prom_val
-                if "type_of_object" not in extracted: extracted["type_of_object"] = prom_val
-                if "type_of_institution" not in extracted: extracted["type_of_institution"] = prom_val
+                if "category" not in extracted:
+                    extracted["category"] = prom_val
+                if "prominence_field" not in extracted:
+                    extracted["prominence_field"] = prom_val
+                if "type_of_natural_heritage" not in extracted:
+                    extracted["type_of_natural_heritage"] = prom_val
+                if "type_of_object" not in extracted:
+                    extracted["type_of_object"] = prom_val
+                if "type_of_institution" not in extracted:
+                    extracted["type_of_institution"] = prom_val
 
             # Dates
             dates_val = match_label(line, ["YEAR CONSTRUCTED", "ESTIMATED AGE", "DATE FOUND", "DATE OF BIRTH", "DATE OF DEATH", "DATE CREATED"])
             if dates_val:
-                if "dates" not in extracted: extracted["dates"] = dates_val
-                if "date_produced" not in extracted: extracted["date_produced"] = dates_val
-                if "dates_of_birth_death" not in extracted: extracted["dates_of_birth_death"] = dates_val
-                if "date_created" not in extracted: extracted["date_created"] = dates_val
+                if "dates" not in extracted:
+                    extracted["dates"] = dates_val
+                if "date_produced" not in extracted:
+                    extracted["date_produced"] = dates_val
+                if "dates_of_birth_death" not in extracted:
+                    extracted["dates_of_birth_death"] = dates_val
+                if "date_created" not in extracted:
+                    extracted["date_created"] = dates_val
                 
             # Ownership
             own_val = match_label(line, ["OWNERSHIP/ JURISDICTION", "OWNERSHIP/JURISDICTION", "OWNERSHIP", "NAME OF OWNER"])
@@ -251,16 +263,20 @@ def _parse_docx_file(stream):
 
             if ("II. DESCRIPTION" in line.upper() or "A. PHYSICAL DESCRIPTION" in line.upper() or "A. PHYSICAL FEATURES" in line.upper()) and "description" not in extracted:
                 desc = look_ahead_text(i, limit=4)
-                if desc: extracted["description"] = desc
+                if desc:
+                    extracted["description"] = desc
             elif ("STORIES ASSOCIATED" in line.upper() or "STORIES/NARRATIVES" in line.upper() or "STORIES AND NARRATIVES" in line.upper()) and "stories" not in extracted:
                 stories = look_ahead_text(i, limit=4)
-                if stories: extracted["stories"] = stories
+                if stories:
+                    extracted["stories"] = stories
             elif ("IV. SIGNIFICANCE" in line.upper() or "BIODIVERSITY SIGNIFICANCE" in line.upper()) and "significance" not in extracted:
                 sig = look_ahead_text(i, limit=4)
-                if sig: extracted["significance"] = sig
+                if sig:
+                    extracted["significance"] = sig
             elif ("CONSTRAINTS/THREATS" in line.upper() or "ISSUES/CHALLENGES" in line.upper()) and "constraints_threats" not in extracted:
                 con = look_ahead_text(i, limit=4)
-                if con: extracted["constraints_threats"] = con
+                if con:
+                    extracted["constraints_threats"] = con
             elif ("CONSERVATION MEASURES" in line.upper() or "SAFEGUARDING MEASURES" in line.upper()) and "conservation_measures" not in extracted:
                 cons_m = look_ahead_text(i, limit=4)
                 if cons_m: 
@@ -268,13 +284,16 @@ def _parse_docx_file(stream):
                     extracted["safeguarding_description"] = cons_m
             elif "LGU VISION STATEMENT" in line.upper() and "vision" not in extracted:
                 vision = look_ahead_text(i, limit=4)
-                if vision: extracted["vision"] = vision
+                if vision:
+                    extracted["vision"] = vision
             elif "LGU MISSION STATEMENT" in line.upper() and "mission" not in extracted:
                 mission = look_ahead_text(i, limit=4)
-                if mission: extracted["mission"] = mission
+                if mission:
+                    extracted["mission"] = mission
             elif "LGU GOAL STATEMENTS" in line.upper() and "goals" not in extracted:
                 goals = look_ahead_text(i, limit=4)
-                if goals: extracted["goals"] = goals
+                if goals:
+                    extracted["goals"] = goals
             elif "B. BRIEF HISTORY OF THE LGU" in line.upper() and "history" not in extracted:
                 history = look_ahead_text(i, limit=4)
                 if history:
@@ -282,7 +301,8 @@ def _parse_docx_file(stream):
                     extracted["description"] = history
             elif "G. LGU PROGRAMS ON CULTURE, ARTS, AND HERITAGE" in line.upper() and "strategies" not in extracted:
                 strat = look_ahead_text(i, limit=4)
-                if strat: extracted["strategies"] = strat
+                if strat:
+                    extracted["strategies"] = strat
 
         # Parse tables for details like informants, mapper name, references, profiling date
         for row in table_cells:

@@ -79,7 +79,8 @@ if rp_table is not None:
                 x = int(geom.attrib.get('x', '0'))
                 geom.attrib['y'] = str(y - 200)
                 geom.attrib['x'] = str(x + 250)
-            except: pass
+            except:
+                pass
             
         mx_root.append(ar_table)
         attraction_review_id = ar_table.attrib['id']
@@ -107,7 +108,8 @@ for cell in to_remove:
 edges_to_add = []
 if review_photo_id and attraction_review_id:
     row = find_row(review_photo_id, 'review_id')
-    if row: edges_to_add.append((row, attraction_review_id, 'review_id'))
+    if row:
+        edges_to_add.append((row, attraction_review_id, 'review_id'))
 
 max_num = get_max_id() + 2000
 print(f"Adding {len(edges_to_add)} edges...")

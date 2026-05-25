@@ -6,16 +6,63 @@
     "display": "standalone",
     "background_color": "#022c22",
     "theme_color": "#10b981",
+    "orientation": "any",
+    "categories": [
+        "travel",
+        "navigation",
+        "culture"
+    ],
     "icons": [
         {
             "src": "/static/img/mangatarem_map_teaser.webp",
             "sizes": "192x192",
-            "type": "image/webp"
+            "type": "image/webp",
+            "purpose": "any maskable"
         },
         {
             "src": "/static/img/mangatarem_map_teaser.webp",
             "sizes": "512x512",
-            "type": "image/webp"
+            "type": "image/webp",
+            "purpose": "any maskable"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Interactive Map",
+            "short_name": "Map",
+            "description": "Explore the cultural map of Mangatarem",
+            "url": "/map",
+            "icons": [{ "src": "/static/img/mangatarem_map_teaser.webp", "sizes": "192x192" }]
+        },
+        {
+            "name": "Visual Archive",
+            "short_name": "Gallery",
+            "description": "View Mangatarem cultural gallery",
+            "url": "/gallery",
+            "icons": [{ "src": "/static/img/mangatarem_map_teaser.webp", "sizes": "192x192" }]
+        },
+        {
+            "name": "Local Festivals",
+            "short_name": "Events",
+            "description": "Discover local cultural events",
+            "url": "/events",
+            "icons": [{ "src": "/static/img/mangatarem_map_teaser.webp", "sizes": "192x192" }]
+        }
+    ],
+    "screenshots": [
+        {
+            "src": "/static/img/hero.webp",
+            "sizes": "1920x1080",
+            "type": "image/webp",
+            "form_factor": "wide",
+            "label": "Heritage portal landing page"
+        },
+        {
+            "src": "/static/img/mangatarem_map_teaser.webp",
+            "sizes": "768x512",
+            "type": "image/webp",
+            "form_factor": "narrow",
+            "label": "Interactive cultural map"
         }
     ]
 }
