@@ -2,7 +2,25 @@
 
 Record important project decisions here.
 
+### 2026-05-30 — Single Consolidated Hub-and-Spoke DFD Layout (V5)
+
+Status: Accepted
+
+Context: The capstone panel explicitly requested exactly *one* unified DFD diagram in the documentation to save page space and represent both macro-level and micro-level system modules. The previous layout utilized a vertical 3-column system split into separate Level 0 and Level 1 versions.
+
+Decision:
+1. **Designed a Single Consolidated DFD**: Developed `generate_dfd_v5.py` to compile a single, comprehensive DFD diagram modeled after the structure of Figure 2.3.
+2. **Centralized System Hub**: Positioned the entire system boundary as a large process box (`0.0: Interactive Digital Cultural Map & Tourism Information System`) right in the center of the canvas.
+3. **Circular Distribution**: Distributed all 15 functional sub-processes (1.0 to 15.0) in a clean rectangular ring around the central System Hub box.
+4. **Localized Database Compartments**: Nested all 16 database datastores (D1 to D16) directly adjacent to or underneath their active processes to guarantee zero intersecting lines and maximum structural legibility.
+5. **Cleaned Outer Flows**: Kept external actors (Tourist, Admin, Business, Guardian, Google, Mapbox) on the outermost margins, routing all data flows cleanly using rounded orthogonal connections.
+
+Consequences: Satisfies the panel's constraints perfectly by presenting exactly *one* complete DFD diagram that serves as both a high-level Context diagram and a low-level detailed DFD without any visual overlaps or floating connections.
+
+Related files: `docs/diagrams/dfd/generate_dfd_v5.py`, `docs/diagrams/dfd/dfd-level-0_v5.drawio`, `docs/diagrams/dfd/dfd-level-1-clean_v5.drawio`, `memory-bank/progress.md`, `memory-bank/activeContext.md`
+
 ### 2026-05-27 — Physical Database Table Consolidation & Single-Page ERD Cleanup
+
 
 Status: Accepted
 

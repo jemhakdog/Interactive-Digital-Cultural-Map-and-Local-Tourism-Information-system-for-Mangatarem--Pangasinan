@@ -59,3 +59,8 @@ def register_blueprints(app):
     from modules.chat.routes import chat_bp
     import modules.chat.sockets  # Register socket handlers
     app.register_blueprint(chat_bp)
+
+    # Gamification Module
+    from modules.gamification import gamification_bp
+    app.register_blueprint(gamification_bp)
+

@@ -106,6 +106,18 @@
                         </td>
                         <td class="py-4 px-6 text-right">
                             <div class="flex justify-end gap-3">
+                                <a href="{{ url_for('admin.admin_heritage_export_excel', profile_id=item.id) }}" 
+                                   class="p-2 hover:bg-emerald-500/10 text-emerald-400 rounded transition-colors" title="Export to NCCA Excel">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                </a>
+                                <a href="{{ url_for('admin.admin_heritage_export_docx', profile_id=item.id) }}" 
+                                   class="p-2 hover:bg-amber-500/10 text-amber-400 rounded transition-colors" title="Export to NCCA Word">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    </svg>
+                                </a>
                                 <a href="{{ url_for('admin.admin_heritage_edit', heritage_type=heritage_type, item_id=item.id) }}" 
                                    class="p-2 hover:bg-blue-500/10 text-blue-400 rounded transition-colors" title="Edit">
                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -141,3 +141,62 @@ def reject_establishment_review(id):
     db.session.commit()
     flash("Review rejected.", "success")
     return redirect(url_for("admin.manage_establishment_reviews"))
+
+
+# === Merchant Verification ===
+
+@admin_bp.route("/merchants/verify")
+@login_required
+@admin_required
+def manage_merchant_verifications():
+    """List and manage all merchant business verifications."""
+    from modules.business.models import BusinessVerification
+    verifications = BusinessVerification.query.order_by(BusinessVerification.submitted_at.desc()).all()
+    return render_template(
+        "admin/verify_merchants.html",
+        verifications=verifications,
+    )
+
+
+@admin_bp.route("/merchants/verify/<int:id>/approve", methods=["POST"])
+@login_required
+@admin_required
+def approve_merchant_verification(id):
+    """Approve a merchant's business verification."""
+    from modules.business.models import BusinessVerification
+    verification = BusinessVerification.query.get_or_404(id)
+    verification.status = "approved"
+    
+    # Approve the user
+    user = verification.user
+    user.is_approved = True
+    
+    # Also automatically approve their establishments if pending
+    for est in user.establishments:
+        if est.status == "pending":
+            est.status = "approved"
+            
+    db.session.commit()
+    logger.info(f"Merchant verification approved for user ID {user.id}")
+    flash(f"Merchant account for '{user.username}' has been verified and approved.", "success")
+    return redirect(url_for("admin.manage_merchant_verifications"))
+
+
+@admin_bp.route("/merchants/verify/<int:id>/reject", methods=["POST"])
+@login_required
+@admin_required
+def reject_merchant_verification(id):
+    """Reject a merchant's business verification."""
+    from modules.business.models import BusinessVerification
+    verification = BusinessVerification.query.get_or_404(id)
+    verification.status = "rejected"
+    
+    # Do not approve the user
+    user = verification.user
+    user.is_approved = False
+    
+    db.session.commit()
+    logger.info(f"Merchant verification rejected for user ID {user.id}")
+    flash(f"Merchant verification for '{user.username}' has been rejected.", "warning")
+    return redirect(url_for("admin.manage_merchant_verifications"))
+

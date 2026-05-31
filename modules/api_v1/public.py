@@ -23,10 +23,27 @@ def map_v2_view():
     # Get initial data
     attractions_count = Attraction.query.filter_by(status="approved").count()
     
+    checked_in_today_attractions = []
+    checked_in_today_establishments = []
+    
+    from flask_login import current_user
+    if current_user.is_authenticated:
+        from modules.gamification.models import TouristCheckIn
+        from datetime import datetime
+        today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        today_checkins = TouristCheckIn.query.filter(
+            TouristCheckIn.user_id == current_user.id,
+            TouristCheckIn.verified_at >= today_start
+        ).all()
+        checked_in_today_attractions = [c.attraction_id for c in today_checkins if c.attraction_id]
+        checked_in_today_establishments = [c.establishment_id for c in today_checkins if c.establishment_id]
+    
     return render_template(
         "pagez/map_v2.html", 
         attractions_count=attractions_count,
-        mapbox_token=os.environ.get("mapbox_token", "")
+        mapbox_token=os.environ.get("mapbox_token", ""),
+        checked_in_today_attractions=checked_in_today_attractions,
+        checked_in_today_establishments=checked_in_today_establishments
     )
 
 
@@ -125,6 +142,12 @@ def attraction_detail_v1_view(id):
     # Check if favorited by current user
     is_favorite = False
     is_visited = False
+    is_stamped_today = False
+    stamp_metadata = {}
+    is_active_route = False
+
+    from flask import session
+    from datetime import datetime
     from flask_login import current_user
     if current_user.is_authenticated:
         from models import VisitorLog
@@ -136,6 +159,27 @@ def attraction_detail_v1_view(id):
             target_type="attraction",
             target_id=id
         ).first() is not None
+
+        # Check if checked in today
+        from modules.gamification.models import TouristCheckIn
+        today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        stamped_today_record = TouristCheckIn.query.filter(
+            TouristCheckIn.user_id == current_user.id,
+            TouristCheckIn.attraction_id == id,
+            TouristCheckIn.verified_at >= today_start
+        ).first()
+        
+        if stamped_today_record:
+            is_stamped_today = True
+            stamp_metadata = {
+                "verified_at": stamped_today_record.verified_at.strftime("%I:%M %p"),
+                "distance": round(stamped_today_record.distance_meters, 1) if stamped_today_record.distance_meters else None
+            }
+            
+        # Check if active navigation route in session matches this attraction
+        active_nav = session.get('active_nav')
+        if active_nav and active_nav.get('type') == 'attraction' and int(active_nav.get('id')) == id:
+            is_active_route = True
 
     cache_key = f"attraction_detail_v1:{id}"
     cached_data = cache_get(cache_key)
@@ -151,6 +195,9 @@ def attraction_detail_v1_view(id):
             nearby_eat=cached_data['nearby_eat'],
             is_favorite=is_favorite,
             is_visited=is_visited,
+            is_stamped_today=is_stamped_today,
+            stamp_metadata=stamp_metadata,
+            is_active_route=is_active_route,
         )
 
     # Cache MISS - Fetch data
@@ -217,6 +264,9 @@ def attraction_detail_v1_view(id):
         nearby_eat=nearby_eat,
         is_favorite=is_favorite,
         is_visited=is_visited,
+        is_stamped_today=is_stamped_today,
+        stamp_metadata=stamp_metadata,
+        is_active_route=is_active_route,
     )
 
 

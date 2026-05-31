@@ -1003,6 +1003,9 @@
                             <p class="text-[9px] font-medium text-gray-600 uppercase tracking-wider">Time</p>
                         </div>
                     </div>
+                <!-- Map Stamp HUD Container -->
+                <div id="map-stamp-hud" class="mt-4 p-4 rounded-2xl bg-gray-50 border border-gray-100 flex flex-col gap-3">
+                    <!-- Injected dynamically by JS -->
                 </div>
                 <button id="start-navigation" class="start-btn py-4 mt-4">Start Navigation</button>
             </div>
@@ -1088,6 +1091,8 @@
 <script>
     window.MAPBOX_TOKEN = "{{ mapbox_token }}";
     window.USER_AUTH = {{ 'true' if current_user.is_authenticated else 'false' }};
+    window.STAMPED_TODAY_ATTRACTIONS = {{ checked_in_today_attractions | default([], true) | tojson }};
+    window.STAMPED_TODAY_ESTABLISHMENTS = {{ checked_in_today_establishments | default([], true) | tojson }};
 </script>
 {% if current_user.is_authenticated and current_user.role == 'user' %}
 <script src="{{ url_for('static', filename='js/pages/user-actions.js') }}" defer></script>

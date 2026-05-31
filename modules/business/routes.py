@@ -136,11 +136,38 @@ def detail(id):
 
     # Check if favorited by current user
     is_favorite = False
+    is_stamped_today = False
+    stamp_metadata = {}
+    is_active_route = False
+    
     if current_user.is_authenticated:
         from modules.business.models import UserFavoriteEstablishment
         is_favorite = UserFavoriteEstablishment.query.filter_by(
             user_id=current_user.id, establishment_id=id
         ).first() is not None
+        
+        # Check if checked in today
+        from modules.gamification.models import TouristCheckIn
+        from datetime import datetime
+        today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+        stamped_today_record = TouristCheckIn.query.filter(
+            TouristCheckIn.user_id == current_user.id,
+            TouristCheckIn.establishment_id == id,
+            TouristCheckIn.verified_at >= today_start
+        ).first()
+        
+        if stamped_today_record:
+            is_stamped_today = True
+            stamp_metadata = {
+                "verified_at": stamped_today_record.verified_at.strftime("%I:%M %p"),
+                "distance": round(stamped_today_record.distance_meters, 1) if stamped_today_record.distance_meters else None
+            }
+            
+        # Check if active navigation route in session matches this establishment
+        from flask import session
+        active_nav = session.get('active_nav')
+        if active_nav and active_nav.get('type') == 'establishment' and int(active_nav.get('id')) == id:
+            is_active_route = True
 
     log_render("business", "detail", "establishment_detail.html")
     return render_template(
@@ -149,7 +176,10 @@ def detail(id):
         rooms=rooms,
         menu_items=menu_items,
         reviews=reviews,
-        is_favorite=is_favorite
+        is_favorite=is_favorite,
+        is_stamped_today=is_stamped_today,
+        stamp_metadata=stamp_metadata,
+        is_active_route=is_active_route
     )
 
 @business_bp.route("/<int:id>/review", methods=["POST"])

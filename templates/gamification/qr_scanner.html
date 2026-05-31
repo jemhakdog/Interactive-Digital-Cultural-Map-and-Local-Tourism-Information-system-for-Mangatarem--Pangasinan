@@ -1,0 +1,532 @@
+{% extends "base.html" %}
+{% block title %}Passport Stamp Validation - Mangatarem Map{% endblock %}
+
+{% block head %}
+{{ super() }}
+<style>
+    /* Premium Glassmorphic Palette & Dynamic Glows */
+    .glass-hud {
+        background: rgba(8, 15, 30, 0.8);
+        backdrop-filter: blur(24px) saturate(220%);
+        -webkit-backdrop-filter: blur(24px) saturate(220%);
+        border: 1px solid rgba(16, 185, 129, 0.15);
+        box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.8),
+                    0 0 50px -10px rgba(16, 185, 129, 0.1);
+    }
+    
+    /* Radar Scanner Layout */
+    .radar-container {
+        position: relative;
+        width: 16rem;
+        height: 16rem;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, rgba(15, 23, 42, 0.6) 70%);
+        border: 1px solid rgba(16, 185, 129, 0.1);
+        box-shadow: inset 0 0 30px rgba(16, 185, 129, 0.05);
+    }
+
+    /* Concentric tech lines */
+    .radar-ring-outer {
+        position: absolute;
+        width: 92%;
+        height: 92%;
+        border-radius: 50%;
+        border: 1px dashed rgba(16, 185, 129, 0.25);
+        animation: spin-clockwise 20s linear infinite;
+    }
+
+    .radar-ring-mid {
+        position: absolute;
+        width: 80%;
+        height: 80%;
+        border-radius: 50%;
+        border: 2px solid rgba(20, 184, 166, 0.15);
+        border-top-color: rgba(20, 184, 166, 0.6);
+        border-bottom-color: rgba(16, 185, 129, 0.6);
+        animation: spin-counter 8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+    }
+
+    .radar-ring-inner {
+        position: absolute;
+        width: 68%;
+        height: 68%;
+        border-radius: 50%;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        background: rgba(15, 23, 42, 0.85);
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        display: flex;
+        flex-col: true;
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+    }
+
+    /* Radar sweeping beam */
+    .radar-sweep-beam {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, transparent 40%, rgba(16, 185, 129, 0.25) 100%);
+        animation: spin-clockwise 3s linear infinite;
+        pointer-events: none;
+        z-index: 5;
+    }
+    
+    /* Ping telemetry effect */
+    .radar-ping-wave {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 2px solid rgba(16, 185, 129, 0.4);
+        opacity: 0;
+        animation: ping-expand 2.5s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+        pointer-events: none;
+    }
+
+    @keyframes spin-clockwise {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    @keyframes spin-counter {
+        from { transform: rotate(360deg); }
+        to { transform: rotate(0deg); }
+    }
+
+    @keyframes ping-expand {
+        0% {
+            transform: scale(0.6);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(1.3);
+            opacity: 0;
+            border-color: rgba(20, 184, 166, 0);
+        }
+    }
+    
+    /* Interactive status dot */
+    .status-pulse-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+    
+    .pulse-lock {
+        background-color: #10B981;
+        box-shadow: 0 0 12px #10B981, 0 0 20px rgba(16, 185, 129, 0.5);
+    }
+    
+    .pulse-search {
+        background-color: #F59E0B;
+        box-shadow: 0 0 12px #F59E0B;
+        animation: search-blink 1s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    
+    @keyframes search-blink {
+        0%, 100% { opacity: 0.3; transform: scale(0.9); }
+        50% { opacity: 1; transform: scale(1.1); }
+    }
+
+    /* Live Telemetry Data Box styling */
+    .telemetry-item {
+        background: rgba(15, 23, 42, 0.45);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 12px;
+        padding: 0.6rem 0.8rem;
+    }
+
+    /* Success stamp graphic pop animation */
+    .stamp-awarded-pop {
+        animation: stamp-pop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes stamp-pop {
+        0% { transform: scale(0.3) rotate(-30deg); opacity: 0; }
+        70% { transform: scale(1.15) rotate(10deg); }
+        100% { transform: scale(1) rotate(0deg); opacity: 1; }
+    }
+
+    /* Linear loading checking status bar */
+    .progress-bar-container {
+        width: 100%;
+        height: 4px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 9999px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, #10b981 0%, #14b8a6 100%);
+        border-radius: 9999px;
+        transition: width 0.1s linear;
+        box-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="min-h-screen pt-32 pb-16 px-4 flex items-center justify-center bg-slate-950 text-slate-100 font-body relative overflow-hidden">
+    <!-- Ethereal background aura -->
+    <div class="absolute -top-40 -left-40 w-[30rem] h-[30rem] rounded-full bg-emerald-500/10 blur-[120px] pointer-events-none"></div>
+    <div class="absolute -bottom-40 -right-40 w-[30rem] h-[30rem] rounded-full bg-teal-500/10 blur-[120px] pointer-events-none"></div>
+
+    <div class="max-w-md w-full glass-hud rounded-[2.5rem] p-8 md:p-10 relative overflow-hidden text-center space-y-8">
+        
+        <!-- Top Status Indicator -->
+        <div class="flex flex-col items-center gap-4">
+            <span class="inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-black uppercase tracking-widest rounded-full">
+                <span class="status-pulse-dot pulse-search" id="top-status-dot"></span>
+                <span id="top-status-label">Acquiring GPS Satellite Signal</span>
+            </span>
+            <div class="space-y-1">
+                <h1 class="text-2xl font-black tracking-tight text-white font-display">Passport Check-in</h1>
+                <p class="text-slate-400 text-xs font-semibold leading-relaxed">
+                    Arriving at destination: <br>
+                    <span class="text-lg font-black text-white block mt-1 tracking-tight" id="destination-title">{{ target_name }}</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Radar Circular Interface -->
+        <div class="flex items-center justify-center relative py-2">
+            <div class="radar-container">
+                <!-- Glowing rotating circles -->
+                <div class="radar-ring-outer"></div>
+                <div class="radar-ring-mid"></div>
+                
+                <!-- Conic beam -->
+                <div class="radar-sweep-beam" id="radar-beam"></div>
+                
+                <!-- Radar ping waves -->
+                <div class="radar-ping-wave" style="animation-delay: 0s;"></div>
+                <div class="radar-ping-wave" style="animation-delay: 1.2s;"></div>
+                
+                <!-- Inner Stamp Circle HUD -->
+                <div class="radar-ring-inner">
+                    <div class="flex flex-col items-center gap-2 select-none">
+                        <div class="w-14 h-14 rounded-full bg-slate-900 flex items-center justify-center border border-white/5 shadow-inner" id="icon-bg">
+                            <i class="fas fa-satellite text-2xl text-amber-400 animate-pulse" id="center-icon"></i>
+                        </div>
+                        <span class="text-[9px] font-black uppercase tracking-[0.25em] text-amber-500" id="center-label">Locating</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Real-time GPS Telemetry Dashboard -->
+        <div class="space-y-3">
+            <div class="grid grid-cols-2 gap-3 text-left">
+                <div class="telemetry-item">
+                    <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">Latitude / Longitude</span>
+                    <span class="text-xs font-bold text-slate-200 block font-mono mt-0.5" id="telemetry-coords">Searching...</span>
+                </div>
+                <div class="telemetry-item">
+                    <span class="text-[9px] text-slate-500 font-bold uppercase tracking-wider block">GPS Precision Limit</span>
+                    <span class="text-xs font-bold text-slate-200 block font-mono mt-0.5" id="telemetry-accuracy">Locking...</span>
+                </div>
+            </div>
+            
+            <!-- Checking-in automated progress loading panel -->
+            <div class="p-4 bg-slate-900/60 border border-white/5 rounded-2xl space-y-3 transition-all duration-300" id="status-panel-container">
+                <div class="flex items-center justify-between text-xs font-bold text-slate-300" id="status-header">
+                    <span class="flex items-center gap-2 text-amber-400">
+                        <i class="fas fa-sync animate-spin text-[10px]"></i>
+                        <span id="status-panel-text">Connecting to device satellites...</span>
+                    </span>
+                    <span class="text-[10px] font-mono text-slate-500" id="status-panel-pct">0%</span>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="status-progress"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Actions panel -->
+        <div class="flex flex-col gap-3">
+            <!-- Hidden action verify button -->
+            <button id="verify-manual-btn" disabled 
+                    class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-30 disabled:hover:bg-emerald-600 text-white font-black rounded-2xl transition-all text-xs uppercase tracking-widest shadow-lg shadow-emerald-500/10 cursor-pointer hidden">
+                <i class="fas fa-check-circle mr-1.5"></i> Verify Geolocation
+            </button>
+            
+            <a href="{{ url_for('gamification.view_passport') }}" 
+               class="block w-full py-4 bg-slate-900/90 hover:bg-slate-900 border border-white/5 hover:border-white/10 text-slate-400 hover:text-slate-200 font-bold rounded-2xl transition-all text-xs uppercase tracking-widest">
+                Cancel Stamps Check-in
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Beautiful Stamp Unlock Reward Modal -->
+<div id="unlock-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/90 backdrop-blur-md hidden p-4">
+    <div class="max-w-md w-full glass-hud rounded-[3rem] p-10 text-center space-y-6 relative border-emerald-500/20">
+        <div class="w-20 h-20 mx-auto rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+            <i class="fas fa-stamp text-4xl text-emerald-400 animate-pulse"></i>
+        </div>
+        <div class="space-y-2">
+            <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[9px] font-black uppercase tracking-wider rounded-full">New Stamp Awarded</span>
+            <h2 class="text-3xl font-black text-white font-display">Check-in Complete!</h2>
+            <p class="text-xs text-slate-400 leading-relaxed font-semibold" id="modal-message"></p>
+        </div>
+        
+        <!-- Unlocked Badge reward panel -->
+        <div id="badge-rewards-container" class="hidden p-5 bg-gradient-to-r from-emerald-500/5 to-teal-500/5 border border-emerald-500/10 rounded-2xl text-left space-y-3">
+            <div class="flex items-center gap-3">
+                <img id="badge-image" src="" alt="Badge" class="w-14 h-14 rounded-xl border border-emerald-500/20 bg-slate-950 p-1 object-contain">
+                <div>
+                    <h4 class="text-sm font-black text-white" id="badge-title"></h4>
+                    <p class="text-[9px] text-emerald-400 font-black uppercase tracking-wider">Unlocked New Achievement Badge!</p>
+                </div>
+            </div>
+            <p class="text-[11px] text-slate-400 leading-relaxed font-medium" id="badge-desc"></p>
+        </div>
+
+        <button id="modal-close-btn"
+                class="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-2xl transition-all text-xs uppercase tracking-widest shadow-lg shadow-emerald-500/25">
+            Back to My Passport
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const statusPanelText = document.getElementById("status-panel-text");
+    const statusPanelPct = document.getElementById("status-panel-pct");
+    const statusProgress = document.getElementById("status-progress");
+    
+    const topStatusDot = document.getElementById("top-status-dot");
+    const topStatusLabel = document.getElementById("top-status-label");
+    
+    const centerIcon = document.getElementById("center-icon");
+    const centerLabel = document.getElementById("center-label");
+    const iconBg = document.getElementById("icon-bg");
+    const radarBeam = document.getElementById("radar-beam");
+    
+    const telemetryCoords = document.getElementById("telemetry-coords");
+    const telemetryAccuracy = document.getElementById("telemetry-accuracy");
+    const verifyManualBtn = document.getElementById("verify-manual-btn");
+    
+    const unlockModal = document.getElementById("unlock-modal");
+
+    let isRequesting = false;
+    let gpsCoords = null;
+
+    // Simulate concentric locking progress bar smoothly
+    function updateProgress(percentage, text, colorClass = "text-amber-400") {
+        statusProgress.style.width = `${percentage}%`;
+        statusPanelPct.innerText = `${percentage}%`;
+        statusPanelText.innerHTML = text;
+        statusPanelText.className = `flex items-center gap-2 ${colorClass}`;
+    }
+
+    function triggerCheckin(latitude, longitude) {
+        if (isRequesting) return;
+        isRequesting = true;
+
+        updateProgress(75, `<i class="fas fa-satellite-dish animate-pulse"></i> Transmitting coordinates...`, "text-emerald-400");
+        centerLabel.innerText = "Checking In";
+        centerIcon.className = "fas fa-spinner text-2xl text-emerald-400 animate-spin";
+        iconBg.className = "w-14 h-14 rounded-full bg-slate-900 flex items-center justify-center border border-emerald-500/20 shadow-inner";
+
+        fetch("{{ url_for('gamification.verify_checkin') }}", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRFToken": "{{ csrf_token() }}"
+            },
+            body: JSON.stringify({
+                type: "{{ target_type }}",
+                id: {{ target_id }},
+                latitude: latitude,
+                longitude: longitude
+            })
+        })
+        .then(response => response.json().then(data => ({ status: response.status, body: data })))
+        .then(({ status, body }) => {
+            if (status === 200) {
+                updateProgress(100, `<i class="fas fa-check-circle"></i> Verification Accepted!`, "text-emerald-400");
+                
+                // Stamped center disk animation
+                centerIcon.className = "fas fa-stamp text-2xl text-emerald-400 stamp-awarded-pop";
+                centerLabel.innerText = "Stamped";
+                centerLabel.className = "text-[9px] font-black uppercase tracking-[0.25em] text-emerald-400";
+                radarBeam.style.animationPlayState = "paused";
+                
+                topStatusDot.className = "status-pulse-dot pulse-lock";
+                topStatusLabel.innerText = "Passport Stamp Awarded";
+                
+                document.getElementById("modal-message").innerText = body.message;
+                
+                if (body.unlocked_badges && body.unlocked_badges.length > 0) {
+                    const badge = body.unlocked_badges[0];
+                    document.getElementById("badge-title").innerText = badge.title;
+                    document.getElementById("badge-desc").innerText = badge.description;
+                    document.getElementById("badge-image").src = badge.badge_image_url || '/static/img/badges/default.png';
+                    document.getElementById("badge-rewards-container").classList.remove("hidden");
+                }
+                
+                setTimeout(() => {
+                    unlockModal.classList.remove("hidden");
+                }, 900);
+            } else {
+                handleFail(body.message);
+            }
+        })
+        .catch(err => {
+            console.error(err);
+            handleFail("System network timeout. Could not establish secure LGU link.");
+        });
+    }
+
+    function handleFail(message) {
+        isRequesting = false;
+        
+        centerIcon.className = "fas fa-times text-2xl text-rose-500";
+        centerLabel.innerText = "Failed";
+        centerLabel.className = "text-[9px] font-black uppercase tracking-[0.25em] text-rose-500";
+        iconBg.className = "w-14 h-14 rounded-full bg-slate-900 flex items-center justify-center border border-rose-500/20 shadow-inner";
+        
+        topStatusDot.className = "status-pulse-dot bg-rose-500 shadow-[0_0_12px_#EF4444]";
+        topStatusLabel.innerText = "Proximity Check Failed";
+        
+        updateProgress(0, `<i class="fas fa-exclamation-triangle"></i> Out of Proximity Bounds`, "text-rose-400");
+        
+        // Show the verification error alert log
+        const statusContainer = document.getElementById("status-panel-container");
+        statusContainer.classList.add("border-rose-500/20", "bg-rose-950/10");
+        
+        // Allow manual trigger button if failed due to GPS lock instability
+        verifyManualBtn.classList.remove("hidden");
+        verifyManualBtn.disabled = false;
+        verifyManualBtn.innerText = "Try Manual Verification";
+    }
+
+    // Interactive countdown telemetry simulation
+    function startCheckingIn(lat, lon) {
+        let pct = 0;
+        const interval = setInterval(() => {
+            pct += 4;
+            if (pct >= 50) {
+                clearInterval(interval);
+                updateProgress(50, `<i class="fas fa-fingerprint animate-pulse text-[10px]"></i> Verifying presence...`, "text-emerald-400");
+                triggerCheckin(lat, lon);
+            } else {
+                updateProgress(pct, `<i class="fas fa-unlock animate-pulse text-[10px]"></i> Autochecking presence... ${Math.ceil((50 - pct) / 10)}s`, "text-emerald-400");
+            }
+        }, 80);
+    }
+
+    // Verify Active Navigation Session Guard
+    const activeNav = JSON.parse(localStorage.getItem('active_navigation_target') || 'null');
+    const isNavigatingToTarget = activeNav && 
+                                 String(activeNav.id) === "{{ target_id }}" && 
+                                 activeNav.type === "{{ target_type }}";
+
+    if (!isNavigatingToTarget) {
+        // Display beautiful security block
+        centerIcon.className = "fas fa-route text-2xl text-amber-500 animate-pulse";
+        centerLabel.innerText = "Guarded";
+        centerLabel.className = "text-[9px] font-black uppercase tracking-[0.25em] text-amber-500";
+        iconBg.className = "w-14 h-14 rounded-full bg-slate-900 flex items-center justify-center border border-amber-500/20 shadow-inner";
+        
+        topStatusDot.className = "status-pulse-dot pulse-search";
+        topStatusLabel.innerText = "Navigation Route Required";
+        
+        telemetryCoords.innerText = "Locked";
+        telemetryAccuracy.innerText = "Awaiting Route";
+        
+        updateProgress(0, `<i class="fas fa-lock"></i> Route Navigation Required`, "text-amber-500");
+        
+        const statusContainer = document.getElementById("status-panel-container");
+        statusContainer.classList.add("border-amber-500/20", "bg-amber-950/10");
+        
+        // Show high-tech start navigation button instead of manual verification
+        verifyManualBtn.classList.remove("hidden");
+        verifyManualBtn.disabled = false;
+        verifyManualBtn.className = "w-full py-4 bg-gradient-to-r from-amber-500 to-emerald-600 hover:from-amber-600 hover:to-emerald-700 text-white font-black rounded-2xl transition-all text-xs uppercase tracking-widest shadow-lg shadow-emerald-500/10 cursor-pointer";
+        verifyManualBtn.innerHTML = `<i class="fas fa-compass mr-1.5"></i> Start Active Navigation`;
+        
+        verifyManualBtn.onclick = function() {
+            window.location.href = `/map?route_to={{ target_id }}&type={{ target_type }}`;
+        };
+        return; // Halt execution!
+    }
+
+    function acquireGpsSignal() {
+        if (navigator.geolocation) {
+            updateProgress(15, `<i class="fas fa-compass animate-spin text-[10px]"></i> Reading device geolocation sensors...`);
+            
+            navigator.geolocation.getCurrentPosition(
+                function(position) {
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+                    const accuracy = position.coords.accuracy || 10;
+                    
+                    gpsCoords = { lat, lon };
+                    
+                    // Set live telemetry cards
+                    telemetryCoords.innerText = `${lat.toFixed(5)}°, ${lon.toFixed(5)}°`;
+                    telemetryAccuracy.innerText = `Within ${Math.ceil(accuracy)}m`;
+                    
+                    // Highlight locked dials
+                    topStatusDot.className = "status-pulse-dot pulse-lock";
+                    topStatusLabel.innerText = "GPS Proximity Lock Acquired";
+                    
+                    centerIcon.className = "fas fa-passport text-2xl text-emerald-400 animate-bounce";
+                    centerLabel.innerText = "Locked";
+                    centerLabel.className = "text-[9px] font-black uppercase tracking-[0.25em] text-emerald-400";
+                    iconBg.className = "w-14 h-14 rounded-full bg-slate-900 flex items-center justify-center border border-emerald-500/20 shadow-inner";
+                    
+                    startCheckingIn(lat, lon);
+                },
+                function(error) {
+                    let msg = "Sensor error. Please permit location services.";
+                    if (error.code === error.PERMISSION_DENIED) {
+                        msg = "Check-in requires Geolocation permission to authorize visit.";
+                    }
+                    telemetryCoords.innerText = "Failed";
+                    telemetryAccuracy.innerText = "Denied";
+                    handleFail(msg);
+                },
+                { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 }
+            );
+        } else {
+            telemetryCoords.innerText = "Unsupported";
+            telemetryAccuracy.innerText = "No Sensor";
+            handleFail("Stamps verification requires a GPS-enabled browser.");
+        }
+    }
+
+    // Call Geolocation instantly on active navigation session
+    acquireGpsSignal();
+
+    // Manual button fallback / refresh handler
+    verifyManualBtn.addEventListener("click", function() {
+        verifyManualBtn.disabled = true;
+        verifyManualBtn.innerText = "Refreshing GPS...";
+        // Reset container status highlights
+        const statusContainer = document.getElementById("status-panel-container");
+        statusContainer.className = "p-4 bg-slate-900/60 border border-white/5 rounded-2xl space-y-3 transition-all duration-300";
+        acquireGpsSignal();
+    });
+
+    // Close modal redirect
+    document.getElementById("modal-close-btn").addEventListener("click", function() {
+        window.location.href = "{{ url_for('gamification.view_passport') }}";
+    });
+});
+</script>
+{% endblock %}

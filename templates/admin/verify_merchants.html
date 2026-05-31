@@ -1,0 +1,121 @@
+{% extends "admin/dashboard.html" %}
+
+{% block head %}
+{{ super() }}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/components/admin-forms.css') }}">
+{% endblock %}
+
+{% block admin_header %}
+<nav class="flex text-xs text-sky-100/60 gap-2 mb-2 uppercase tracking-widest">
+    <a href="{{ url_for('admin.manage_establishments') }}" class="hover:text-white transition-colors">Establishments</a>
+    <span>/</span>
+    <span class="text-white font-bold">Merchant Verification</span>
+</nav>
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+    <div>
+        <h1 class="text-4xl font-bold text-white mb-2">Merchant Verifications</h1>
+        <p class="text-sky-100/80 font-medium">Verify local merchant permits and activate business accounts.</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block admin_content %}
+<div class="px-6 py-8">
+    <!-- Verifications Table Card -->
+    <div class="glass-card overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left" id="verificationTable">
+                <thead>
+                    <tr class="text-sky-900/60 text-[10px] uppercase tracking-[0.2em] border-b border-sky-900/10">
+                        <th class="py-6 px-6">ID</th>
+                        <th class="py-6 px-6">Merchant Username</th>
+                        <th class="py-6 px-6">Business Permit</th>
+                        <th class="py-6 px-6">Other Documents</th>
+                        <th class="py-6 px-6">Submitted At</th>
+                        <th class="py-6 px-6">Status</th>
+                        <th class="py-6 px-6 text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="text-gray-800">
+                    {% for verification in verifications %}
+                    <tr class="border-b border-sky-900/5 hover:bg-sky-50/50 transition-colors group">
+                        <td class="py-4 px-6 font-mono text-xs">{{ verification.id }}</td>
+                        <td class="py-4 px-6">
+                            <div class="flex flex-col">
+                                <span class="font-bold text-sky-950 block">
+                                    {{ verification.user.username }}
+                                </span>
+                                <span class="text-xs text-gray-500 font-medium">{{ verification.user.email }}</span>
+                            </div>
+                        </td>
+                        <td class="py-4 px-6">
+                            {% if verification.permit_document_url %}
+                            <a href="{{ verification.permit_document_url }}" target="_blank"
+                               class="inline-flex items-center gap-2 px-3 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 rounded-lg text-xs font-bold hover:bg-emerald-500 hover:text-white transition-all">
+                                <i class="fas fa-file-pdf"></i>
+                                View Permit
+                            </a>
+                            {% else %}
+                            <span class="text-xs text-gray-400 italic">No document</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-4 px-6">
+                            {% if verification.other_document_url %}
+                            <a href="{{ verification.other_document_url }}" target="_blank"
+                               class="inline-flex items-center gap-2 px-3 py-1.5 bg-sky-500/10 border border-sky-500/20 text-sky-600 rounded-lg text-xs font-bold hover:bg-sky-500 hover:text-white transition-all">
+                                <i class="fas fa-paperclip"></i>
+                                View Other Docs
+                            </a>
+                            {% else %}
+                            <span class="text-xs text-gray-400 italic">None</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-4 px-6 text-xs text-gray-600 font-medium">
+                            {{ verification.submitted_at.strftime("%b %d, %Y - %I:%M %p") if verification.submitted_at else "N/A" }}
+                        </td>
+                        <td class="py-4 px-6">
+                            {% if verification.status == 'approved' %}
+                            <span class="px-2.5 py-1 bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 rounded-full text-[10px] uppercase font-black tracking-wider">Verified</span>
+                            {% elif verification.status == 'rejected' %}
+                            <span class="px-2.5 py-1 bg-red-500/10 text-red-500 border border-red-500/20 rounded-full text-[10px] uppercase font-black tracking-wider">Rejected</span>
+                            {% else %}
+                            <span class="px-2.5 py-1 bg-amber-500/10 text-amber-500 border border-amber-500/20 rounded-full text-[10px] uppercase font-black tracking-wider animate-pulse">Pending Review</span>
+                            {% endif %}
+                        </td>
+                        <td class="py-4 px-6 text-right">
+                            <div class="flex justify-end items-center gap-3">
+                                {% if verification.status == 'pending' %}
+                                <form action="{{ url_for('admin.approve_merchant_verification', id=verification.id) }}" method="POST" class="inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-md hover:shadow-lg">
+                                        Approve
+                                    </button>
+                                </form>
+                                <form action="{{ url_for('admin.reject_merchant_verification', id=verification.id) }}" method="POST" class="inline">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition-all shadow-md hover:shadow-lg">
+                                        Reject
+                                    </button>
+                                </form>
+                                {% else %}
+                                <span class="text-xs text-gray-500 font-medium italic">Audit Complete</span>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="py-12 text-center">
+                            <div class="flex flex-col items-center gap-3">
+                                <i class="fas fa-check-circle text-gray-300 text-4xl"></i>
+                                <span class="text-gray-500 italic">No merchant verifications found.</span>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

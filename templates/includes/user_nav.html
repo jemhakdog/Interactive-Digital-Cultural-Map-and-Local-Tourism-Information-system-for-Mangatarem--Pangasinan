@@ -29,6 +29,16 @@
     <span>My Visits</span>
 </a>
 
+<a href="{{ url_for('gamification.view_passport') }}"
+    class="flex items-center gap-2 transition-all duration-300 group {{ 'text-premium-blue font-bold' if request.endpoint == 'gamification.view_passport' else 'text-gray-300 hover:text-premium-blue' }}">
+    <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor"
+        viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 11c0 3.517-1.009 6.799-2.753 9.571m-3.44-2.04l.054-.09A13.916 13.916 0 009 11M12 11c0-2.9-1.003-5.567-2.683-7.683M12 11h.01M9 11v.01M9 11a12.02 12.02 0 00-3.44 8.041m0 0l-.054-.09M9 11c0-2.9-1.003-5.567-2.683-7.683M9 11h.01M6 11v.01M6 11a12.02 12.02 0 00-3.44 8.041m0 0l-.054-.09M6 11C6 8.1 4.997 5.433 3.317 3.317M3.317 3.317A12.02 12.02 0 016 11c0 2.9-.882 5.543-2.399 7.74M6 11H3.317"></path>
+    </svg>
+    <span>Passport</span>
+</a>
+
 <!-- More Dropdown -->
 <div class="relative user-more-dropdown" id="user-more-dropdown">
     <button type="button"

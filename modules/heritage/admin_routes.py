@@ -432,3 +432,38 @@ def admin_heritage_export_docx(profile_id):
         logging.error(f"Error generating DOCX: {e}")
         flash(f"Failed to generate export: {str(e)}")
         return redirect(url_for('admin.admin_documents'))
+
+
+# === Export to Excel ===
+
+@admin_bp.route("/heritage/export/excel/<int:profile_id>")
+@login_required
+def admin_heritage_export_excel(profile_id):
+    """Export a heritage record to NCCA Excel format using openpyxl."""
+    _require_admin()
+    
+    from models import HeritageProfile
+    from utils.heritage_registry import get_heritage_config
+    from modules.heritage.exporter import export_heritage_excel
+    
+    profile = HeritageProfile.query.get_or_404(profile_id)
+    config = get_heritage_config(profile.asset_type)
+    
+    try:
+        excel_buffer = export_heritage_excel(profile, config)
+        filename = f"NCCA_Form_{config['form']}_{profile.name_of_asset or 'Export'}.xlsx"
+        # Secure filename characters
+        safe_filename = "".join([c if c.isalnum() or c in "._-" else "_" for c in filename])
+        
+        return send_file(
+            excel_buffer,
+            download_name=safe_filename,
+            as_attachment=True,
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+    except Exception as e:
+        import logging
+        logging.error(f"Error generating Excel: {e}")
+        flash(f"Failed to generate Excel export: {str(e)}")
+        return redirect(url_for('admin.admin_heritage_dashboard'))
+

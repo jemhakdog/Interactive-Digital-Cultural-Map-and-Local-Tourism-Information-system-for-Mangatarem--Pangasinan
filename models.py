@@ -47,3 +47,7 @@ from modules.chat.models import ChatRoom, ChatParticipant, ChatMessage
 
 # === Booking Module Models ===
 from modules.booking.models import BookableAsset, BookingSlot, Reservation
+
+# === Gamification Module Models ===
+from modules.gamification.models import AchievementBadge, UserPassport, TouristCheckIn
+

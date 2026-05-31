@@ -184,13 +184,66 @@ document.addEventListener('DOMContentLoaded', function () {
         const urlParams = new URLSearchParams(window.location.search);
         const selectPlaceId = urlParams.get('select_place');
         const routeToId = urlParams.get('route_to');
+        const routeType = urlParams.get('type') || 'attraction';
 
-        console.log("🔗 [URL Params] select_place:", selectPlaceId, "route_to:", routeToId);
+        console.log("🔗 [URL Params] select_place:", selectPlaceId, "route_to:", routeToId, "type:", routeType);
+
+        if (!selectPlaceId && !routeToId) {
+            // Check if there is an active navigation target in LocalStorage to restore across refreshes!
+            const storedNav = localStorage.getItem('active_navigation_target');
+            if (storedNav) {
+                try {
+                    const navTarget = JSON.parse(storedNav);
+                    console.log("🔄 [Active Navigation] Restoring active navigation route to:", navTarget.name);
+                    
+                    const place = state.allPlaces.find(p => p.id === navTarget.id && p.type === navTarget.type);
+                    if (place) {
+                        state.selectedPlace = place;
+                        state.isNavigating = true;
+                        
+                        setTimeout(() => {
+                            flyToPlace(place);
+                            showModal(place);
+                            
+                            // Automatically start route drawing!
+                            if (!state.userLocation) {
+                                console.log("⏳ [Active Navigation] User location missing. Setting pending directions.");
+                                state.pendingDirections = place;
+                                
+                                const locateBtn = document.getElementById('search-locate-btn') || document.getElementById('locate-me-btn');
+                                if (locateBtn) {
+                                    console.log("🖱️ [Active Navigation] Triggering location fetch via button click");
+                                    locateBtn.click();
+                                }
+                            } else {
+                                getRoute(state.userLocation, {
+                                    lat: place.latitude || place.lat,
+                                    lng: place.longitude || place.lng
+                                });
+                            }
+                        }, 800);
+                        return; // Successfully restored active navigation!
+                    }
+                } catch (e) {
+                    console.error("Error parsing stored active navigation target:", e);
+                }
+            }
+
+            console.log("🔄 [URL Params] No active map parameter. Clearing stale navigation sessions.");
+            localStorage.removeItem('active_navigation_target');
+            fetch('/passport/api/stop-navigation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrfToken()
+                }
+            }).catch(err => console.error("Error clearing backend nav session:", err));
+        }
 
         if (selectPlaceId || routeToId) {
             const targetId = parseInt(selectPlaceId || routeToId);
             if (!isNaN(targetId)) {
-                let place = state.allPlaces.find(p => p.id === targetId && p.type === 'attraction');
+                let place = state.allPlaces.find(p => p.id === targetId && p.type === routeType);
                 if (!place) {
                     place = state.allPlaces.find(p => p.id === targetId);
                 }
@@ -800,6 +853,118 @@ document.addEventListener('DOMContentLoaded', function () {
             distEl.textContent = '-- KM';
             timeEl.textContent = '-- Min';
         }
+
+        // Dynamic stamp multi-tier feedback HUD
+        updateMapStampHUD(place);
+    }
+
+    function updateMapStampHUD(place) {
+        const hudEl = document.getElementById('map-stamp-hud');
+        if (!hudEl) return;
+
+        hudEl.innerHTML = '';
+        const type = (place.type === 'establishment' || ['hotel', 'restaurant', 'cafe', 'inn', 'fastfood'].includes(place.category) || place.establishment_id) ? 'establishment' : 'attraction';
+
+        // 1. Guest Mode Check
+        if (!window.USER_AUTH) {
+            hudEl.innerHTML = `
+                <div class="flex items-center gap-3 p-1">
+                    <div class="w-10 h-10 rounded-full bg-sky-50 flex items-center justify-center text-lg shrink-0">🔑</div>
+                    <div>
+                        <h4 class="text-xs font-bold text-gray-900">🔑 Unlock Travel Stamp</h4>
+                        <p class="text-[10px] text-gray-600 mt-0.5">Sign in to claim passport stamps at physical spots and earn merchant discounts!</p>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
+        // 2. Already Stamped Today Check
+        const stampedList = (type === 'establishment') ? (window.STAMPED_TODAY_ESTABLISHMENTS || []) : (window.STAMPED_TODAY_ATTRACTIONS || []);
+        const isStampedToday = stampedList.includes(place.id);
+
+        if (isStampedToday) {
+            hudEl.innerHTML = `
+                <div class="flex flex-col gap-3">
+                    <div class="flex items-center gap-3 p-1">
+                        <div class="w-10 h-10 rounded-full bg-emerald-100 border border-emerald-300 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5 text-emerald-600 animate-pulse" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-emerald-800">🏆 Passport Stamped Today!</h4>
+                            <p class="text-[10px] text-emerald-600 mt-0.5">You have checked in at this spot today. Dynamic LGU discounts are unlocked!</p>
+                        </div>
+                    </div>
+                    <a href="/passport/my-passport" class="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-center font-bold text-xs shadow-sm transition-all block no-underline">
+                        View Passport Dashboard
+                    </a>
+                </div>
+            `;
+            return;
+        }
+
+        // 3. Active Navigation check
+        if (state.isNavigating && state.selectedPlace && state.selectedPlace.id === place.id) {
+            let distMeters = 9999;
+            if (state.userLocation) {
+                const distKm = calculateDistance(
+                    state.userLocation.lat, state.userLocation.lng,
+                    place.latitude || place.lat, place.longitude || place.lng
+                );
+                distMeters = distKm * 1000;
+            }
+
+            // Proximity validation threshold (100 meters)
+            if (distMeters <= 100) {
+                hudEl.innerHTML = `
+                    <div class="flex flex-col gap-3">
+                        <div class="flex items-center gap-3 p-1">
+                            <div class="w-10 h-10 rounded-full bg-teal-100 border border-teal-300 flex items-center justify-center shrink-0">
+                                <svg class="w-5 h-5 text-teal-600 animate-bounce" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h4 class="text-xs font-bold text-teal-800">🎉 Destination Reached!</h4>
+                                <p class="text-[10px] text-teal-650 mt-0.5">You are within 100m of the spot. Tap below to scan physical QR & earn stamp!</p>
+                            </div>
+                        </div>
+                        <a href="/passport/scan/${type}/${place.id}" class="w-full py-2.5 bg-teal-600 hover:bg-teal-700 text-white rounded-xl text-center font-bold text-xs shadow-sm transition-all block animate-pulse no-underline">
+                            Claim Passport Stamp (Scan QR)
+                        </a>
+                    </div>
+                `;
+            } else {
+                hudEl.innerHTML = `
+                    <div class="flex items-center gap-3 p-1">
+                        <div class="w-10 h-10 rounded-full bg-teal-50 border border-teal-200 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5 text-teal-600 animate-spin" style="animation-duration: 4s;" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="10" stroke-dasharray="3 3"></circle>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3"></path>
+                            </svg>
+                        </div>
+                        <div>
+                            <h4 class="text-xs font-bold text-teal-700">📍 Active Route to Stamp</h4>
+                            <p class="text-[10px] text-teal-650 mt-0.5">Keep navigating! Check-in will unlock once you are within 100m. (Currently <strong>${Math.round(distMeters)}m</strong> away).</p>
+                        </div>
+                    </div>
+                `;
+            }
+            return;
+        }
+
+        // 4. Default State: Not Navigating / Locked
+        hudEl.innerHTML = `
+            <div class="flex items-center gap-3 p-1">
+                <div class="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm shrink-0">🔒</div>
+                <div>
+                    <h4 class="text-xs font-bold text-gray-800">🔒 Travel Stamp Locked</h4>
+                    <p class="text-[10px] text-gray-500 mt-0.5">To unlock this stamp, start map navigation to lock route and begin tracking.</p>
+                </div>
+            </div>
+        `;
     }
 
     function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -868,6 +1033,23 @@ document.addEventListener('DOMContentLoaded', function () {
             try {
                 state.currentNavMode = mode;
                 state.isNavigating = true;
+                if (state.selectedPlace) {
+                    const targetData = {
+                        id: state.selectedPlace.id,
+                        type: state.selectedPlace.type || 'attraction',
+                        name: state.selectedPlace.name,
+                        timestamp: Date.now()
+                    };
+                    localStorage.setItem('active_navigation_target', JSON.stringify(targetData));
+                    fetch('/passport/api/start-navigation', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCsrfToken()
+                        },
+                        body: JSON.stringify(targetData)
+                    }).catch(err => console.error("Error setting backend nav session:", err));
+                }
 
                 const profile = mode === 'driving' ? 'car' : mode === 'walking' ? 'foot' : 'bicycle';
                 // Using OSRM Public Demo Server
@@ -964,6 +1146,23 @@ document.addEventListener('DOMContentLoaded', function () {
         try {
             state.currentNavMode = mode;
             state.isNavigating = true;
+            if (state.selectedPlace) {
+                const targetData = {
+                    id: state.selectedPlace.id,
+                    type: state.selectedPlace.type || 'attraction',
+                    name: state.selectedPlace.name,
+                    timestamp: Date.now()
+                };
+                localStorage.setItem('active_navigation_target', JSON.stringify(targetData));
+                fetch('/passport/api/start-navigation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken()
+                    },
+                    body: JSON.stringify(targetData)
+                }).catch(err => console.error("Error setting backend nav session:", err));
+            }
             
             const profile = mode === 'driving' ? 'driving' : mode === 'walking' ? 'walking' : 'cycling';
             const url = `https://api.mapbox.com/directions/v5/mapbox/${profile}/${origin.lng},${origin.lat};${destination.lng},${destination.lat}?steps=true&geometries=geojson&access_token=${mapboxgl.accessToken}`;
@@ -1140,6 +1339,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 
                 state.isNavigating = false;
+                localStorage.removeItem('active_navigation_target');
+                fetch('/passport/api/stop-navigation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken()
+                    }
+                }).catch(err => console.error("Error clearing backend nav session:", err));
 
                 // Hide the place stats so "Start Navigation" button disappears
                 const statsEl = document.getElementById('place-stats');
