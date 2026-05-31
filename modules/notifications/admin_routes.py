@@ -92,7 +92,8 @@ def compose():
                 history_entry = NewsletterHistory(
                     subject=subject,
                     content=content,
-                    recipient_count=success_count
+                    recipient_count=success_count,
+                    sender_id=current_user.id
                 )
                 db.session.add(history_entry)
                 db.session.commit()

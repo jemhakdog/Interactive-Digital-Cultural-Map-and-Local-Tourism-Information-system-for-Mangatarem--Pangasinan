@@ -1,0 +1,227 @@
+erDiagram
+    USER {
+        int id PK
+        string username
+        string email
+        string password_hash
+        string role
+        string barangay
+        bool is_approved
+    }
+
+    PASSWORD_RESET_TOKEN {
+        int id PK
+        int user_id FK
+        string token
+        datetime expires_at
+        bool used
+        datetime created_at
+    }
+
+    NEWSLETTER_SUBSCRIBER {
+        int id PK
+        string email
+        bool is_active
+        int user_id FK
+        datetime created_at
+    }
+
+    NEWSLETTER_HISTORY {
+        int id PK
+        string subject
+        text content
+        int recipient_count
+        int sender_id FK
+        datetime sent_at
+    }
+
+    BARANGAY_INFO {
+        int id PK
+        string barangay_name
+        text history
+        text cultural_assets
+        text traditions
+        text local_practices
+        text unique_features
+        int user_id FK
+        datetime updated_at
+    }
+
+    ATTRACTION {
+        int id PK
+        string name
+        text description
+        string category
+        string barangay
+        float lat
+        float lng
+        string image_url
+        string status
+        int user_id FK
+        int reviewed_by_id FK
+        datetime reviewed_at
+        datetime created_at
+        int heritage_profile_id FK
+    }
+
+    HERITAGE_PROFILE {
+        int id PK
+        string asset_type
+        string mapper_name
+        date date_profiled
+        string status
+        int user_id FK
+        int reviewed_by_id FK
+        datetime reviewed_at
+        datetime created_at
+        json key_informants
+        text reference_sources
+        text significance
+        text constraints_threats
+        text conservation_measures
+        string common_photo_url
+    }
+
+    EVENT {
+        int id PK
+        string title
+        text description
+        datetime date
+        string location
+        string barangay
+        string image_url
+        int user_id FK
+        string status
+        string category
+        int reviewed_by_id FK
+        datetime reviewed_at
+        datetime created_at
+    }
+
+    GALLERY_ITEM {
+        int id PK
+        string type
+        string url
+        string caption
+        int user_id FK
+        string status
+        int reviewed_by_id FK
+        datetime reviewed_at
+        datetime uploaded_at
+    }
+
+    ESTABLISHMENT {
+        int id PK
+        int owner_id FK
+        string name
+        string type
+        text description
+        string address
+        float latitude
+        float longitude
+        int barangay_id FK
+        string contact_number
+        string email
+        string website
+        json operating_hours
+        string price_range
+        json amenities
+        string cover_image_url
+        string logo_url
+        string status
+        bool is_featured
+        float rating_avg
+        int review_count
+        datetime created_at
+        geometry geom
+    }
+
+    ESTABLISHMENT_ROOM {
+        int id PK
+        int establishment_id FK
+        string name
+        text description
+        float price_per_night
+        int capacity
+        json amenities
+        json image_urls
+        bool is_available
+        datetime created_at
+    }
+
+    ESTABLISHMENT_MENU_ITEM {
+        int id PK
+        int establishment_id FK
+        string name
+        text description
+        float price
+        string category
+        string image_url
+        bool is_available
+        bool is_bestseller
+        datetime created_at
+    }
+
+    VISITOR_LOG {
+        int id PK
+        string target_type
+        int target_id
+        int visitor_count
+        string visitor_name
+        int visitor_age
+        string visitor_address
+        bool is_system_user
+        date visit_date
+        int logged_by_id FK
+        int visitor_user_id FK
+        text notes
+        datetime created_at
+    }
+
+    DATABASE_AUDIT_LOG {
+        int id PK
+        int user_id FK
+        string action
+        string table_name
+        int record_id
+        string ip_address
+        string user_agent
+        string query_summary
+        string status
+        datetime created_at
+    }
+
+    ANALYTICS_PAGE_VIEW {
+        int id PK
+        string view_type
+        int item_id
+        string page_name
+        datetime timestamp
+        int user_id FK
+    }
+
+    REVIEW_PHOTO {
+        int id PK
+        int review_id FK
+        string url
+        datetime created_at
+    }
+
+    %% Relationships reflecting clean Draw.io structured links
+    USER ||--o{ PASSWORD_RESET_TOKEN : "owns"
+    USER ||--o{ ATTRACTION : "creates"
+    USER ||--o{ EVENT : "creates"
+    USER ||--o{ GALLERY_ITEM : "uploads"
+    USER ||--o{ ESTABLISHMENT : "owns"
+    USER ||--o{ VISITOR_LOG : "logs"
+    USER ||--o{ DATABASE_AUDIT_LOG : "triggers"
+    USER ||--o{ ANALYTICS_PAGE_VIEW : "triggers"
+    USER ||--o{ HERITAGE_PROFILE : "maps"
+    USER ||--o{ NEWSLETTER_SUBSCRIBER : "subscribes"
+    USER ||--o{ NEWSLETTER_HISTORY : "sends"
+
+    HERITAGE_PROFILE ||--o{ ATTRACTION : "links"
+    BARANGAY_INFO ||--o{ ESTABLISHMENT : "located_in"
+    ESTABLISHMENT ||--o{ ESTABLISHMENT_ROOM : "contains"
+    ESTABLISHMENT ||--o{ ESTABLISHMENT_MENU_ITEM : "serves"
+    ATTRACTION ||--o{ REVIEW_PHOTO : "photos"

@@ -269,13 +269,17 @@ def post_review(id):
     # Save uploaded photos immediately (no moderation)
     photo_files = request.files.getlist("photos")
     saved_photos = 0
+    temp_urls = []
     for photo in photo_files[:5]:  # max 5 photos
         if not photo or not photo.filename:
             continue
         url = save_uploaded_file(photo)
         if url:
-            db.session.add(ReviewPhoto(review_id=review.id, url=url))
+            temp_urls.append(url)
             saved_photos += 1
+            
+    if temp_urls:
+        review.photo_urls = temp_urls
 
     db.session.commit()
 

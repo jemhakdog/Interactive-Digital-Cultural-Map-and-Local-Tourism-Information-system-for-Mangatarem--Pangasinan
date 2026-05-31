@@ -46,9 +46,16 @@ def forgot_password_view():
     return render_template("auth/forgot_password.html")
 
 def _validate_reset_token(token_str: str) -> "PasswordResetToken | None":
-    record = PasswordResetToken.query.filter_by(token=token_str).first()
-    if record and record.is_valid:
-        return record
+    user = User.query.filter_by(reset_token=token_str).first()
+    if user:
+        record = PasswordResetToken(
+            user=user,
+            token=user.reset_token,
+            expires_at=user.reset_token_expires_at,
+            used=user.reset_token_used
+        )
+        if record.is_valid:
+            return record
     return None
 
 def reset_password_view(token: str):

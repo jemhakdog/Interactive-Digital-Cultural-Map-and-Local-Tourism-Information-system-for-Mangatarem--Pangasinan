@@ -16,12 +16,18 @@ def subscribe():
     Handle newsletter subscription requests.
     """
     email = request.validated_data['email']
+    from modules.auth.models import User
+    
+    # Check if user exists to link to subscription
+    user = User.query.filter_by(email=email).first()
+    user_id = user.id if user else None
     
     # Check if already subscribed
     existing = NewsletterSubscriber.query.filter_by(email=email).first()
     if existing:
-        if not existing.is_active:
+        if not existing.is_active or existing.user_id != user_id:
             existing.is_active = True
+            existing.user_id = user_id
             db.session.commit()
             
             try:
@@ -42,7 +48,7 @@ def subscribe():
 
     # Create new subscriber
     try:
-        new_subscriber = NewsletterSubscriber(email=email)
+        new_subscriber = NewsletterSubscriber(email=email, user_id=user_id)
         db.session.add(new_subscriber)
         db.session.commit()
         

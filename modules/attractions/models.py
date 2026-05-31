@@ -100,7 +100,7 @@ class Review(db.Model):
     user = db.relationship('User', backref=db.backref('reviews', lazy='dynamic'))
     attraction = db.relationship('Attraction', backref=db.backref('reviews', lazy='dynamic'))
     
-    photos = db.relationship('ReviewPhoto', backref='review', lazy='dynamic', cascade='all, delete-orphan')
+    photo_urls = db.Column(db.JSON, nullable=True, default=list)
 
     # Self-referential relationship for nested comment replies
     replies = db.relationship(
@@ -118,6 +118,17 @@ class Review(db.Model):
         ),
     )
 
+    @property
+    def photos(self):
+        """Simulate the legacy ReviewPhoto table so existing WTForms, seed scripts, and templates do not break."""
+        class LegacyPhotosQuery:
+            def __init__(self, review):
+                self.review = review
+            def all(self):
+                urls = self.review.photo_urls or []
+                return [ReviewPhoto(hash(url) & 0xffffffff, self.review.id, url) for url in urls]
+        return LegacyPhotosQuery(self)
+
     def to_dict(self):
         return {
             'id': self.id,
@@ -134,13 +145,13 @@ class Review(db.Model):
         }
 
 
-class ReviewPhoto(db.Model):
-    """Photos attached to a user review. No moderation — posted immediately."""
-    __tablename__ = 'REVIEW_PHOTO'
-    id = db.Column(db.Integer, primary_key=True)
-    review_id = db.Column(db.Integer, db.ForeignKey('REVIEW.id', ondelete='CASCADE'), nullable=False, index=True)
-    url = db.Column(db.String(500), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+class ReviewPhoto(object):
+    """Legacy compatibility class to simulate review photos without a separate database table."""
+    def __init__(self, id, review_id, url, created_at=None):
+        self.id = id
+        self.review_id = review_id
+        self.url = url
+        self.created_at = created_at or datetime.utcnow()
 
     def to_dict(self):
         return {

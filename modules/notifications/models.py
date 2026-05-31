@@ -7,8 +7,11 @@ class NewsletterSubscriber(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False, index=True)
     is_active = db.Column(db.Boolean, default=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('USER.id', ondelete='SET NULL'), nullable=True, index=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     
+    user = db.relationship('User', backref=db.backref('newsletter_subscriptions', lazy='dynamic'))
+
     def __repr__(self):
         return f'<NewsletterSubscriber {self.email}>'
 
@@ -19,7 +22,10 @@ class NewsletterHistory(db.Model):
     subject = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
     recipient_count = db.Column(db.Integer, default=0)
+    sender_id = db.Column(db.Integer, db.ForeignKey('USER.id', ondelete='SET NULL'), nullable=True, index=True)
     sent_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    sender = db.relationship('User', backref=db.backref('sent_newsletters', lazy='dynamic'))
 
     def __repr__(self):
         return f'<NewsletterHistory {self.subject}>'
