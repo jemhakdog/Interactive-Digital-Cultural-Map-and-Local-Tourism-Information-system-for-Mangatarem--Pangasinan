@@ -4,79 +4,46 @@ This chapter presents the comprehensive results of the design, development, and 
 
 ## Proposed System Flowchart
 
-The operational workflow of the Interactive Digital Cultural Map and Local Tourism Information System is formalized through a centralized, multi-role system flowchart. Within the context of the Rapid Application Development (RAD) methodology, this flowchart serves as a critical blueprint for aligning functional capabilities with stakeholder expectations during rapid iterations. By mapping the logical pathways of distinct actor groups, the flowchart visualizes the transition from fragmented, legacy manual processes to a synchronized, community-driven digital ecosystem.
+**Cultural Mapping and Content Moderation (LGU Workflow) Flowchart**
+The system workflow begins when a user initiates a session by accessing the digital web portal, prompting the main interactive map interface to load. For a Public Visitor, the workflow moves into the searching and filtering categories module, where they can refine their view by cultural categories or specific barangay boundaries. The system then processes this request to explore the interactive map, pulling data dynamically from the database to render custom visual pins directly on the screen. When a visitor clicks a pin to view attraction details, the system retrieves the full profile—complete with descriptions, hours, and photos—from the database repository. Finally, visitors can leave reviews or interactive feedback, which the system processes and immediately saves to update the live feed.
 
-The system flowchart is architecturally divided into three role-based user lanes (Swimlanes) and a unified database processing engine, isolating security boundaries and operational concerns. This design guarantees strict data governance, where grassroots data capture is verified through administrative oversight before public exposure.
+**Barangay Representative Flowchart**
+For the Barangay Representative, the workflow begins with a secure login process that verifies their identity before granting access to their specialized Barangay Dashboard. From this workspace, representatives can digitally fill out heritage forms 01–07 using standard inventory layouts and upload associated photos or videos. Once they submit the asset for review, the workflow saves the submission under a "Pending" status within the Supabase database. This triggers the Tourism Office Admin workflow, where an administrator logs into the system with high-privilege credentials to access the central Admin Dashboard and review pending submissions.
 
+**Tourism Office Admin (Admin) Flowchart**
+The system then encounters a crucial administrative decision point: verifying if the asset meets official standards. If the coordinates or details are incorrect, the admin rejects the submission, attaches explanatory notes, and loops the workflow back to the representative's dashboard for correction. If the submission passes verification, the admin approves and publishes the asset; the system instantly changes its status to "Approved," updates the central mapping engine, and renders the new pin on the public map interface to complete the operational workflow.
 
+## System Features and User Interface Discussion
 
-### Operational Swimlanes and Actor Roles
+This section details the core functionalities of the Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan based on the defined data flow processes. The platform is designed with a role-based architecture to ensure data security, operational efficiency, and a streamlined workflow. Access is strictly divided between authorized personnel specifically the System Administrator and the Barangay Representative, alongside the public-facing interfaces designed for the General Public/Tourists and Academic Researchers.
 
-The workflow partitions responsibilities across four vertical channels to ensure security, usability, and data integrity:
+### Administrator
 
-1. **General Public and Academic Users (Visitor Lane)** – Represents the high-concurrency consumer tier. Public users browse the georeferenced municipal map, apply spatial filters to locate attractions, and access verified historical records. Additionally, authenticated public users can submit interactive feedback and reviews for establishments, pushing user-generated ratings to the system database.
-2. **Barangay Representatives (Contributor Lane)** – Represents the grassroots data stewardship tier. Contributor accounts are restricted to a single verified representative per barangay. Representatives digitize primary-source historical data, upload local photos, and submit heritage profiles directly through the contributor portal.
-3. **LGU Tourism Office Administrators (Admin Lane)** – Represents the administrative moderation and quality assurance tier. Administrators possess high-privilege access to oversee user accounts, publish municipal-wide tourism announcements, and qualitative audits. They manage the moderation queue to verify and authorize all submissions.
-4. **Database and Mapping Engine (System Lane)** – Serves as the central repository and transaction coordinator. It manages persistent storage, validates spatial boundaries, records action logs to the database audit registry, and executes PostGIS vector tile generation to serve dynamic map pins to client interfaces.
+![Admin Dashboard](../screenshots/dashboard.png)
+**Figure 3.2** Admin Dashboard
 
-### Alphanumeric Step-by-Step Workflow Path Mapping
+The Administrator (LGU Tourism Office Staff) holds the highest level of control within the system and is primarily responsible for governance, validation, and access control. This feature enables the Administrator to review and verify newly submitted cultural heritage profiles and media assets. This includes validating submitted geographic coordinates, NCCA Forms 01–07 data layouts, and uploaded documents/photos before granting system access or publishing them to the public map. The Administrator manages the moderation queue, approves valid submissions to render them instantly on the public map, or rejects incorrect submissions with descriptive feedback notes routed back to the contributor's dashboard.
 
-The precise sequential interactions mapped across the proposed system flowchart are structured as follows:
+### Barangay Representative
 
-* **General Visitor Workflow Path (V1–V5):**
-  * **V1: Access Web Portal**: The visitor initiates a secure web session, loading the public portal containing the map atlas.
-  * **V2: Search & Filter Categories**: The visitor applies dynamic taxonomic queries (e.g., natural heritage, built heritage, intangible cultural assets) or filters by barangay boundary.
-  * **V3: Explore Interactive Map**: The map coordinates with the backend to render georeferenced visual pins dynamically on the Mapbox GL JS map canvas.
-  * **V4: View Attraction/Establishment Details**: Clicking a pin fetches detailed profiles from the database, rendering historical narratives, operating statuses, business menus, and accommodation configurations.
-  * **V5: Leave Review / Interactive Feedback**: Authenticated visitors submit community ratings, reviews, and validating media, pushing new interactive feedback to the database engine.
-* **Barangay Contributor Workflow Path (C1–C5):**
-  * **C1: Secure Login**: The contributor authenticates via a Flask-Login form utilizing secure cookie validation.
-  * **C2: Access Barangay Dashboard**: The system redirects the user to their designated dashboard, exposing local stewardship progress metrics.
-  * **C3: Digitally Fill Heritage Forms 01–07**: The contributor inputs structured primary-source data conforming to the national cultural heritage inventory protocols.
-  * **C4: Upload Photos & Media Assets**: The contributor attaches high-resolution photography and documents to serve as evidentiary support for the heritage profile.
-  * **C5: Submit Asset for Review**: Committing the form triggers a transactional save, marking the asset's state as `PENDING` and queuing it in the moderation queue.
-* **Tourism Office Admin Workflow Path (A1–A6):**
-  * **A1: Secure Login (Admin)**: The administrator authenticates via a high-privilege credentials form.
-  * **A2: Access Admin Dashboard**: The admin views active system metrics, active session logs, page views, establishment updates, and the pending moderation queue.
-  * **A3: Review Pending Submissions**: The administrator retrieves queued entries from the moderation queue.
-  * **A4: Decision Gate (Meets Standards?)**: The administrator conducts a qualitative audit of the metadata, geo-coordinates, and media assets.
-  * **A5: Approve & Publish (Yes Branch)**: If the asset meets requirements, the admin approves it. The database updates the state to `APPROVED`, and the mapping engine immediately renders the pin to the general public.
-  * **A6: Reject & Send Feedback (No Branch)**: If the asset fails audits, the admin rejects it, logs detailed correction requests, and routes it back to the respective contributor dashboard in a `REJECTED` state for rectification.
-* **Database and Mapping Engine System Path (DB1):**
-  * **DB1: PostgreSQL & Mapbox Vector Tiles**: Implements strict validation constraints, logs transaction records to the `DATABASE_AUDIT_LOG`, updates caching via Upstash Redis, and serves optimized vector tiles via PostGIS `ST_AsMVT` to visitor interfaces.
+![Login Portal](../screenshots/login.png)
+**Figure 3.3** Login Portal
 
-### Core Pipelines of the System Flow
+The Barangay Representative (Contributor) serves as the grassroots data steward responsible for digitizing and maintaining the local cultural inventory of their specific jurisdiction. This feature enables the representative to digitally fill out NCCA heritage forms 01–07 and upload associated photos or videos. Once submitted, the system saves the record under a "Pending" status in the database and queues it for administrative review. Representatives can track their submissions' moderation status in real time and edit rejected assets based on administrative feedback comments.
 
-The operational workflow transitions through four critical pipelines designed to automate spatial rendering and prevent unauthorized data modifications:
+### Public User (Tourists / Visitors)
 
-1. **Data Ingestion Pipeline** – Coordinates how incoming data from forms (Jinja2 templates, Flask-WTF validation, and secure upload handlers) is accepted, parsed for geographic coordinates, and written to database tables.
-2. **Moderation Queue Pipeline** – Restricts public database queries to only retrieve rows whose status is explicitly marked as `APPROVED`. New contributions from Barangay Representatives are locked in a `PENDING` state, isolated from the public atlas.
-3. **Administrative Review Pipeline** – Empowers the LGU Tourism Office with a consolidated moderation portal. The system generates detailed comparison diffs, allowing admins to inspect submitted coordinates against physical boundaries before committing.
-4. **Public Publication Pipeline** – Automates the transition of verified data to public visualization. Once approved, caching layers are invalidated, and the new georeferenced coordinates are fed into the Mapbox Vector Tile generation script, achieving real-time, low-latency pin rendering.
+![Home Page](../screenshots/homepage.png)
+**Figure 3.4** Home Page
 
-## System Features and User Interfaces
+The Public User represents the high-concurrency consumer tier, accessing the public-facing interfaces designed for tourism discovery and exploration. This feature provides a dynamic, full-screen map canvas (utilizing Mapbox GL JS) displaying custom vector tiles. Public users can browse georeferenced pins representing cultural landmarks, apply taxonomic category filters, view attraction details (including historical narratives, operating hours, and photos), and submit community ratings or reviews that are saved directly to update the live public feed.
 
-The structural capabilities of the Interactive Digital Cultural Map and Local Tourism Information System are rigidly organized around the access privileges and operational requirements of its four primary user roles:
+![Interactive Map](../screenshots/map.png)
+**Figure 3.5** Interactive Map
 
-### 1. System Administrator (Tourism Office Staff / IT Staff)
-The System Administrator holds the highest level of administrative control and is primarily responsible for system governance, validation, and access control.
-- **Content Moderation Module**: A centralized, high-privilege moderation dashboard where administrators retrieve, review, and evaluate pending cultural profiles and media uploads submitted by contributors. The module provides a comparison diff interface and a single-click action to approve and publish the georeferenced coordinates to the public map, or reject the submission and log specific correction notes.
-- **User Account Management**: Tools to manage system credentials, verify new contributor profiles, and grant or revoke access privileges to maintain platform integrity.
-- **Global Settings and System Auditing**: Access to system-wide audit registries (`DATABASE_AUDIT_LOG`) to monitor modification histories, configure global mapping boundaries, and publish LGU notices.
+The interactive map interface provides users with an immersive, full-screen geospatial canvas to explore georeferenced cultural heritage sites and attractions across the municipality.
 
-### 2. Barangay Representative (Contributor)
-The Barangay Representative serves as the grassroots data contributor, responsible for digitizing and maintaining the local cultural inventory of their specific jurisdiction.
-- **Grassroots Submission Portal**: A secure dashboard restricted to a single verified contributor per barangay, enabling them to draft and submit cultural profiles. The portal provides standardized digital forms matching national NCCA heritage formats.
-- **Media Upload Module**: Integrated drag-and-drop secure media handlers to upload high-resolution photography and supporting documents, automatically generating relational links to parent heritage profiles.
-- **Status and Revision Tracker**: A progress dashboard displaying the real-time moderation status of their submissions (`PENDING`, `APPROVED`, `REJECTED`). If a submission is rejected, the tracker displays the admin's correction notes, allowing the contributor to edit and resubmit.
-
-### 3. Public User (Tourists / Visitors)
-This tier represents the primary public consumer interface, designed with a focus on responsive UI/UX to encourage tourism discovery.
-- **Georeferenced Map Canvas**: A dynamic, full-screen map interface (utilizing Mapbox GL JS) displaying custom vector tiles. Public users browse georeferenced pins representing natural heritage sites, local landmarks, and events.
-- **Taxonomic Filtering Module**: Advanced filter pickers allowing visitors to segment map pins by category (e.g., historical spots, eco-tourism, local festivals) or filter pins within specific barangay boundaries.
-- **Establishment Review and Caching Engine**: Clicking a pin renders a detailed pop-up display with narratives, menu options, or lodging details. Authenticated visitors can submit reviews, ratings, and validation photos, which are processed via an automated validation pipeline.
-
-### 4. Students and Researchers (Academic Users)
+### Students and Researchers (Academic Users)
 Designed specifically to support the academic community, this module provides structured, query-optimized search paths to retrieve cultural and historical archives.
 - **Digital Cultural Atlas**: A search-optimized digital database registry providing academic users with comprehensive, read-only access to digitized barangay profiles, historical archives, and traditional heritage accounts.
 - **Municipal Archives Retrieval Engine**: A query pipeline allowing researchers to filter the municipal archives by era, category, or keyword, rendering standardized heritage records for academic reference and data gathering, aligned with the primary LGU document repository.
