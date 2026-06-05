@@ -32,17 +32,17 @@
 - Developed `generate_dfd_v5.py` to arrange one massive System Hub box in the center, 15 sub-processes in a surrounding rectangular ring, 16 localized database datastores directly adjacent/underneath their active processes, and external actors on the far perimeter grid coordinates.
 - Successfully compiled the generator script using the local virtual environment Python interpreter with well-formed, valid Draw.io XML outputs.
 - Chronologically refactored sequential DFD Level-1 diagram (`dfd-level-1-clean_v4.drawio`) Sequential Processes `1.0` through `15.0` to match Option A user-journey sequence.
-- Programmatically optimized datastore and entity duplications down Column 1 and Y-axis horizontal grid alignment.
+- Overhauled the root `README.md` to properly document the Mangatarem Interactive Digital Cultural Map system, tech stack, and setup commands, replacing the generic template contents.
+- Performed a codebase cleanup, removing obsolete database diagram layout scripts, old web scraping/seeding helpers, temporary logs, and duplicated dependency files.
 
 ## Current
 
-
-- Travel passport stamp visibility widget layout and map bottom sheet real-time feedback completely integrated and verified.
-- Persistence and route lock recovery across refreshes fully operational.
+- System documentation updated to describe the actual Mangatarem Cultural Map and local tourism directory.
+- Codebase structure clean, with all temporary helper files and diagnostic logs removed.
 
 ## Next
 
-- Optimize PWA service worker asset pre-caching.
+- Commit changes to the Git repository.
 
 ## Blockers
 

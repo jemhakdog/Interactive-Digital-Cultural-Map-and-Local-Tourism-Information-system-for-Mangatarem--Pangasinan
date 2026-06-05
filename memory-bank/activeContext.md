@@ -2,10 +2,13 @@
 
 ## Current focus
 
-- Maintaining and extending the interactive gamification system, specifically improving travel passport stamp check-in visibility, logical route gating, and browser refresh state persistence.
-- Ensuring seamless offline-first PWA assets, biophilic bi-column sidebar detail views, and real-time Leaflet/Mapbox selected place telemetry.
+- Finalizing the repository state for commit after updating the project documentation and performing a directory cleanup.
 
 ## Recent changes
+
+- **README Overhaul & Codebase Cleanup:**
+  - Overhauled the root `README.md` to document the actual **Mangatarem Interactive Digital Cultural Map & Local Tourism Information System**, replacing generic AI template instructions. Detailed its key modules, tech stack (Flask, Socket.io, SQLAlchemy, Tailwind CSS, Redis, Supabase, uv), and security features.
+  - Cleaned up the root and scripts folders by deleting obsolete ERD scripts, temporary logs, old data scrapers/seeds, and misspelled files (`requirments.txt`), leaving only clean, functional assets.
 
 - **Programmatic Consolidated DFD Layout Snapping (V5):**
   - Developed `generate_dfd_v5.py` to programmatically build a consolidated circular Level 1 Hub-and-Spoke DFD (`dfd-level-1-clean_v5.drawio` and `dfd-level-0_v5.drawio`), perfectly copying the design of Figure 2.3.
@@ -39,4 +42,4 @@
 
 ## Next step
 
-- Verify and optimize PWA service worker caching rules for the dynamic map vectors and passport dashboard check-ins.
+- Commit changes to the Git repository.
