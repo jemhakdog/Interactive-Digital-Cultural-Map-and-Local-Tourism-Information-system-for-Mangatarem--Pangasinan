@@ -166,7 +166,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </section>
 
 <!-- Stats Strip -->
-<div class="relative z-20 -mt-10 mb-20">
+<div class="relative z-20 -mt-8 mb-20">
     <div class="container mx-auto px-6">
         <div
             class="bg-white p-8 md:p-12 rounded-[2rem] shadow-forest flex flex-wrap justify-around gap-12 border border-white/50 relative z-20 overflow-hidden">
@@ -194,7 +194,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!-- Spotlight Section - Horizontal Cards -->
 <section id="featured" class="py-24 bg-heritage-cream paper-texture overflow-hidden">
     <div class="container mx-auto px-6">
-        <div class="flex items-end justify-between mb-10">
+        <div class="flex items-end justify-between mb-8">
             <div data-aos="fade-right">
                 <span class="spotlight-label">Featured</span>
                 <h2 class="spotlight-title">Heritage Spotlight</h2>
@@ -265,16 +265,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 <img src="{{ url_for('static', filename='img/st_raymund_church.webp') }}" alt="Heritage Walk"
                     class="w-full h-full object-cover spotlight-img reveal-img" loading="lazy" decoding="async">
                 <div
-                    class="absolute inset-0 bg-sapphire-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-10 z-20">
+                    class="absolute inset-0 bg-sapphire-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8 z-20">
                     <span class="source-code-label !text-premium-blue mb-2">History & Architecture</span>
                     <h3 class="text-3xl font-bold text-white font-display mb-4">The Heritage Walk</h3>
                     <p class="text-silver-teal mb-8 font-light">Explore centuries-old structures that tell the story
                         of our town's Spanish colonial legacy.</p>
                     <a href="{{ url_for('public.map_view') }}"
-                        class="btn-pill-primary !py-3 !text-sm w-max group">Start Journey</a>
+                        class="btn-pill-primary !py-2 !text-sm w-max group">Start Journey</a>
                 </div>
                 <div class="absolute bottom-6 left-6 right-6 group-hover:opacity-0 transition-opacity duration-300 z-10">
-                    <div class="bg-sapphire-black/75 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10 w-fit shadow-2xl flex items-center gap-3">
+                    <div class="bg-sapphire-black/75 backdrop-blur-md px-6 py-2 rounded-2xl border border-white/10 w-fit shadow-2xl flex items-center gap-2">
                         <h3 class="text-xl font-bold text-white font-display tracking-wide">Heritage Walk</h3>
                         <svg class="w-4 h-4 text-accent animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
@@ -288,16 +288,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 <img src="{{ url_for('static', filename='img/manleluag_spring.webp') }}" alt="Eco-Trail"
                     class="w-full h-full object-cover spotlight-img reveal-img" loading="lazy" decoding="async">
                 <div
-                    class="absolute inset-0 bg-sapphire-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-10 z-20">
+                    class="absolute inset-0 bg-sapphire-black/80 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex flex-col justify-end p-8 z-20">
                     <span class="source-code-label !text-premium-blue mb-2">Nature & Expedition</span>
                     <h3 class="text-3xl font-bold text-white font-display mb-4">The Eco-Trail</h3>
                     <p class="text-silver-teal mb-8 font-light">Immerse yourself in lush forests and therapeutic hot
                         springs at Manleluag Spring National Park.</p>
                     <a href="{{ url_for('public.map_view') }}"
-                        class="btn-pill-primary !py-3 !text-sm w-max group">Plan Your Trek</a>
+                        class="btn-pill-primary !py-2 !text-sm w-max group">Plan Your Trek</a>
                 </div>
                 <div class="absolute bottom-6 left-6 right-6 group-hover:opacity-0 transition-opacity duration-300 z-10">
-                    <div class="bg-sapphire-black/75 backdrop-blur-md px-6 py-3 rounded-2xl border border-white/10 w-fit shadow-2xl flex items-center gap-3">
+                    <div class="bg-sapphire-black/75 backdrop-blur-md px-6 py-2 rounded-2xl border border-white/10 w-fit shadow-2xl flex items-center gap-2">
                         <h3 class="text-xl font-bold text-white font-display tracking-wide">Eco-Trail</h3>
                         <svg class="w-4 h-4 text-accent animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
@@ -331,14 +331,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         <img src="{{ est.cover_image_url or url_for('static', filename='img/placeholder.jpg') }}" 
                              alt="{{ est.name }}" 
                              class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700">
-                        <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-4 py-1.5 rounded-full text-[10px] font-bold text-sapphire-black uppercase tracking-widest shadow-sm border border-slate-900/5">
+                        <div class="absolute top-4 left-4 bg-white/90 backdrop-blur-md px-4 py-1 rounded-full text-[10px] font-bold text-sapphire-black uppercase tracking-widest shadow-sm border border-slate-900/5">
                              {{ est.type }}
                         </div>
                     </div>
                     <div class="px-2 pb-2">
-                        <div class="flex justify-between items-start mb-3 gap-2">
+                        <div class="flex justify-between items-start mb-2 gap-2">
                             <h3 class="text-xl font-bold text-sapphire-black group-hover:text-royal-blue transition-colors leading-tight font-display">{{ est.name }}</h3>
-                            <div class="flex items-center gap-1 text-amber-600 bg-amber-50 px-2.5 py-1 rounded-full text-xs font-bold shadow-sm border border-amber-200/50 shrink-0">
+                            <div class="flex items-center gap-1 text-amber-600 bg-amber-50 px-2 py-1 rounded-full text-xs font-bold shadow-sm border border-amber-200/50 shrink-0">
                                 <svg class="w-3 h-3 fill-current" viewBox="0 0 20 20" aria-hidden="true">
                                     <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                                 </svg>
@@ -350,7 +350,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 </div>
                 <div class="px-2 pb-2 flex justify-between items-center border-t border-slate-50 pt-4 mt-auto">
                     <span class="text-[11px] font-bold text-royal-blue uppercase tracking-wider">{{ est.barangay }}</span>
-                    <a href="{{ url_for('public.map_view') }}" class="text-sm font-bold text-sapphire-black hover:text-accent transition-colors flex items-center gap-1.5 group/locate">
+                    <a href="{{ url_for('public.map_view') }}" class="text-sm font-bold text-sapphire-black hover:text-accent transition-colors flex items-center gap-2 group/locate">
                         <span>Locate</span>
                         <svg class="w-4 h-4 transform group-hover/locate:translate-x-1 transition-transform text-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
@@ -378,21 +378,21 @@ document.addEventListener('DOMContentLoaded', function() {
             <h2 class="text-4xl font-bold text-sapphire-black font-display mb-8">How to explore?</h2>
             
             <div class="space-y-8">
-                <div class="flex gap-6">
+                <div class="flex gap-4">
                     <div class="w-12 h-12 bg-sky-100 rounded-2xl flex items-center justify-center text-sky-700 flex-shrink-0 font-bold">1</div>
                     <div>
                         <h4 class="font-bold text-lg text-sapphire-black mb-1">Interactive Layers</h4>
                         <p class="text-teal-gray font-light">Toggle between Heritage Sites, Nature spots, and Local Businesses using the sidebar tabs.</p>
                     </div>
                 </div>
-                <div class="flex gap-6">
+                <div class="flex gap-4">
                     <div class="w-12 h-12 bg-amber-100 rounded-2xl flex items-center justify-center text-amber-700 flex-shrink-0 font-bold">2</div>
                     <div>
                         <h4 class="font-bold text-lg text-sapphire-black mb-1">Smart "Near Me"</h4>
                         <p class="text-teal-gray font-light">Use the "Find Nearest" buttons to instantly locate coffee shops or food hubs near your GPS location.</p>
                     </div>
                 </div>
-                <div class="flex gap-6">
+                <div class="flex gap-4">
                     <div class="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-700 flex-shrink-0 font-bold">3</div>
                     <div>
                         <h4 class="font-bold text-lg text-sapphire-black mb-1">Tailored Routes</h4>
@@ -409,7 +409,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </div>
 
 <!-- Floating Guide Button -->
-<button onclick="toggleGuide()" class="fixed bottom-10 right-10 z-[90] bg-sapphire-black text-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-3 hover:scale-110 transition-all active:scale-95 group">
+<button onclick="toggleGuide()" class="fixed bottom-8 right-8 z-[90] bg-sapphire-black text-white px-6 py-4 rounded-full shadow-2xl flex items-center gap-3 hover:scale-110 transition-all active:scale-95 group">
     <div class="w-8 h-8 bg-sky-500 rounded-full flex items-center justify-center text-xs font-bold group-hover:rotate-12 transition-transform">?</div>
     <span class="text-sm font-bold tracking-tight">Quick Guide</span>
 </button>
@@ -470,53 +470,14 @@ function toggleGuide() {
     </div>
 </section>
 
-<!-- Community & Events Bento -->
-<section class="py-24 bg-heritage-cream paper-texture">
-    <div class="container mx-auto px-6">
-        <div class="bento-grid">
-            <!-- Events Card -->
-            <div class="col-span-2 row-span-2 bg-white p-12 border-l-8 border-premium-blue shadow-forest reveal group">
-                <span class="source-code-label !text-teal-gray">Live Culture</span>
-                <h3 class="text-4xl font-bold text-sapphire-black font-display mt-4 mb-6 leading-tight">Upcoming Festivals</h3>
-                <p class="text-teal-gray mb-10 leading-relaxed font-light">
-                    Celebrate the vibrant traditions that bring our 82 barangays together in community and spirit.
-                </p>
-                <a href="{{ url_for('events.index') }}"
-                    class="inline-flex items-center text-sapphire-black font-bold group/link text-sm">
-                    <span class="accent-underline accent-underline-blue pb-1 tracking-wide font-display">View Calendar</span>
-                    <svg class="w-4 h-4 ml-2 group-hover/link:translate-x-1.5 transition-transform text-action-blue" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                </a>
-            </div>
 
-            <!-- Gallery Card -->
-            <div class="col-span-2 row-span-2 bg-white p-12 border-l-8 border-silver-teal shadow-forest reveal group">
-                <span class="source-code-label !text-teal-gray">Visual Archive</span>
-                <h3 class="text-4xl font-bold text-sapphire-black font-display mt-4 mb-6 leading-tight">Community Stories</h3>
-                <p class="text-teal-gray mb-10 leading-relaxed font-light">
-                    Explore a curated collection of memories and moments shared by our residents and guests.
-                </p>
-                <a href="{{ url_for('gallery.index') }}"
-                    class="inline-flex items-center text-sapphire-black font-bold group/link text-sm">
-                    <span class="accent-underline pb-1 tracking-wide font-display">Browse Gallery</span>
-                    <svg class="w-4 h-4 ml-2 group-hover/link:translate-x-1.5 transition-transform text-premium-blue" fill="none"
-                        stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"></path>
-                    </svg>
-                </a>
-            </div>
-        </div>
-    </div>
-</section>
 
 <!-- Newsletter Section - Premium Glassmorphism -->
 <section class="py-32 bg-sapphire-black relative overflow-hidden">
     <div class="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/felt.png')]"></div>
     <div class="container mx-auto px-6 text-center relative z-10" data-aos="zoom-in">
         <div class="max-w-3xl mx-auto glass-aura p-16 rounded-[3rem] border-white/5 shadow-inner">
-            <span class="source-code-label mb-6">Stay Connected</span>
+            <span class="source-code-label mb-8">Stay Connected</span>
             <h2 class="text-4xl md:text-5xl font-bold text-white font-display mb-8">Join the Digital Archive</h2>
             <p class="text-silver-teal text-lg mb-12 font-light max-w-xl mx-auto leading-relaxed">
                 Receive the latest cultural discoveries, festival schedules, and community heritage stories directly in
@@ -526,13 +487,13 @@ function toggleGuide() {
             <form class="max-w-md mx-auto group" data-action="newsletter-submit" onsubmit="return handleNewsletterSubmit(event)">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <div
-                    class="relative flex items-center p-1.5 bg-white/10 hover:bg-white/15 border border-white/20 focus-within:ring-2 focus-within:ring-sky-500/50 rounded-full transition-all">
+                    class="relative flex items-center p-1 bg-white/10 hover:bg-white/15 border border-white/20 focus-within:ring-2 focus-within:ring-sky-500/50 rounded-full transition-all">
                     <input type="email" id="newsletter-email" name="email"
                         style="background: transparent !important; -webkit-appearance: none; appearance: none;"
-                        class="w-full px-4 py-3 bg-transparent text-white placeholder-white focus:outline-none focus:border-0 focus:ring-0 border-0"
+                        class="w-full px-4 py-2 bg-transparent text-white placeholder-white focus:outline-none focus:border-0 focus:ring-0 border-0"
                         placeholder="Enter your email" required aria-label="Email address" />
                     <button type="submit"
-                        class="shrink-0 px-8 py-3 bg-premium-blue hover:bg-white text-sapphire-black font-bold rounded-full transition-all text-sm uppercase tracking-widest">
+                        class="shrink-0 px-8 py-2 bg-premium-blue hover:bg-white text-sapphire-black font-bold rounded-full transition-all text-sm uppercase tracking-widest">
                         Join
                     </button>
                 </div>
