@@ -20,9 +20,10 @@
 - Successfully consolidated 5 redundant tables down to 2 unified tables (`REVIEW` and `USER_FAVORITE`) using Strategy A (Nullable Foreign Keys + CHECK Constraints), reducing active table count to 28.
 - Safely migrated all existing reviews, nested replies, photos, favorites, and RSVP states with zero data loss.
 - Implemented backward-compatible shims maintaining 100% app runtime boot stability.
-- Completed comprehensive academic rewrite of manuscript Chapters 1–3, removing first-person pronouns and aligning with the BLRT template style guidelines.
+- Completed comprehensive academic rewrite of manuscript Chapters 1–3, removing first-person pronouns, eliminating casual phrasing, and aligning with the BLRT template style guidelines.
+- Executed a complete RRL verification sweep, replacing unverified placeholder citations (e.g., Wilson 2025, Reyes 2024, Smith 2023, Cruz 2022) with real peer-reviewed articles and direct URL/DOI links across `references.md`, `Chapter-1-Introduction.md`, and `full1-3.md`.
+- Formally resolved all 12+ spelling, structural, formatting, and consistency items from the `todo.md` checklist, including updating the Guimaras cultural mapping citation to its published reference: `Germina Jr. & Martir (2025)`.
 - Created a dynamic Markdown-to-DOCX compiler in `make.py` and compiled `Chapter_1_to_3_Consolidated.docx` dynamically.
-- Formally resolved all 12+ spelling, structural, formatting, and consistency items from the `todo.md` checklist.
 - Developed an automated quality checker script `verify_manuscript.py` returning 0 errors.
 - Fully polished and snapped Level 1 DFD (V3.2) layout by removing Context-level system boundaries, deleting the obsolete central system hub, merging detail datastores, and injecting missing datastores.
 - Fully polished and snapped ERD (V3.2) by injecting the missing active model `BUSINESS_VERIFICATION` and wiring its relationship edge.

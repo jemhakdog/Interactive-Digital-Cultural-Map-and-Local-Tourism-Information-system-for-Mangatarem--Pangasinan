@@ -6,6 +6,11 @@
 
 ## Recent changes
 
+- **Grammarian Review & Literature Citation Verification:**
+  - Overhauled Chapter 1's "Background of the Study" and "Encountered Problems" sections in the consolidated manuscript (`garammarian_rivisions/full1-3.md`) to elevate the tone to a formal academic standard. Removed all instances of casual, informal, or AI-generated language (such as "perfect spot", "messy habits", "paper chores", and first-person observations like "we've noticed").
+  - Replaced unverified placeholder citations (e.g., Reyes, Smith, Cruz, Wilson) with genuine peer-reviewed studies and specific URL/DOI links in `references.md`, `Chapter-1-Introduction.md`, and `full1-3.md`.
+  - Integrated verified publications such as `Chang & Caneday (2011)` (Web-GIS tourism search), `de Claro et al. (2024)` (public services integration), `Cascón-Katchadourian et al. (2018)` (old cartographic georeferencing), and updated the Guimaras cultural mapping study to its official publication reference: `Germina Jr. & Martir (2025)` with DOI link `10.51386/25815946/ijsms-v8i3p124`.
+
 - **README Overhaul & Codebase Cleanup:**
   - Overhauled the root `README.md` to document the actual **Mangatarem Interactive Digital Cultural Map & Local Tourism Information System**, replacing generic AI template instructions. Detailed its key modules, tech stack (Flask, Socket.io, SQLAlchemy, Tailwind CSS, Redis, Supabase, uv), and security features.
   - Cleaned up the root and scripts folders by deleting obsolete ERD scripts, temporary logs, old data scrapers/seeds, and misspelled files (`requirments.txt`), leaving only clean, functional assets.
