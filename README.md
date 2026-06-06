@@ -74,12 +74,15 @@ Follow these steps to set up and run the system locally:
    ```
    Once done, proceed to the next step.
 
-2. **Clone the repository:**
-   Clone the repository to your local system and navigate to the project directory:
-   ```bash
-   git clone https://github.com/jemhakdog/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan.git
-   cd Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan
-   ```
+2. **Get the code (Clone or Download):**
+   - **Option A: Clone the repository (Recommended)**
+     ```bash
+     git clone https://github.com/jemhakdog/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan.git
+     cd Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan
+     ```
+   - **Option B: Download the ZIP**
+     Alternatively, you can download the source code as a ZIP archive:
+     [Download Source Code (ZIP)](https://github.com/jemhakdog/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/archive/refs/tags/v0.5.0.zip) and extract it to your preferred directory.
 
 3. **Install dependencies:**
    Open a **new** command prompt (`cmd`), navigate to the project folder, and run:
