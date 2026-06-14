@@ -2,7 +2,7 @@ import logging
 from flask import redirect, url_for, flash, render_template, request
 from flask_login import login_required, current_user
 from extensions import db, limiter
-from models import GalleryItem, AttractionReview
+from models import GalleryItem, AttractionReview, Announcement
 from utils.logger_helper import log_entry, log_success, log_error
 from utils.cache_helpers import cache_delete, invalidate_attraction_cache
 from . import admin_bp
@@ -132,3 +132,36 @@ def reject_review(id):
 
     _next = request.args.get("next") or request.referrer or url_for("admin.reviews_list")
     return redirect(_next)
+
+
+# === ANNOUNCEMENT MODERATION ===
+
+@admin_bp.route("/announcements/approve/<int:id>")
+@login_required
+@limiter.limit("10 per minute")
+def admin_approve_announcement(id):
+    """Approve a pending announcement."""
+    log_entry("admin", "approve_announcement", id=id)
+    if (redir := _require_admin()):
+        return redir
+    announcement = Announcement.query.get_or_404(id)
+    announcement.status = "approved"
+    db.session.commit()
+    log_success("admin", "approve_announcement", f"Announcement ID {id} approved")
+    flash("Announcement approved and published!")
+    return redirect(url_for("admin.admin_dashboard"))
+
+@admin_bp.route("/announcements/reject/<int:id>")
+@login_required
+@limiter.limit("10 per minute")
+def admin_reject_announcement(id):
+    """Reject and delete a pending announcement."""
+    log_entry("admin", "reject_announcement", id=id)
+    if (redir := _require_admin()):
+        return redir
+    announcement = Announcement.query.get_or_404(id)
+    db.session.delete(announcement)
+    db.session.commit()
+    log_success("admin", "reject_announcement", f"Announcement ID {id} rejected")
+    flash("Announcement rejected and removed.")
+    return redirect(url_for("admin.admin_dashboard"))

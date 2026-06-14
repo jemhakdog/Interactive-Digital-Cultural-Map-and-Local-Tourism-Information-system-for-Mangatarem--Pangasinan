@@ -250,6 +250,52 @@ document.addEventListener('DOMContentLoaded', function() {
 </section>
 
 
+<!-- Latest Announcements Section -->
+<section id="announcements-section" class="py-24 bg-white overflow-hidden">
+    <div class="container mx-auto px-6">
+        <div class="flex items-end justify-between mb-12 reveal">
+            <div>
+                <span class="source-code-label">Community Bulletin</span>
+                <h2 class="text-4xl md:text-5xl font-bold text-sapphire-black font-display mt-4 leading-tight">
+                    <span class="accent-underline">Latest</span> Notices & Alerts</h2>
+            </div>
+            <a href="/announcements" class="text-sm font-bold text-emerald-800 hover:text-emerald-950 transition-colors flex items-center gap-2 group/all">
+                <span>View Bulletin Board</span>
+                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                </svg>
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% if announcements and announcements|length > 0 %}
+                {% for ann in announcements %}
+                <div class="group bg-slate-50 hover:bg-emerald-50/20 rounded-3xl p-8 border border-slate-900/5 hover:border-emerald-500/20 transition-all duration-500 hover:shadow-xl hover:-translate-y-2 flex flex-col justify-between" data-aos="fade-up" data-aos-delay="{{ loop.index0 * 100 }}">
+                    <div>
+                        <div class="flex items-center justify-between mb-4">
+                            <span class="text-[9px] font-extrabold uppercase tracking-widest px-2.5 py-1 rounded-md border {% if not ann.barangay_id %}bg-emerald-100 text-emerald-800 border-emerald-200{% else %}bg-amber-100 text-amber-800 border-amber-200{% endif %}">
+                                {% if not ann.barangay_id %}LGU Notice{% else %}{{ ann.barangay_name }}{% endif %}
+                            </span>
+                            <span class="text-[10px] text-gray-400 font-semibold font-mono">{{ ann.created_at.strftime('%b %d, %Y') if ann.created_at else '' }}</span>
+                        </div>
+                        <h3 class="text-xl font-bold text-slate-800 group-hover:text-emerald-800 transition-colors mb-3 leading-snug font-display">{{ ann.title }}</h3>
+                        <p class="text-gray-500 text-sm font-light leading-relaxed line-clamp-4">{{ ann.content }}</p>
+                    </div>
+                    <div class="border-t border-slate-100 pt-4 mt-6 flex justify-between items-center text-xs">
+                        <span class="text-slate-400">By {{ ann.author_name }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="col-span-3 text-center py-12 glass-card border-dashed border-2 border-slate-900/10">
+                    <p class="text-gray-600 italic">No active announcements at this time.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+
 <!-- Curated Experiences - Modern Editorial Bento -->
 <section id="experiences" class="py-24 bg-white overflow-hidden">
     <div class="container mx-auto px-6">

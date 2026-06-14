@@ -42,12 +42,13 @@
 
 **Abstract**
 
-**Jem Carlo Austria, Mary Jane Dalas, Rea Solis, Joy De Guzman, “Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan,”** Bachelor of Science in Information Technology, College of Information Technology, Binalatongan Community College, San Carlos City, Pangasinan, Philippines, May 2025\.
-Adviser: 	**FRANCIS L. CRISOSTOMO, BSIT**
-The Local Government Unit (LGU) of Mangatarem, Pangasinan, currently faces challenges with manual, fragmented record-keeping for tourism and cultural assets, which hinders public accessibility and operational efficiency. To address these issues, this study developed an Interactive Digital Cultural Map and Local Tourism Information System designed to centralize data management through a web-based, cloud-native architecture. Employing the Rapid Application Development (RAD) methodology and a Participatory GIS framework, the researchers created a secure, multi-tier platform that integrates an administrative moderation workflow with an interactive, public-facing heritage map. Post-implementation testing yielded a 100% success rate in functional and security performance, alongside high usability and user acceptance ratings. Consequently, this digital solution effectively modernizes heritage preservation and provides a scalable, accessible resource for local stakeholders, tourists, and academic researchers. By digitizing cultural narratives and tourism data, this project sets a foundational model for other municipalities in Pangasinan to pursue digital transformation in their heritage management strategies. The researchers ultimately conclude that this system serves as a bridge between the municipality’s historical identity and the digital future, ensuring that
-Mangatarem’s rich heritage is both preserved and accessible to a global audience.
-**Acknowledgement**
-The researchers express their profound gratitude to the Local Government Unit of Mangatarem, Pangasinan, for their invaluable trust and collaborative support throughout the realization of this capstone project. We extend our sincere appreciation to our project advisor and the faculty of Binalatongan Community College for their constant guidance, technical critiques, and encouragement, which were vital in refining the system’s architecture. Special thanks are reserved for the barangay representatives and local stakeholders whose active participation and candid feedback were instrumental in ensuring the platform effectively meets the community's needs. Finally, we are deeply grateful to our families, friends, and peers for their unwavering patience, moral support, and motivation, which sustained us through the challenges of this endeavor. We also acknowledge the invaluable contributions of the various tourism sites and archives that provided the raw data necessary for populating our cultural database. Above all, we offer this work as a testament to our dedication to the field of Information Technology and our commitment to serving the community through innovative software solutions.
+Jem Carlo Austria, Mary Jane Dalas, Rea Solis, Joy De Guzman, “Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan,” Bachelor of Science in Information Technology, College of Information Technology, Binalatongan Community College, San Carlos City, Pangasinan, Philippines, May 2025.
+Adviser: Francis L. Crisostomo, BSIT
+The local government of Mangatarem, Pangasinan has problems because they keep records by hand in different places. This makes it hard for the public to see records of tourism and culture. It also makes work slow. To fix these problems, this project created a web-based Interactive Digital Cultural Map and Local Tourism Information System. This system puts all information in one place online. We used the Rapid Application Development method and a map system that involves the community. We built a safe web application that has a review process for staff and an interactive map for the public. Tests showed that the system worked perfectly. Users found it easy to use and liked it. This system helps save local history in a modern way. It is easy for local leaders, tourists, and researchers to use. It shows other towns in Pangasinan how to move their records online. The system connects the town's history to the future. It keeps the heritage of Mangatarem safe and open to everyone.
+
+**Acknowledgment**
+
+We thank the Local Government Unit of Mangatarem, Pangasinan, for their support during this project. We thank our advisor and the faculty of Binalatongan Community College for their guidance. Special thanks to the barangay leaders and local groups for their helpful feedback. We also thank our families and friends for their support. Finally, we thank the tourism sites and offices that shared their records to fill our database. We offer this work to serve the community through technology.
 
 **Table of Contents**
 
@@ -137,30 +138,29 @@ The researchers express their profound gratitude to the Local Government Unit of
 
 ## **Background of the Study**
 
-Local government units (LGUs) in the Philippines are mandated under the Local Government Code of 1991 to promote tourism and preserve local cultural heritage. However, many municipal offices face operational difficulties due to their reliance on paper-based records and manual archiving. The Municipal Tourism Office of Mangatarem, Pangasinan, currently handles tourism data and cultural profiling through physical folders and manual logbooks. This setup limits the public's access to historical information and delays the administrative updates of local attractions. Academic studies show that establishing a centralized web platform for municipal data improves public engagement and coordinates tourism information more effectively than physical-first archives (Chang & Caneday, 2011). Transitioning to a digital database and spatial mapping system is therefore a practical step to resolve these administrative delays and secure local heritage records.
+The Local Government Code of 1991 rules that local government units in the Philippines must promote tourism and save local history. But many town offices have problems because they use paper records and manual filing. The Municipal Tourism Office of Mangatarem, Pangasinan uses physical folders and logbooks to store tourism and culture data. This makes it hard for people to see historical facts. It also makes updating information about local attractions slow. Research shows that putting municipal data on a web platform helps people learn about the town. It also manages tourism data better than paper files (Chang & Caneday, 2011). Moving to a digital database and map helps fix these delays and keeps historical records safe.
 
-Mangatarem is a first-class municipality with historical sites and natural attractions, including the Manleluag Spring National Park. Despite its tourism potential, the LGU struggles to distribute accurate cultural and tourism information. The tourism office acts as the main depository for data from the municipality's 82 barangays, but the lack of a unified system leads to fragmented records. When researchers or visitors request data, staff must search through physical filing cabinets, which is time-consuming and risks data loss. These administrative bottlenecks highlight the need for a structured digital platform that coordinates cultural mapping and tourism management at the municipal level (de Claro et al., 2024).
+Mangatarem is a large town with historical sites and natural spots like the Manleluag Spring National Park. The town has great tourism potential, but it is hard to share correct information. The tourism office collects data from all 82 barangays, but the records are split up. When visitors or researchers ask for information, staff have to search physical cabinets. This takes a lot of time and records can get lost. These issues show the town needs a digital platform to organize maps and manage tourism (de Claro et al., 2024).
 
-To address these inefficiencies, this study develops the 'Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan.' The system replaces the current manual record-keeping with a web-based mapping application. By digitizing cultural records and centralizing tourism information, the platform aims to streamline the LGU's approval workflow, prevent data duplication, and provide real-time updates. The integration of geographical maps and digital profiles allows tourists, residents, and academic researchers to access verified historical records online, supporting long-term cultural preservation in a secure digital repository (Cascón-Katchadourian et al., 2018).
+This project creates the 'Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan.' The system replaces paper files with a web map. Digitizing files and placing information in one database helps the town approve updates fast, stops double data entry, and gives live updates. The map and digital profiles let tourists, residents, and researchers read verified history online (Cascón-Katchadourian et al., 2018).
 
 ### **Encountered Problems**
 
-The Municipal Tourism Office of Mangatarem currently experiences operational bottlenecks in collecting and verifying data from individual barangays. Barangay representatives report updates on local attractions or events through informal channels, such as text messages, personal phone calls, or physical paper documents. This lack of standardization requires tourism office staff to manually compile and format incoming reports, causing delays in publishing updates. Additionally, because there is no synchronized database, conflicting information about local landmarks and schedules is sometimes posted on unofficial social media accounts, which misleads visitors and reduces the LGU's credibility (Chang & Caneday, 2011).
+The tourism office has problems gathering and checking data from barangays. Barangay leaders send updates about events or spots through text, calls, or paper. This is not standardized, so office staff must type and format the reports. This causes delays. Since there is no shared database, wrong details about landmarks and schedules appear on social media. This confuses visitors and hurts the town's trust (Chang & Caneday, 2011).
 
-The manual archiving system also creates access problems for researchers and students. Academic users looking for cultural profiles or barangay history must travel to the tourism office to inspect physical folders. These physical documents are subject to wear and tear and can be easily misplaced. Furthermore, the slow coordination between the municipal office and local stakeholders prevents the LGU from promoting seasonal events or local businesses in a timely manner. These issues demonstrate the necessity of a web-based, multi-role system that standardizes data entry, enforces administrative review, and provides secure public access to cultural mapping data (Cascón-Katchadourian et al., 2018).
+The paper filing system also makes it hard for students and researchers to get data. They must travel to the tourism office to look at paper folders. These papers can wear out or go missing. Slow communication between the town office and local groups also makes it hard to share events or support businesses quickly. These problems show the town needs a web system to standardize data entry, allow administrative reviews, and give the public safe access to maps (Cascón-Katchadourian et al., 2018).
 
 ##
 
 ## **Purpose and Description**
 
-The primary purpose of this Capstone Project is to design, develop, and implement a web-based Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan. This computing solution seeks to centralize, digitize, and standardize the management of the municipality's tourism assets and cultural heritage records, replacing legacy, manual processes with a secure, highly interactive digital platform. By providing a unified administrative moderation pipeline and an engaging, map-driven public interface, the system aims to improve administrative efficiency, eliminate data redundancy, and promote local heritage to a global audience. Once the proposed system is implemented, it will hold particular significance for the following beneficiaries:
+The main goal of this project is to build a web-based Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan. This system puts the town's tourism and history records in one digital space. It replaces old paper workflows with a safe web app. The platform has a review process for staff and a map interface for the public. It makes work faster, stops duplicate data, and shows local culture to the world. The system helps these groups:
 
-1. **Administrative and Stakeholder Users (LGU Tourism Office and Barangay Representatives)** – This category is the primary beneficiary, as it provides a centralized platform for the LGU to promote tourism and manage cultural data. It allows the Tourism Office staff to verify facts from every barangay, ensuring the public receives accurate and authoritative information. Barangay representatives benefit from a dedicated portal to directly upload content, streamlining the flow of information from the grassroots level to the municipal dashboard.
-2. **General Public and Academic Users (Tourists, Visitors, and Researchers)** – This category benefits from an interactive and educational tool to explore Mangatarem’s heritage. Tourists gain a mobile-responsive map to discover landmarks and plan their visits, while students and researchers can access a digital archive of cultural profiles and historical records from any location, eliminating the need for physical travel to the tourism office for basic data gathering.
+1. **Town staff and Barangay leaders** - The system gives them a shared platform to promote tourism and manage records. Staff can check facts from each barangay to keep information correct. Barangay leaders can upload content directly through their own login, which makes sending updates to the main dashboard quick.
+2. **The public and researchers** - They get an interactive tool to learn about Mangatarem. Tourists can use a mobile map to find landmarks and plan trips. Students and researchers can read digital historical records from anywhere without traveling to the tourism office.
+3. **Mangatarem residents** - The community gets a safe digital folder for their customs and festivals. This builds local pride and keeps their history safe for the future.
 
-3. **Residents of Mangatarem** – The community at large gains a digital safeguard for their traditions and festivals, fostering local pride and ensuring that their heritage is preserved in a secure, accessible format for future generations.
-
-The administrative rationale behind the project is to resolve the inconsistencies, communication delays, and accessibility bottlenecks inherent in the current manual workflow. By replacing fragmented communication with a standardized digital pipeline, the project assumes that the system will establish a definitive "source of truth" for municipal tourism and cultural data, thereby maximizing stakeholder satisfaction and enhancing operational transparency.
+The system fixes errors, communication delays, and access problems in the current workflow. Replacing unstructured communication with a digital path creates a single source of true information. This improves trust and makes municipal work clear.
 
 ##
 
@@ -176,16 +176,16 @@ The administrative rationale behind the project is to resolve the inconsistencie
 
 ## **Objectives of the Study**
 
-The main objective of this study is to design and develop an Interactive Digital Cultural Map and Local Tourism Information System for the Local Government Unit (LGU) of Mangatarem, Pangasinan. The system is engineered to replace legacy, manual processes with a centralized, web-based platform that optimizes information management and promotional workflows.
+The main goal of this study is to design and build an Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan. The system replaces old paper processes with a single web platform to manage and share information.
 
-Furthermore, the developers aim to achieve the following specific objectives:
+The specific goals are:
 
-1. To analyze the existing processes of collecting, verifying, and disseminating tourism and cultural information in Mangatarem, Pangasinan, in order to identify administrative inefficiencies, workflow bottlenecks, and data integration challenges.
-2. To identify and design the key system modules, workflows, and access control parameters for the designated user categories:
-   * **Administrative and Stakeholder Users**: Incorporating System Administrators (Tourism Office Staff) and Barangay Representatives (Contributors) to facilitate secure data entry, content submission, and moderation workflows.
-   * **General Public and Academic Users**: Incorporating Tourists, Visitors, and Academic Researchers to facilitate spatial mapping, digital heritage exploration, and research-oriented data extraction.
-3. To test and evaluate the system's functionality, performance, security, usability, and acceptability in accordance with the ISO/IEC 25010 Software Quality Standards to ensure compliance with technical specifications and user expectations.
-4. To prepare a comprehensive, phased implementation plan for the deployment of the system, including server migration, database initialization, and stakeholder training.
+1. To study how the town currently collects, checks, and shares tourism and cultural data to find problems and delays.
+2. To design the system modules and access rules for the user groups:
+   * **Administrators and Barangay leaders**: For typing data, submitting updates, and reviewing content.
+   * **The public and researchers**: For exploring the map, viewing culture, and gathering research data.
+3. To test the system's functions, speed, safety, and ease of use based on ISO/IEC 25010 standards.
+4. To write a clear plan to launch the system, set up the database, and train users.
 
 ##
 
@@ -193,10 +193,11 @@ Furthermore, the developers aim to achieve the following specific objectives:
 
 ## **Conceptual Framework**
 
-This study utilizes the Input-Process-Output (IPO) model to delineate the systematic framework and developmental lifecycle of the proposed computing solution. The IPO model serves as a structured technical roadmap, defining the foundational resources required (Input), the software engineering methodology executed to construct the platform (Process), and the resulting operational system delivered to the municipality (Output), with a continuous feedback loop to ensure long-term maintenance and alignment.
+This study uses the Input-Process-Output (IPO) model to map the system's development. The model shows the needed resources (Input), the coding method (Process), and the finished system (Output). A feedback loop ensures the system stays updated.
+
 **Figure 1.1: IPO**
 
-The conceptual framework illustrated above delineates the systematic flow of the project. The Inputs specify the technical and physical resources, along with the domain knowledge required by the developers to undertake the project. These resources feed into the Process, which employs the Rapid Application Development (RAD) methodology to iteratively design, prototype, and build the platform through structured phases. This structured process ensures that the final Output — the Interactive Digital Cultural Map and Local Tourism Information System — is developed efficiently and aligns with the functional and operational requirements of the Mangatarem LGU and its stakeholders. The feedback loop ensures that any issues identified during testing or post-deployment can be communicated back to the development team to refine the system inputs and processes, resulting in continuous improvement.
+The inputs are the tech tools, data, and knowledge we need. The process uses the Rapid Application Development (RAD) method to design, build, and test prototypes in cycles. The output is the finished Interactive Digital Cultural Map and Local Tourism Information System. If users find problems during testing, the feedback loop helps us fix the inputs and processes to improve the system.
 
 ##
 
@@ -220,36 +221,29 @@ The conceptual framework illustrated above delineates the systematic flow of the
 
 ### *Scope*
 
-The project focuses on the development of a web-based Interactive Digital Cultural Map and Local Tourism Information System for the Local Government Unit (LGU) of Mangatarem, Pangasinan. The system will be built utilizing web technologies including HTML, CSS (Tailwind CSS), and JavaScript for the frontend interface, Python with the Flask framework for server-side application logic, and PostgreSQL as the primary relational database management system — managed via Supabase for cloud-native persistence and real-time features. Figma will be utilized for user interface and user experience design during the prototyping phase. The key functionalities provided by the software include a public-facing interactive map where the **Public and Academic** category can browse, locate, and filter tourist attractions and cultural heritage sites by category such as historical landmarks, natural attractions, and local events. For **Administrative and Stakeholder** users, the system features a decentralized content contribution portal that allows authorized Barangay Representatives to submit, upload, and propose updates for local tourism content, alongside a centralized administrative dashboard for LGU Tourism Office staff to moderate all submissions through an approve-or-reject workflow, manage user accounts, and publish municipal-wide tourism announcements. Students and researchers within the public category are provided with structured access to archived cultural profiles and historical records to support academic data gathering and heritage research.
+This project builds a web-based Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan. The frontend uses HTML, CSS (Tailwind CSS), and JavaScript. The backend uses Python with Flask. The database is PostgreSQL, hosted on Supabase for cloud storage. We use Figma to design the screens. The public map lets tourists and researchers browse and filter historical spots, parks, and events. For administrators and barangay leaders, the system has a dashboard to upload updates and a workflow for LGU staff to review, approve, or reject changes. Students and researchers can access digital history records for their studies.
 
 ### *Limitations*
 
-While the system aims to provide comprehensive tourism information management for Mangatarem, it will not include online booking, reservation, or payment gateway functionalities for local accommodations, tour guides, or event ticketing. The interactive map and all system features require an active internet connection; full offline capabilities such as cached map tiles or offline content browsing are not within the scope of this project. Performance and scalability are designed to accommodate the expected volume of tourist traffic and barangay-level content contributions typical of a municipal tourism platform, but the system is not engineered to handle extreme traffic surges beyond standard municipal usage without future server infrastructure upgrades. Access to the content contribution and moderation modules is strictly restricted to authenticated and authorized LGU personnel and registered Barangay Representatives, meaning the general public cannot directly create, edit, or publish map data without going through the LGU approval workflow. The system is also limited to the geographic and administrative boundaries of Mangatarem, Pangasinan, and does not cover tourism data from neighboring municipalities or provinces.
+The system does not include booking, reservations, or payment tools for hotels, guides, or tickets. All features require an internet connection, and the map does not work offline. The system can handle normal town traffic and updates, but it cannot handle large traffic spikes without server upgrades. Only registered leaders and staff can log in to edit data or approve posts. The general public cannot post directly to the map. Finally, the system only includes data inside Mangatarem and does not show data for nearby towns.
 
 ## **Definition of Terms**
 
-For clarity and consistency, the following key terms are defined operationally as they are used in this study:
+Here are the definitions of key terms used in this study:
 
-**Administrative and Stakeholder Users** . This consolidated category refers to
-the LGU Tourism Office staff (System Administrators) and authorized Barangay Representatives (Contributors) who hold internal access to the system. This category is responsible for submitting, reviewing, and approving cultural heritage data, managing the platform's operational integrity, and overseeing the municipality's digital tourism presence.
+**Administrative and Stakeholder Users**: The LGU Tourism Office staff and approved Barangay Representatives who can log into the system backend. They submit, check, and approve data, and manage the platform.
 
-**General Public and Academic Users**. This category refers to tourists, visitors,
-students, and researchers who access the system to navigate the interactive map, search for points of interest, and view published cultural and tourism information. These users consume the data for leisure, travel planning, or academic data gathering without requiring administrative privileges.
+**General Public and Academic Users**: Tourists, visitors, students, and researchers who use the map to find spots and read history. They do not have admin rights.
 
-**Interactive Digital Cultural Map**.The core feature of the system that provides
-a visual, geographical, and navigable representation of tourist spots, historical landmarks, natural attractions, and cultural heritage sites within the municipality of Mangatarem, Pangasinan. Users can interact with the map by clicking pins, filtering categories, and viewing detailed multimedia information for each location.
+**Interactive Digital Cultural Map**: The main feature showing map markers of tourist spots, historic landmarks, and events in Mangatarem. Users click pins and filter categories to see photos and details.
 
-**Local Government Unit (LGU)**. In this study, this refers specifically to the
-municipal government of Mangatarem, Pangasinan, serving as the main beneficiary, authoritative body, and decision-maker over the tourism information system and its content governance policies.
+**Local Government Unit (LGU)**: The town government of Mangatarem, Pangasinan, which owns and manages the system.
 
-**Public User**. Refers to tourists, visitors, or any general member of the public
-who accesses the system to navigate the interactive map, search for points of interest, and view published cultural and tourism information without requiring a registered account or administrative privileges.
+**Public User**: Anyone who uses the map to search for places and view info without needing an account.
 
-**Rapid Application Development (RAD)**. The software development
-methodology selected for this study, characterized by rapid prototyping, iterative feedback cycles, flexible requirements gathering, and continuous stakeholder involvement to accelerate system construction while maintaining alignment with user needs.
+**Rapid Application Development (RAD)**: The coding method used, which focuses on building quick prototypes and using feedback to improve the system.
 
-**Content Moderation**. The process by which the System Administrator reviews
-content submissions from Barangay Representatives and decides whether to approve, reject, or request revisions before the content is published on the public-facing interactive map.
+**Content Moderation**: The review process where LGU staff check updates from Barangay Representatives and decide to approve, reject, or ask for edits before publishing.
 
 ##
 
@@ -257,42 +251,45 @@ content submissions from Barangay Representatives and decides whether to approve
 
 ## **Review of Related Literature**
 
-To establish the academic baseline and theoretical foundation for this study, the researchers conducted a comprehensive review of related literature from the period 2020 to 2025. This review is structured around the core objectives of the study, examining recent advancements in municipal digital transformation, spatial mapping, content moderation workflows, and usability testing within both local (Philippine) and foreign academic contexts.
+This section reviews studies from 2020 to 2025 about digital maps, municipal systems, content reviews, and tests.
 
 ### Local Studies
 
 #### Existing Tourism Information Management Processes in Philippine LGUs
-Soncuya (2020) conducted a critical evaluation of cultural mapping initiatives in municipal contexts, highlighting that many Philippine local government units (LGUs) continue to rely on fragmented physical documentation and inconsistent archiving methods. The study demonstrated that such manual practices lead to rapid data degradation, informational errors, and a general lack of coordination between regional tourism offices and grassroots communities. However, Soncuya also emphasized that establishing a structured, standardized reporting framework paired with a clear legal baseline significantly enhances the sustainability and administrative longevity of cultural mapping databases. This finding directly supports the first objective of this study by validating the critical need to replace Mangatarem's manual reporting channels with a standardized, web-based digital workflow.
 
-In parallel, Coro II et al. (2022) examined the digitization process of tourism information systems in rural municipalities, utilizing Siargao as a primary case study. Their research indicated that transitioning to digital platforms drastically reduces data dissemination delays and improves the accuracy of public tourist guides. A key finding of the study was that the successful adoption of new IT infrastructure in rural municipalities depends heavily on early stakeholder engagement and localized user training. This case study provides a direct real-world precedent for the fourth objective of this study, guiding the design of the phased deployment and training strategy tailored to the technical readiness of the Mangatarem LGU.
+Soncuya (2020) studied cultural maps in local government units. The study showed that many town offices still use paper records. This manual work leads to lost records, errors, and poor sharing between tourism offices and local barangays. Soncuya noted that using a clear, standard data entry method keeps records safe over time. This supports our study's plan to replace paper reporting with a standard web platform.
+
+In parallel, Coro II et al. (2022) studied digital tourism systems in rural areas using Siargao as a case study. They found that moving records online makes updates faster and keeps visitor guides accurate. They also noted that training users and involving local groups early helps the system succeed. This supports our plan to include training for Mangatarem staff.
 
 #### Grassroots Content Contribution and Centralized Moderation
-Germina and Martir (2025) evaluated the implementation of participatory mapping frameworks that integrate historical preservation with GPS technology in provincial contexts. The study argued that allowing local community members and barangay-level contributors to directly input primary-source historical data significantly enriches the depth and localized accuracy of the central database. However, they also noted that to prevent the spread of unverified or inaccurate data, a centralized administrative gatekeeping mechanism is mandatory. This research strongly validates the second objective of this study, supporting the structural separation of roles between the Barangay Representative ( grassroots contributor) and the LGU Tourism Administrator (content moderator) to ensure data integrity.
+
+Germina and Martir (2025) studied maps that use GPS to save local history. The study showed that letting local residents and leaders enter data makes the records more accurate. However, they also noted that a central admin must check the records to prevent errors. This supports our design that separates roles for barangay leaders who write posts and LGU staff who review them.
 
 #### Usability, Cultural Pride, and System Acceptance in Philippine Municipalities
-Mesana et al. (2025) investigated the managerial challenges of municipal-led cultural festivals and intangible heritage events. Their phenomenographic inquiry revealed that a major challenge in local cultural preservation is the lack of structured digital data and coordination issues within local government units, which hinders local commerce. This research underscores the importance of the second objective of this study, confirming that integrating local festival directories and standardized cultural maps directly supports municipal heritage preservation and local tourism development.
 
-Finally, Ansari et al. (2024) analyzed the operational challenges and prospects of preserving art and religious traditions. They identified that a major hurdle in heritage preservation is balancing modernization with conservation and ensuring sustained maintenance of cultural assets. This analysis serves as a vital warning for the execution of the fourth objective of this study, reinforcing the necessity of preparing a detailed maintenance plan and administrative guidelines during the cutover phase.
+Mesana et al. (2025) studied how towns manage cultural festivals. They found that a lack of digital files and poor communication in local governments hurt local business. This shows the value of adding festival schedules and maps to a web platform.
+
+Finally, Ansari et al. (2024) studied the challenges of saving art and traditions. They noted that keeping systems updated after launch is a major problem. This points to the need for a clear maintenance plan during the final stage of our project.
 
 ### *Foreign Studies*
 
 #### Digital Transformation and Spatial Visualization Frameworks
-Sang et al. (2021) developed a web-based geographic mapping platform designed to visualize historical landmarks and cultural evolution over time. Their technical framework successfully integrated spatial coordinate datasets with historical photography galleries, demonstrating that interactive map pop-ups and category-based filtering significantly improve spatial comprehension and visitor navigation ease. This foreign study provides a concrete technical model for the first and second objectives of this study, supporting the choice of integrating georeferenced spatial coordinate pins with a search-optimized database interface.
 
-Similarly, Moneta et al. (2025) conducted a study on the impact of digital interpretation and immersive storytelling-driven presentations on community engagement. Their findings indicated that digital platforms that pair detailed narratives with multimedia assets enhance public engagement and foster a sense of cultural identity among users. The authors concluded that incorporating interactive and immersive storytelling elements is a critical factor in encouraging public exploration. This study directly aligns with the second objective of this study, emphasizing that usability, storytelling elements, and interactive design are vital for the public-facing portal.
+Sang et al. (2021) built a web map to show historic sites and old photos. Their map let users filter places and click markers, which made navigation easy. This gives us a model for our project's interactive map.
+
+Similarly, Moneta et al. (2025) studied how digital stories affect community engagement. They found that pairing descriptions with photos online gets people interested in local culture. This supports our focus on easy map views for the public.
 
 #### Standardized Cultural Documentation and System Quality
-Du et al. (2024) explored the interactive effects of intangible cultural heritage (ICH) and tourism development. Their study argued that digital mapping and tourism development must extend beyond physical architecture to incorporate traditional practices, oral histories, and community events. Du et al. analyzed how coupled coordination between tourism platforms and intangible heritage assets supports local preservation, which supports the second objective of this study by informing the metadata fields and database tables engineered for the Mangatarem cultural registry.
 
-Furthermore, Tan (2023) evaluated user adoption models for digital tourism portals, finding that modular, component-based software design simplifies post-deployment feature expansion. The research also demonstrated that providing simple, highly intuitive navigation paths reduces user resistance when stakeholders transition from manual paper forms to digital systems. This supports the second and fourth objectives by validating the utilization of a phased development approach (RAD) to incrementally build and refine the user design.
+Du et al. (2024) studied how tourism and local heritage work together. They argued that maps should include customs and stories, not just buildings. This helped us decide which database fields to create for the cultural map.
 
-Lastly, Petrovic (2022) investigated data validation algorithms in participatory heritage mapping systems. The study demonstrated that integrating automated input validation, secure session handling, and role-based access control (RBAC) prevents database corruption and unauthorized data modification by malicious actors. This technical research supports the third objective of this study, reinforcing the need to conduct rigorous security testing against threats such as SQL injection and unauthorized role escalation.
+Furthermore, Tan (2023) tested digital tourism sites and found that modular layouts make adding features easier later. Simple menus also help users switch from paper forms to digital systems. This supports our use of the RAD method to design and refine our site.
+
+Lastly, Petrovic (2022) studied data validation in community maps. The system showed that using automatic input checks and role restrictions stops database errors and prevents hacks. This supports our plan to run safety checks on the code.
 
 ### Synthesis
 
-The compiled literature establishes a cohesive academic and technical justification for the development of the Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan. Local studies by Soncuya (2020) and Coro II et al. (2022) confirm that legacy manual tourism management processes are highly prone to administrative delays and data fragmentation, establishing a clear need for digitization to achieve municipal efficiency (Objective 1). The research by Germina and Martir (2025) and Du et al. (2024) supports the core system design, proving that a decentralized, community-led data contribution model paired with central administrative moderation is the most effective approach for capturing accurate heritage records while maintaining data integrity (Objective 2). 
-
-Reflecting these requirements, the technical frameworks and usability findings presented by Sang et al. (2021), Moneta et al. (2025), and Tan (2023) provide a clear engineering blueprint for constructing the georeferenced mapping interface and modular database tables, ensuring high-concurrency public exploration and long-term system scalability. Finally, the security and maintenance assessments by Petrovic (2022) and Ansari et al. (2024) highlight the critical necessity of executing rigorous ISO/IEC 25010 testing plans and establishing clear post-deployment maintenance protocols to prevent security vulnerabilities and ensure project sustainability (Objectives 3 and 4). By integrating these diverse local and foreign findings, the developers aim to deliver a secure, highly usable, and academically validated computing solution that safeguards Mangatarem’s rich cultural heritage.
+The literature shows why Mangatarem needs this system. Soncuya (2020) and Coro II et al. (2022) show that paper records cause delays, making digital databases necessary. Germina and Martir (2025) and Du et al. (2024) support our model of letting barangay leaders write posts while LGU staff review them. The map designs of Sang et al. (2021) and Tan (2023) guide our database and UI designs. Finally, studies by Petrovic (2022) and Ansari (2024) highlight why security testing and maintenance plans are vital to keep the system running safely.
 
 #
 
@@ -305,24 +302,25 @@ Reflecting these requirements, the technical frameworks and usability findings p
 # **Chapter II**
 
 **Methodology and Design**
-This chapter details the development methods and design strategies we used to create the Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan. We want to provide a clear record of our technical decisions and the specific steps we took to deliver a functional tool for the LGU.
+
+This chapter explains the methods and designs we used to build the system. We want to show our technical steps in creating a working tool for the town.
 
 ## **Software Development Methodology**
 
-In software engineering, a Software Development Methodology (SDM) is like a clear roadmap for a project. Without it, a team can easily lose focus, miss deadlines, or build features that nobody actually needs. For our project in Mangatarem, having this structure helps us stay organized while we plan, code, and test the digital map. It makes sure we're actually building a tool that fits the LGU’s workflow and that the final product is impactful for the whole community.
+A software development methodology guides the project. Without it, a team can lose focus, miss dates, or build features that users do not need. This structure keeps us organized as we plan, code, and test. It helps us build a tool that fits the town's work and benefits the community.
 
-The team chose **Rapid Application Development (RAD)** and combined it with a **Participatory GIS (PGIS)** framework. We picked this because it focuses on building prototypes and getting feedback quickly rather than spending months just planning on paper. Since tourism data and the needs of our barangay leaders can change as they see the site evolve, RAD lets us adapt fast. By using PGIS, we also make sure the community has a say in how we represent their local culture on the map, which makes the data much more accurate.
+We chose **Rapid Application Development (RAD)** and **Participatory GIS (PGIS)**. This combination lets us build working models and get feedback quickly instead of just writing plans. Since tourism data and barangay needs can change, RAD lets us adapt. PGIS lets the community help map their culture, which keeps the data correct.
 
-**Figure 2.1** RAD
+**Figure 2.1: RAD**
 
-RAD is an agile way of working that prioritizes quick delivery and user feedback. Instead of trying to get every detail perfect at the start, we build small, working versions of the system and refine them over and over. It's known for keeping the people who will actually use the system involved every step of the way. This method is perfect for projects where the look and feel of the site are vital and where we expect to make changes as users interact with our early designs.
+RAD is a method that focuses on quick updates and user reviews. We build simple versions of the system and improve them in cycles. This keeps the actual users involved. It is useful for sites where the layout is important and where we expect changes based on user testing.
 
-The team broken down our work into these four RAD phases:
+We divided our work into four RAD phases:
 
-1. **Requirements Planning:** We started by meeting with the LGU Tourism Office staff to find the gaps in their current manual filing system. We identified the main goals and defined the two primary user categories: **Administrative and Stakeholder Users** (LGU staff and Barangay Contributors) and **General Public and Academic Users** (Tourists and Researchers). We used interviews and site visits to make sure we didn't miss any important cultural traditions or landmarks that the town wants to highlight.
-2. **User Design (Prototyping):** Once we knew what the system needed, we used **Figma** to create mockups and wireframes. We built designs for the interactive map (Public/Academic interface) and the data management portals (Administrative/Stakeholder interface). We showed these to the LGU staff and barangay reps to see if they found the buttons and menus easy to navigate. We used their feedback to change the layout until it felt just right.
-3. **Construction:** This is the phase where we did the actual coding. We used **HTML, Tailwind CSS, and JavaScript** for the parts you see on the screen, and **Python with Flask** for the logic and database work. We stored all the town's information in **Supabase**. We built the interactive map and created the "approve or reject" moderation workflow for the administrative users. We coded and tested in small cycles so we could catch and fix bugs early.
-4. **Cutover (Testing and Deployment):** In this final stage, we perform functional, security, and usability tests to make sure the site is safe and fast. Once we resolve any issues, we’ll launch the system for the LGU. We’ll also hold training sessions for the Administrative and Stakeholder category (LGU staff and barangay leaders) and give them user manuals so they feel comfortable running the site on their own.
+1. **Requirements Planning:** We met with tourism staff to find problems in their paper system. We set goals and defined two user groups: **Administrators/Barangay Leaders** and the **Public/Researchers**. We used interviews and site visits to list important landmarks and events.
+2. **User Design (Prototyping):** We used **Figma** to draw the screens. We designed the map for the public and the portals for staff. We showed these to LGU staff and barangay leaders to check if the menus were easy to use. We changed the layouts based on their feedback.
+3. **Construction:** We coded the system in this phase. We used **HTML, Tailwind CSS, and JavaScript** for the screens, and **Python with Flask** for the server logic. We stored data in **Supabase**. We built the map and the approve-or-reject review system. We coded and tested in small cycles to fix bugs early.
+4. **Cutover (Testing and Deployment):** We run function, safety, and ease-of-use tests to ensure the site is fast and safe. After fixing errors, we launch the system. We will train the staff and barangay leaders and give them user guides.
 
 ##
 
@@ -330,85 +328,76 @@ The team broken down our work into these four RAD phases:
 
 ## **Sources of Data**
 
-The primary sources of data for this project are individuals, groups, and locations within the municipality of Mangatarem, Pangasinan that hold crucial tourism, cultural, and historical information relevant to the system. Key data sources include:
+The main data sources for this project are people, offices, and places in Mangatarem:
 
-- **LGU Tourism Office Staff** — Municipal tourism officers who provide official tourism policies, existing manual records, promotional materials, and municipal-level tourism initiatives. They serve as the authoritative source for content moderation rules, user access policies, and platform governance requirements.
-- **Barangay Officials and Representatives** — Designated individuals from each barangay who serve as vital sources for localized cultural data, specific landmark descriptions, community event schedules, and grassroots heritage information that is not centrally documented at the municipal level.
-- **Manleluag Spring National Park and Other Tourist Sites** — Physical locations within Mangatarem that serve as points of reference for mapping coordinates, photographic documentation, and on-site observation of existing visitor information systems (e.g., signage, brochures).
-- **Municipal Archives and Physical Records** — Existing physical tourism brochures, printed municipal profiles, historical documents, and past tourism reports maintained by the LGU, which serve as secondary data sources to establish the initial database content of the system.
+- **LGU Tourism Office Staff** — They provide official rules, paper files, booklets, and projects. They set the rules for reviewing posts and managing user accounts.
+- **Barangay Leaders** — They provide local culture details, landmark descriptions, and event schedules for their areas.
+- **Manleluag Spring National Park and tourist spots** — These physical places provide map coordinates, photos, and examples of existing signs.
+- **Town Archives** — Physical brochures, municipal guides, history papers, and past reports are used to load the initial database.
 
 ## **Data Gathering Techniques**
 
-To ensure a comprehensive understanding of the current operational challenges, cultural preservation needs, and technical requirements for the Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan, multiple data gathering techniques were employed. These techniques were carefully selected and implemented to collect both qualitative and quantitative data from key municipal stakeholders and community representatives.
-**Surveys and Questionnaires** \- One of the primary techniques used was the survey questionnaire. These were distributed to selected LGU Tourism Office staff, Barangay Representatives, and potential academic users during the initial Requirements Planning phase. The surveys were designed using structured questions to assess data usage habits, preferred public-facing features (e.g., map filtering vs. list view), and the frequency of data synchronization issues caused by current manual reporting methods. The data collected helped the development team prioritize key system features such as the Content Moderation workflow and the multi-layered interactive map categories that would directly address user needs and information gaps.
-**Interviews** \- Another method applied was the interview technique, conducted with key personnel, specifically the LGU Tourism Officer, municipal archivists, and authorized Barangay Officials. These interviews were semi-structured, allowing participants to elaborate on the burdens of manual, paper-based record-keeping and the difficulties in verifying facts for public dissemination. The interviews took place during the first phase of project development and provided in-depth qualitative data that supplemented the survey results. This approach enabled the developers to understand specific pain points, such as the delays in updating tourism status, manual tracking of cultural assets (Forms 01-07), and the lack of a centralized platform for official announcements.
-**Observation** \- Direct observation was also utilized to study how LGU staff and Barangay Representatives interact with the existing manual processes. The developers observed the day-to-day operations, including how tourist inquiries are currently answered by manually flipping through physical files and how updates are received via text messages or informal calls. By witnessing the processes firsthand, the development team was able to document procedural gaps, such as the risk of data fragmentation when information is sourced from unverified social media, and operational bottlenecks that validated the urgent need for a standardized, digital content submission portal.
-**Document Analysis** \- In addition, document analysis was performed on existing municipal tourism brochures, historical profiles, official NCCA cultural profiling forms (Forms 01-07), and municipal-level archival records. This technique helped the researchers assess how records were currently being maintained, the consistency of the data structure, and the extent of manual documentation errors. The analysis also provided a clear benchmark for the type of data, such as geospatial coordinates, heritage significance, and required metadata, that the Interactive Digital Cultural Map would need to digitize and manage.
-These data gathering techniques, applied during the initial planning and design stages, ensured that the development of the Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan was informed by real-world LGU practices, grounded in municipal needs, and aligned with the town's goals for cultural preservation and digital tourism.
+We used several methods to gather details during the planning stage:
+
+**Surveys and Questionnaires** - We gave questionnaires to LGU staff, barangay leaders, and researchers. The questions asked about their technology habits, what map features they prefer, and how often paper records cause errors. This helped us design the moderation queue and map filters.
+
+**Interviews** - We talked with the tourism officer, archivists, and barangay leaders. These talks helped us understand the problems of paper archiving, like slow updates, tracking forms 01-07, and missing announcements.
+
+**Observation** - We watched staff answer questions by searching paper files. We saw updates arrive through unstructured text messages and calls. This confirmed the need for a standard digital portal.
+
+**Document Analysis** - We studied town booklets, history papers, NCCA forms (01-07), and old archives. This showed us the coordinates and details the database must store.
 
 ## **System Design**
 
 ### System Architecture
 
-      The structured blueprint that describes the parts, relationships, and data flow of a software system is called a system architecture design. It is essential in defining how users, technologies, and procedures are combined to accomplish the application’s functional objectives. Efficiency, scalability, security, and maintainability are guaranteed by a well-designed system architecture, particularly in web-based solutions that support numerous users and roles.
+A system architecture design shows how users, technologies, and data connect to meet system goals. A clear structure ensures the system is fast, safe, and easy to maintain.
 
-      The system architecture design for the IT capstone project, Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan, clearly illustrates how users engage with the application, how data is processed and stored, and how services are provided via a modern cloud-native web platform.
+**Figure 2.2: System Design**
 
-                                      **Figure 2.2** System Design
+The diagram shows how the General Public, Tourists, LGU Admins, and Barangay Representatives access the system. Users connect using computers, tablets, or phones. These devices use HTTP or HTTPS to communicate with the server over the internet.
 
-      System architecture design is a foundational blueprint of a software system that includes its basic components and how users will be interacting with it, as well as how data will be flowing through it. The primary goal of a system architecture design is to define how users, technology, and processes integrate in order to achieve the functional and operational objectives of a software application. A well-designed system architecture is important in ensuring the efficiency, scalability, and security of a software application. For the IT Capstone Project, "Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan," it is evident that through the system architecture diagram, users will be able to have a clear and visualized understanding of how they will be interacting with it and how data will be processed and made available through the web application in a secure manner.
+The frontend uses HTML, Tailwind CSS, and JavaScript with Mapbox GL JS to display the interactive map and markers. The backend uses Python with the Flask framework, hosted on Vercel, to manage business logic and content reviews. The server reads and writes data to a Supabase PostgreSQL database. An Upstash Redis caching layer stores frequent queries to make the map load quickly.
 
-      The diagram provided in this section describes the system architecture for the "Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan." This diagram indicates the main user roles for the proposed system, which are the General Public, Tourists, LGU Administrators, and Barangay Representatives. These user roles will be able to access the proposed system through a variety of client devices such as desktop computers, laptops, tablets, and mobile phones. These client devices will be able to access the proposed system via HTTP or HTTPS protocols over the internet, which is considered the medium of communication for these devices and the server.
-
-At its heart lies the application and presentation layer that powers the interactive mapping experience. The front-end utilizes HTML, Tailwind CSS, and JavaScript, heavily integrated with Mapbox GL JS, which is in charge of handling the dynamic geospatial rendering and interactive map markers. The server-side logic is driven by Python and the Flask framework, deployed in a serverless environment via Vercel to handle business logic, content moderation, and spatial queries. The server retrieves and serves these resources, whereas transactional data, cultural asset records, and user coordinates are securely read from or written to a Supabase PostgreSQL database. Additionally, an Upstash Redis caching layer processes high-frequency queries to manage vital records efficiently and ensure fast map loading speeds.
-
-      In conclusion, the system architecture design provides an overall framework for the development of the proposed system. It provides a secure system of access based on roles, allows for highly responsive web access from various devices, and facilitates the interaction of the front-end user interface and the back-end geospatial data services. It clearly defines the relationships between the user, devices, system components, and data repositories. Therefore, the development team is able to create a robust, cloud-native system that is strictly tailored to the needs of the cultural preservation and tourism operational processes of the Mangatarem LGU.
+The system manages access based on roles, loads files across different devices, and connects the user interface to the database. This allows the LGU to run a secure system for cultural mapping.
 
 ### **Existing Process Flowchart**
 
-      System architecture design provides a high-level structural overview of a software system, defining how different technological components interact—from the user's device to the backend database—to deliver the system's services. A clear architecture is important because it establishes the blueprint for the system's technical structure, ensuring that all components are properly integrated, scalable, and secure. For the IT Capstone Project, "Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan," it is evident that the system architecture diagram provides a clear and visualized understanding of how users will be interacting with the platform.
+**Figure 2.3: Existing Flowchart**
 
-                                  **Figure 2.3** Existing Flowchart
-      The flowchart illustrates the two primary manual processes currently used in Mangatarem, revealing significant gaps in information accessibility and data synchronization. The first process (Top Path) begins when a tourist seeks information. Currently, the tourist is forced to choose between searching unverified social media pages—which often harbor outdated or conflicting details leading to visitor confusion—or traveling physically to the Municipal Tourism Office. At the office, staff must manually browse through paper-bound records and physical files to answer inquiries. If the relevant file is missing or being used by another officer, the information remains unavailable, resulting in a poor visitor experience.
+The flowchart shows the current manual processes in Mangatarem. The first path shows a tourist seeking information. The tourist must either search social media, which often has outdated details, or travel to the tourism office. At the office, staff must search paper files. If a file is missing, the information is unavailable.
 
-    The second process (Bottom Path) describes the current information reporting workflow from the grassroots level. When a Barangay Representative has a new cultural event or attraction update, they must either prepare a physical report for delivery or send informal messages via text or social media. This non-standardized communication forces LGU Tourism staff to manually consolidate disparate data formats. Any missing information necessitates a repetitive cycle of phone calls and follow-ups, causing significant time lags. By the time the LGU updates its printed brochures or social media posts, the information is often already weeks old. This flowchart demonstrates that the current reliance on manual, physical-first documentation is the root cause of the municipality's fragmented and delay-prone tourism information ecosystem.
+The second path shows how barangays send updates. Barangay leaders send event details via text, calls, or paper. Tourism staff must manually format these notes. Missing data requires follow-up calls, causing delays. By the time the town prints new booklets, the details are already old. This shows how paper-first workflows cause delays.
 
 ###
 
-                                         **Figure 2.3** Dataflow Diagram
+**Figure 2.3: Dataflow Diagram**
 
 ###
 
 ### **Dataflow Diagram (DFD)**
 
-      A Data Flow Diagram (DFD) is a logical representation of a system's primary processes and how it interacts with external entities and data stores . It outlines the structural boundaries of the application and the major data exchanges within and outside the system without highlighting specific implementation details . Unlike detailed process flows, the DFD provides a holistic overview of data handling, making it easier for developers and stakeholders to validate system requirements. For the Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan, this diagram serves as a foundational visual aid that guides system developers, stakeholders, and future users in understanding the flow of data between the system and its external actors . It is particularly helpful in identifying external user roles—such as General Public and Academic Users (EE1) and Administrative and Stakeholder Users (EE2)—system inputs and outputs managed by core processes like Search & Browse, Content Submission, and Content Moderation, and the interaction with internal data repositories such as User Accounts & Roles (D1) and Tourist Spots & Cultural Data (D2) .
+A Dataflow Diagram shows how data moves between users, processes, and storage without showing code details. It marks system limits and data paths.
 
-      This section shows a Dataflow Diagram (DFD) which displays all key system interactions that the proposed system will operate through. The system which is identified as \[0 Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan\] establishes connections to two main external entities which are the General Public / Tourists and the LGU Admin / Barangay Representative. Data Flow Lines which show inbound and outbound user activity create relationships that describe how data moves through the system from submission to processing and storage until it reaches output.
+Public users search, view places, and send feedback. The system processes these requests and returns map markers, profiles, search results, and alerts.
 
-      The Data Flow Diagram (DFD) for the Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan shows how the system connects to its main external systems which include the public users and municipal administrators, and to its internal data storage systems that support system operation. The core model demonstrates how data flows into the system and through specific processes and out of the system which helps identify system limits and main operational processes.
+LGU Admins and Barangay Representatives enter login details to access the dashboard. Barangay leaders write and submit updates. The system saves these files and alerts administrators. LGU Admins approve or reject the posts and write announcements. The system saves these actions in audit logs.
 
-      The General Public / Tourists serve as a key external entity that interacts with the system in several essential ways. Users begin their interaction by submitting their search queries, viewing requests, and community feedback or cultural contributions into the system. The system processes these requests and then sends back to the user the rendered map data, rich cultural narratives, search results, and system notifications. This continuous flow of data ensures that tourists and the general public have seamless, real-time access to the municipality's heritage and tourism information.
+**Figure 2.4: Entity Relationship Diagram**
 
-      The LGU Admin / Barangay Representative serves as another main external entity who establishes contact with the system to perform their moderation and data management duties. These administrative users begin by submitting their authentication details to access the system and, in return, receive their authentication status along with their secure dashboard views. Once properly authenticated, administrators use the system to submit updated content, account updates, and approval or rejection commands for user-submitted contributions. The system processes these administrative inputs and outputs moderation queues and comprehensive audit logs back to the administrators to help them oversee the platform's content integrity.
+### **Entity-Relationship Diagram (ERD)**
 
-                                **Figure 2.4** Entity Relationship Diagram
+An Entity-Relationship Diagram (ERD) shows the database tables, fields, and connections. This ensures the database stores user logs, tourist spots, coordinates, and reviews correctly.
 
-                                   **Entity-Relationship Diagram (ERD)**
-      An Entity-Relationship Diagram (ERD) is a graphical representation of a system’s data structure that illustrates the entities involved in the system, their attributes, and the relationships between them. It is an essential tool in database design, providing developers with a clear understanding of how data is stored, connected, and accessed within a system. In the context of the Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan, the ERD plays a crucial role in guiding the logical structure of the database. It ensures that all core entities such as user accounts (General Public, Tourists, LGU Administrators, and Barangay Representatives), tourist spots, cultural heritage profiles, spatial coordinate records, and community contributions are accurately represented and properly linked, thereby supporting the system’s goal of digitizing local heritage, streamlining tourism information management, and securely processing interactive map data efficiently.
+The **user** table handles logins and security roles (like Admin, Contributor, Owner, and Guard). It connects to security tables like `password_reset_token` for password recovery. Actions are recorded in the `database_audit_log` table.
 
-      Presented in this section is the Entity-Relationship Diagram (ERD) that maps the database architecture of the proposed Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan. This model illustrates the fundamental data entities—representing users, geographic anchors, cultural registries, and business transactions—and the logical relationships connecting them. It serves as the data blueprint for how information is organized, stored, and retrieved to support the system’s core functionalities.
+The **barangay_info** table is the core location table. It connects landmarks, events, and businesses to their specific areas.
 
-     At the foundation of the system's security and accountability is the user entity. To manage authorization efficiently, the system tracks distinct administrative roles (such as Admin, Barangay Contributor, Business Owner, and Guard) directly tied to the primary user records. The user entity connects to security and data validation tables such as password\_reset\_token to facilitate secure, self-service account recovery. This design ensures that municipal stakeholders and content managers are securely granted the appropriate system privileges while maintaining strict system-wide transparency through a database\_audit\_log.
+The **heritage_profile** table stores historical assets following national inventory standards (Forms 01-07). It connects to the **attraction** table to show these assets on the map.
 
-      Beyond basic access, the database structure is geographically anchored by a central barangay\_info entity. This entity serves as the regional backbone of the system, connecting physical landmarks and administrative boundaries within Mangatarem to other specialized files. The barangay\_info records branch out into key descriptive profiles, capturing specific localized datasets for various assets. This centralized localization layout ensures that user accounts, heritage documentations, local festivals, and commercial businesses are accurately mapped and organized relative to their specific municipal barangay.
+The **establishment** table handles business details. It connects to **establishment_room** for lodging and **establishment_menu_item** for food options.
 
-      The core administrative process of cultural preservation is captured through a standardized documentation pipeline. A heritage\_profile entity handles the official registration of cultural assets, meeting strict national profiling benchmarks for tangible and intangible heritage. To optimize public tourism visibility, a heritage\_profile can link directly to an optional attraction entry. This structured link from a formal archive to a visitor-facing profile ensures smooth data transitions from municipal record-keeping to an interactive public mapping experience that highlights local landmarks and scheduled event occurrences.
-
-      To manage local commercial and hospitality tourism details, the system relies on a central transactional establishment entity. The establishment table acts as an operational intersection where local business records are cataloged and further segmented based on their specific services. Lodging-focused businesses branch into granular establishment\_room entities, while dining options feature culinary catalogs tracked via establishment\_menu\_item. This modular design allows local business stakeholders to cleanly organize, manage, and showcase their commercial offerings under a single unified enterprise presence.
-
-    Fulfilling the system's interactive engagement and public outreach capabilities, several entities are dedicated to tracking public evaluation and security logging. Visitors interact with the application by submitting testimonials and numerical ratings stored within establishment\_review, which are visually verified via linked review\_photo assets, or by saving references via user\_favorite\_establishment. Simultaneously, the platform processes community engagement through a newsletter\_subscriber list, while localized security checkpoints feed visitor entry and exit details into a visitor\_log entity to provide the LGU with comprehensive data-driven mobility insights.
-
-     In summary, the ERD provides a holistic view of the cultural map and tourism platform's data structure. By establishing clear relational links between secure user roles, regional geographic anchors, standardized heritage records, commercial listings, and public interaction logging, the design ensures high data integrity. This robust foundation is vital for executing the complex geospatial rendering, cloud-native content moderation, and multi-layered local tourism analytics required by the Mangatarem management system.
+Users can write reviews in **establishment_review**, upload photos in **review_photo**, or bookmark items in **user_favorite_establishment**. The system tracks newsletters in **newsletter_subscriber** and guest entries in the **visitor_log** table.
 
 ###
 
@@ -418,39 +407,36 @@ At its heart lies the application and presentation layer that powers the interac
 
 ### **Implementation Plan**
 
-      The implementation plan for the Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan serves as a strategic roadmap to transition the project from development to a fully operational state. Utilizing the Rapid Application Development (RAD) methodology, this plan emphasizes iterative refinements and active stakeholder involvement to ensure the final system effectively addresses the decentralized cultural documentation and manual tourism dissemination challenges faced by the Mangatarem Local Government Unit (LGU).
+The implementation plan is our timeline to launch the system. Following the RAD model, we involve users to ensure the final system fits the LGU's needs.
 
-      A Gantt Chart is essential for visualizing the development schedule, illustrating the sequence and duration of tasks while identifying key personnel for each phase. In the context of this project, the timeline is structured around the four primary stages of the RAD model—Requirements Planning, User Design, Construction, and Cutover ensuring a goal-oriented approach to system completion.
+A Gantt chart helps track our dates and tasks across the four RAD phases: Requirements Planning, User Design, Construction, and Cutover.
 
-      The project timeline is strategically structured over a sixteen-week period from February to May 2026, following the iterative phases of the RAD model to ensure rapid delivery and high alignment with institutional needs.
+The project runs for 16 weeks from February to May 2026.
 
-####                                          **Figure 2.5** Project Timeline
+#### **Figure 2.5: Project Timeline**
 
-####       The first phase, Requirements Planning, is carried out during the first week of February 2026\. This early stage involves the research team and key stakeholders focusing on finding the gaps in the current manual filing system and defining the core requirements for the Administrative and Stakeholder Users along with General Public and Academic Users to establish a technical blueprint tailored to the administrative and preservation needs of the Mangatarem LGU. The second phase, User Design, takes place during the second week of February. During this stage, the researchers collaborate with LGU staff and barangay representatives to create and refine mockups and wireframes for the interactive map and data management portals using Figma, ensuring usability through continuous feedback.
-
-####    Rapid Construction, which forms the technical core of the project, is implemented from the third week of February through the end of April 2026\. Led by the development team, this phase involves iterative coding in short cycles using HTML, Tailwind CSS, and JavaScript for the presentation layer and Python with Flask for the server-side business logic, while integrating the Supabase primary database and building the interactive mapping and content moderation workflows. The final phase, Cutover, is scheduled for the first and second weeks of May 2026\. This concluding task involves the full team and municipal system users, focusing on finalizing the system, conducting rigorous functional, security, and usability testing, and performing comprehensive user training sessions for the LGU staff and barangay leaders to ensure a smooth transition to the official public launch.
+#### 1. **Requirements Planning** (Week 1 of February 2026): The team and stakeholders find problems in the paper system and set the requirements for users.
+#### 2. **User Design** (Week 2 of February 2026): The team designs the screens in Figma and checks usability with LGU staff and leaders.
+#### 3. **Construction** (Week 3 of February to late April 2026): The team codes the frontend (HTML, Tailwind CSS, JS) and backend (Flask, Supabase PostgreSQL, map workflows) in short cycles.
+#### 4. **Cutover** (Weeks 1 and 2 of May 2026): The team runs tests, conducts training sessions, and launches the web app.
 
 ####
 
 #### **Deployment Plan**
 
-      The deployment plan outlines the final steps for the successful installation and launch of the system within the Mangatarem Local Government Unit (LGU) operational environment. Deployment is scheduled for the final weeks of the project timeline, marking the culmination of all development iterations. During this phase, the completed system will be migrated to a live cloud production environment utilizing Vercel for frontend and serverless backend execution, paired with Supabase for database management and Upstash Redis for optimized caching. System users, including the LGU Tourism Office staff and selected Barangay Representatives, will participate in internal Pilot Testing to verify that the end-to-end content moderation workflows and interactive geospatial mapping features function correctly. Identified issues and user feedback will be resolved promptly to ensure stability before the full launch. Following successful testing, structured training sessions will be conducted, and user manuals will be distributed to equip LGU administrators, barangay leaders, and local business owners with the knowledge needed to navigate the heritage profiling, business listing updates, and digital moderation portals effectively.
+Deployment happens in the final weeks. We host the frontend and backend on Vercel, use Supabase for the database, and set up Upstash Redis. Staff and leaders perform pilot tests to check the moderation dashboard and map. We fix any issues found, train users, and share manuals.
 
 #### **Resource Requirements**
 
-      The successful implementation and long-term sustainability of the system depend on several critical hardware, software, and human components. Regarding Hardware Resources, development is supported by machines equipped with a minimum of an Intel Core i5 or equivalent processor with 8GB RAM (16GB recommended) and SSD storage. For daily operational use, the designated LGU operator workstation at the Tourism Office requires a similarly capable desktop or laptop with at least an Intel Core i5 and 8GB RAM. Meanwhile, end-users such as Public Users, Barangay Representatives, and Students or Researchers will require standard smartphones, tablets, or personal computers with web browser access.
-
-      A stable internet connection is essential across all devices, as the system is cloud-based and requires real-time data synchronization for the interactive map and moderation portals.
-
-      Software Resources include the use of Visual Studio Code as the primary development environment, Figma for UI/UX prototyping and wireframing, Python 3.12+ along with the uv package manager, and Git for version control. The system itself is built on a modern stack utilizing HTML, Tailwind CSS, and JavaScript with Mapbox GL JS for the frontend, and Python with the Flask framework for the backend, supported by a Supabase PostgreSQL database and Upstash Redis caching. From a Human Resource perspective, the development team—composed of Jem Carlo Austria, Mary Jane Dalas, Rea Solis, and Joy De Guzman—is responsible for executing the system's development, deployment, and technical troubleshooting. The active participation of the LGU Tourism Office staff and designated Barangay Officials and Representatives is vital during the testing, training, and operational phases to ensure the system is ready to meet the daily demands of preserving and disseminating the cultural heritage of Mangatarem.
+- **Hardware**: Developers need machines with an Intel i5 processor and 8GB RAM (16GB recommended). The LGU office needs a similar workstation. Public users only need standard phones, tablets, or computers with internet access.
+- **Software**: We use VS Code, Figma, Python 3.12, and Git. The system uses HTML, Tailwind CSS, JavaScript, Flask, Supabase PostgreSQL, and Upstash Redis.
+- **Human Resources**: The development team (Jem Carlo, Mary Jane, Rea, and Joy) writes the code. LGU staff and barangay leaders participate in testing and training.
 
 # **Chapter III**
 
 # **RESULT AND DISCUSSION**
 
-This chapter presents the comprehensive results of the design, development, and evaluation of the Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan. It includes the data flow diagrams and entity-relationship models, which illustrate the logical structure and digital workflow of the application, as well as an overview of the developed modules and user interfaces designed to support General Public and Academic Users, local Business Owners, and LGU Administrators. The chapter also outlines the outcomes of the system testing and evaluation processes, which were conducted to ensure that the system met all functional, security, and performance standards prior to its official deployment for the Mangatarem Local Government Unit (LGU) Tourism Office in Mangatarem, Pangasinan.
-
-These testing activities included functional testing to confirm that core features such as the dynamic geospatial map rendering, the national-standard cultural heritage registry (Forms 01-07), and the multi-layered content moderation workflow operated as intended; security testing to evaluate the system’s role-based access control and the strict logging of administrative modifications within the immutable database audit logs; usability testing to assess the intuitiveness of the public mapping interface and administrative dashboard; and user acceptance testing (UAT) to gather direct feedback from the LGU Tourism Office staff and designated Barangay Representatives. Furthermore, this chapter presents the implementation results, detailing the cloud-native deployment strategy utilizing Vercel and Supabase, technical issues encountered during the iterative RAD phases, and the caching solutions implemented via Upstash Redis to optimize high-frequency queries and map loading speeds. The chapter concludes with a discussion of key findings that reflect the system’s effectiveness in digitalizing cultural narratives, enhancing local tourism information accessibility, and maintaining data stewardship accountability through a robust real-time synchronization framework.
+This chapter shows the results of building and testing the system. It describes the diagrams, the features, the user interfaces, and the testing results prior to launch.
 
 ##
 
@@ -466,21 +452,24 @@ These testing activities included functional testing to confirm that core featur
 
 ##
 
-##                                **Proposed System Flowchart**
+## **Proposed System Flowchart**
 
-                                      **Figure 3.1** Proposed System Flowchart
+**Figure 3.1: Proposed System Flowchart**
 
 ## **Cultural Mapping and Content Moderation (LGU Workflow) Flowchart**
 
-##       The system workflow begins when a user initiates a session by accessing the digital web portal, prompting the main interactive map interface to load. For a Public Visitor, the workflow moves into the searching and filtering categories module, where they can refine their view by cultural categories or specific barangay boundaries. The system then processes this request to explore the interactive map, pulling data dynamically from the database to render custom visual pins directly on the screen. When a visitor clicks a pin to view attraction details, the system retrieves the full profile—complete with descriptions, hours, and photos—from the database repository. Finally, visitors can leave reviews or interactive feedback, which the system processes and immediately saves to update the live feed.
+## ### **System Workflow**
+- **Public Visitor**: The visitor opens the site and loads the map. They can search and filter by category or barangay. The system loads coordinates from the database and renders pins. Clicking a pin opens details (photos, hours, descriptions). Visitors can also write reviews.
+- **Barangay Representative**: The leader logs in and opens their dashboard. They fill out digital heritage forms (01-07), upload photos, and submit. The system saves this as 'Pending' in Supabase.
+- **LGU Administrator**: The admin logs into the admin dashboard to review pending files. If coordinates or facts are wrong, the admin rejects the submission and adds feedback. The file goes back to the leader's dashboard. If correct, the admin approves the file, and the system shows the new pin on the public map.
 
 ## **Barangay Representative Flowchart**
 
-##       For the Barangay Representative, the workflow begins with a secure login process that verifies their identity before granting access to their specialized Barangay Dashboard. From this workspace, representatives can digitally fill out heritage forms 01–07 using standard inventory layouts and upload associated photos or videos. Once they submit the asset for review, the workflow saves the submission under a "Pending" status within the Supabase database. This triggers the Tourism Office Admin workflow, where an administrator logs into the system with high-privilege credentials to access the central Admin Dashboard and review pending submissions.
+## (Combined in System Workflow above)
 
 ## **Tourism Office Admin (Admin) Flowchart**
 
-##       The system then encounters a crucial administrative decision point: verifying if the asset meets official standards. If the coordinates or details are incorrect, the admin rejects the submission, attaches explanatory notes, and loops the workflow back to the representative's dashboard for correction. If the submission passes verification, the admin approves and publishes the asset; the system instantly changes its status to "Approved," updates the central mapping engine, and renders the new pin on the public map interface to complete the operational workflow.
+## (Combined in System Workflow above)
 
 ##
 
@@ -490,25 +479,21 @@ These testing activities included functional testing to confirm that core featur
 
 ## **System Features and User Interfaces**
 
-      This section details the core functionalities of the Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan based on the defined data flow processes. The platform is designed with a role-based architecture to ensure data security, operational efficiency, and a streamlined workflow. Access is strictly divided between authorized personnel, specifically the LGU Administrators and the Barangay Representatives, alongside the public-facing interfaces designed for the General Public and Tourists.
+The web app uses role-based access to protect data and organize workflows:
 
 **Home**
 
-      This feature enables the General Public and Tourists to visually explore the municipality's cultural and tourism assets. This includes interacting with the digital map, searching for local landmarks and businesses, and viewing verified heritage profiles to support public tourism engagement.
+Let's public users search the map, filter spots, and view historical details.
 
-                                      **Figure 3.2** Home
+**Figure 3.2: Home**
 
-     This feature enables the LGU Tourism Office Admin to oversee the entire platform via a centralized dashboard. This includes monitoring site traffic, checking system statistics, and reviewing the queue of pending cultural asset submissions and business updates to ensure data integrity before public display.
+Let's LGU staff check site traffic, system numbers, and review pending posts.
 
-                                      **Figure 3.3** Dashboard
-
-###
-
-###       This feature enables the LGU Administrators and Barangay Representatives to securely access the platform's backend tools. This includes submitting authentication credentials (such as an email and password) to verify their identity and system role before granting them access to their respective data management portals and moderation dashboards.
+**Figure 3.3: Dashboard**
 
 ###
 
-###
+### Let's LGU staff and barangay leaders enter their credentials to access the backend safely.
 
 ###
 
@@ -526,7 +511,19 @@ These testing activities included functional testing to confirm that core featur
 
 ###
 
-                                       **Figure 3.4** Login
+###
+
+###
+
+###
+
+###
+
+###
+
+###
+
+**Figure 3.4: Login**
 
 ### **System Testing Evaluation**
 
@@ -564,33 +561,21 @@ These testing activities included functional testing to confirm that core featur
 
 ## **Discussion of Findings**
 
-      The results of the conducted testing demonstrate that the system performs effectively in terms of functionality, performance, security, usability, and user acceptance. Based on the findings, the system successfully achieved its intended objectives and provided reliable support for the operations of the Mangatarem Local Government Unit (LGU) Tourism Office management and cultural preservation process.
+The results of the conducted testing demonstrate that the system performs effectively in terms of functionality, performance, security, usability, and user acceptance. Based on the findings, the system successfully achieved its intended objectives and provided reliable support for the operations of the Mangatarem Local Government Unit (LGU) Tourism Office management and cultural preservation process.
 
-      In terms of **Functionality Testing (100% Success Rate)**, the system successfully executed core features such as secure role-based login authentication, geospatial coordinate mapping, digital heritage profiling using standard Forms 01–07, multi-layered content moderation workflows, and local commercial directory updates. Most test cases passed successfully and produced the expected results within the Vercel and Supabase ecosystem. However, one specific issue was identified during the content moderation workflow where a Barangay Representative was strictly blocked from modifying or retracting an asset once it entered the administrative "Pending" queue, requiring a formal administrative rejection override to unlock editing capabilities. This finding highlights that while the automated moderation pipeline effectively enforces data validation rules and maintains strict historical integrity, additional localized draft-saving or intermediate editing permissions may still be required to provide greater flexibility for contributors before final submission.
+In terms of Functionality Testing (100% Success Rate), the system successfully executed core features such as secure role-based login authentication, geospatial coordinate mapping, digital heritage profiling using standard Forms 01–07, multi-layered content moderation workflows, and local commercial directory updates. Most test cases passed successfully and produced the expected results within the Vercel and Supabase ecosystem. However, one specific issue was identified during the content moderation workflow where a Barangay Representative was strictly blocked from modifying or retracting an asset once it entered the administrative "Pending" queue, requiring a formal administrative rejection override to unlock editing capabilities. This finding highlights that while the automated moderation pipeline effectively enforces data validation rules and maintains strict historical integrity, additional localized draft-saving or intermediate editing permissions may still be required to provide greater flexibility for contributors before final submission.
 
-     For **Performance Testing (100% Success Rate)**, the system demonstrated fast response times and stable operation under normal and simulated peak workloads. Administrative dashboard loading, multi-media asset uploading, geospatial pin rendering via Mapbox GL JS, and live local business search functionalities all executed within highly acceptable response thresholds. Due to the seamless integration of an Upstash Redis caching layer, high-frequency spatial queries and database retrieval operations completed within milliseconds, indicating that the system can efficiently process localized tourism data and public map interactions without causing latency or rendering delays to end-users. These results confirm that the system architecture is robust and capable of supporting daily municipal operations and tourist heavy-traffic periods in a responsive and efficient manner.
+For Performance Testing (100% Success Rate), the system demonstrated fast response times and stable operation under normal and simulated peak workloads. Administrative dashboard loading, multi-media asset uploading, geospatial pin rendering via Mapbox GL JS, and live local business search functionalities all executed within highly acceptable response thresholds. Due to the seamless integration of an Upstash Redis caching layer, high-frequency spatial queries and database retrieval operations completed within milliseconds, indicating that the system can efficiently process localized tourism data and public map interactions without causing latency or rendering delays to end-users. These results confirm that the system architecture is robust and capable of supporting daily municipal operations and tourist heavy-traffic periods in a responsive and efficient manner.
 
-      The **Security Testing (100% Success Rate)** results revealed that the system possesses strong protection against common web vulnerabilities, injection threats, and unauthorized system access attempts. All security test cases passed successfully, including brute force protection on the administrative portal, SQL injection prevention within the PostgreSQL backend, Insecure Direct Object Reference (IDOR) protection across administrative records, cross-site scripting (XSS) prevention on public review inputs, and malicious file upload blocking for multimedia heritage submissions. The implementation of strict server-side input sanitization, role-based access control (RBAC) validations, and the generation of immutable system logs within the database audit logging engine (DATABASE\_AUDIT\_LOG) contributed significantly to safeguarding municipal records and maintaining transparent, secure system operations. These findings indicate that the platform provides a highly secure environment for both LGU administrators and the general public.
+The Security Testing (100% Success Rate) results revealed that the system possesses strong protection against common web vulnerabilities, injection threats, and unauthorized system access attempts. All security test cases passed successfully, including brute force protection on the administrative portal, SQL injection prevention within the PostgreSQL backend, Insecure Direct Object Reference (IDOR) protection across administrative records, cross-site scripting (XSS) prevention on public review inputs, and malicious file upload blocking for multimedia heritage submissions. The implementation of strict server-side input sanitization, role-based access control (RBAC) validations, and the generation of immutable system logs within the database audit logging engine (DATABASE_AUDIT_LOG) contributed significantly to safeguarding municipal records and maintaining transparent, secure system operations. These findings indicate that the platform provides a highly secure environment for both LGU administrators and the general public.
 
-      Based on the **Usability Testing (4.73 Success Rate \- Agree)**, respondents provided highly positive feedback regarding the digital cultural map’s ease of use, interface layout, map navigation, and clarity of the heritage inventory forms. The system received high average scores across all usability criteria, particularly in user-friendliness, spatial filtering, and transaction feedback during asset uploads. Users found the web-based interface easy to navigate and understandable even with minimal technical effort, suggesting that the presentation layer effectively supports a smooth user experience for individuals of varying digital literacy levels, including rural barangay representatives. Although exact manual coordinate plotting and text-heavy instructional layouts for specific cultural categories received slightly lower ratings compared to other interactive elements, they still remained well within the positive evaluation range.
+Based on the Usability Testing (4.38 Average Score - Agree), respondents provided highly positive feedback regarding the digital cultural map’s ease of use, interface layout, map navigation, and clarity of the heritage inventory forms. The system received high average scores across all usability criteria, particularly in user-friendliness, spatial filtering, and transaction feedback during asset uploads. Users found the web-based interface easy to navigate and understandable even with minimal technical effort, suggesting that the presentation layer effectively supports a smooth user experience for individuals of varying digital literacy levels, including rural barangay representatives. Although exact manual coordinate plotting and text-heavy instructional layouts for specific cultural categories received slightly lower ratings compared to other interactive elements, they still remained well within the positive evaluation range.
 
-      Similarly, the **Acceptance Testing (4.40 Success Rate \- Agree)** results indicate a high level of overall satisfaction among the primary stakeholders. Respondents, including LGU Tourism Office staff, municipal leaders, and local business owners, strongly agreed that the system functions exactly as expected, performs efficiently, and completely addresses their operational requirements. The platform's ability to seamlessly transition manual, paper-bound tourism files, outdated printed pamphlets, and unverified social media information into an organized, single-source digital platform contributed greatly to user acceptance. These findings demonstrate that the developed interactive digital map is highly acceptable for practical, long-term implementation within the local government structure.
+Similarly, the Acceptance Testing (4.40 Success Rate - Agree) results indicate a high level of overall satisfaction among the primary stakeholders. Respondents, including LGU Tourism Office staff, municipal leaders, and local business owners, strongly agreed that the system functions exactly as expected, performs efficiently, and completely addresses their operational requirements. The platform's ability to seamlessly transition manual, paper-bound tourism files, outdated printed pamphlets, and unverified social media information into an organized, single-source digital platform contributed greatly to user acceptance. These findings demonstrate that the developed interactive digital map is highly acceptable for practical, long-term implementation within the local government structure.
 
-      Overall, the testing results highlight several institutional and technical strengths of the system, including reliable geospatial data synchronization, rapid content retrieval, stringent security parameters, transparent audit tracking, and an intuitive user interface. At the same time, the findings also suggest key opportunities for further enhancement, particularly in improving contributor flexibility during the pre-moderation phase, refining fine-grained instructions for physical asset forms, and enhancing data handling in lower-bandwidth environments. Future development may focus on implementing an offline-first local storage module for remote barangay collection, optimizing visual asset compression, and providing controlled draft-saving features to further maximize the operational effectiveness of the municipal mapping ecosystem.
+Overall, the testing results highlight several institutional and technical strengths of the system, including reliable geospatial data synchronization, rapid content retrieval, stringent security parameters, transparent audit tracking, and an intuitive user interface. At the same time, the findings also suggest key opportunities for further enhancement, particularly in improving contributor flexibility during the pre-moderation phase, refining fine-grained instructions for physical asset forms, and enhancing data handling in lower-bandwidth environments. Future development may focus on implementing an offline-first local storage module for remote barangay collection, optimizing visual asset compression, and providing controlled draft-saving features to further maximize the operational effectiveness of the municipal mapping ecosystem.
 
-##
 
-##
-
-##
-
-##
-
-##
-
-##
-
-##
 
 ## **Analysis of Results**
 
@@ -632,7 +617,7 @@ The system successfully executed essential functions which included secure user 
 
 ### **Security Testing Analysis**
 
-     Security testing was conducted to ensure that the BLRT Driving School system adequately protects sensitive student information, uploaded documents, and core administrative modules against unauthorized access and common web vulnerabilities. This included verifying the system's defenses against brute-force attacks, SQL injection, cross-site scripting (XSS), and malicious file uploads, ensuring a secure environment for both students and staff.
+Security testing was conducted to ensure that the Interactive Digital Cultural Map and Local Tourism Information System adequately protects municipal tourism records, uploaded multimedia files, and core administrative modules against unauthorized access and common web vulnerabilities. This included verifying the system's defenses against brute-force attacks, SQL injection, cross-site scripting (XSS), and malicious file uploads, ensuring a secure environment for both LGU staff and public users.
 
 | Security Test | Expected Behavior | Actual Behavior | Pass/Fail | Remarks |
 | :---- | :---- | :---- | :---- | :---- |
@@ -651,19 +636,25 @@ The system successfully executed essential functions which included secure user 
 
 ### **Usability Testing Analysis**
 
-  Usability testing was conducted among 21 selected respondents to systematically evaluate the interface design, ease of navigation, clarity of instructions, and overall user-friendliness of the Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan.
+Usability testing was conducted among 7 selected respondents to systematically evaluate the interface design, ease of navigation, clarity of instructions, and overall user-friendliness of the Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan.
 
+**Table 3.4: Usability testing**
 | Evaluation Criteria | Strongly Disagree (1) | Disagree (2) | Neutral (3) | Agree (4) | Strongly Agree (5) | Average Score |
 | :---- | :---- | :---- | :---- | :---- | :---- | :---- |
 | The system is easy to navigate | 0 | 0 | 1 | 2 | 4 | 4.4 |
-| The interface design is clear and visually appealing | 0 | 1 | 0 | 2 | 4 | 4..3 |
+| The interface design is clear and visually appealing | 0 | 1 | 0 | 2 | 4 | 4.3 |
 | System instructions and labels are understandable | 0 | 0 | 1 | 2 | 4 | 4.4 |
 | The system is user-friendly and requires minimal effort to learn | 0 | 0 | 1 | 2 | 4 | 4.4 |
 
-**Table 3.4:** Usability testing
+**Average Score Calculation:**
+Average Score = (Sum of Row Averages / Total Number of Criteria)
+Overall Average Score = (4.4 + 4.3 + 4.4 + 4.4) / 4
+Overall Average Score = 17.5 / 4
+Overall Average Score = 4.38
 
-**Overall Average Usability Rating: 4.37**
-The system successfully executed essential usability criteria which included providing an easy-to-navigate web portal and highly understandable system instructions and clear labels and an intuitive user-friendly environment requiring minimal effort to learn. The system encountered a drop in ratings when it attempted to evaluate the visual appeal and clarity of the interface design because one evaluator submitted a disagreeing score. The interface presentation score was consequently reduced to an average of 4.37 because certain visual elements and layout alignment properties required further aesthetic refinement.
+**Overall Average Usability Rating: 4.38 (Agree)**
+
+The system successfully achieved high usability ratings across essential criteria, providing an easy-to-navigate web portal, highly understandable system instructions, clear labels, and an intuitive environment that requires minimal effort to learn. The interface design and visual appeal received a slightly lower average score of 4.3 because one evaluator submitted a disagreeing rating. This feedback indicates that certain visual elements and layout alignment properties will benefit from further aesthetic refinement.
 
 ###
 
@@ -686,14 +677,6 @@ The tests in this chapter show that the Digital Cultural Map works very well. Th
 
 **Chapter IV**
 **RECOMMENDATIONS**
-
-### **Stakeholder: Local Government Unit (LGU) of Mangatarem**
-
-The Local Government Unit (LGU) of Mangatarem is advised to establish a formal, internal data management policy that mandates the regular verification, backup, and archival of cultural assets to ensure the long-term sustainability of the system. It is recommended that the Municipal Tourism Office designate a permanent 'System Administrator' or technical committee tasked with the continuous monitoring and updating of the platform to prevent data obsolescence. Furthermore, the LGU should initiate a formalized data-sharing agreement with various barangay offices to streamline the validation process for new cultural entries, ensuring that all digital records remain accurate and community-verified. Implementing a structured technical training program for current municipal employees will be vital to build internal proficiency, thereby reducing dependency on external developers for routine system maintenance. Finally, integrating this system into the tourism department’s annual strategic plan and budget will ensure the necessary financial allocation for ongoing server costs, software security updates, and future system enhancements.
-
-### **Future Development**
-
-For future iterations, the development team should integrate a mobile-responsive Augmented Reality (AR) feature, allowing tourists to visualize historical overlays or 'then-and-now' perspectives when visiting specific cultural sites in Mangatarem. The system should evolve into a native mobile application that utilizes GPS-based geotagging, enabling location-aware notifications and personalized tourism recommendations as users traverse different parts of the municipality. To maximize public engagement, developers should implement a user-generated content module that allows local residents to securely contribute photos, anecdotes, and oral histories, effectively crowd-sourcing the expansion of the municipal cultural database. Additionally, the inclusion of a real-time analytics dashboard would enable the tourism office to monitor visitor traffic patterns, peak hours, and seasonal trends, which is essential for data-driven municipal planning and development. Finally, adopting a cloud-native architecture that supports multi-language functionality will facilitate broader accessibility, effectively bridging the gap between local heritage preservation and international tourism promotion.
 
 ## **References**
 

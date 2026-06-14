@@ -129,8 +129,8 @@ def test_user_search_api(app, client):
         with client.session_transaction() as sess:
             sess['_user_id'] = str(staff.id)
 
-        # Search for 'tourist'
-        resp = client.get("/auth/api/users/search?q=tourist")
+        # Search for 'tourist_'
+        resp = client.get("/auth/api/users/search?q=tourist_")
         assert resp.status_code == 200
         data = resp.get_json()
         assert data is not None

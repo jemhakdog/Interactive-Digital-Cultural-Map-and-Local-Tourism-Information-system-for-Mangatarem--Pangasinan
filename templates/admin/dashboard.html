@@ -147,11 +147,11 @@
     </div>
 
     <!-- Approval Queues -->
-    {% if pending_users or pending_gallery or pending_reviews %}
+    {% if pending_users or pending_gallery or pending_reviews or pending_announcements %}
     <div class="space-y-6">
         <h2 class="text-xl font-black text-slate-800 flex items-center gap-3 font-heading uppercase tracking-wider">
             <span class="w-8 h-8 rounded-xl bg-yellow-500 text-white flex items-center justify-center font-black text-sm shadow-md shadow-yellow-500/20">
-                {{ pending_users|length + pending_gallery|length + pending_reviews|length }}
+                {{ pending_users|length + pending_gallery|length + pending_reviews|length + pending_announcements|length }}
             </span>
             <span>Awaiting Validation</span>
         </h2>
@@ -283,6 +283,54 @@
                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
                                                 </svg>
                                             </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Pending Announcements Queue -->
+            {% if pending_announcements %}
+            <div class="glass-card rounded-3xl overflow-hidden flex flex-col justify-between">
+                <div>
+                    <div class="px-6 py-4 border-b border-slate-100 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-premium-blue" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                        <h4 class="font-black text-slate-800 text-xs uppercase tracking-wider">Pending Announcements</h4>
+                    </div>
+                    <div class="overflow-x-auto admin-scrollbar">
+                        <table class="w-full text-left border-collapse">
+                            <tbody class="divide-y divide-slate-100">
+                                {% for item in pending_announcements %}
+                                <tr class="hover:bg-slate-50/50 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <p class="font-bold text-slate-800 text-xs leading-normal">{{ item.title }}</p>
+                                        <p class="text-slate-400 text-[10px] font-semibold mt-1">
+                                            by <span class="text-slate-600 font-bold">{{ item.user.username }}</span> for Barangay {{ item.barangay.name if item.barangay else 'Central LGU' }}
+                                        </p>
+                                    </td>
+                                    <td class="px-6 py-4 text-right align-middle">
+                                        <div class="flex justify-end gap-2">
+                                            <a href="{{ url_for('admin.admin_approve_announcement', id=item.id) }}"
+                                               class="p-2 bg-sky-500 text-white rounded-xl hover:bg-sky-600 transition shadow-sm admin-action-btn"
+                                               title="Approve Announcement">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                                </svg>
+                                            </a>
+                                            <a href="{{ url_for('admin.admin_reject_announcement', id=item.id) }}"
+                                               class="p-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition admin-action-btn"
+                                               title="Reject Announcement">
+                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                                                </svg>
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>

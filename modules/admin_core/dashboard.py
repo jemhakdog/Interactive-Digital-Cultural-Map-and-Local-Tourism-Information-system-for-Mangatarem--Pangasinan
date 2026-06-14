@@ -5,7 +5,7 @@ from sqlalchemy import func
 from datetime import datetime, timedelta
 from typing import Dict, List, Tuple
 
-from models import db, User, Attraction, Event, GalleryItem, AttractionReview, UserFavoriteAttraction, AnalyticsPageView
+from models import db, User, Attraction, Event, GalleryItem, AttractionReview, UserFavoriteAttraction, AnalyticsPageView, Announcement
 from utils.logger_helper import log_entry, log_success, log_error
 from . import admin_bp
 
@@ -69,6 +69,7 @@ def _get_pending_items() -> Dict[str, any]:
         "users": User.query.filter(User.is_approved == False, User.role.in_(["contributor", "business_owner"])).all(),
         "gallery": GalleryItem.query.filter_by(status="pending").all(),
         "reviews": AttractionReview.query.filter_by(status="pending").join(User, AttractionReview.user_id == User.id).join(Attraction, AttractionReview.attraction_id == Attraction.id).all(),
+        "announcements": Announcement.query.filter_by(status="pending").all(),
     }
 
 
@@ -117,6 +118,7 @@ def admin_dashboard():
         pending_users=pending["users"],
         pending_gallery=pending["gallery"],
         pending_reviews=pending["reviews"],
+        pending_announcements=pending["announcements"],
         top_attractions=top_attractions,
         engagement_data=engagement_data,
         recent_activity=recent_activity,

@@ -172,6 +172,9 @@ document.addEventListener('DOMContentLoaded', function () {
     if (!isLeafletMode) {
         map.on('style.load', () => {
             // Remove layers first (they depend on the source)
+            if (map.getLayer('mvt-heritage-glow')) {
+                map.removeLayer('mvt-heritage-glow');
+            }
             if (map.getLayer('mvt-points')) {
                 map.removeLayer('mvt-points');
             }
@@ -217,6 +220,31 @@ document.addEventListener('DOMContentLoaded', function () {
         const labelLayerId = layers?.find(
             (layer) => layer.type === 'symbol' && layer.layout?.['text-field']
         )?.id;
+
+        // Add a golden/bronze heritage glow layer for dual-marker representation
+        if (!map.getLayer('mvt-heritage-glow')) {
+            map.addLayer({
+                id: 'mvt-heritage-glow',
+                type: 'circle',
+                source: 'mvt-tiles',
+                'source-layer': 'layer',
+                minzoom: 10,
+                filter: ['in', 'category', 'Built', 'Movable', 'Intangible', 'Personality', 'Institution', 'Historical'],
+                paint: {
+                    'circle-radius': [
+                        'interpolate',
+                        ['linear'],
+                        ['zoom'],
+                        10, 8,
+                        14, 15,
+                        16, 22
+                    ],
+                    'circle-color': '#d97706',
+                    'circle-opacity': 0.45,
+                    'circle-blur': 0.6
+                }
+            }, labelLayerId);
+        }
 
         // Add circle layer for points (styled by category)
         if (!map.getLayer('mvt-points')) {

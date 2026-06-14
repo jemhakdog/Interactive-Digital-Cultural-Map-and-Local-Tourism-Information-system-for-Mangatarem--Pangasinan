@@ -95,11 +95,33 @@ def index():
         if redis:
             redis.set("home_featured_establishments_v2", json.dumps(featured_establishments), ex=3600)
 
+    # Fetch latest 3 approved announcements
+    latest_announcements = []
+    try:
+        from models import Announcement
+        latest_announcements = Announcement.query.filter_by(status="approved").order_by(Announcement.created_at.desc()).limit(3).all()
+    except Exception as e:
+        logger.error(f"Error fetching latest announcements: {e}")
+
     return render_template(
         "pagez/index.html", 
         featured=featured_attractions,
-        featured_establishments=featured_establishments
+        featured_establishments=featured_establishments,
+        announcements=latest_announcements
     )
+
+
+@public_bp.route("/announcements")
+def announcements_public_feed():
+    """
+    Public timeline feed showing all approved announcements.
+    """
+    logger.info("Public announcements feed accessed")
+    record_view("page", page_name="announcements_feed")
+    from models import Announcement
+    
+    announcements = Announcement.query.filter_by(status="approved").order_by(Announcement.created_at.desc()).all()
+    return render_template("pagez/announcements.html", announcements=announcements)
 
 
 

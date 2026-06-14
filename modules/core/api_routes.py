@@ -68,7 +68,9 @@ def api_attractions():
             "longitude": attr.longitude,
             "barangay": attr.barangay.name if attr.barangay else None,
             "image_url": attr.image_url,
-            "osm_alternatives": attr.osm_alternatives
+            "osm_alternatives": attr.osm_alternatives,
+            "heritage_profile_id": attr.heritage_profile_id,
+            "heritage_asset_type": attr.heritage_profile.asset_type if attr.heritage_profile else None
         })
         
     payload = {

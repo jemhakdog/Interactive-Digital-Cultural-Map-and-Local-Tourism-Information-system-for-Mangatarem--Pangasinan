@@ -51,3 +51,7 @@ from modules.booking.models import BookableAsset, BookingSlot, Reservation
 # === Gamification Module Models ===
 from modules.gamification.models import AchievementBadge, UserPassport, TouristCheckIn
 
+# === Announcements Module Models ===
+from modules.announcements.models import Announcement
+
+

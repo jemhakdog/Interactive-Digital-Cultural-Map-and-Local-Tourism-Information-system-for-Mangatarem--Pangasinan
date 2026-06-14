@@ -1,15 +1,17 @@
 /* 
-   Barangay Directory - Mobile Optimized Styles (App-like UI)
-   Inspired by premium property listing aesthetics.
+   Barangay Directory - Premium Dark Mode Dashboard Styles
 */
 
 :root {
-    --mobile-bg: #F8F9FB;
-    --mobile-accent: #0ea5e9; /* Sky 500 */
-    --mobile-text-main: #1A1D23;
-    --mobile-text-muted: #6B7280;
-    --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-    --glass-bg: rgba(255, 255, 255, 0.85);
+    --mobile-bg: #121212;
+    --mobile-panel: #1a1a1a;
+    --mobile-accent: #a3e635; /* Lime-green */
+    --mobile-accent-hover: #85e024;
+    --mobile-text-main: #f3f4f6;
+    --mobile-text-muted: #9ca3af;
+    --border-color: #2d2d2d;
+    --card-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    --glass-bg: rgba(26, 26, 26, 0.85);
 }
 
 /* Mobile Layout Container */
@@ -18,6 +20,7 @@
     min-height: 100vh;
     padding-bottom: 80px; /* Space for bottom nav */
     font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+    color: var(--mobile-text-main);
 }
 
 /* Mobile Header */
@@ -52,14 +55,14 @@
 }
 
 .search-pill {
-    background: white;
+    background: var(--mobile-panel);
     border-radius: 1rem;
     padding: 0.75rem 1rem;
     display: flex;
     align-items: center;
     gap: 0.75rem;
     box-shadow: var(--card-shadow);
-    border: 1px solid rgba(0,0,0,0.02);
+    border: 1px solid var(--border-color);
 }
 
 .search-pill input {
@@ -71,9 +74,13 @@
     background: transparent;
 }
 
+.search-pill input::placeholder {
+    color: var(--mobile-text-muted);
+}
+
 .filter-btn {
     background: var(--mobile-accent);
-    color: white;
+    color: #000;
     width: 40px;
     height: 40px;
     border-radius: 0.75rem;
@@ -81,6 +88,11 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    transition: background-color 0.2s ease;
+}
+
+.filter-btn:hover {
+    background: var(--mobile-accent-hover);
 }
 
 /* Horizontal Scroller */
@@ -122,18 +134,28 @@
     display: none;
 }
 
+/* Popular Card */
 .popular-card {
     flex: 0 0 240px;
-    background: white;
+    background: var(--mobile-panel);
     border-radius: 1.5rem;
     overflow: hidden;
     scroll-snap-align: start;
     box-shadow: var(--card-shadow);
     position: relative;
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s ease, border-color 0.2s ease;
+    text-decoration: none;
+    display: block;
+}
+
+.popular-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--mobile-accent);
 }
 
 .popular-card-img {
-    height: 180px;
+    height: 140px;
     width: 100%;
     object-fit: cover;
 }
@@ -146,7 +168,7 @@
     position: absolute;
     top: 0.75rem;
     left: 0.75rem;
-    background: rgba(255,255,255,0.9);
+    background: rgba(18, 18, 18, 0.8);
     backdrop-filter: blur(4px);
     padding: 0.25rem 0.75rem;
     border-radius: 0.5rem;
@@ -154,36 +176,50 @@
     font-weight: 800;
     text-transform: uppercase;
     color: var(--mobile-accent);
+    border: 1px solid var(--border-color);
 }
 
-/* Discovery List */
+/* Discovery List (Barangay Cards) */
 .discovery-section {
     padding: 1rem 1.25rem;
 }
 
 .discovery-card {
     display: flex;
-    align-items: center;
-    gap: 1rem;
-    background: white;
-    padding: 0.75rem;
-    border-radius: 1.25rem;
-    margin-bottom: 1rem;
+    flex-direction: column;
+    background: var(--mobile-panel);
+    padding: 1rem;
+    border-radius: 1.5rem;
+    margin-bottom: 1.5rem;
     box-shadow: var(--card-shadow);
+    border: 1px solid var(--border-color);
+    transition: border-color 0.2s ease, transform 0.2s ease;
+    text-decoration: none;
+}
+
+.discovery-card:hover {
+    border-color: var(--mobile-accent);
+    transform: translateY(-2px);
 }
 
 .discovery-card-img {
-    width: 80px;
-    height: 80px;
+    width: 100%;
+    aspect-ratio: 16 / 9;
     border-radius: 1rem;
     object-fit: cover;
+    margin-bottom: 1rem;
+}
+
+.discovery-card-content {
+    display: flex;
+    flex-direction: column;
 }
 
 .discovery-card-content h4 {
-    font-size: 0.9375rem;
+    font-size: 1.125rem;
     font-weight: 700;
     color: var(--mobile-text-main);
-    margin-bottom: 0.25rem;
+    margin: 0;
 }
 
 .discovery-card-meta {
@@ -205,7 +241,7 @@
     display: flex;
     justify-content: space-around;
     padding: 0.75rem 0.5rem calc(0.75rem + env(safe-area-inset-bottom));
-    border-top: 1px solid rgba(0,0,0,0.05);
+    border-top: 1px solid var(--border-color);
     z-index: 100;
 }
 
@@ -244,7 +280,7 @@
 .bottom-sheet-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.4);
+    background: rgba(0,0,0,0.6);
     z-index: 200;
     opacity: 0;
     pointer-events: none;
@@ -261,9 +297,10 @@
     bottom: 0;
     left: 0;
     right: 0;
-    background: white;
+    background: var(--mobile-panel);
     border-top-left-radius: 2.5rem;
     border-top-right-radius: 2.5rem;
+    border-top: 1px solid var(--border-color);
     padding: 2rem 1.5rem calc(1.5rem + env(safe-area-inset-bottom));
     z-index: 201;
     transform: translateY(100%);
@@ -277,7 +314,7 @@
 .sheet-handle {
     width: 40px;
     height: 4px;
-    background: #E5E7EB;
+    background: var(--border-color);
     border-radius: 2px;
     margin: -1rem auto 1.5rem;
 }
@@ -285,6 +322,7 @@
 .filter-group-title {
     font-size: 1rem;
     font-weight: 700;
+    color: var(--mobile-text-main);
     margin-bottom: 1rem;
 }
 
@@ -298,17 +336,18 @@
 .filter-chip {
     padding: 0.625rem 1.25rem;
     border-radius: 9999px;
-    border: 1px solid #E5E7EB;
+    border: 1px solid var(--border-color);
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--mobile-text-muted);
     cursor: pointer;
     transition: all 0.2s ease;
+    background: transparent;
 }
 
 .filter-chip.active {
     background: var(--mobile-accent);
-    color: white;
+    color: #000;
     border-color: var(--mobile-accent);
 }
 
@@ -321,9 +360,10 @@
     flex: 1;
     padding: 1rem;
     border-radius: 1rem;
-    border: 1px solid #E5E7EB;
+    border: 1px solid var(--border-color);
     font-weight: 700;
     color: var(--mobile-text-main);
+    background: transparent;
 }
 
 .btn-apply {
@@ -331,7 +371,8 @@
     padding: 1rem;
     border-radius: 1rem;
     background: var(--mobile-accent);
-    color: white;
+    color: #000;
     font-weight: 700;
     text-align: center;
+    border: none;
 }

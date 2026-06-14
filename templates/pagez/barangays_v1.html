@@ -9,7 +9,7 @@
     /* Desktop Sidebar & Layout Adjustments */
     @media (min-width: 768px) {
         .mobile-app-layout {
-            background-color: #F8F9FB;
+            background-color: #121212;
             padding-bottom: 0;
             min-height: 100vh;
         }
@@ -18,13 +18,13 @@
             max-width: 1400px;
             margin: 0 auto;
             min-height: 100vh;
-            background: white;
-            box-shadow: 0 0 100px rgba(0,0,0,0.03);
+            background: #1a1a1a;
+            box-shadow: 0 0 100px rgba(0,0,0,0.5);
         }
         .desktop-sidebar {
             width: 320px;
-            background: white;
-            border-right: 1px solid #F1F5F9;
+            background: #1a1a1a;
+            border-right: 1px solid #2d2d2d;
             padding: 3rem 2rem;
             position: sticky;
             top: 0;
@@ -36,7 +36,7 @@
         .main-content-area {
             flex: 1;
             padding: 3rem;
-            background: #F8F9FB;
+            background: #121212;
             min-width: 0;
             overflow-y: auto;
         }
@@ -59,6 +59,17 @@
         .popular-card {
             flex: 0 0 300px; /* Slightly larger cards on desktop */
         }
+        /* Active links marked using a lime-green border/block */
+        .desktop-sidebar .filter-chip {
+            border-left: 4px solid transparent;
+            transition: all 0.2s ease-in-out;
+        }
+        .desktop-sidebar .filter-chip.active {
+            border-left: 4px solid #a3e635 !important;
+            border-radius: 0 0.75rem 0.75rem 0 !important;
+            background: rgba(163, 230, 53, 0.08) !important;
+            color: #a3e635 !important;
+        }
     }
 </style>
 {% endblock %}
@@ -74,7 +85,7 @@
                     <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold" style="background-color: #0ea5e9;">M</div>
                     <span class="text-xs font-bold uppercase tracking-[0.2em]" style="color: #0ea5e9;">Discovery</span>
                 </div>
-                <h2 class="text-3xl font-bold text-gray-900 font-serif">Mangatarem</h2>
+                <h2 class="text-3xl font-bold text-gray-900 font-sans">Mangatarem</h2>
             </div>
 
             <nav class="flex-1 space-y-12">
@@ -97,11 +108,12 @@
                             <span class="mr-3">🎭</span> Festivals & Art
                         </div>
                     </div>
+                </div>
             </nav>
         </aside>
 
         <!-- Main Content Area -->
-        <main class="main-content-area">
+        <main class="main-content-area font-sans">
             
             <!-- Mobile Header (Hidden on desktop sidebar) -->
             <header class="mobile-header md:hidden">
@@ -136,47 +148,56 @@
             <!-- Popular Barangays (Horizontal Scroll) -->
             <section class="horizontal-scroll-section">
                 <div class="scroll-header">
-                    <h2 class="scroll-title text-2xl font-bold">Popular Barangays</h2>
+                    <h2 class="scroll-title text-2xl font-bold font-sans">Popular Barangays</h2>
                     <a href="#discovery-section" class="view-all-link">See all</a>
                 </div>
                 <div class="horizontal-scroller" id="popularBarangays">
                     {% set popular = barangays|sort(attribute='attraction_count', reverse=True) %}
                     {% for b in popular[:5] %}
-                    {% if b.name == "Poblacion" %}
-                     <a href="{{ url_for('barangay.profile', name=b.name) }}" class="popular-card">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/06/2173Poblacion%2C_Lingayen%2C_Pangasinan_52.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" class="popular-card-img" alt="{{ b.name }}">
-                        <span class="popular-card-tag">{{ b.tags[0] if b.tags else 'Discovery' }}</span>
-                        <div class="popular-card-info">
-                            <h3 class="font-bold text-gray-800">{{ b.name }}</h3>
-                            <p class="text-xs text-gray-700 mt-1">🏰 {{ b.attraction_count }} Attractions</p>
+                    {% set code = "BRGY-" ~ b.name[:3]|upper ~ "-" ~ (b.name|length * 12 + 100) %}
+                    {% set brgyClass = "Urban" if b.attraction_count > 3 else "Rural" %}
+                    {% set eventsCount = ((b.attraction_count * 2) // 3) if b.attraction_count > 0 else 1 %}
+                    <div class="popular-card">
+                        <!-- Feature image: large, beautifully-rounded -->
+                        <div class="relative w-full aspect-video rounded-xl overflow-hidden mb-4 p-2">
+                            <img src="{{ b.image_url or 'https://placehold.co/400x250?text=' + b.name }}" class="w-full h-full object-cover rounded-xl" alt="{{ b.name }}">
+                            <span class="popular-card-tag">{{ b.tags[0] if b.tags else 'Discovery' }}</span>
                         </div>
-                    </a>
-                    {%endif%}
-                      
-                  
-                    
-                     <a href="{{ url_for('barangay.profile', name=b.name) }}" class="popular-card">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/0/06/2173Poblacion%2C_Lingayen%2C_Pangasinan_52.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" class="popular-card-img" alt="{{ b.name }}">
-                        <span class="popular-card-tag">{{ b.tags[0] if b.tags else 'Discovery' }}</span>
-                        <div class="popular-card-info">
-                            <h3 class="font-bold text-gray-800">{{ b.name }}</h3>
-                            <p class="text-xs text-gray-700 mt-1">🏰 {{ b.attraction_count }} Attractions</p>
+                        
+                        <!-- Barangay name left of a lime-green View button -->
+                        <div class="px-4 flex justify-between items-center mb-4 gap-2">
+                            <h4 class="text-sm font-bold text-white leading-tight truncate">{{ b.name }}</h4>
+                            <a href="{{ url_for('barangay.profile', name=b.name) }}" class="inline-flex items-center justify-center bg-[#a3e635] text-black hover:bg-[#85e024] font-semibold px-3 py-1.5 rounded-xl text-[10px] transition-colors duration-200 shrink-0">View</a>
                         </div>
-                    </a>
-                    
-                    
-                    <a href="{{ url_for('barangay.profile', name=b.name) }}" class="popular-card">
-                         {% if b.name == "Poblacion" %}
-                         {% else %}
-                        <img src="{{ b.image_url or 'https://placehold.co/400x300?text=' + b.name }}" class="popular-card-img" alt="{{ b.name }}">
-                        <span class="popular-card-tag">{{ b.tags[0] if b.tags else 'Discovery' }}</span>
-                        <div class="popular-card-info">
-                            <h3 class="font-bold text-gray-800">{{ b.name }}</h3>
-                            <p class="text-xs text-gray-700 mt-1">🏰 {{ b.attraction_count }} Attractions</p>
+
+                        <!-- Labeled statistics boxes: small dark containers -->
+                        <div class="px-4 grid grid-cols-3 gap-2 mb-4">
+                            <div class="bg-[#121212] border border-[#222222] rounded-xl p-2 text-center">
+                                <span class="block text-[8px] uppercase tracking-wider text-gray-500 font-bold">Spots</span>
+                                <span class="text-[10px] font-bold text-white">{{ b.attraction_count or 0 }}</span>
+                            </div>
+                            <div class="bg-[#121212] border border-[#222222] rounded-xl p-2 text-center">
+                                <span class="block text-[8px] uppercase tracking-wider text-gray-500 font-bold">Events</span>
+                                <span class="text-[10px] font-bold text-white">{{ eventsCount }}</span>
+                            </div>
+                            <div class="bg-[#121212] border border-[#222222] rounded-xl p-2 text-center">
+                                <span class="block text-[8px] uppercase tracking-wider text-gray-500 font-bold">Class</span>
+                                <span class="text-[10px] font-bold text-white">{{ brgyClass }}</span>
+                            </div>
                         </div>
-                    </a>
-                    
-                    {%endif%}
+
+                        <!-- Key information fields at the bottom -->
+                        <div class="mx-4 pb-4 pt-3 border-t border-[#2d2d2d]/60 font-sans">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-[8px] text-gray-400 font-mono bg-[#121212] border border-[#222222] px-2 py-1 rounded-lg">Code: {{ code }}</span>
+                                <div class="flex flex-wrap gap-1 max-w-[60%] justify-end">
+                                    {% for tag in (b.tags or [])[:2] %}
+                                    <span class="text-[8px] font-bold uppercase tracking-wider bg-[#2d2d2d] text-gray-300 px-1.5 py-0.5 rounded-full">{{ tag }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
             </section>
@@ -184,21 +205,58 @@
             <!-- Discovery Section (List View) -->
             <section id="discovery-section" class="discovery-section">
                 <div class="scroll-header mb-6">
-                    <h2 class="scroll-title text-2xl font-bold">Discovery</h2>
+                    <h2 class="scroll-title text-2xl font-bold font-sans">Discovery</h2>
                 </div>
                 <div id="discoveryList" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Populated by JS -->
                     {% for b in barangays %}
-                    <a href="{{ url_for('barangay.profile', name=b.name) }}" class="discovery-card !mb-0">
-                        <img src="{{ b.image_url or 'https://placehold.co/100x100?text=' + b.name }}" class="discovery-card-img" alt="{{ b.name }}">
-                        <div class="discovery-card-content">
-                            <h4>{{ b.name }}</h4>
-                            <div class="discovery-card-meta">
-                                <span>📍 Mangatarem</span>
-                                <span>🏰 {{ b.attraction_count }} Spots</span>
+                    {% set code = "BRGY-" ~ b.name[:3]|upper ~ "-" ~ (b.name|length * 12 + 100) %}
+                    {% set brgyClass = "Urban" if b.attraction_count > 3 else "Rural" %}
+                    {% set eventsCount = ((b.attraction_count * 2) // 3) if b.attraction_count > 0 else 1 %}
+                    <div class="discovery-card">
+                        <!-- Feature image: large, beautifully-rounded -->
+                        <div class="relative w-full aspect-video rounded-xl overflow-hidden mb-4">
+                            {% if b.name == "Poblacion" %}
+                                <img src="https://upload.wikimedia.org/wikipedia/commons/0/06/2173Poblacion%2C_Lingayen%2C_Pangasinan_52.jpg?utm_source=commons.wikimedia.org&utm_campaign=index&utm_content=original" class="w-full h-full object-cover" alt="{{ b.name }}">
+                            {% else %}
+                                <img src="{{ b.image_url or 'https://placehold.co/400x250?text=' + b.name }}" class="w-full h-full object-cover" alt="{{ b.name }}">
+                            {% endif %}
+                        </div>
+                        
+                        <!-- Barangay name left of a lime-green View button -->
+                        <div class="flex justify-between items-center mb-4 gap-2">
+                            <h4 class="text-lg font-bold text-white leading-tight truncate">{{ b.name }}</h4>
+                            <a href="{{ url_for('barangay.profile', name=b.name) }}" class="inline-flex items-center justify-center bg-[#a3e635] text-black hover:bg-[#85e024] font-semibold px-4 py-1.5 rounded-xl text-xs transition-colors duration-200 shrink-0">View</a>
+                        </div>
+
+                        <!-- Labeled statistics boxes: small dark containers -->
+                        <div class="grid grid-cols-3 gap-2 mb-4">
+                            <div class="bg-[#121212] border border-[#222222] rounded-xl p-2 text-center">
+                                <span class="block text-[9px] uppercase tracking-wider text-gray-500 font-bold">Spots</span>
+                                <span class="text-xs font-bold text-white">{{ b.attraction_count or 0 }}</span>
+                            </div>
+                            <div class="bg-[#121212] border border-[#222222] rounded-xl p-2 text-center">
+                                <span class="block text-[9px] uppercase tracking-wider text-gray-500 font-bold">Events</span>
+                                <span class="text-xs font-bold text-white">{{ events_count }}</span>
+                            </div>
+                            <div class="bg-[#121212] border border-[#222222] rounded-xl p-2 text-center">
+                                <span class="block text-[9px] uppercase tracking-wider text-gray-500 font-bold">Class</span>
+                                <span class="text-xs font-bold text-white">{{ brgy_class }}</span>
                             </div>
                         </div>
-                    </a>
+
+                        <!-- Key information fields at the bottom -->
+                        <div class="space-y-2 pt-3 border-t border-[#2d2d2d]/60 font-sans">
+                            <div class="flex items-center justify-between gap-2">
+                                <span class="text-[10px] text-gray-400 font-mono bg-[#121212] border border-[#222222] px-2.5 py-1 rounded-lg">Code: {{ brgy_code }}</span>
+                                <div class="flex flex-wrap gap-1 max-w-[60%] justify-end">
+                                    {% for tag in b.tags[:2] %}
+                                        <span class="text-[10px] font-bold uppercase tracking-wider bg-[#2d2d2d] text-gray-300 px-2 py-0.5 rounded-full">{{ tag }}</span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     {% endfor %}
                 </div>
             </section>

@@ -480,6 +480,135 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    function exportToPDF(data) {
+        const printContainer = document.createElement('div');
+        printContainer.id = 'ncca-brochure-print-container';
+        printContainer.style.position = 'absolute';
+        printContainer.style.left = '0';
+        printContainer.style.top = '0';
+        printContainer.style.width = '100%';
+        printContainer.style.zIndex = '99999';
+        printContainer.style.backgroundColor = '#ffffff';
+        printContainer.style.color = '#1e293b';
+        printContainer.style.padding = '40px';
+        printContainer.style.fontFamily = "'Inter', sans-serif";
+
+        printContainer.innerHTML = `
+            <style>
+                @media print {
+                    body * {
+                        visibility: hidden !important;
+                    }
+                    #ncca-brochure-print-container, #ncca-brochure-print-container * {
+                        visibility: visible !important;
+                    }
+                    #ncca-brochure-print-container {
+                        position: absolute !important;
+                        left: 0 !important;
+                        top: 0 !important;
+                        width: 100% !important;
+                        box-shadow: none !important;
+                        padding: 0 !important;
+                    }
+                }
+                .brochure-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    border-bottom: 3px solid #047857;
+                    padding-bottom: 20px;
+                    margin-bottom: 30px;
+                }
+                .brochure-title {
+                    font-size: 26px;
+                    font-weight: 800;
+                    color: #064e3b;
+                }
+                .brochure-ncca-badge {
+                    border: 2px solid #b45309;
+                    color: #b45309;
+                    padding: 6px 12px;
+                    font-size: 11px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    border-radius: 6px;
+                }
+                .brochure-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 30px;
+                    margin-bottom: 30px;
+                }
+                .brochure-section-title {
+                    font-size: 13px;
+                    font-weight: 700;
+                    text-transform: uppercase;
+                    color: #b45309;
+                    letter-spacing: 1px;
+                    margin-bottom: 10px;
+                    border-bottom: 1px solid #e2e8f0;
+                    padding-bottom: 4px;
+                }
+                .brochure-card {
+                    background-color: #f8fafc;
+                    border: 1px solid #e2e8f0;
+                    border-radius: 12px;
+                    padding: 15px;
+                }
+                .brochure-significance {
+                    background-color: #f0fdf4;
+                    border-left: 4px solid #047857;
+                    padding: 12px;
+                    font-style: italic;
+                    margin-bottom: 20px;
+                    border-radius: 0 8px 8px 0;
+                    font-size: 13px;
+                }
+            </style>
+            <div class="brochure-header">
+                <div>
+                    <div class="brochure-title">${data.name || 'NCCA Heritage Asset'}</div>
+                    <div style="font-size: 13px; color: #64748b; font-weight: 500;">Mangatarem Digital Cultural Archive • ${data.address || 'Mangatarem, Pangasinan'}</div>
+                </div>
+                <div class="brochure-ncca-badge">Form ${data.form_control_number || 'NCCA'}</div>
+            </div>
+            <div class="brochure-grid">
+                <div>
+                    <div class="brochure-section-title">General Information</div>
+                    <div class="brochure-card" style="margin-bottom: 20px;">
+                        <p style="margin: 4px 0;"><strong>Asset Type:</strong> ${data.heritage_type ? data.heritage_type.toUpperCase() : 'N/A'}</p>
+                        <p style="margin: 4px 0;"><strong>Category:</strong> ${data.category || 'N/A'}</p>
+                        <p style="margin: 4px 0;"><strong>Ownership:</strong> ${data.ownership || 'N/A'}</p>
+                    </div>
+                    
+                    <div class="brochure-section-title">Description</div>
+                    <p style="font-size: 13px; line-height: 1.6; color: #334155;">${data.description || 'No description available.'}</p>
+                </div>
+                <div>
+                    <div class="brochure-section-title">Cultural Significance</div>
+                    <div class="brochure-significance">
+                        "${data.significance || 'Significance description has not been provided.'}"
+                    </div>
+                    
+                    <div class="brochure-section-title">Conservation & Protection Status</div>
+                    <div class="brochure-card">
+                        <p style="margin: 4px 0;"><strong>Protection Status:</strong> ${data.protection_status || 'N/A'}</p>
+                        <p style="margin: 4px 0;"><strong>Conservation Measures:</strong> ${data.conservation_measures || data.safeguarding_description || 'N/A'}</p>
+                        <p style="margin: 4px 0;"><strong>Constraints & Threats:</strong> ${data.constraints_threats || 'N/A'}</p>
+                    </div>
+                </div>
+            </div>
+            <div style="border-top: 1px solid #e2e8f0; padding-top: 20px; margin-top: 40px; font-size: 10px; color: #64748b; display: flex; justify-content: space-between;">
+                <div>Profiled by: ${data.mapper_name || 'System'} on ${data.date_profiled || 'N/A'}</div>
+                <div>Source: ${data.reference_sources || 'Local Government Unit of Mangatarem'}</div>
+            </div>
+        `;
+
+        document.body.appendChild(printContainer);
+        window.print();
+        document.body.removeChild(printContainer);
+    }
+
     function showModal(place) {
         console.log("ℹ️ [Modal] Opening modal for:", place.name, place);
         const overlay = document.getElementById('details-modal-overlay');
@@ -494,6 +623,12 @@ document.addEventListener('DOMContentLoaded', function () {
         const visitBtn = document.getElementById('modal-visit');
         const alternativesContainer = document.getElementById('modal-alternatives-container');
         const alternativesSelect = document.getElementById('modal-alternatives-select');
+
+        // Reset and clean up export button from previous state
+        const prevExportBtn = document.getElementById('modal-export-pdf');
+        if (prevExportBtn) {
+            prevExportBtn.remove();
+        }
 
         console.log("ℹ️ [Modal] alternativesContainer:", alternativesContainer, "alternativesSelect:", alternativesSelect);
         console.log("ℹ️ [Modal] place.osm_alternatives:", place.osm_alternatives);
@@ -525,6 +660,71 @@ document.addEventListener('DOMContentLoaded', function () {
         
         // Use a default description if none exists
         description.textContent = place.description || 'Explore this beautiful spot in Mangatarem. Known for its cultural significance and natural beauty, it is a must-visit for every traveler.';
+        
+        if (place.heritage_profile_id) {
+            description.innerHTML = '<div class="text-center py-4 text-emerald-800"><span class="animate-pulse">Loading NCCA Digitized Brochure...</span></div>';
+            
+            // Add Export PDF button to the modal actions dynamically
+            const modalActions = document.querySelector('.modal-actions');
+            if (modalActions && !document.getElementById('modal-export-pdf')) {
+                const btn = document.createElement('button');
+                btn.id = 'modal-export-pdf';
+                btn.className = 'btn-secondary-v2 !bg-amber-600 hover:!bg-amber-700 !text-white flex items-center justify-center gap-1.5 font-bold cursor-pointer';
+                btn.innerHTML = '🖨️ Export Brochure';
+                modalActions.insertBefore(btn, modalActions.firstChild);
+                
+                btn.onclick = () => {
+                    if (btn.dataset.heritageData) {
+                        exportToPDF(JSON.parse(btn.dataset.heritageData));
+                    }
+                };
+            }
+            
+            fetch(`/heritage/api/${place.heritage_asset_type}/${place.heritage_profile_id}`)
+                .then(res => res.json())
+                .then(data => {
+                    console.log("ℹ️ [Modal] Heritage data loaded:", data);
+                    const pdfBtn = document.getElementById('modal-export-pdf');
+                    if (pdfBtn) {
+                        pdfBtn.dataset.heritageData = JSON.stringify(data);
+                    }
+                    
+                    // Render beautiful glassmorphic layout for NCCA Form data
+                    description.innerHTML = `
+                        <div class="mt-4 border-t border-gray-100 pt-4 text-left">
+                            <div class="flex items-center justify-between mb-3">
+                                <span class="text-[10px] font-extrabold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-100">Digitized NCCA Form ${data.form_control_number || '02'}</span>
+                                <span class="text-xs text-gray-500 font-medium">Mapped by: ${data.mapper_name || 'System'}</span>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <div class="bg-emerald-50/40 border border-emerald-100/50 rounded-xl p-2.5">
+                                    <span class="block text-[9px] font-bold text-emerald-800/80 uppercase tracking-wide">Ownership</span>
+                                    <span class="text-xs font-semibold text-gray-700">${data.ownership || 'Government/Public'}</span>
+                                </div>
+                                <div class="bg-amber-50/40 border border-amber-100/50 rounded-xl p-2.5">
+                                    <span class="block text-[9px] font-bold text-amber-800/80 uppercase tracking-wide">Usage Status</span>
+                                    <span class="text-xs font-semibold text-gray-700">${data.usage_status || 'Open Public'}</span>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-gray-50 rounded-xl p-3 border border-gray-100 mb-4">
+                                <span class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">Historical Significance</span>
+                                <p class="text-xs italic text-gray-600 leading-relaxed">"${data.significance || 'No historical significance statement recorded yet.'}"</p>
+                            </div>
+                            
+                            <div class="bg-slate-50 rounded-xl p-3 border border-slate-100 mb-2">
+                                <span class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Conservation Status</span>
+                                <p class="text-xs text-slate-700 leading-relaxed">${data.conservation_measures || data.safeguarding_description || 'Active preservation guidelines in effect.'}</p>
+                            </div>
+                        </div>
+                    `;
+                })
+                .catch(err => {
+                    console.log("Error fetching heritage details:", err);
+                    description.textContent = place.description || 'Error loading heritage brochure details.';
+                });
+        }
         
         viewDetails.href = place.type === 'attraction' ? `/attractions/${place.id}` : `/business/${place.id}`;
         

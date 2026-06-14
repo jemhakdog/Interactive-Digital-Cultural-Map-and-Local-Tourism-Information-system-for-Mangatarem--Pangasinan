@@ -10,7 +10,7 @@ AG Kit is a modular system consisting of:
 
 - **20 Specialist Agents** - Role-based AI personas (1 major upgrade in 2026.5.13)
 - **45 Skills** - Domain-specific knowledge modules with conditional loading
-- **14 Workflows** - Slash command procedures
+- **15 Workflows** - Slash command procedures
 
 ---
 
@@ -21,7 +21,7 @@ AG Kit is a modular system consisting of:
 ├── ARCHITECTURE.md          # This file
 ├── agents/                  # 20 Specialist Agents
 ├── skills/                  # 45 Skills (with conditional loading)
-├── workflows/               # 14 Slash Commands
+├── workflows/               # 15 Slash Commands
 ├── rules/                   # Global Rules
 ├── memory/                  # Persistent Memory (2026.5.13)
 └── scripts/                 # Master Validation Scripts
@@ -182,7 +182,7 @@ Modular knowledge domains that agents can load on-demand based on task context. 
 
 ---
 
-## 🔄 Workflows (14)
+## 🔄 Workflows (15)
 
 Slash command procedures. Invoke with `/command`.
 
@@ -202,6 +202,7 @@ Slash command procedures. Invoke with `/command`.
 | `/test`          | Run tests                                      |
 | `/ui-ux-pro-max` | Design with 50 styles                          |
 | `/verify`        | **NEW** Prove code works by running it         |
+| `/writing-expert`| **NEW** Rewrite/simplify writing in plain text |
 
 ---
 
@@ -294,7 +295,7 @@ For details, see [scripts/README.md](scripts/README.md)
 | ------------------- | --------------------------------- |
 | **Total Agents**    | 20 (1 major upgrade in 2026.5.13) |
 | **Total Skills**    | 45 (+8 new in 2026.5.13)          |
-| **Total Workflows** | 14 (+3 new in 2026.5.13)          |
+| **Total Workflows** | 15 (+4 new in 2026.5.13)          |
 | **Total Scripts**   | 2 (master) + 18 (skill-level)     |
 | **Coverage**        | ~95% web/mobile + orchestration   |
 | **Token Efficiency**| 13-33% better than v2 (2026.5.13) |

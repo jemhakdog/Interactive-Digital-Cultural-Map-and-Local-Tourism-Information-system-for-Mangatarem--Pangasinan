@@ -18,6 +18,7 @@ class Attraction(db.Model):
     heritage_profile_id = db.Column(db.Integer, db.ForeignKey("HERITAGE_PROFILE.id"), nullable=True)
     
     barangay = db.relationship('BarangayInfo', backref='attractions')
+    heritage_profile = db.relationship('HeritageProfile', backref=db.backref('attractions', lazy=True))
     
     status = db.Column(db.String(20), default="pending", index=True)
     is_featured = db.Column(db.Boolean, default=False)
@@ -77,7 +78,9 @@ class Attraction(db.Model):
             'advisory_message': self.advisory_message,
             'advisory_status': self.advisory_status,
             'created_at': self.created_at.isoformat() if self.created_at else None,
-            'osm_alternatives': self.osm_alternatives
+            'osm_alternatives': self.osm_alternatives,
+            'heritage_profile_id': self.heritage_profile_id,
+            'heritage_asset_type': self.heritage_profile.asset_type if self.heritage_profile else None
         }
 
 

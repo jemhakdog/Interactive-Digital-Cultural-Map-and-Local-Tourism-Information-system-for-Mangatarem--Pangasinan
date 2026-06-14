@@ -9,6 +9,7 @@ from .models import BarangayInfo
 from modules.attractions.models import Attraction, AttractionReview
 from modules.events.models import Event
 from modules.gallery.models import GalleryItem
+from modules.announcements.models import Announcement
 from utils.file_helpers import save_uploaded_file, detect_media_type
 from utils.security import (
     validate_string_input, 
@@ -753,3 +754,99 @@ def barangay_reply_to_review(review_id):
 
     flash("Response posted successfully!")
     return redirect(url_for("barangay.barangay_reviews"))
+
+
+# --- Contributor Announcement CRUD ---
+
+@barangay_bp.route("/announcements")
+@login_required
+def barangay_announcements():
+    if current_user.role != "contributor":
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+
+    announcements = Announcement.query.filter_by(barangay_id=current_user.barangay_id).order_by(Announcement.created_at.desc()).all()
+    return render_template("barangay/announcements.html", announcements=announcements)
+
+@barangay_bp.route("/announcements/add", methods=["GET", "POST"])
+@login_required
+@limiter.limit("10 per minute")
+def barangay_add_announcement():
+    if current_user.role != "contributor":
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        content = request.form.get("content", "").strip()
+
+        is_valid_title, err_title = validate_string_input(title, max_length=200)
+        is_valid_content, err_content = validate_string_input(content, max_length=5000)
+
+        if not is_valid_title or not is_valid_content:
+            flash(f"Invalid input: {err_title or err_content}", "error")
+            return redirect(url_for("barangay.barangay_add_announcement"))
+
+        announcement = Announcement(
+            title=title,
+            content=sanitize_html_input(content),
+            user_id=current_user.id,
+            barangay_id=current_user.barangay_id,
+            status="pending"
+        )
+        db.session.add(announcement)
+        db.session.commit()
+        flash("Announcement submitted for approval!")
+        return redirect(url_for("barangay.barangay_announcements"))
+
+    return render_template("barangay/add_announcement.html")
+
+@barangay_bp.route("/announcements/edit/<int:id>", methods=["GET", "POST"])
+@login_required
+@limiter.limit("10 per minute")
+def barangay_edit_announcement(id):
+    if current_user.role != "contributor":
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+
+    announcement = Announcement.query.get_or_404(id)
+    if announcement.barangay_id != current_user.barangay_id:
+        flash("Access denied. You can only edit announcements for your own barangay.", "error")
+        return redirect(url_for("barangay.barangay_announcements"))
+
+    if request.method == "POST":
+        title = request.form.get("title", "").strip()
+        content = request.form.get("content", "").strip()
+
+        is_valid_title, err_title = validate_string_input(title, max_length=200)
+        is_valid_content, err_content = validate_string_input(content, max_length=5000)
+
+        if not is_valid_title or not is_valid_content:
+            flash(f"Invalid input: {err_title or err_content}", "error")
+            return redirect(url_for("barangay.barangay_edit_announcement", id=id))
+
+        announcement.title = title
+        announcement.content = sanitize_html_input(content)
+        announcement.status = "pending"  # Re-moderated
+        db.session.commit()
+        flash("Announcement updated and submitted for approval!")
+        return redirect(url_for("barangay.barangay_announcements"))
+
+    return render_template("barangay/edit_announcement.html", announcement=announcement)
+
+@barangay_bp.route("/announcements/delete/<int:id>")
+@login_required
+def barangay_delete_announcement(id):
+    if current_user.role != "contributor":
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
+
+    announcement = Announcement.query.get_or_404(id)
+    if announcement.barangay_id != current_user.barangay_id:
+        flash("Access denied. You can only delete announcements for your own barangay.", "error")
+        return redirect(url_for("barangay.barangay_announcements"))
+
+    db.session.delete(announcement)
+    db.session.commit()
+    flash("Announcement deleted successfully!")
+    return redirect(url_for("barangay.barangay_announcements"))
