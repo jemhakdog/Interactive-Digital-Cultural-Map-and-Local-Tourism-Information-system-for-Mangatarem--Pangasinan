@@ -36,14 +36,17 @@
 - Overhauled the root `README.md` to properly document the Mangatarem Interactive Digital Cultural Map system, tech stack, and setup commands, replacing the generic template contents.
 - Performed a codebase cleanup, removing obsolete database diagram layout scripts, old web scraping/seeding helpers, temporary logs, and duplicated dependency files.
 
-## Current
+## Current (2026-07-29)
 
-- System documentation updated to describe the actual Mangatarem Cultural Map and local tourism directory.
-- Codebase structure clean, with all temporary helper files and diagnostic logs removed.
+- **Ponytail Audit & Cleanup Complete:** Removed 12,540 lines of dead code, duplicate modules, unreferenced JS, and throwaway scripts across 156 files.
+- **Bug Fixes Applied:** Admin form action, missing 500.html template, PWA z-index, Business Owner menu edit UI.
+- **CRUD Verified Across All 4 User Roles:** Admin, Business Owner, Barangay Representative, Tourist — all nav items tested.
+- **Git Branches Analyzed:** All 7 feature branches confirmed fully merged into main. Only `feat/admin-desktop-app` (Windows app) has unique commits, excluded per user request.
+- **Dependencies Installed:** `flask-limiter`, `google-auth`, `polyline`, `pyiceberg`, `postgrest` for local dev server startup.
 
 ## Next
 
-- Commit changes to the Git repository.
+- Commit all changes to main branch.
 
 ## Blockers
 

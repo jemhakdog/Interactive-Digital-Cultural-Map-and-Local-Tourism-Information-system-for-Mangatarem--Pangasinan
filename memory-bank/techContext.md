@@ -44,3 +44,8 @@ See `.env.example`.
 - OSRM used for TSP (Traveling Salesman Problem) routing.
 - PostGIS extension required in Supabase database for MVT generation.
 - Security relies on `bleach` for HTML sanitization, and Flask-WTF for CSRF.
+- Admin attraction form action must use `url_for('admin.add_attraction')` not `url_for('admin.admin_attractions')`.
+- Event form date field is `<input type='date'>` — fill with `YYYY-MM-DD` format.
+- PWA install prompt z-index set to 100 (was 9999) to avoid covering form buttons.
+- `errors/500.html` template required for Flask error handler to render properly.
+- Duplicate `core/` modules (security, email, validators, etc.) removed — use `utils/` as canonical source.
