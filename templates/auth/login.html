@@ -156,11 +156,34 @@
                     <div class="flex justify-center google-btn-wrapper" id="google-btn-container">
                         <div id="g_id_onload"
                             data-client_id="794547070676-80dbt1j3a724hacci5684s7b7v93j1fh.apps.googleusercontent.com"
-                            data-login_uri="{{ url_for('auth.google_login', _external=True) }}" data-auto_prompt="false"
+                            data-callback="handleGoogleCredential"
+                            data-auto_prompt="false"
                             data-nonce="{{ oauth_nonce }}">
                         </div>
                         <div class="g_id_signin" id="g_id_signin_btn" data-type="standard" data-shape="pill" data-theme="filled_black" data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
                     </div>
+                    <script>
+                        function handleGoogleCredential(response) {
+                            var form = document.createElement('form');
+                            form.method = 'POST';
+                            form.action = '{{ url_for("auth.google_login") }}';
+
+                            var credentialField = document.createElement('input');
+                            credentialField.type = 'hidden';
+                            credentialField.name = 'credential';
+                            credentialField.value = response.credential;
+                            form.appendChild(credentialField);
+
+                            var nonceField = document.createElement('input');
+                            nonceField.type = 'hidden';
+                            nonceField.name = 'nonce';
+                            nonceField.value = '{{ oauth_nonce }}';
+                            form.appendChild(nonceField);
+
+                            document.body.appendChild(form);
+                            form.submit();
+                        }
+                    </script>
                     <script src="{{ url_for('static', filename='js/pages/auth.js') }}" defer></script>
 
                     <!-- Bottom Links -->
