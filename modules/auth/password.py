@@ -1,9 +1,10 @@
 from flask import request, redirect, url_for, flash, render_template, current_app
+from sqlalchemy import update
 from extensions import db, limiter
 from .models import User, PasswordResetToken
-from core.email_sender import send_password_reset_email
+from utils.email_sender import send_password_reset_email
 import logging
-from core.logger import (
+from utils.logger_helper import (
     log_entry,
     log_logic,
     log_success,
@@ -79,8 +80,22 @@ def reset_password_view(token: str):
             flash("Passwords do not match.", "error")
             return render_template("auth/reset_password.html", token=token)
 
+        # TOCTOU fix: atomically claim the token with a single UPDATE
+        # that only succeeds if the token is still unused.
+        stmt = (
+            update(User)
+            .where(User.reset_token == token, User.reset_token_used == False)
+            .values(reset_token_used=True)
+        )
+        result = db.session.execute(stmt)
+        if result.rowcount == 0:
+            db.session.rollback()
+            log_error("auth", "reset_password", "Token already used — possible concurrent reset")
+            flash("Reset link is invalid or has expired. Please request a new one.", "error")
+            return redirect(url_for("auth.forgot_password"))
+        db.session.commit()
+
         reset_record.user.set_password(new_password)
-        reset_record.used = True
         db.session.commit()
 
         log_success("auth", "reset_password", f"Password reset for user id={reset_record.user_id}")

@@ -7,6 +7,7 @@ import os
 import shutil
 import logging
 import re
+import hmac
 
 update_bp = Blueprint("update", __name__)
 logger = logging.getLogger(__name__)
@@ -34,7 +35,11 @@ def require_update_token(f):
             token = request.get_json().get("token")
         
         expected_token = os.environ.get("UPDATE_TOKEN")
-        if expected_token and token != expected_token:
+        if expected_token is None:
+            logger.error("UPDATE_TOKEN not configured - rejecting request")
+            return jsonify({"status": "error", "message": "Server configuration error"}), 500
+
+        if not token or not hmac.compare_digest(token, expected_token):
             logger.warning(f"Invalid update token attempt from user: {current_user.username}")
             return jsonify({"status": "error", "message": "Invalid token"}), 401
         

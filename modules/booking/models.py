@@ -103,6 +103,10 @@ class Reservation(db.Model):
     user = db.relationship('User', backref=db.backref('reservations', lazy='dynamic'))
     slot = db.relationship('BookingSlot', backref=db.backref('reservations', lazy='dynamic'))
     
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'booking_slot_id', name='uq_user_slot'),
+    )
+    
     def to_dict(self):
         return {
             'id': self.id,

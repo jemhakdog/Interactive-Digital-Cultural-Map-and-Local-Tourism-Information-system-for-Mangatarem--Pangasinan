@@ -19,9 +19,22 @@ def _require_admin():
     return None
 
 
+def _safe_next_url():
+    """Return the ``next`` query parameter only if it is a safe internal path.
+
+    Accepts paths that start with ``/`` but rejects protocol-relative URLs
+    (``//evil.com``) and absolute URLs (``http://evil.com``).  Falls back to
+    the referrer, then to a safe default.
+    """
+    candidate = request.args.get("next")
+    if candidate and candidate.startswith("/") and not candidate.startswith("//"):
+        return candidate
+    return request.referrer or url_for("admin.reviews_list")
+
+
 # === GALLERY MODERATION ===
 
-@admin_bp.route("/gallery/approve/<int:id>")
+@admin_bp.route("/gallery/approve/<int:id>", methods=["POST"])
 @login_required
 @limiter.limit("10 per minute")
 def approve_gallery(id):
@@ -37,7 +50,7 @@ def approve_gallery(id):
     return redirect(url_for("admin.admin_dashboard"))
 
 
-@admin_bp.route("/gallery/reject/<int:id>")
+@admin_bp.route("/gallery/reject/<int:id>", methods=["POST"])
 @login_required
 @limiter.limit("10 per minute")
 def reject_gallery(id):
@@ -89,7 +102,7 @@ def reviews_list():
     )
 
 
-@admin_bp.route("/reviews/approve/<int:id>", methods=["GET", "POST"])
+@admin_bp.route("/reviews/approve/<int:id>", methods=["POST"])
 @login_required
 @limiter.limit("30 per minute")
 def approve_review(id):
@@ -108,11 +121,10 @@ def approve_review(id):
     log_success("admin", "approve_review", f"Review ID {id} approved")
     flash("Review approved and is now publicly visible!")
 
-    _next = request.args.get("next") or request.referrer or url_for("admin.reviews_list")
-    return redirect(_next)
+    return redirect(_safe_next_url())
 
 
-@admin_bp.route("/reviews/reject/<int:id>", methods=["GET", "POST"])
+@admin_bp.route("/reviews/reject/<int:id>", methods=["POST"])
 @login_required
 @limiter.limit("30 per minute")
 def reject_review(id):
@@ -130,13 +142,12 @@ def reject_review(id):
     log_success("admin", "reject_review", f"Review ID {id} rejected")
     flash("Review rejected and removed.")
 
-    _next = request.args.get("next") or request.referrer or url_for("admin.reviews_list")
-    return redirect(_next)
+    return redirect(_safe_next_url())
 
 
 # === ANNOUNCEMENT MODERATION ===
 
-@admin_bp.route("/announcements/approve/<int:id>")
+@admin_bp.route("/announcements/approve/<int:id>", methods=["POST"])
 @login_required
 @limiter.limit("10 per minute")
 def admin_approve_announcement(id):
@@ -151,7 +162,7 @@ def admin_approve_announcement(id):
     flash("Announcement approved and published!")
     return redirect(url_for("admin.admin_dashboard"))
 
-@admin_bp.route("/announcements/reject/<int:id>")
+@admin_bp.route("/announcements/reject/<int:id>", methods=["POST"])
 @login_required
 @limiter.limit("10 per minute")
 def admin_reject_announcement(id):

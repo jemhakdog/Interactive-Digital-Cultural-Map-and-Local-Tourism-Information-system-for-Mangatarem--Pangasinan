@@ -562,10 +562,23 @@ def visitor_registry():
         establishments=form_establishments
     )
 
+def _safe_next():
+    """Return the 'next' param only if it is an internal path, else the default."""
+    raw = request.form.get("next") or request.args.get("next")
+    if raw and raw.startswith("/") and not raw.startswith("//"):
+        return raw
+    return url_for("admin.visits_index")
+
+
 @admin_bp.route("/visits/log", methods=["POST"])
 @login_required
 def log_visit():
     """API endpoint to log a visitor check-in."""
+    if current_user.role not in ["admin", "contributor", "business_owner"]:
+        if request.is_json:
+            return jsonify({"success": False, "error": "Access denied"}), 403
+        flash("Access denied.")
+        return redirect(url_for("public.index"))
     try:
         data = request.get_json() if request.is_json else request.form
         
@@ -607,8 +620,7 @@ def log_visit():
             return jsonify({"success": True, "message": "Visit logged successfully"})
         
         flash("Visit logged successfully.")
-        next_url = request.form.get("next") or request.args.get("next") or url_for("admin.visits_index")
-        return redirect(next_url)
+        return redirect(_safe_next())
         
     except Exception as e:
         db.session.rollback()
@@ -616,5 +628,4 @@ def log_visit():
         if request.is_json:
             return jsonify({"success": False, "error": str(e)}), 500
         flash(f"Error: {e}")
-        next_url = request.form.get("next") or request.args.get("next") or url_for("admin.visits_index")
-        return redirect(next_url)
+        return redirect(_safe_next())

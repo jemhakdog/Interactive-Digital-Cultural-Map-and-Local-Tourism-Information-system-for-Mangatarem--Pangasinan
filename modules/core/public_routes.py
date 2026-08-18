@@ -1,7 +1,7 @@
 from models import db, User, Attraction, Event, BarangayInfo
 from modules.business.models import Establishment
 from extensions import limiter
-from flask import Blueprint, render_template, request, url_for, current_app, make_response, redirect
+from flask import Blueprint, render_template, request, url_for, current_app, make_response, redirect, abort
 from utils.logger_helper import log_entry, log_success
 from utils.validators import validate_query_params
 from modules.analytics.utils import record_view
@@ -17,8 +17,10 @@ logger = logging.getLogger(__name__)
 def test_supabase():
     """
     Demonstrate using the Supabase Python client.
+    Only available when the app is running in debug mode.
     """
-    from flask import current_app
+    if not current_app.debug:
+        abort(404)
     supabase = current_app.supabase
     
     if not supabase:

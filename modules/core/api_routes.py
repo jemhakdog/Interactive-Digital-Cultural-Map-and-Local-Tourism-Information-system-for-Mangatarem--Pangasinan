@@ -1,4 +1,5 @@
 from flask import Blueprint, jsonify, request
+from flask_login import login_required, current_user
 from models import Attraction
 from extensions import limiter
 import logging
@@ -90,6 +91,7 @@ def api_attractions():
     return response
 
 @api_bp.route("/map-feedback", methods=["POST"])
+@login_required
 def submit_map_feedback():
     """
     Accepts feedback from the interactive map.
@@ -124,12 +126,14 @@ def submit_map_feedback():
 # === Gemini Live API Endpoints ===
 
 @api_bp.route("/gemini/config")
+@login_required
+@limiter.limit("5 per minute")
 def gemini_config():
     """
-    Securely provide the Gemini API key to the frontend client.
-    In a production environment with strict security, this would be tied to user session
-    or heavily rate-limited to prevent abuse.
+    Provide the Gemini API key to admin users only.
     """
+    if not current_user.is_authenticated or getattr(current_user, "role", None) != "admin":
+        return jsonify({"error": "Forbidden"}), 403
     import os
     key = os.environ.get("GEMINI_API_KEY")
     if not key:

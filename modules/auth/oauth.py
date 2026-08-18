@@ -1,10 +1,13 @@
 import os
-from flask import request, redirect, url_for, flash, render_template, session
+import hashlib
+import hmac
+import secrets
+from flask import request, redirect, url_for, flash, render_template, session, current_app
 from flask_login import login_user
 from extensions import db
 from .models import User
 import logging
-from core.logger import (
+from utils.logger_helper import (
     log_entry,
     log_logic,
     log_success,
@@ -79,13 +82,26 @@ def _check_role_restrictions(user: User) -> bool:
     log_logic("auth", "google_login", f"Allowing role '{user.role}' for Google Sign-In")
     return True
 
+def _generate_oauth_nonce() -> str:
+    """Generate a cryptographic nonce for Google Identity Services."""
+    return secrets.token_urlsafe(32)
+
+
 def google_login_view():
     log_entry("auth", "google_login")
     token = request.form.get("credential")
+    nonce = request.form.get("nonce")
     
     if not token:
         log_error("auth", "google_login", "No credential provided")
         flash("No Google credential received.", "error")
+        return redirect(url_for("auth.login"))
+    
+    # Validate OAuth nonce to prevent credential replay attacks
+    expected_nonce = session.pop("oauth_nonce", None)
+    if not expected_nonce or not nonce or not hmac.compare_digest(expected_nonce, nonce):
+        log_error("auth", "google_login", "OAuth nonce validation failed — possible replay attack")
+        flash("OAuth session validation failed. Please try again.", "error")
         return redirect(url_for("auth.login"))
     
     credentials = _verify_google_token(token)
@@ -98,9 +114,12 @@ def google_login_view():
     
     if not user:
         log_logic("auth", "google_login", f"New user '{email}' detected. Storing details and redirecting to role selection.")
+        secret = current_app.config['SECRET_KEY'].encode()
+        email_hmac = hmac.new(secret, email.encode(), hashlib.sha256).hexdigest()
         session['oauth_signup'] = {
             'email': email,
-            'name': name
+            'name': name,
+            '_hmac': email_hmac
         }
         return redirect(url_for("auth.select_role"))
     
@@ -139,8 +158,36 @@ def select_role_view():
     
     email = oauth_signup.get('email')
     name = oauth_signup.get('name')
+    stored_hmac = oauth_signup.get('_hmac')
+    
+    if not email or not stored_hmac:
+        log_error("auth", "select_role", "Missing email or HMAC in OAuth session")
+        flash("Invalid OAuth session data. Please try again.", "error")
+        return redirect(url_for("auth.login"))
+    
+    secret = current_app.config['SECRET_KEY'].encode()
+    expected_hmac = hmac.new(secret, email.encode(), hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(stored_hmac, expected_hmac):
+        log_error("auth", "select_role", f"HMAC mismatch for email in session — possible session tampering")
+        flash("OAuth session verification failed. Please try again.", "error")
+        session.pop('oauth_signup', None)
+        return redirect(url_for("auth.login"))
     
     if request.method == "POST":
+        # Validate CSRF token explicitly (defense-in-depth over Flask-WTF global check)
+        from flask_wtf.csrf import validate_csrf
+        form_csrf = request.form.get("csrf_token")
+        if not form_csrf:
+            log_error("auth", "select_role", "Missing CSRF token in role selection form")
+            flash("Security token missing. Please try again.", "error")
+            return redirect(url_for("auth.login"))
+        try:
+            validate_csrf(form_csrf)
+        except Exception:
+            log_error("auth", "select_role", "CSRF token validation failed — possible CSRF attack")
+            flash("Security token invalid. Please try again.", "error")
+            return redirect(url_for("auth.login"))
+        
         role = request.form.get("role")
         if role not in ["user", "business_owner", "contributor"]:
             flash("Invalid role selected.", "error")

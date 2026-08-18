@@ -71,8 +71,32 @@ def reserve_slot():
         )
         db.session.add(slot)
         db.session.flush() # To get slot.id
+
+    # Idempotency: check for existing non-cancelled reservation on this slot
+    existing = Reservation.query.filter_by(
+        user_id=current_user.id,
+        booking_slot_id=slot.id
+    ).filter(Reservation.status != 'cancelled').first()
+    if existing:
+        db.session.rollback()
+        return jsonify({
+            'success': True,
+            'reservation_id': existing.id,
+            'status': existing.status,
+            'qr_token': existing.qr_code_token,
+            'idempotent': True
+        })
         
-    if slot.available_capacity < party_size:
+    # Atomically reserve capacity: the WHERE clause prevents TOCTOU overbooking
+    rows_updated = db.session.query(BookingSlot).filter(
+        BookingSlot.id == slot.id,
+        (BookingSlot.total_capacity - BookingSlot.booked_count) >= party_size
+    ).update(
+        {BookingSlot.booked_count: BookingSlot.booked_count + party_size}
+    )
+    db.session.flush()
+
+    if rows_updated == 0:
         return jsonify({'error': 'Not enough capacity available for this date'}), 400
         
     # Create the reservation
@@ -83,9 +107,6 @@ def reserve_slot():
         primary_contact=contact,
         status='pending' if asset.requires_approval else 'confirmed'
     )
-    
-    # Update slot count
-    slot.booked_count += party_size
     
     db.session.add(reservation)
     db.session.commit()
@@ -129,7 +150,6 @@ def dashboard():
 @login_required
 def update_status():
     """Update reservation status (approve/reject/check-in)."""
-    # Needs authorization checks in a real scenario to ensure this user owns the asset
     if current_user.role not in ['admin', 'contributor', 'business_owner']:
         return jsonify({'error': 'Unauthorized'}), 403
         
@@ -141,19 +161,57 @@ def update_status():
         return jsonify({'error': 'Missing parameters'}), 400
         
     reservation = Reservation.query.get_or_404(res_id)
+    
+    # Ownership verification: ensure this user has authority over this reservation
+    if current_user.role == 'admin':
+        pass  # Admins can update any reservation
+    elif current_user.role == 'business_owner':
+        # Business owners can only update reservations for their own attractions
+        owned = db.session.query(Reservation.id).join(BookingSlot).join(BookableAsset).join(
+            Attraction, BookableAsset.attraction_id == Attraction.id
+        ).filter(
+            Reservation.id == reservation.id,
+            Attraction.user_id == current_user.id
+        ).first()
+        if not owned:
+            return jsonify({'error': 'Not authorized to update this reservation'}), 403
+    elif current_user.role == 'contributor' and current_user.barangay_id:
+        # Contributors can only update reservations in their barangay
+        owned = db.session.query(Reservation.id).join(BookingSlot).join(BookableAsset).outerjoin(
+            Attraction, BookableAsset.attraction_id == Attraction.id
+        ).outerjoin(
+            HeritageProfile, BookableAsset.heritage_profile_id == HeritageProfile.id
+        ).filter(
+            Reservation.id == reservation.id,
+            (Attraction.barangay_id == current_user.barangay_id) |
+            (HeritageProfile.barangay_id == current_user.barangay_id)
+        ).first()
+        if not owned:
+            return jsonify({'error': 'Not authorized to update this reservation'}), 403
+    else:
+        return jsonify({'error': 'Unauthorized'}), 403
     old_status = reservation.status
     
     if new_status not in ['pending', 'confirmed', 'cancelled', 'attended', 'no-show']:
         return jsonify({'error': 'Invalid status'}), 400
+
+    # State machine: only allow valid transitions; terminal states cannot be reversed
+    allowed_transitions = {
+        'pending':   ['confirmed', 'cancelled'],
+        'confirmed': ['cancelled', 'attended', 'no-show'],
+        'cancelled': [],   # terminal
+        'attended':  [],   # terminal
+        'no-show':   [],   # terminal
+    }
+    if new_status not in allowed_transitions.get(old_status, []):
+        return jsonify({'error': f'Cannot transition from {old_status} to {new_status}'}), 400
         
-    # Handle capacity if it's being cancelled
-    if new_status == 'cancelled' and old_status != 'cancelled':
-        reservation.slot.booked_count -= reservation.party_size
-    elif old_status == 'cancelled' and new_status != 'cancelled':
-        # Reactivating
-        if reservation.slot.available_capacity < reservation.party_size:
-             return jsonify({'error': 'Not enough capacity to reactivate'}), 400
-        reservation.slot.booked_count += reservation.party_size
+    # Handle capacity if it's being cancelled (lock slot to prevent race condition)
+    if new_status == 'cancelled':
+        slot = db.session.query(BookingSlot).filter(
+            BookingSlot.id == reservation.slot_id
+        ).with_for_update().first()
+        slot.booked_count -= reservation.party_size
         
     reservation.status = new_status
     db.session.commit()

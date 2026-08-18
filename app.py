@@ -72,8 +72,10 @@ def create_app(config_name=None):
     # Load configuration
     app.config.from_object(config_by_name[config_name])
     
-    # Apply ProxyFix for Production/Vercel
-    if is_vercel:
+    # Apply ProxyFix only when TRUSTED_PROXIES is explicitly set.
+    # Without this guard, any client can forge X-Forwarded-* headers.
+    # Set TRUSTED_PROXIES=true (or comma-separated CIDRs) on Vercel.
+    if is_vercel and os.environ.get("TRUSTED_PROXIES"):
         app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_prefix=1)
 
     # Initialize extensions
@@ -81,7 +83,17 @@ def create_app(config_name=None):
     login_manager.init_app(app)
     limiter.init_app(app)
     csrf.init_app(app)
-    socketio.init_app(app, cors_allowed_origins="*")
+    
+    # Configure Socket.IO CORS origins from environment or sensible defaults
+    socketio_origins = os.environ.get("SOCKETIO_ALLOWED_ORIGINS", "")
+    if not socketio_origins:
+        if app.config.get("DEBUG"):
+            socketio_origins = ["http://localhost:5002", "http://127.0.0.1:5002"]
+        else:
+            socketio_origins = []  # Empty list = no cross-origin allowed in production
+    else:
+        socketio_origins = [o.strip() for o in socketio_origins.split(",") if o.strip()]
+    socketio.init_app(app, cors_allowed_origins=socketio_origins)
     
     @login_manager.user_loader
     def load_user(user_id):
@@ -137,4 +149,4 @@ def create_app(config_name=None):
 app = create_app()
 
 if __name__ == "__main__":
-    socketio.run(app, host="0.0.0.0", port=5002, debug=True)
+    socketio.run(app, host="0.0.0.0", port=5002, debug=os.environ.get("FLASK_ENV") != "production")

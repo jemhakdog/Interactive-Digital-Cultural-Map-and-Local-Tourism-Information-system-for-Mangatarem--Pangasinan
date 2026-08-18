@@ -39,6 +39,9 @@ class AchievementBadge(db.Model):
 class UserPassport(db.Model):
     """Tracks tourist passport stamps, visited locations, and unlocked badges."""
     __tablename__ = 'USER_PASSPORT'
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'badge_id', name='uq_user_badge'),
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('USER.id', ondelete='CASCADE'), nullable=False, index=True)
@@ -53,6 +56,10 @@ class UserPassport(db.Model):
 class TouristCheckIn(db.Model):
     """Stores GPS-verified QR-scan logs at heritage sites and merchants."""
     __tablename__ = 'TOURIST_CHECK_IN'
+    __table_args__ = (
+        db.UniqueConstraint('user_id', 'attraction_id', name='uq_user_attraction'),
+        db.UniqueConstraint('user_id', 'establishment_id', name='uq_user_establishment'),
+    )
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('USER.id', ondelete='CASCADE'), nullable=False, index=True)

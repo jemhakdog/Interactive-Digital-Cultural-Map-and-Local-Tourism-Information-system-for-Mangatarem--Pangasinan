@@ -2,13 +2,13 @@ from flask import render_template, request, redirect, url_for, flash
 from extensions import db, limiter
 from .models import User
 import logging
-from core.security import (
+from utils.security import (
     validate_email_format,
     validate_username,
     validate_password_strength,
     validate_and_escape,
 )
-from core.logger import (
+from utils.logger_helper import (
     log_entry,
     log_query,
     log_logic,

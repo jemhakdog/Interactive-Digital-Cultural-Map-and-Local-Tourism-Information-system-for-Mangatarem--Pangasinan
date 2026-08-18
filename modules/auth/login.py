@@ -1,9 +1,9 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, session
 from flask_login import login_user, logout_user, login_required, current_user
 from extensions import limiter
 from .models import User
 import logging
-from core.logger import (
+from utils.logger_helper import (
     log_entry,
     log_query,
     log_logic,
@@ -70,8 +70,11 @@ def login_view():
         log_error("auth", "login", f"Invalid credentials for '{username}'")
         flash("Invalid username or password", "error")
     
+    from .oauth import _generate_oauth_nonce
+    nonce = _generate_oauth_nonce()
+    session["oauth_nonce"] = nonce
     log_render("auth", "login", "login.html")
-    return render_template("auth/login.html")
+    return render_template("auth/login.html", oauth_nonce=nonce)
 
 @login_required
 def logout_view():

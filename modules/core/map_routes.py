@@ -17,6 +17,7 @@ Architecture:
 """
 
 from flask import Blueprint, jsonify, request, make_response, current_app
+from flask_login import login_required, current_user
 from extensions import limiter
 import logging
 from datetime import datetime, timedelta
@@ -248,6 +249,7 @@ def get_available_layers():
 
 @map_bp.route("/cache/invalidate", methods=["POST"])
 @limiter.limit("10 per hour")
+@login_required
 def invalidate_cache():
     """
     Invalidate cached tiles for a specific layer.
@@ -263,6 +265,10 @@ def invalidate_cache():
     Returns:
         JSON status object
     """
+    # Only admins may invalidate the tile cache.
+    if current_user.role != "admin":
+        return jsonify({"error": "Forbidden"}), 403
+
     data = request.get_json()
     if not data:
         return jsonify({"error": "Request body required"}), 400
@@ -285,13 +291,32 @@ def invalidate_cache():
         }), 200
 
     try:
-        # Build pattern for cache key
-        z = data.get("z", "*")
-        x = data.get("x", "*")
-        y = data.get("y", "*")
+        # Build pattern for cache key — validate z/x/y are integers or "*".
+        def _validate_coord(val, name):
+            if val is None or val == "*":
+                return "*"
+            try:
+                return str(int(val))
+            except (ValueError, TypeError):
+                raise ValueError(f"Invalid {name} value: must be an integer or '*'")
+
+        try:
+            z = _validate_coord(data.get("z"), "z")
+            x = _validate_coord(data.get("x"), "x")
+            y = _validate_coord(data.get("y"), "y")
+        except ValueError as ve:
+            return jsonify({"error": str(ve)}), 400
 
         pattern = f"mvt:{layer_name}:{z}:{x}:{y}"
-        keys = redis_client.keys(pattern)
+
+        # Use SCAN instead of KEYS to avoid blocking the Redis server.
+        keys = []
+        cursor = 0
+        while True:
+            cursor, batch = redis_client.scan(cursor=cursor, match=pattern, count=100)
+            keys.extend(batch)
+            if cursor == 0:
+                break
 
         if keys:
             redis_client.delete(*keys)
@@ -364,9 +389,15 @@ def register_cache_invalidation_hooks(app):
         redis_client = get_redis_client()
         if redis_client:
             try:
-                # Pattern to match all MVT cache keys
+                # Pattern to match all MVT cache keys — use SCAN to avoid blocking.
                 pattern = "mvt:*"
-                keys = redis_client.keys(pattern)
+                keys = []
+                cursor = 0
+                while True:
+                    cursor, batch = redis_client.scan(cursor=cursor, match=pattern, count=100)
+                    keys.extend(batch)
+                    if cursor == 0:
+                        break
                 if keys:
                     redis_client.delete(*keys)
                     logger.info(f"Invalidated {len(keys)} map tile cache entries")

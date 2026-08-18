@@ -1,5 +1,5 @@
 from flask import request, jsonify
-from flask_login import login_required
+from flask_login import login_required, current_user
 from .models import User
 
 @login_required
@@ -17,13 +17,17 @@ def api_user_search_view():
         (User.username.ilike(f"%{query}%")) | (User.email.ilike(f"%{query}%"))
     ).limit(5).all()
 
+    is_privileged = current_user.role in ("admin", "contributor")
+
     results = []
     for user in users:
-        results.append({
+        entry = {
             "id": user.id,
             "username": user.username,
-            "email": user.email,
             "barangay": user.barangay.name if user.barangay else "Unknown"
-        })
+        }
+        if is_privileged:
+            entry["email"] = user.email
+        results.append(entry)
 
     return jsonify(results)

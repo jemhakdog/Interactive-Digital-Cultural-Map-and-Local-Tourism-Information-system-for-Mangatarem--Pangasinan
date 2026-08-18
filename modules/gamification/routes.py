@@ -6,6 +6,7 @@ Handles QR scanning, GPS location validation, badge unlocking, and merchant vouc
 import math
 import logging
 from datetime import datetime
+from sqlalchemy import insert
 from flask import render_template, request, jsonify, redirect, url_for, flash, session
 from flask_login import login_required, current_user
 from extensions import db, limiter
@@ -158,31 +159,39 @@ def verify_checkin():
             "message": f"Verification failed. You are {int(distance)}m away from '{spot_name}'. Must be within 50m to check in."
         }), 400
 
-    # Check if user already checked in today at this spot to prevent gaming the system
-    existing_today = TouristCheckIn.query.filter(
-        TouristCheckIn.user_id == current_user.id,
-        TouristCheckIn.attraction_id == (target_id if target_type == "attraction" else None),
-        TouristCheckIn.establishment_id == (target_id if target_type == "establishment" else None),
-        TouristCheckIn.verified_at >= datetime.utcnow().replace(hour=0, minute=0, second=0)
+    # Check if user already checked in at this spot (soft UX check).
+    existing = TouristCheckIn.query.filter_by(
+        user_id=current_user.id,
+        attraction_id=(target_id if target_type == "attraction" else None),
+        establishment_id=(target_id if target_type == "establishment" else None),
     ).first()
 
-    if existing_today:
+    if existing:
         return jsonify({
             "success": True,
             "message": f"Welcome back! You already checked in at '{spot_name}' today.",
             "already_checked_in": True
         })
 
-    # Save verified check-in
-    checkin = TouristCheckIn(
-        user_id=current_user.id,
-        attraction_id=(target_id if target_type == "attraction" else None),
-        establishment_id=(target_id if target_type == "establishment" else None),
-        latitude=user_lat,
-        longitude=user_lon,
-        distance_meters=distance
+    # Atomically insert check-in. ON CONFLICT DO NOTHING prevents TOCTOU races:
+    # even if two concurrent requests both pass the query above, only one insert succeeds.
+    if target_type == "attraction":
+        conflict_cols = ['user_id', 'attraction_id']
+    else:
+        conflict_cols = ['user_id', 'establishment_id']
+
+    db.session.execute(
+        insert(TouristCheckIn)
+        .values(
+            user_id=current_user.id,
+            attraction_id=(target_id if target_type == "attraction" else None),
+            establishment_id=(target_id if target_type == "establishment" else None),
+            latitude=user_lat,
+            longitude=user_lon,
+            distance_meters=distance,
+        )
+        .on_conflict_do_nothing(index_elements=conflict_cols)
     )
-    db.session.add(checkin)
     db.session.flush()
 
     # ---- Badge Unlock Logic ----
@@ -201,12 +210,12 @@ def verify_checkin():
         required_ids = badge.target_locations # list of required attraction IDs
         # Check if user has checked in to all required locations
         if required_ids and all(req_id in visited_attraction_ids for req_id in required_ids):
-            # Unlock badge
-            passport = UserPassport(
-                user_id=current_user.id,
-                badge_id=badge.id
+            # Unlock badge (ON CONFLICT prevents duplicate rewards from race conditions)
+            db.session.execute(
+                insert(UserPassport)
+                .values(user_id=current_user.id, badge_id=badge.id)
+                .on_conflict_do_nothing(index_elements=['user_id', 'badge_id'])
             )
-            db.session.add(passport)
             unlocked_badges.append({
                 "title": badge.title,
                 "description": badge.description,
