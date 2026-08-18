@@ -4,7 +4,7 @@ import hmac
 import secrets
 from flask import request, redirect, url_for, flash, render_template, session, current_app
 from flask_login import login_user
-from extensions import db
+from extensions import db, csrf
 from .models import User
 import logging
 from utils.logger_helper import (
@@ -87,6 +87,7 @@ def _generate_oauth_nonce() -> str:
     return secrets.token_urlsafe(32)
 
 
+@csrf.exempt
 def google_login_view():
     log_entry("auth", "google_login")
     token = request.form.get("credential")
