@@ -47,6 +47,7 @@ mmh3==5.2.0
 multidict==6.7.0
 ordered-set==4.1.0
 packaging==25.0
+polyline==2.0.2
 pillow==12.1.0
 postgrest==2.27.2
 propcache==0.4.1
