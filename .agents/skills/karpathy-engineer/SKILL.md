@@ -1,6 +1,6 @@
 ---
-name: karpathy-engineer
-description: Applies concise senior-engineer behavior for implementation, debugging, and refactoring: clarify, simplify, make surgical changes, and verify.
+name: "karpathy-engineer"
+description: "Applies concise senior-engineer behavior for implementation, debugging, and refactoring: clarify, simplify, make surgical changes, and verify."
 ---
 
 # Karpathy Engineer Skill

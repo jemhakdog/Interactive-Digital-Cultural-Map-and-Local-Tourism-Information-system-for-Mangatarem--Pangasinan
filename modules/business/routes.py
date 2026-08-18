@@ -9,7 +9,7 @@ from extensions import db, limiter
 from .models import Establishment, EstablishmentRoom, EstablishmentMenuItem, EstablishmentReview
 from modules.barangay.models import BarangayInfo
 from functools import wraps
-from core.logger import log_entry, log_render
+from utils.logger_helper import log_entry, log_render
 from datetime import datetime, timedelta
 import math
 import logging

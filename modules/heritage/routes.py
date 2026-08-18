@@ -4,7 +4,7 @@ Extracted from routes/public.py.
 """
 
 from flask import Blueprint, render_template, request, abort, jsonify, make_response
-from core.logger import log_entry, log_render, log_success
+from utils.logger_helper import log_entry, log_render, log_success
 from utils.security import validate_string_input
 from modules.analytics.utils import record_view
 from datetime import datetime, timedelta

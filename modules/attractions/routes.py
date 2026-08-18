@@ -73,7 +73,7 @@ def api_list():
         }
 
         if user_lat is not None and user_lng is not None:
-            from core.geo import haversine_distance
+            from utils.geo import haversine_distance
             dist = haversine_distance(user_lat, user_lng, a.latitude, a.longitude)
             attr_dict["distance"] = round(dist, 2)
             if dist > radius:

@@ -231,13 +231,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
             console.log("🔄 [URL Params] No active map parameter. Clearing stale navigation sessions.");
             localStorage.removeItem('active_navigation_target');
-            fetch('/passport/api/stop-navigation', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': getCsrfToken()
-                }
-            }).catch(err => console.error("Error clearing backend nav session:", err));
+            if (window.USER_AUTH) {
+                fetch('/passport/api/stop-navigation', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': getCsrfToken()
+                    }
+                }).catch(err => console.error("Error clearing backend nav session:", err));
+            }
         }
 
         if (selectPlaceId || routeToId) {
@@ -1241,14 +1243,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         timestamp: Date.now()
                     };
                     localStorage.setItem('active_navigation_target', JSON.stringify(targetData));
-                    fetch('/passport/api/start-navigation', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRFToken': getCsrfToken()
-                        },
-                        body: JSON.stringify(targetData)
-                    }).catch(err => console.error("Error setting backend nav session:", err));
+                    if (window.USER_AUTH) {
+                        fetch('/passport/api/start-navigation', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': getCsrfToken()
+                            },
+                            body: JSON.stringify(targetData)
+                        }).catch(err => console.error("Error setting backend nav session:", err));
+                    }
                 }
 
                 const profile = mode === 'driving' ? 'car' : mode === 'walking' ? 'foot' : 'bicycle';
@@ -1354,14 +1358,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     timestamp: Date.now()
                 };
                 localStorage.setItem('active_navigation_target', JSON.stringify(targetData));
-                fetch('/passport/api/start-navigation', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCsrfToken()
-                    },
-                    body: JSON.stringify(targetData)
-                }).catch(err => console.error("Error setting backend nav session:", err));
+                if (window.USER_AUTH) {
+                    fetch('/passport/api/start-navigation', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCsrfToken()
+                        },
+                        body: JSON.stringify(targetData)
+                    }).catch(err => console.error("Error setting backend nav session:", err));
+                }
             }
             
             const profile = mode === 'driving' ? 'driving' : mode === 'walking' ? 'walking' : 'cycling';
@@ -1540,13 +1546,15 @@ document.addEventListener('DOMContentLoaded', function () {
                 
                 state.isNavigating = false;
                 localStorage.removeItem('active_navigation_target');
-                fetch('/passport/api/stop-navigation', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': getCsrfToken()
-                    }
-                }).catch(err => console.error("Error clearing backend nav session:", err));
+                if (window.USER_AUTH) {
+                    fetch('/passport/api/stop-navigation', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': getCsrfToken()
+                        }
+                    }).catch(err => console.error("Error clearing backend nav session:", err));
+                }
 
                 // Hide the place stats so "Start Navigation" button disappears
                 const statsEl = document.getElementById('place-stats');
@@ -1559,7 +1567,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 state.selectedCoords = null;
                 
                 if (window.sheetManager) {
-                    window.sheetManager.snapTo('bottom');
+                    window.sheetManager.snapTo('peek');
                 }
             };
         }
@@ -1994,6 +2002,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
         console.log("📡 [Arrival] Verifying physical proximity boundaries with Mangatarem server...", payload);
 
+        if (!window.USER_AUTH) return;
+
         fetch('/booking/api/verify-arrival', {
             method: 'POST',
             headers: {
@@ -2332,13 +2342,27 @@ document.addEventListener('DOMContentLoaded', function () {
             }, { passive: true });
 
             this.handle.addEventListener('touchstart', (e) => {
-                e.stopPropagation(); // Stop from reaching map, but NOT capture phase
+                e.stopPropagation();
+                e.preventDefault();
                 this.onDragStart(e);
             }, { passive: false });
+
+            // Also allow dragging from the search area (above results)
+            const searchContainer = document.querySelector('.search-input-container');
+            if (searchContainer) {
+                searchContainer.addEventListener('touchstart', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    this.onDragStart(e);
+                }, { passive: false });
+            }
             
             const resultsSection = document.getElementById('results-section');
             resultsSection.addEventListener('touchstart', (e) => {
-                if (resultsSection.scrollTop <= 0) {
+                // Only hijack the gesture for sheet-dragging when the list is at its top
+                // AND the sheet isn't already fully open (at full, swipe-up must scroll the list).
+                if (resultsSection.scrollTop <= 0 && !this.sheet.classList.contains('is-full')) {
+                    e.preventDefault();
                     this.onDragStart(e);
                 }
             }, { passive: false });
@@ -2417,7 +2441,7 @@ document.addEventListener('DOMContentLoaded', function () {
             if (Math.abs(deltaY) > 5) this.hasMoved = true;
             
             let newTranslateY = this.startTranslateY + deltaY;
-            const peekY = window.innerHeight - 100; // Match 100px peek
+            const peekY = window.innerHeight - 220; // Match 220px peek
             const fullY = 0;
             
             // Resistance
@@ -2452,7 +2476,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     this.snapTo('peek');
                 }
             } else {
-                const peekY = window.innerHeight - 100;
+                const peekY = window.innerHeight - 220;
                 const midY = window.innerHeight * 0.5;
                 
                 if (this.currentTranslateY > midY + (peekY - midY) / 2) {
@@ -2471,7 +2495,7 @@ document.addEventListener('DOMContentLoaded', function () {
             
             if (state === 'peek') {
                 this.sheet.classList.add('is-peek');
-                this.sheet.style.transform = `translateY(calc(100% - 100px))`;
+                this.sheet.style.transform = `translateY(calc(100% - 220px))`;
             } else if (state === 'full') {
                 this.sheet.classList.add('is-full');
                 this.sheet.style.transform = 'translateY(0)';
@@ -2479,6 +2503,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 this.sheet.classList.add('is-mid');
                 const midY = window.innerHeight * 0.5;
                 this.sheet.style.transform = `translateY(${midY}px)`;
+            } else if (state === 'hidden') {
+                this.sheet.style.transform = 'translateY(100%)';
             }
         }
     }

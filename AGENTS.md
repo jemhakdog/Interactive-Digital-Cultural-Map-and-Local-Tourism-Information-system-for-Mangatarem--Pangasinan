@@ -12,6 +12,11 @@ Single source of truth for all AI agents in this repo. Adapters (`GEMINI.md`, `C
 
 Reserve most context for the actual project, not template instructions.
 
+## Environment
+
+- Python project. Virtual environment: `.venv` (Python 3.12). Activate with `source .venv/Scripts/activate` (Git Bash) or `.venv\Scripts\activate.bat` (cmd) before running Python.
+- Use `.venv/bin/python` (or the venv interpreter) for all Python/uv/pip/tooling commands.
+
 ## Cross-model continuity
 
 Multiple models may share this project (Gemini, Claude, ChatGPT/Codex, Cline, OpenRouter, Cursor, Copilot). `memory-bank/handoff.md` is the single rolling "where we left off" pointer — update on pause/switch, read on resume. Per-model budgets, cache-stable files, and routing live in `memory-bank/model-routing.md`.

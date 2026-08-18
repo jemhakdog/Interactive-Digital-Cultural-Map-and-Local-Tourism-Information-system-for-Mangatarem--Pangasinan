@@ -1,0 +1,18 @@
+{
+  "phase": "P1",
+  "stage": "01_intelligence_dependency_risk",
+  "status": "complete",
+  "target": "jemhakdog/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan",
+  "outputs": [
+    "piolium/attack-surface/advisory-summary.md",
+    "piolium/attack-surface/sbom.json"
+  ],
+  "findings": {
+    "critical": 2,
+    "high": 12,
+    "moderate": 11,
+    "low": 2,
+    "total_unpatched": 25
+  },
+  "completed_at": "2026-08-18T03:00:32Z"
+}

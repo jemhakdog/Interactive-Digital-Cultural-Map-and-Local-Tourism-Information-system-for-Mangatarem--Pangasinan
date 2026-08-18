@@ -44,6 +44,23 @@
 - **Git Branches Analyzed:** All 7 feature branches confirmed fully merged into main. Only `feat/admin-desktop-app` (Windows app) has unique commits, excluded per user request.
 - **Dependencies Installed:** `flask-limiter`, `google-auth`, `polyline`, `pyiceberg`, `postgrest` for local dev server startup.
 
+## Current (2026-07-31)
+
+- Fixed Map V2 bottom-sheet drag-to-reveal behavior on mobile by removing the blanket `touch-action:none` rule and adding `touch-action: pan-y` only to the results list.
+- Bumped service-worker cache to `gomangatarem-v10` and updated the static script tag to `map_v2.js?v=1.1.9` so the fixed JS/CSS load immediately instead of lingering in stale cache.
+- Confirmed temporary Cloudflare Tunnel works for LAN/mobile testing, but no permanent named tunnel/domain was configured.
+- Completed ponytail audit batch cleanup:
+  - Deleted dead files: `archive/`, `code_screenshots/`, `.antigravitycli/`, `tmp/verify_newsletter.py`, `instance/heritage_page.html`, `data/scraped_attractions.json`, `data/scraped_heritage.json`, `build/desktop.py`.
+  - Deleted duplicate `core/` shims: `core/db_manager.py`, `core/geo.py`, `core/logger.py`, `core/session.py`, `utils/session_helper.py`.
+  - Updated active imports from `core.logger` → `utils.logger_helper` and `core.geo` → `utils.geo` across 8 modules.
+  - Removed unused validators: `validate_json_input()` and `validate_coordinates_fields()` from `utils/validators.py` (~110 lines).
+  - Removed dead `DatabaseAuditLog` model from `modules/analytics/models.py`.
+  - Preserved `data/scraped_events.json` (live) and skipped riskier refactors: auth module merge, seed consolidation, `.kilo/worktrees/`, backward-compat model aliases.
+
+## Next
+
+- Commit all changes to main branch.
+
 ## Next
 
 - Commit all changes to main branch.

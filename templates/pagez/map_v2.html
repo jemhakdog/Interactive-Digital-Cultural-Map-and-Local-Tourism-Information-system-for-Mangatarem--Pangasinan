@@ -87,7 +87,7 @@
         border-radius: 32px 32px 0 0;
         padding: 24px;
         z-index: 40; /* Stay below navbar (50) */
-        transform: translateY(calc(100% - 100px));
+        transform: translateY(calc(100% - 220px));
         transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
         height: calc(100vh - 140px); /* Consistent height for snapping */
         max-height: 90vh;
@@ -97,7 +97,7 @@
         overscroll-behavior: contain;
         pointer-events: auto !important;
         will-change: transform;
-        touch-action: pan-y;
+        /* touch-action must NOT be none here: it blocks finger scrolling of #results-section. Only drag initiators (handle/search) get touch-action:none. */
     }
 
     #results-section {
@@ -106,11 +106,12 @@
         overscroll-behavior: contain;
         -webkit-overflow-scrolling: touch;
         padding-bottom: 20px;
+        touch-action: pan-y; /* allow finger scrolling of the list; drag only starts when scrollTop <= 0 */
     }
 
     /* Snapping states managed by JS */
     .bottom-sheet.is-peek {
-        transform: translateY(calc(100% - 100px));
+        transform: translateY(calc(100% - 220px));
     }
     .bottom-sheet.is-full {
         transform: translateY(0);
@@ -199,6 +200,7 @@
         flex-shrink: 0;
         transition: background 0.2s;
         position: relative; /* For touch target expansion */
+        touch-action: none;
     }
     
     /* Expanded touch target */
@@ -223,6 +225,7 @@
         border-radius: 20px;
         padding: 12px 20px;
         box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+        touch-action: none;
     }
 
     .search-input-container input {
@@ -1087,7 +1090,7 @@
 {% block scripts %}
 <script src="https://api.mapbox.com/mapbox-gl-js/v3.3.0/mapbox-gl.js"></script>
 <!-- Leaflet JS Fallback -->
-<script src="{{ url_for('static', filename='js/leaflet.js') }}" defer></script>
+<script src="{{ url_for('static', filename='vendor/leaflet/leaflet.js') }}" defer></script>
 <script>
     window.MAPBOX_TOKEN = "{{ mapbox_token }}";
     window.USER_AUTH = {{ 'true' if current_user.is_authenticated else 'false' }};
@@ -1097,6 +1100,6 @@
 {% if current_user.is_authenticated and current_user.role == 'user' %}
 <script src="{{ url_for('static', filename='js/pages/user-actions.js') }}" defer></script>
 {% endif %}
-<script src="{{ url_for('static', filename='js/pages/map_v2.js') }}?v=1.1.8"></script>
+<script src="{{ url_for('static', filename='js/pages/map_v2.js') }}?v=1.1.9"></script>
 <script src="{{ url_for('static', filename='js/pages/gemini_live.js') }}?v=1.0.0"></script>
 {% endblock %}

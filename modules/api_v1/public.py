@@ -226,7 +226,7 @@ def attraction_detail_v1_view(id):
     nearby_stay = []
     nearby_eat = []
     if attraction.latitude and attraction.longitude:
-        from core.geo import haversine_distance
+        from utils.geo import haversine_distance
         all_establishments = Establishment.query.filter_by(status="approved").all()
         for est in all_establishments:
             dist = haversine_distance(

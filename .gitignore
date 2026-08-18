@@ -61,3 +61,34 @@ tailwindcss-*
 # External repositories / Cloned tools
 Athena-Public/
 
+# Databases & Backups
+instance_backup/
+*.db.bak
+
+# Caches & Temp
+.ruff_cache/
+.pytest_cache/
+__pycache__/
+tmp/
+
+# Agent tooling
+.agent/
+.agents/
+.antigravitycli/
+
+# Design & Mockups
+.mockups/
+design-system/
+code_screenshots/
+
+# Generated / Non-essential
+db_schemas/
+archive/
+db_update_package/
+scratch/
+
+# OS junk
+nul
+Thumbs.db
+.DS_Store
+

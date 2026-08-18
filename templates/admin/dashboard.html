@@ -269,20 +269,26 @@
                                     </td>
                                     <td class="px-6 py-4 text-right align-middle">
                                         <div class="flex justify-end gap-2">
-                                            <a href="{{ url_for('admin.approve_review', id=review.id) }}"
-                                               class="p-2 bg-sky-500 text-white rounded-xl hover:bg-sky-600 transition shadow-sm admin-action-btn"
-                                               title="Approve Review">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                            </a>
-                                            <button data-delete-url="{{ url_for('admin.reject_review', id=review.id) }}"
+                                            <form method="POST" action="{{ url_for('admin.approve_review', id=review.id) }}" style="display:inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit"
+                                                   class="p-2 bg-sky-500 text-white rounded-xl hover:bg-sky-600 transition shadow-sm admin-action-btn"
+                                                   title="Approve Review">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                            <form method="POST" action="{{ url_for('admin.reject_review', id=review.id) }}" style="display:inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit"
                                                     class="p-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition admin-action-btn"
                                                     title="Reject Review">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </button>
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>
@@ -317,20 +323,26 @@
                                     </td>
                                     <td class="px-6 py-4 text-right align-middle">
                                         <div class="flex justify-end gap-2">
-                                            <a href="{{ url_for('admin.admin_approve_announcement', id=item.id) }}"
-                                               class="p-2 bg-sky-500 text-white rounded-xl hover:bg-sky-600 transition shadow-sm admin-action-btn"
-                                               title="Approve Announcement">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                                                </svg>
-                                            </a>
-                                            <a href="{{ url_for('admin.admin_reject_announcement', id=item.id) }}"
-                                               class="p-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition admin-action-btn"
-                                               title="Reject Announcement">
-                                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
-                                                </svg>
-                                            </a>
+                                            <form method="POST" action="{{ url_for('admin.admin_approve_announcement', id=item.id) }}" style="display:inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit"
+                                                   class="p-2 bg-sky-500 text-white rounded-xl hover:bg-sky-600 transition shadow-sm admin-action-btn"
+                                                   title="Approve Announcement">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                            <form method="POST" action="{{ url_for('admin.admin_reject_announcement', id=item.id) }}" style="display:inline">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit"
+                                                   class="p-2 bg-red-50 text-red-600 rounded-xl hover:bg-red-100 transition admin-action-btn"
+                                                   title="Reject Announcement">
+                                                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12" />
+                                                    </svg>
+                                                </button>
+                                            </form>
                                         </div>
                                     </td>
                                 </tr>

@@ -22,18 +22,29 @@ document.addEventListener('DOMContentLoaded', () => {
             color: #e2e8f0;
             font-family: 'Plus Jakarta Sans', sans-serif;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 0 0 20px rgba(16, 185, 129, 0.1);
-            z-index: 9999;
+            z-index: 100;
             transform: translateY(150px) scale(0.9);
             opacity: 0;
             transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             flex-direction: column;
             gap: 12px;
+            pointer-events: none; /* ponytail: hidden HUD must never block the map/sheet underneath */
         }
 
         .pwa-install-hud.visible {
             transform: translateY(0) scale(1);
             opacity: 1;
+            pointer-events: auto;
+        }
+
+        @media (max-width: 767px) {
+            .pwa-install-hud {
+                bottom: 260px; /* clear of the 220px peek sheet + handle */
+                left: 16px;
+                right: 16px;
+                width: auto;
+            }
         }
 
         .pwa-hud-header {
@@ -130,7 +141,7 @@ document.addEventListener('DOMContentLoaded', () => {
             font-family: 'Plus Jakarta Sans', sans-serif;
             font-size: 0.85rem;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-            z-index: 9999;
+            z-index: 100;
             transform: translateY(150px);
             opacity: 0;
             transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);

@@ -29,6 +29,22 @@
 - **Barangay Rep** (7 nav items): Full CRUD on Landmarks and Events, Update Barangay Profile, Read-only on Gallery, Reviews, Reservations.
 - **Tourist** (10 nav items): Read-only across Dashboard, Passport, Map, Barangays, Events, Gallery, Stay & Eat, Routes.
 
+## Recent changes (2026-07-31)
+
+### Map V2 Mobile Touch Fixes
+- Removed `touch-action: none` from `.bottom-sheet` and added `touch-action: pan-y` to `#results-section` so the landmark list scrolls by finger.
+- Refined the results-list touchstart handler to only hijack the gesture when the sheet is not already fully open.
+- Bumped SW cache to `gomangatarem-v10` and static query version to `map_v2.js?v=1.1.9` so mobile browsers load the corrected files immediately.
+- Added PWA install HUD mobile layout adjustment (`bottom: 260px`) so it no longer overlaps the sheet handle.
+
+### Ponytail Audit Batch Cleanup
+- Deleted dead files: `archive/`, `code_screenshots/`, `.antigravitycli/`, `tmp/verify_newsletter.py`, `instance/heritage_page.html`, `data/scraped_attractions.json`, `data/scraped_heritage.json`, `build/desktop.py`.
+- Deleted duplicate `core/` shims: `core/db_manager.py`, `core/geo.py`, `core/logger.py`, `core/session.py`, `utils/session_helper.py`.
+- Updated active imports from `core.logger` → `utils.logger_helper` and `core.geo` → `utils.geo` across 8 modules.
+- Removed unused validators: `validate_json_input()` and `validate_coordinates_fields()` from `utils/validators.py` (~110 lines).
+- Removed dead `DatabaseAuditLog` model from `modules/analytics/models.py`.
+- Preserved `data/scraped_events.json` (live) and skipped riskier refactors: auth module merge, seed consolidation, `.kilo/worktrees/`, backward-compat model aliases.
+
 ## Next step
 
 - Commit all changes to main branch.

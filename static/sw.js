@@ -1,12 +1,11 @@
-const CACHE_NAME = 'gomangatarem-v7';
+const CACHE_NAME = 'gomangatarem-v10';
 const MAP_CACHE_NAME = 'mapbox-tiles';
 const STATIC_ASSETS = [
     '/static/css/main.css',
     '/static/css/style.css',
     '/static/css/pages/map.css',
     '/static/js/pages/map_v2.js',
-    '/manifest.json',
-    '/offline'
+    '/manifest.json'
 ];
 
 // Install Event: Cache static assets
@@ -48,21 +47,26 @@ self.addEventListener('fetch', (event) => {
         return; 
     }
 
-    // 2. Mapbox Handling (Cross-origin but allowed)
+    // 2. Mapbox Handling — only cache tile/style GETs, let analytics POSTs pass through
     if (url.hostname.includes('mapbox.com')) {
-        event.respondWith(
-            caches.open(MAP_CACHE_NAME).then((cache) => {
-                return cache.match(event.request).then((response) => {
-                    const fetchPromise = fetch(event.request).then((networkResponse) => {
-                        if (networkResponse.ok && (url.pathname.includes('/tiles/') || url.pathname.includes('/styles/'))) {
-                            cache.put(event.request, networkResponse.clone());
-                        }
-                        return networkResponse;
-                    }).catch(() => null);
-                    return response || fetchPromise;
-                });
-            })
-        );
+        const isTileOrStyle = url.pathname.includes('/tiles/') || url.pathname.includes('/styles/');
+        if (isTileOrStyle && event.request.method === 'GET') {
+            event.respondWith(
+                caches.open(MAP_CACHE_NAME).then((cache) => {
+                    return cache.match(event.request).then((response) => {
+                        const fetchPromise = fetch(event.request).then((networkResponse) => {
+                            if (networkResponse.ok) {
+                                cache.put(event.request, networkResponse.clone());
+                            }
+                            return networkResponse;
+                        }).catch(() => new Response('Offline', { status: 503 }));
+                        return response || fetchPromise;
+                    });
+                })
+            );
+            return;
+        }
+        // Non-tile/style requests (analytics POSTs, etc.) — let browser handle natively
         return;
     }
 
@@ -106,10 +110,13 @@ self.addEventListener('fetch', (event) => {
                     if (cachedResponse) {
                         return cachedResponse;
                     }
-                    // For document navigation page requests, fall back to /offline
                     if (event.request.mode === 'navigate' || (event.request.headers.get('accept') && event.request.headers.get('accept').includes('text/html'))) {
-                        return caches.match('/offline');
+                        return new Response('<h1>Offline</h1><p>You are offline. Please check your connection.</p>', {
+                            status: 503,
+                            headers: { 'Content-Type': 'text/html' }
+                        });
                     }
+                    return new Response('Offline', { status: 503 });
                 });
             })
         );

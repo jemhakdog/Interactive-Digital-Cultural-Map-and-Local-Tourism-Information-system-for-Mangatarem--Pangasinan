@@ -34,7 +34,7 @@
     <!-- Form Section -->
     <div class="container mx-auto px-6 -mt-16">
         <div class="max-w-3xl mx-auto glass-panel p-8 md:p-12 rounded-[2.5rem]">
-            <form action="{{ url_for('admin.edit_attraction', id=0) if attraction else url_for('admin.admin_attractions') }}" method="POST" enctype="multipart/form-data" 
+            <form action="{{ url_for('admin.edit_attraction', id=0) if attraction else url_for('admin.add_attraction') }}" method="POST" enctype="multipart/form-data" 
                 class="space-y-8">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <!-- Note: The above action is just a placeholder, typically handling would be in a dedicated add route -->

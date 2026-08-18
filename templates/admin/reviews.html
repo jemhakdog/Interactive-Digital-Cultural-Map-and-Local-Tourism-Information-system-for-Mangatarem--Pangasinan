@@ -148,18 +148,23 @@
                     <!-- Right - Moderation Action Controls -->
                     <div class="flex items-center gap-2 flex-shrink-0 lg:self-center">
                         {% if review.status != 'approved' %}
-                        <a href="{{ url_for('admin.approve_review', id=review.id, next=request.url) }}"
-                           class="bg-sky-500 hover:bg-sky-600 text-white font-black text-[9px] uppercase tracking-wider px-5 py-3 rounded-xl transition-all shadow-md shadow-sky-500/10 flex items-center gap-1.5 admin-action-btn">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
-                            <span>Approve</span>
-                        </a>
+                        <form method="POST" action="{{ url_for('admin.approve_review', id=review.id, next=request.url) }}" style="display:inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit"
+                               class="bg-sky-500 hover:bg-sky-600 text-white font-black text-[9px] uppercase tracking-wider px-5 py-3 rounded-xl transition-all shadow-md shadow-sky-500/10 flex items-center gap-1.5 admin-action-btn">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                                <span>Approve</span>
+                            </button>
+                        </form>
                         {% endif %}
-                        <a href="{{ url_for('admin.reject_review', id=review.id, next=request.url) }}"
-                           onclick="return confirm('Delete this review permanently?')"
-                           class="bg-red-50 hover:bg-red-100 text-red-600 font-black text-[9px] uppercase tracking-wider px-5 py-3 rounded-xl transition-all flex items-center gap-1.5 admin-action-btn">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
-                            <span>Reject</span>
-                        </a>
+                        <form method="POST" action="{{ url_for('admin.reject_review', id=review.id, next=request.url) }}" style="display:inline" onsubmit="return confirm('Delete this review permanently?')">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit"
+                               class="bg-red-50 hover:bg-red-100 text-red-600 font-black text-[9px] uppercase tracking-wider px-5 py-3 rounded-xl transition-all flex items-center gap-1.5 admin-action-btn">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                                <span>Reject</span>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>

@@ -4,9 +4,9 @@ Project: mangatarem-cultural-map.
 
 Goal: Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan.
 
-Last updated: 2026-07-29
+Last updated: 2026-07-31
 
-Current focus: Codebase cleanup and bug fixes complete. Ready for commit.
+Current focus: Map V2 mobile touch fixes and ponytail batch cleanup completed. Ready for commit.
 
 If resuming work or switching models, read `memory-bank/handoff.md` next.
 

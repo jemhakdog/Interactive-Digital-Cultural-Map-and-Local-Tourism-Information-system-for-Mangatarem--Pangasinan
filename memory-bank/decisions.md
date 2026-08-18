@@ -108,3 +108,38 @@ Decision:
 Consequences: Highly optimized, clean, and normalized database schema (bringing table count down to exactly 32 tables) that aligns perfectly between local SQLite and online Supabase, enabling robust migrations.
 
 Related files: `db_schemas/schema.sql`, `scripts/db_ops/verify_schema.py`, `migrations/versions/536847569d90_add_form_data.py`, `core/app_setup.py`, `scratch/verify_db.py`, `scratch/execute_cleanup.py`
+
+### 2026-07-31 — Map V2 bottom-sheet mobile touch fixes and service-worker cache bump
+
+Status: Accepted
+
+Context: On mobile devices the Map V2 bottom sheet could not be dragged open, and the landmark results list only showed ~4 items because native touch scrolling was blocked by a global `touch-action: none` rule on `.bottom-sheet`. Additionally, the PWA install HUD initially sat in front of the sheet handle, intercepting touch gestures before being repositioned in a prior change.
+
+Decision:
+1. Removed `touch-action: none` from `.bottom-sheet` so native scrolling works inside `#results-section`.
+2. Added `touch-action: pan-y` to `#results-section` so vertical finger scrolling is allowed while the sheet-drag gesture still fires when the list is at `scrollTop <= 0`.
+3. Refined the `resultsSection` touchstart handler to avoid hijacking the gesture when the sheet is already fully open (`is-full`), allowing the list to keep scrolling naturally.
+4. Bumped the service-worker cache name to `gomangatarem-v10` and changed the static script tag to `map_v2.js?v=1.1.9` so updated HTML/JS/CSS are fetched immediately instead of being served from stale cache.
+5. Kept mobile testing URL ephemeral (`trycloudflare.com` tunnel) because the project does not yet own a domain for a permanent named Cloudflare tunnel.
+
+Consequences: Mobile visitors now see all landmarks, the bottom sheet drags open reliably, and no extra page refresh is required after deployment to pick up the fix.
+
+Related files: `templates/pagez/map_v2.html`, `static/js/pages/map_v2.js`, `static/sw.js`
+
+### 2026-07-31 — Ponytail audit batch cleanup (dead files, duplicate core/ shims, unused validators, dead model)
+
+Status: Accepted
+
+Context: Follow-up ponytail audit flagged dead files, byte-for-byte duplicate `core/` shims, zero-caller validators, and an unused `DatabaseAuditLog` model. The live `data/scraped_events.json` and the auth-module split, seed-script consolidation, `.kilo/worktrees/`, and backward-compat model aliases were intentionally preserved to avoid higher-risk refactors.
+
+Decision:
+1. Deleted dead tracked artifacts: `archive/` (client secrets and stale logs), `code_screenshots/`, `.antigravitycli/`, `tmp/verify_newsletter.py`, `instance/heritage_page.html`, `data/scraped_attractions.json`, `data/scraped_heritage.json`, and `build/desktop.py`.
+2. Deleted duplicate `core/` shims and one unused `utils/` shim: `core/db_manager.py`, `core/geo.py`, `core/logger.py`, `core/session.py`, and `utils/session_helper.py`.
+3. Updated active imports across `modules/api_v1/public.py`, `modules/attractions/routes.py`, and six auth/gallery/business/heritage modules so logging now uses `utils.logger_helper` and geo math uses `utils.geo`.
+4. Removed unused validators `validate_json_input()` and `validate_coordinates_fields()` from `utils/validators.py`, along with orphaned dead code left behind from earlier edits.
+5. Removed the unused `DatabaseAuditLog` model from `modules/analytics/models.py`.
+6. Verified all touched Python files pass syntax checks before marking the batch complete.
+
+Consequences: Reduced dead code and duplicate entry points while keeping every live route, model, template, and migration intact. The cleanup was executed in low-risk batches with explicit caller checks so the app remains bootable without the removed shims.
+
+Related files: `core/db_manager.py`, `core/geo.py`, `core/logger.py`, `core/session.py`, `utils/session_helper.py`, `utils/validators.py`, `modules/analytics/models.py`, `modules/api_v1/public.py`, `modules/auth/login.py`, `modules/auth/oauth.py`, `modules/auth/password.py`, `modules/auth/register.py`, `modules/business/routes.py`, `modules/gallery/routes.py`, `modules/heritage/routes.py`, `modules/attractions/routes.py`

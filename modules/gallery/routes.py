@@ -5,7 +5,7 @@ Extracted from routes/public.py.
 
 from flask import Blueprint, render_template, request
 from models import db, GalleryItem, User
-from core.logger import log_entry, log_query, log_render, log_success
+from utils.logger_helper import log_entry, log_query, log_render, log_success
 import logging
 
 gallery_bp = Blueprint("gallery", __name__, url_prefix="/gallery")
