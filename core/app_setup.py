@@ -191,7 +191,9 @@ def register_request_hooks(app: Flask) -> None:
         )
 
         # Cross-Origin protection (only meaningful with HTTPS)
-        if app.config.get("SESSION_COOKIE_SECURE"):
+        # Skip COOP/CORP on auth pages — Google GSI needs cross-origin postMessage with accounts.google.com
+        is_auth_page = request.path.startswith("/auth/")
+        if app.config.get("SESSION_COOKIE_SECURE") and not is_auth_page:
             response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
             response.headers["Cross-Origin-Resource-Policy"] = "same-origin"
 
