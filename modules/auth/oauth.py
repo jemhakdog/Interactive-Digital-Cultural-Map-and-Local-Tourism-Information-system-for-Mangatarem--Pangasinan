@@ -36,8 +36,8 @@ def _verify_google_token(token: str) -> Optional[Tuple[str, str]]:
         name = idinfo.get("name")
         log_success("auth", "google_login", f"Verified token for {email} ({name})")
         return (email, name)
-    except ValueError as e:
-        log_error("auth", "google_login", f"Invalid token: {str(e)}")
+    except Exception as e:
+        log_error("auth", "google_login", f"Token verification failed ({type(e).__name__}): {str(e)}")
         return None
 
 def _generate_unique_username(base_username: str) -> str:
@@ -90,6 +90,16 @@ def _generate_oauth_nonce() -> str:
 @csrf.exempt
 def google_login_view():
     log_entry("auth", "google_login")
+    try:
+        return _handle_google_login()
+    except Exception as e:
+        logger.exception("Unhandled error in google_login_view")
+        log_error("auth", "google_login", f"Unhandled error: {type(e).__name__}: {str(e)}")
+        flash("Google sign-in encountered an error. Please try again.", "error")
+        return redirect(url_for("auth.login"))
+
+
+def _handle_google_login():
     token = request.form.get("credential")
     nonce = request.form.get("nonce")
     
