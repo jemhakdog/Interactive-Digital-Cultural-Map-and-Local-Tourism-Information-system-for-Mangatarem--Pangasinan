@@ -161,11 +161,12 @@ def register_request_hooks(app: Flask) -> None:
         csp_policies = {
             "default-src": "'self'",
             "script-src": "'self' https://fonts.googleapis.com https://maps.mapbox.com https://api.mapbox.com https://accounts.google.com https://unpkg.com https://cdn.jsdelivr.net https://*.jsdelivr.net https://vercel.live https://*.vercel.live 'unsafe-inline' 'unsafe-eval'",
-            "style-src": "'self' https://fonts.googleapis.com https://api.mapbox.com https://unpkg.com https://cdn.jsdelivr.net https://*.jsdelivr.net https://vercel.live 'unsafe-inline'",
+            "style-src": "'self' https://fonts.googleapis.com https://api.mapbox.com https://unpkg.com https://cdn.jsdelivr.net https://*.jsdelivr.net https://vercel.live https://accounts.google.com 'unsafe-inline'",
             "img-src": "'self' data: https: blob: https://vercel.com https://*.vercel.com https://*.basemaps.cartocdn.com https://*.arcgisonline.com",
             "font-src": "'self' https://fonts.gstatic.com data:",
             "connect-src": "'self' https://router.project-osrm.org https://*.basemaps.cartocdn.com https://unpkg.com https://cdn.jsdelivr.net https://*.jsdelivr.net https://fonts.googleapis.com https://fonts.gstatic.com https://placehold.co https://*.mapbox.com https://api.mapbox.com https://events.mapbox.com https://*.supabase.co https://*.upstash.io https://accounts.google.com https://vercel.live https://*.vercel.live wss://*.vercel.live https://*.arcgisonline.com ws://127.0.0.1:5002 ws://localhost:5002 wss://*",
             "worker-src": "'self' blob:",
+            "frame-src": "https://accounts.google.com https://*.google.com https://*.googleusercontent.com",
             "frame-ancestors": "'none'",
             "base-uri": "'self'",
             "form-action": "'self'",
@@ -179,7 +180,7 @@ def register_request_hooks(app: Flask) -> None:
         response.headers["X-Content-Type-Options"] = "nosniff"
 
         # Prevent clickjacking
-        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["X-Frame-Options"] = "SAMEORIGIN"
 
         # Referrer Policy
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
