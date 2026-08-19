@@ -7,7 +7,7 @@ async function getHeritageTypes() {
     const res = await fetch("http://localhost:8000/api/heritage/types", { next: { revalidate: 60 } });
     if (!res.ok) return [];
     const data = await res.json();
-    return (data.types ?? data) as Record<string, unknown>[];
+    return (data.types ?? data.items ?? data) as Record<string, unknown>[];
   } catch { return []; }
 }
 
@@ -35,8 +35,8 @@ export default async function HeritagePage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {(types as Record<string, unknown>[]).map((t) => {
-            const typeKey = String(t.type ?? t.name ?? "").toLowerCase();
-            const typeName = String(t.type ?? t.name ?? "Unknown");
+            const typeKey = String(t.slug ?? t.type ?? "").toLowerCase();
+            const typeName = String(t.label ?? t.type ?? t.name ?? "Unknown");
             const count = t.count ?? t.total ?? 0;
             return (
               <Link key={typeKey} href={`/heritage/${typeKey}`}>

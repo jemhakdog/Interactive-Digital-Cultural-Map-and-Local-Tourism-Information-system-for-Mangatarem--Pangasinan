@@ -21,7 +21,7 @@ export default async function AttractionsPage({
 }) {
   const sp = await searchParams;
   const data = await getAttractions(sp.category, sp.barangay);
-  const attractions = (data.items ?? []) as { id: number; name: string; category?: string; image_url?: string; barangay_name?: string; average_rating?: number }[];
+  const attractions = (data.attractions ?? data.items ?? []) as { id: number; name: string; category?: string; image_url?: string; barangay_name?: string; average_rating?: number }[];
 
   return (
     <div className="container mx-auto px-4 py-8">

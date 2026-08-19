@@ -13,7 +13,7 @@ async function getBusiness() {
 
 export default async function BusinessPage() {
   const data = await getBusiness();
-  const businesses = (data.items ?? []) as { id: number; name: string; category?: string; image_url?: string; barangay_name?: string; average_rating?: number }[];
+  const businesses = (data.establishments ?? data.businesses ?? data.items ?? []) as { id: number; name: string; category?: string; image_url?: string; barangay_name?: string; average_rating?: number }[];
 
   return (
     <div className="container mx-auto px-4 py-8">

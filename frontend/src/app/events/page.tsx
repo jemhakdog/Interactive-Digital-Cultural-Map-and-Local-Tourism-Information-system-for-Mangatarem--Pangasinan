@@ -13,7 +13,7 @@ async function getEvents() {
 
 export default async function EventsPage() {
   const data = await getEvents();
-  const events = (data.items ?? []) as { id: number; name: string; category?: string; date?: string; image_url?: string; barangay_name?: string }[];
+  const events = (data.events ?? data.items ?? []) as { id: number; name: string; category?: string; date?: string; image_url?: string; barangay_name?: string }[];
 
   return (
     <div className="container mx-auto px-4 py-8">
