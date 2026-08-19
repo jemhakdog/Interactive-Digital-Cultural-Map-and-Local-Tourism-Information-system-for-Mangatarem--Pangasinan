@@ -1,0 +1,18 @@
+{
+  "name": "mangatarem-tourism",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n back,front -c blue,green \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "SECRET_KEY=dev-secret-key-12345 .venv/bin/uvicorn backend.app.main:app --port 8000 --reload",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "concurrently -n back,front -c blue,green \"npm run start:backend\" \"npm run start:frontend\"",
+    "start:backend": "SECRET_KEY=dev-secret-key-12345 .venv/bin/uvicorn backend.app.main:app --port 8000",
+    "start:frontend": "cd frontend && npm start",
+    "test": "cd frontend && npx playwright test",
+    "test:ui": "cd frontend && npx playwright test --ui"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.0"
+  }
+}
