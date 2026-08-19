@@ -1,6 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { attractionSchema, eventSchema, type AttractionInput, type EventInput } from "@/lib/validations";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -56,20 +59,12 @@ export function DeleteDialog({ open, onOpenChange, title, description, onConfirm
   );
 }
 
-interface AttractionFormData {
-  name: string;
-  description: string;
-  category: string;
-  latitude: string;
-  longitude: string;
-}
-
 interface AttractionFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  initialData?: Partial<AttractionFormData>;
+  initialData?: Partial<AttractionInput>;
   title: string;
-  onSubmit: (data: AttractionFormData) => Promise<void>;
+  onSubmit: (data: AttractionInput) => Promise<void>;
 }
 
 export function AttractionFormDialog({
@@ -80,20 +75,24 @@ export function AttractionFormDialog({
   onSubmit,
 }: AttractionFormDialogProps) {
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState<AttractionFormData>({
-    name: initialData?.name ?? "",
-    description: initialData?.description ?? "",
-    category: initialData?.category ?? "",
-    latitude: initialData?.latitude ?? "",
-    longitude: initialData?.longitude ?? "",
+
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<AttractionInput>({
+    resolver: zodResolver(attractionSchema),
+    defaultValues: {
+      name: initialData?.name ?? "",
+      description: initialData?.description ?? "",
+      category: initialData?.category ?? "",
+      latitude: initialData?.latitude ?? "",
+      longitude: initialData?.longitude ?? "",
+    },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleFormSubmit = async (data: AttractionInput) => {
     setLoading(true);
     try {
-      await onSubmit(form);
+      await onSubmit(data);
       onOpenChange(false);
+      reset();
     } finally {
       setLoading(false);
     }
@@ -105,52 +104,30 @@ export function AttractionFormDialog({
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              required
-            />
+            <Label htmlFor="name">Name *</Label>
+            <Input id="name" {...register("name")} />
+            {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
-            <Input
-              id="description"
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-            />
+            <Input id="description" {...register("description")} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
-            <Input
-              id="category"
-              value={form.category}
-              onChange={(e) => setForm({ ...form, category: e.target.value })}
-            />
+            <Input id="category" {...register("category")} placeholder="e.g. Nature, Heritage, Religious" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="latitude">Latitude</Label>
-              <Input
-                id="latitude"
-                type="number"
-                step="any"
-                value={form.latitude}
-                onChange={(e) => setForm({ ...form, latitude: e.target.value })}
-              />
+              <Input id="latitude" type="number" step="any" {...register("latitude")} />
+              {errors.latitude && <p className="text-sm text-destructive">{errors.latitude.message}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="longitude">Longitude</Label>
-              <Input
-                id="longitude"
-                type="number"
-                step="any"
-                value={form.longitude}
-                onChange={(e) => setForm({ ...form, longitude: e.target.value })}
-              />
+              <Input id="longitude" type="number" step="any" {...register("longitude")} />
+              {errors.longitude && <p className="text-sm text-destructive">{errors.longitude.message}</p>}
             </div>
           </div>
           <DialogFooter>
@@ -168,20 +145,12 @@ export function AttractionFormDialog({
   );
 }
 
-interface EventFormData {
-  name: string;
-  description: string;
-  category: string;
-  date: string;
-  location: string;
-}
-
 interface EventFormDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  initialData?: Partial<EventFormData>;
+  initialData?: Partial<EventInput>;
   title: string;
-  onSubmit: (data: EventFormData) => Promise<void>;
+  onSubmit: (data: EventInput) => Promise<void>;
 }
 
 export function EventFormDialog({
@@ -192,20 +161,24 @@ export function EventFormDialog({
   onSubmit,
 }: EventFormDialogProps) {
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState<EventFormData>({
-    name: initialData?.name ?? "",
-    description: initialData?.description ?? "",
-    category: initialData?.category ?? "",
-    date: initialData?.date ?? "",
-    location: initialData?.location ?? "",
+
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<EventInput>({
+    resolver: zodResolver(eventSchema),
+    defaultValues: {
+      name: initialData?.name ?? "",
+      description: initialData?.description ?? "",
+      category: initialData?.category ?? "",
+      date: initialData?.date ?? "",
+      location: initialData?.location ?? "",
+    },
   });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleFormSubmit = async (data: EventInput) => {
     setLoading(true);
     try {
-      await onSubmit(form);
+      await onSubmit(data);
       onOpenChange(false);
+      reset();
     } finally {
       setLoading(false);
     }
@@ -217,49 +190,28 @@ export function EventFormDialog({
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
-            <Input
-              id="name"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              required
-            />
+            <Label htmlFor="name">Name *</Label>
+            <Input id="name" {...register("name")} />
+            {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
           </div>
           <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
-            <Input
-              id="description"
-              value={form.description}
-              onChange={(e) => setForm({ ...form, description: e.target.value })}
-            />
+            <Input id="description" {...register("description")} />
           </div>
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
-            <Input
-              id="category"
-              value={form.category}
-              onChange={(e) => setForm({ ...form, category: e.target.value })}
-            />
+            <Input id="category" {...register("category")} placeholder="e.g. Festival, Cultural, Sports" />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="date">Date</Label>
-              <Input
-                id="date"
-                type="date"
-                value={form.date}
-                onChange={(e) => setForm({ ...form, date: e.target.value })}
-              />
+              <Input id="date" type="date" {...register("date")} />
             </div>
             <div className="space-y-2">
               <Label htmlFor="location">Location</Label>
-              <Input
-                id="location"
-                value={form.location}
-                onChange={(e) => setForm({ ...form, location: e.target.value })}
-              />
+              <Input id="location" {...register("location")} />
             </div>
           </div>
           <DialogFooter>

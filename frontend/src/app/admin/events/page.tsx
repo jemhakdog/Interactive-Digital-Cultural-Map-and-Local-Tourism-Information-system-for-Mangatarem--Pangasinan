@@ -50,31 +50,31 @@ export default function AdminEventsPage() {
     setDeleteTarget(null);
   };
 
-  const handleEdit = async (data: { name: string; description: string; category: string; date: string; location: string }) => {
+  const handleEdit = async (data: { name: string; description?: string; category?: string; date?: string; location?: string }) => {
     if (!editTarget) return;
     await fetchAPI(`/api/events/${editTarget.id}`, {
       method: "PUT",
       body: JSON.stringify({
         name: data.name,
-        description: data.description,
-        category: data.category,
+        description: data.description ?? "",
+        category: data.category ?? "",
         date: data.date || null,
-        location: data.location,
+        location: data.location ?? "",
       }),
     });
     loadEvents();
     setEditTarget(null);
   };
 
-  const handleAdd = async (data: { name: string; description: string; category: string; date: string; location: string }) => {
+  const handleAdd = async (data: { name: string; description?: string; category?: string; date?: string; location?: string }) => {
     await fetchAPI("/api/events", {
       method: "POST",
       body: JSON.stringify({
         name: data.name,
-        description: data.description,
-        category: data.category,
+        description: data.description ?? "",
+        category: data.category ?? "",
         date: data.date || null,
-        location: data.location,
+        location: data.location ?? "",
       }),
     });
     loadEvents();

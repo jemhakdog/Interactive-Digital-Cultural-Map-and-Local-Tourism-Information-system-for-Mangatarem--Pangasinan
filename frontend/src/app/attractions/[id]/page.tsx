@@ -2,8 +2,8 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { MapPin, ArrowLeft, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
+import { ReviewSection } from "@/components/review-section";
 
 async function getAttraction(id: string) {
   try {
@@ -30,6 +30,8 @@ export default async function AttractionDetailPage({
   const [attraction, reviewData] = await Promise.all([getAttraction(id), getReviews(id)]);
 
   if (!attraction) notFound();
+
+  const attractionId = Number(id);
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -75,25 +77,31 @@ export default async function AttractionDetailPage({
           </div>
         )}
 
+        <Separator className="my-8" />
+
         {/* Reviews */}
+        <h2 className="text-xl font-bold mb-4">Reviews</h2>
+
+        {/* Review form */}
+        <div className="mb-6">
+          <ReviewSection attractionId={attractionId} />
+        </div>
+
+        {/* Existing reviews */}
         {reviewData.reviews.length > 0 && (
-          <>
-            <Separator className="my-8" />
-            <h2 className="text-xl font-bold mb-4">Reviews</h2>
-            <div className="space-y-4">
-              {(reviewData.reviews as Record<string, unknown>[]).map((r, i) => (
-                <div key={i} className="border rounded-lg p-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="font-medium text-sm">{String(r.user_name ?? "Anonymous")}</span>
-                    {r.rating != null && (
-                      <span className="text-xs text-primary">{"★".repeat(Number(r.rating))}</span>
-                    )}
-                  </div>
-                  <p className="text-sm text-muted-foreground">{String(r.comment ?? "")}</p>
+          <div className="space-y-4">
+            {(reviewData.reviews as Record<string, unknown>[]).map((r, i) => (
+              <div key={i} className="border rounded-lg p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-medium text-sm">{String(r.user_name ?? "Anonymous")}</span>
+                  {r.rating != null && (
+                    <span className="text-xs text-primary">{"★".repeat(Number(r.rating))}</span>
+                  )}
                 </div>
-              ))}
-            </div>
-          </>
+                <p className="text-sm text-muted-foreground">{String(r.comment ?? "")}</p>
+              </div>
+            ))}
+          </div>
         )}
       </div>
     </div>

@@ -50,14 +50,14 @@ export default function AdminAttractionsPage() {
     setDeleteTarget(null);
   };
 
-  const handleEdit = async (data: { name: string; description: string; category: string; latitude: string; longitude: string }) => {
+  const handleEdit = async (data: { name: string; description?: string; category?: string; latitude?: string; longitude?: string }) => {
     if (!editTarget) return;
     await fetchAPI(`/api/attractions/${editTarget.id}`, {
       method: "PUT",
       body: JSON.stringify({
         name: data.name,
-        description: data.description,
-        category: data.category,
+        description: data.description ?? "",
+        category: data.category ?? "",
         latitude: data.latitude ? parseFloat(data.latitude) : null,
         longitude: data.longitude ? parseFloat(data.longitude) : null,
       }),
@@ -66,13 +66,13 @@ export default function AdminAttractionsPage() {
     setEditTarget(null);
   };
 
-  const handleAdd = async (data: { name: string; description: string; category: string; latitude: string; longitude: string }) => {
+  const handleAdd = async (data: { name: string; description?: string; category?: string; latitude?: string; longitude?: string }) => {
     await fetchAPI("/api/attractions", {
       method: "POST",
       body: JSON.stringify({
         name: data.name,
-        description: data.description,
-        category: data.category,
+        description: data.description ?? "",
+        category: data.category ?? "",
         latitude: data.latitude ? parseFloat(data.latitude) : null,
         longitude: data.longitude ? parseFloat(data.longitude) : null,
       }),
