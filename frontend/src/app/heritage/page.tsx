@@ -1,6 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Landmark } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+
+export const metadata: Metadata = {
+  title: "Heritage",
+  description: "Cultural heritage sites and landmarks of Mangatarem",
+  openGraph: {
+    title: "Heritage | Mangatarem Tourism",
+    description: "Cultural heritage sites and landmarks of Mangatarem",
+  },
+};
 
 async function getHeritageTypes() {
   try {

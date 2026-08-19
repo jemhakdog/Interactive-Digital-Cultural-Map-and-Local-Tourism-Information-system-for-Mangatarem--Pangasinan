@@ -1,5 +1,15 @@
+import type { Metadata } from "next";
 import { ImageIcon } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+
+export const metadata: Metadata = {
+  title: "Gallery",
+  description: "Photos and media from Mangatarem tourism",
+  openGraph: {
+    title: "Gallery | Mangatarem Tourism",
+    description: "Photos and media from Mangatarem tourism",
+  },
+};
 
 interface GalleryItem {
   id: string | number;

@@ -1,7 +1,17 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Building2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+
+export const metadata: Metadata = {
+  title: "Business Directory",
+  description: "Restaurants, hotels, and local businesses in Mangatarem",
+  openGraph: {
+    title: "Business Directory | Mangatarem Tourism",
+    description: "Restaurants, hotels, and local businesses in Mangatarem",
+  },
+};
 
 async function getBusiness() {
   try {

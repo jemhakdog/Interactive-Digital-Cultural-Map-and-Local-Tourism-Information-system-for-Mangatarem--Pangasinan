@@ -1,7 +1,17 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Calendar } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+
+export const metadata: Metadata = {
+  title: "Events",
+  description: "Upcoming events and festivals in Mangatarem, Pangasinan",
+  openGraph: {
+    title: "Events | Mangatarem Tourism",
+    description: "Upcoming events and festivals in Mangatarem, Pangasinan",
+  },
+};
 
 async function getEvents() {
   try {

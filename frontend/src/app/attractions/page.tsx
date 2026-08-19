@@ -1,7 +1,17 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { MapPin } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+
+export const metadata: Metadata = {
+  title: "Attractions",
+  description: "Explore attractions in Mangatarem — nature, heritage, and cultural sites",
+  openGraph: {
+    title: "Attractions | Mangatarem Tourism",
+    description: "Explore attractions in Mangatarem — nature, heritage, and cultural sites",
+  },
+};
 
 async function getAttractions(category?: string, barangay?: string) {
   const params = new URLSearchParams();

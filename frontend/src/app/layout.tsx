@@ -14,12 +14,26 @@ export const metadata: Metadata = {
     template: "%s | Mangatarem Tourism",
   },
   description: "Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan",
-  icons: { icon: "/favicon.ico" },
+  icons: { icon: "/favicon.ico", apple: "/img/icon-512.png" },
+  manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Mangatarem Tourism",
+  },
+  other: {
+    "theme-color": "#16a34a",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="theme-color" content="#16a34a" />
+        <link rel="apple-touch-icon" href="/img/icon-192.png" />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} font-sans antialiased`}>
         <AuthProvider>
           <div className="flex min-h-screen flex-col">
