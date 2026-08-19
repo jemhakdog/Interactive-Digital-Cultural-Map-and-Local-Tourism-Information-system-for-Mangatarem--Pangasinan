@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/lib/auth";
 import { fetchAPI } from "@/lib/api";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Loader2, MapPin, Calendar, Building2, Users } from "lucide-react";
+import { Loader2, MapPin, Calendar, Building2, Users, ArrowRight, Shield } from "lucide-react";
 
 export default function AdminPage() {
   const { user, loading: authLoading } = useAuth();
@@ -21,7 +21,6 @@ export default function AdminPage() {
 
   useEffect(() => {
     if (!user || user.role !== "admin") return;
-    // Fetch counts from list endpoints
     Promise.all([
       fetchAPI("/api/attractions").then((d) => (d as { items: unknown[] }).items?.length ?? 0),
       fetchAPI("/api/events").then((d) => (d as { items: unknown[] }).items?.length ?? 0),
@@ -39,23 +38,32 @@ export default function AdminPage() {
   }
 
   const cards = [
-    { label: "Attractions", value: stats?.attractions ?? 0, icon: MapPin, href: "/admin/attractions" },
-    { label: "Events", value: stats?.events ?? 0, icon: Calendar, href: "/admin/events" },
-    { label: "Businesses", value: stats?.businesses ?? 0, icon: Building2, href: "/admin" },
-    { label: "Users", value: stats?.users ?? 0, icon: Users, href: "/admin/users" },
+    { label: "Attractions", value: stats?.attractions ?? 0, icon: MapPin, href: "/admin/attractions", color: "text-emerald-500 bg-emerald-500/10" },
+    { label: "Events", value: stats?.events ?? 0, icon: Calendar, href: "/admin/events", color: "text-blue-500 bg-blue-500/10" },
+    { label: "Businesses", value: stats?.businesses ?? 0, icon: Building2, href: "/admin", color: "text-amber-500 bg-amber-500/10" },
+    { label: "Users", value: stats?.users ?? 0, icon: Users, href: "/admin/users", color: "text-purple-500 bg-purple-500/10" },
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-2">Admin Dashboard</h1>
-      <p className="text-muted-foreground mb-8">Manage the Mangatarem tourism platform</p>
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
+      <div className="flex items-center gap-3 mb-8">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <Shield className="h-5 w-5" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Admin Dashboard</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">Manage the Mangatarem tourism platform</p>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {cards.map((c) => (
           <Link key={c.label} href={c.href}>
-            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-              <CardContent className="p-4 flex items-center gap-3">
-                <c.icon className="h-8 w-8 text-primary" />
+            <Card className="group border-border/50 hover:shadow-md hover:border-primary/20 transition-all cursor-pointer">
+              <CardContent className="p-5 flex items-center gap-4">
+                <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${c.color} group-hover:scale-110 transition-transform`}>
+                  <c.icon className="h-5 w-5" />
+                </div>
                 <div>
                   <p className="text-2xl font-bold">{c.value}</p>
                   <p className="text-xs text-muted-foreground">{c.label}</p>
@@ -66,13 +74,19 @@ export default function AdminPage() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Link href="/admin/attractions">
-          <Button variant="outline" className="w-full justify-start gap-2">🏛️ Manage Attractions</Button>
-        </Link>
-        <Link href="/admin/events">
-          <Button variant="outline" className="w-full justify-start gap-2">📅 Manage Events</Button>
-        </Link>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        {[
+          { href: "/admin/attractions", label: "Manage Attractions", icon: MapPin },
+          { href: "/admin/events", label: "Manage Events", icon: Calendar },
+        ].map(({ href, label, icon: Icon }) => (
+          <Link key={href} href={href}>
+            <Button variant="outline" className="w-full justify-start gap-3 h-12 rounded-xl">
+              <Icon className="h-4 w-4 text-primary" />
+              <span className="flex-1 text-left">{label}</span>
+              <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            </Button>
+          </Link>
+        ))}
       </div>
     </div>
   );

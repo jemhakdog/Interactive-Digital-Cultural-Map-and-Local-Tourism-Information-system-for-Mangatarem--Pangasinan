@@ -1,71 +1,53 @@
 import type { Metadata } from "next";
-import { ImageIcon } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { GalleryView, GalleryItem } from "./gallery-view";
 
 export const metadata: Metadata = {
-  title: "Gallery",
-  description: "Photos and media from Mangatarem tourism",
-  openGraph: {
-    title: "Gallery | Mangatarem Tourism",
-    description: "Photos and media from Mangatarem tourism",
-  },
+  title: "Visions of Mangatarem — Multimedia Cultural Gallery",
+  description:
+    "Explore high-resolution photography, scenic landscapes, Spanish colonial heritage, and community cultural stories from Mangatarem, Pangasinan.",
 };
 
-interface GalleryItem {
-  id: string | number;
-  image_url?: string;
-  title?: string;
-  caption?: string;
-}
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-async function getGallery() {
+async function getGalleryData() {
   try {
-    const res = await fetch("http://localhost:8000/api/gallery", { next: { revalidate: 60 } });
-    if (!res.ok) return { items: [] };
+    const res = await fetch(`${API_BASE}/api/gallery?per_page=48`, {
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) {
+      return { items: [], barangays: [] };
+    }
     return res.json();
-  } catch { return { items: [] }; }
+  } catch {
+    return { items: [], barangays: [] };
+  }
 }
 
 export default async function GalleryPage() {
-  const data = await getGallery();
-  const items = (data.items ?? []) as GalleryItem[];
+  const data = await getGalleryData();
+  const rawItems = (data.items ?? []) as GalleryItem[];
+  const availableBarangays = (data.barangays ?? []) as string[];
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-2">Gallery</h1>
-      <p className="text-muted-foreground mb-8">Photos from Mangatarem</p>
+    <div className="container mx-auto px-4 py-8 sm:py-10">
+      {/* ── Standard Page Header for Consistency & Test Compatibility ── */}
+      <div className="mb-8 space-y-1">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-2">
+          <span>Visual Heritage & Media Showcase</span>
+        </div>
+        <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
+          Gallery
+        </h1>
+        <p className="text-muted-foreground text-sm md:text-base max-w-2xl">
+          Photos from Mangatarem — explore cultural heritage, natural landscapes, festivals, and community stories.
+        </p>
+      </div>
 
-      {items.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          <ImageIcon className="h-12 w-12 mx-auto mb-4 opacity-30" />
-          <p>No gallery items yet.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {items.map((item) => (
-            <Card key={item.id} className="overflow-hidden">
-              <div className="aspect-square bg-muted">
-                {item.image_url ? (
-                  <img
-                    src={item.image_url}
-                    alt={item.title || item.caption || ""}
-                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
-                  </div>
-                )}
-              </div>
-              {item.title && (
-                <CardContent className="p-3">
-                  <p className="text-sm font-medium line-clamp-1">{item.title}</p>
-                </CardContent>
-              )}
-            </Card>
-          ))}
-        </div>
-      )}
+      {/* ── Interactive Multimedia Gallery Showcase ── */}
+      <GalleryView
+        initialItems={rawItems}
+        availableBarangays={availableBarangays}
+      />
     </div>
   );
 }

@@ -7,7 +7,7 @@ import { fetchAPI } from "@/lib/api";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus, Pencil, Trash2 } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, Calendar } from "lucide-react";
 import { DeleteDialog, EventFormDialog } from "@/components/admin-dialogs";
 
 interface Event {
@@ -86,26 +86,30 @@ export default function AdminEventsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">Manage Events</h1>
-          <p className="text-muted-foreground text-sm mt-1">{events.length} total events</p>
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <Calendar className="h-5 w-5" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Manage Events</h1>
+            <p className="text-muted-foreground text-sm mt-0.5">{events.length} total events</p>
+          </div>
         </div>
-        <Button onClick={() => setAddOpen(true)} className="gap-2">
+        <Button onClick={() => setAddOpen(true)} className="gap-2 rounded-xl">
           <Plus className="h-4 w-4" /> Add Event
         </Button>
       </div>
 
-      <div className="border rounded-lg">
+      <div className="border rounded-xl border-border/50 overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className="bg-muted/50">
               <TableHead>Name</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Date</TableHead>
               <TableHead>Barangay</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -113,54 +117,37 @@ export default function AdminEventsPage() {
             {events.map((e) => (
               <TableRow key={e.id}>
                 <TableCell className="font-medium">{e.name}</TableCell>
-                <TableCell>{e.category || "—"}</TableCell>
-                <TableCell>{e.date ? new Date(e.date).toLocaleDateString() : "—"}</TableCell>
-                <TableCell>{e.barangay_name || "—"}</TableCell>
-                <TableCell>
-                  <Badge variant={e.status === "approved" ? "default" : "secondary"}>
-                    {e.status}
-                  </Badge>
+                <TableCell><Badge variant="secondary" className="text-xs">{e.category || "—"}</Badge></TableCell>
+                <TableCell className="text-muted-foreground text-sm">
+                  {e.date ? new Date(e.date).toLocaleDateString() : "—"}
                 </TableCell>
+                <TableCell className="text-muted-foreground text-sm">{e.barangay_name || "—"}</TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditTarget(e)}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteTarget(e)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex justify-end gap-1">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditTarget(e)}>
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteTarget(e)}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
+            {events.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                  No events yet.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
 
-      <DeleteDialog
-        open={!!deleteTarget}
-        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
-        title="Delete Event"
-        description={`Are you sure you want to delete "${deleteTarget?.name}"? This action cannot be undone.`}
-        onConfirm={handleDelete}
-      />
-
-      <EventFormDialog
-        open={!!editTarget}
-        onOpenChange={(open) => { if (!open) setEditTarget(null); }}
-        initialData={editTarget ? {
-          name: editTarget.name,
-          category: editTarget.category,
-          date: editTarget.date ?? "",
-        } : undefined}
-        title="Edit Event"
-        onSubmit={handleEdit}
-      />
-
-      <EventFormDialog
-        open={addOpen}
-        onOpenChange={setAddOpen}
-        title="Add Event"
-        onSubmit={handleAdd}
-      />
+      <DeleteDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)} onConfirm={handleDelete} title="Delete Event" description={`Are you sure you want to delete "${deleteTarget?.name ?? ""}"?`} />
+      <EventFormDialog open={!!editTarget} onOpenChange={() => setEditTarget(null)} onSubmit={handleEdit} title="Edit Event" initialData={editTarget ? { name: editTarget.name, category: editTarget.category, date: editTarget.date ?? "" } : undefined} />
+      <EventFormDialog open={addOpen} onOpenChange={setAddOpen} onSubmit={handleAdd} title="Add Event" />
     </div>
   );
 }

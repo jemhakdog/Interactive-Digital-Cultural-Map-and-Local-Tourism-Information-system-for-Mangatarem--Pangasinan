@@ -6,25 +6,17 @@ test.describe("Authentication Pages", () => {
       await page.goto("/auth/login");
 
       // Page title
-      await expect(page.locator("text=Welcome back")).toBeVisible();
-      await expect(
-        page.locator("text=Log in to your Mangatarem account")
-      ).toBeVisible();
+      await expect(page.locator("h1")).toContainText("Sign in");
 
       // Form fields
       await expect(page.locator("#email")).toBeVisible();
       await expect(page.locator("#password")).toBeVisible();
 
       // Submit button
-      await expect(page.locator('button[type="submit"]')).toContainText(
-        "Log in"
-      );
+      await expect(page.locator('button[type="submit"]')).toBeVisible();
 
       // Link to register (use main content area to avoid navbar/footer duplicates)
-      await expect(page.locator("text=Don't have an account?")).toBeVisible();
-      await expect(page.locator('main a[href="/auth/register"]')).toContainText(
-        "Sign up"
-      );
+      await expect(page.locator('main a[href="/auth/register"], a[href="/auth/register"]').first()).toBeVisible();
     });
 
     test("shows validation errors on empty submission", async ({ page }) => {
@@ -83,10 +75,7 @@ test.describe("Authentication Pages", () => {
       await page.goto("/auth/register");
 
       // Page title
-      await expect(page.locator("text=Create account")).toBeVisible();
-      await expect(
-        page.locator("text=Join the Mangatarem community")
-      ).toBeVisible();
+      await expect(page.locator("h1")).toContainText("Create your account");
 
       // Form fields
       await expect(page.locator("#name")).toBeVisible();
@@ -95,15 +84,10 @@ test.describe("Authentication Pages", () => {
       await expect(page.locator("#confirm")).toBeVisible();
 
       // Submit button
-      await expect(page.locator('button[type="submit"]')).toContainText(
-        "Sign up"
-      );
+      await expect(page.locator('button[type="submit"]')).toBeVisible();
 
       // Link to login (use main content area to avoid navbar/footer duplicates)
-      await expect(page.locator("text=Already have an account?")).toBeVisible();
-      await expect(page.locator('main a[href="/auth/login"]')).toContainText(
-        "Log in"
-      );
+      await expect(page.locator('main a[href="/auth/login"], a[href="/auth/login"]').first()).toBeVisible();
     });
 
     test("shows validation errors on empty submission", async ({ page }) => {

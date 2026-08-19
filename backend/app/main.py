@@ -93,10 +93,14 @@ app.include_router(analytics_router, prefix="/api/analytics", tags=["analytics"]
 app.include_router(uploads_router, prefix="/api/uploads", tags=["uploads"])
 app.include_router(admin_router, prefix="/api/admin", tags=["admin"])
 
-# Serve uploaded files in development
+# Serve uploaded files and static assets in development
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
 
 _uploads_dir = Path(__file__).resolve().parent.parent / "uploads"
 _uploads_dir.mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=str(_uploads_dir)), name="uploads")
+
+_static_dir = Path(__file__).resolve().parent.parent.parent / "static"
+if _static_dir.exists():
+    app.mount("/static", StaticFiles(directory=str(_static_dir)), name="static")

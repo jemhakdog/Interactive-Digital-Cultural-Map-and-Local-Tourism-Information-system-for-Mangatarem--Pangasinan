@@ -1,67 +1,77 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { Landmark } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { HeritageHubView } from "./heritage-hub-view";
+import { HeritageItem } from "./heritage-types";
 
 export const metadata: Metadata = {
-  title: "Heritage",
-  description: "Cultural heritage sites and landmarks of Mangatarem",
-  openGraph: {
-    title: "Heritage | Mangatarem Tourism",
-    description: "Cultural heritage sites and landmarks of Mangatarem",
-  },
+  title: "Heritage Registry | Mangatarem Tourism",
+  description:
+    "Explore the formal Heritage Registry of Mangatarem, Pangasinan. Browse natural heritage, built heritage, intangible cultural traditions, and historical artifacts across 82 barangays.",
 };
 
-async function getHeritageTypes() {
-  try {
-    const res = await fetch("http://localhost:8000/api/heritage/types", { next: { revalidate: 60 } });
-    if (!res.ok) return [];
-    const data = await res.json();
-    return (data.types ?? data.items ?? data) as Record<string, unknown>[];
-  } catch { return []; }
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+interface HeritageTypeData {
+  slug: string;
+  label: string;
+  label_plural: string;
+  count: number;
 }
 
-const typeIcons: Record<string, string> = {
-  built: "🏛️",
-  natural: "🌿",
-  intangible: "🎭",
-  movable: "🏺",
-  mixed: "🔀",
-};
+async function getHeritageTypes(): Promise<HeritageTypeData[]> {
+  try {
+    const res = await fetch(`${API_BASE}/api/heritage/types`, {
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.types ?? []) as HeritageTypeData[];
+  } catch {
+    return [];
+  }
+}
+
+async function getAllHeritageItems(): Promise<HeritageItem[]> {
+  try {
+    const res = await fetch(`${API_BASE}/api/heritage/?per_page=100`, {
+      next: { revalidate: 60 },
+    });
+    if (!res.ok) return [];
+    const data = await res.json();
+    return (data.items ?? []) as HeritageItem[];
+  } catch {
+    return [];
+  }
+}
 
 export default async function HeritagePage() {
-  const types = await getHeritageTypes();
+  const [types, items] = await Promise.all([
+    getHeritageTypes(),
+    getAllHeritageItems(),
+  ]);
+
+  const typeCounts: Record<string, number> = {};
+  types.forEach((t) => {
+    typeCounts[t.slug] = t.count;
+  });
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-2">Heritage</h1>
-      <p className="text-muted-foreground mb-8">Cultural heritage of Mangatarem</p>
+      {/* ── Editorial Header ── */}
+      <div className="mb-8 space-y-2">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
+          <span>Living History & Cultural Memory</span>
+        </div>
+        <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground">
+          Heritage Registry
+        </h1>
+        <p className="text-muted-foreground text-sm md:text-base max-w-2xl">
+          Explore the formal archive of Mangatarem&apos;s cultural landmarks, natural wonders,
+          living traditions, and sacred artifacts across all 82 barangays.
+        </p>
+      </div>
 
-      {types.length === 0 ? (
-        <div className="text-center py-16 text-muted-foreground">
-          <Landmark className="h-12 w-12 mx-auto mb-4 opacity-30" />
-          <p>No heritage types found.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {(types as Record<string, unknown>[]).map((t) => {
-            const typeKey = String(t.slug ?? t.type ?? "").toLowerCase();
-            const typeName = String(t.label ?? t.type ?? t.name ?? "Unknown");
-            const count = t.count ?? t.total ?? 0;
-            return (
-              <Link key={typeKey} href={`/heritage/${typeKey}`}>
-                <Card className="hover:shadow-md transition-shadow cursor-pointer h-full">
-                  <CardContent className="p-6 text-center">
-                    <span className="text-4xl">{typeIcons[typeKey] || "📜"}</span>
-                    <h3 className="font-semibold mt-3 capitalize">{typeName}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">{Number(count)} items</p>
-                  </CardContent>
-                </Card>
-              </Link>
-            );
-          })}
-        </div>
-      )}
+      {/* ── Interactive Heritage Hub ── */}
+      <HeritageHubView initialItems={items} typeCounts={typeCounts} />
     </div>
   );
 }

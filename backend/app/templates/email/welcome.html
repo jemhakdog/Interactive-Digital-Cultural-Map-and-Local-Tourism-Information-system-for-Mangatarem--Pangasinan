@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to Mangatarem Tourism</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #2d5016 0%, #4a7c23 100%); color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #f9f9f9; padding: 30px; border: 1px solid #ddd; }
+        .button { display: inline-block; background: #4a7c23; color: white; padding: 12px 30px; text-decoration: none; border-radius: 5px; margin: 20px 0; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Welcome to Mangatarem Tourism!</h1>
+    </div>
+    <div class="content">
+        <p>Hello {{ name }},</p>
+        
+        <p>Thank you for joining Mangatarem Tourism System! We're excited to have you explore our beautiful destination.</p>
+        
+        <p>With your account, you can:</p>
+        <ul>
+            <li>Discover amazing attractions and hidden gems</li>
+            <li>Plan your itinerary with our interactive map</li>
+            <li>Earn badges and build your tourist passport</li>
+            <li>Connect with local businesses and services</li>
+        </ul>
+        
+        <p style="text-align: center;">
+            <a href="{{ dashboard_url }}" class="button">Start Exploring</a>
+        </p>
+        
+        <p>If you have any questions, feel free to reach out to our support team.</p>
+        
+        <p>Happy travels!<br>The Mangatarem Tourism Team</p>
+    </div>
+    <div class="footer">
+        <p>This email was sent to {{ email }}. If you didn't create this account, please ignore this email.</p>
+    </div>
+</body>
+</html>

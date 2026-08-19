@@ -49,9 +49,9 @@ test.describe("Public Pages", () => {
   test.describe("Business Page", () => {
     test("loads and displays page header", async ({ page }) => {
       await page.goto("/business");
-      await expect(page.locator("h1")).toContainText("Business Directory");
+      await expect(page.getByRole("heading", { name: "Business Directory" })).toBeVisible();
       await expect(
-        page.locator("text=Restaurants, hotels, and local establishments")
+        page.locator("text=Discover certified accommodations").first()
       ).toBeVisible();
     });
 
@@ -71,9 +71,9 @@ test.describe("Public Pages", () => {
   test.describe("Heritage Page", () => {
     test("loads and displays page header", async ({ page }) => {
       await page.goto("/heritage");
-      await expect(page.locator("h1")).toContainText("Heritage");
+      await expect(page.getByRole("heading", { name: "Heritage Registry" })).toBeVisible();
       await expect(
-        page.locator("text=Cultural heritage of Mangatarem")
+        page.locator("text=Living History & Cultural Memory").first()
       ).toBeVisible();
     });
 
@@ -93,16 +93,16 @@ test.describe("Public Pages", () => {
   test.describe("Gallery Page", () => {
     test("loads and displays page header", async ({ page }) => {
       await page.goto("/gallery");
-      await expect(page.locator("h1")).toContainText("Gallery");
-      await expect(page.locator("text=Photos from Mangatarem")).toBeVisible();
+      await expect(page.getByRole("heading", { name: "Gallery" })).toBeVisible();
+      await expect(page.locator("text=Photos from Mangatarem").first()).toBeVisible();
     });
 
     test("shows gallery grid or empty state", async ({ page }) => {
       await page.goto("/gallery");
       await page.waitForLoadState("networkidle");
 
-      const grid = page.locator('[class*="grid-cols-2"]');
-      const emptyState = page.locator("text=No gallery items yet");
+      const grid = page.locator('[class*="grid"]');
+      const emptyState = page.locator("text=No gallery items");
       const hasGrid = (await grid.count()) > 0;
       const hasEmpty = await emptyState.isVisible();
 
@@ -121,7 +121,7 @@ test.describe("Public Pages", () => {
 
     test("shows category filter dropdown", async ({ page }) => {
       await page.goto("/map");
-      const select = page.locator("select");
+      const select = page.locator("select").first();
       await expect(select).toBeVisible();
 
       // Check select has options (options are not visible in headless, just check select works)

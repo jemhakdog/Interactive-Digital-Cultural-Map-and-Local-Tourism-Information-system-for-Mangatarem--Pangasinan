@@ -7,7 +7,7 @@ import { fetchAPI } from "@/lib/api";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Loader2, Plus, Pencil, Trash2 } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2, MapPin } from "lucide-react";
 import { DeleteDialog, AttractionFormDialog } from "@/components/admin-dialogs";
 
 interface Attraction {
@@ -86,26 +86,30 @@ export default function AdminAttractionsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
       <div className="flex items-center justify-between mb-6">
-        <div>
-          <h1 className="text-3xl font-bold">Manage Attractions</h1>
-          <p className="text-muted-foreground text-sm mt-1">{attractions.length} total attractions</p>
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+            <MapPin className="h-5 w-5" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight">Manage Attractions</h1>
+            <p className="text-muted-foreground text-sm mt-0.5">{attractions.length} total attractions</p>
+          </div>
         </div>
-        <Button onClick={() => setAddOpen(true)} className="gap-2">
+        <Button onClick={() => setAddOpen(true)} className="gap-2 rounded-xl">
           <Plus className="h-4 w-4" /> Add Attraction
         </Button>
       </div>
 
-      <div className="border rounded-lg">
+      <div className="border rounded-xl border-border/50 overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className="bg-muted/50">
               <TableHead>Name</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Barangay</TableHead>
               <TableHead>Status</TableHead>
-              <TableHead>Featured</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -113,53 +117,39 @@ export default function AdminAttractionsPage() {
             {attractions.map((a) => (
               <TableRow key={a.id}>
                 <TableCell className="font-medium">{a.name}</TableCell>
-                <TableCell>{a.category || "—"}</TableCell>
-                <TableCell>{a.barangay_name || "—"}</TableCell>
+                <TableCell><Badge variant="secondary" className="text-xs">{a.category || "—"}</Badge></TableCell>
+                <TableCell className="text-muted-foreground text-sm">{a.barangay_name || "—"}</TableCell>
                 <TableCell>
-                  <Badge variant={a.status === "approved" ? "default" : "secondary"}>
+                  <Badge variant={a.status === "published" ? "default" : "outline"} className="text-xs capitalize">
                     {a.status}
                   </Badge>
                 </TableCell>
-                <TableCell>{a.is_featured ? "⭐" : "—"}</TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditTarget(a)}>
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteTarget(a)}>
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex justify-end gap-1">
+                    <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditTarget(a)}>
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => setDeleteTarget(a)}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
+            {attractions.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center text-muted-foreground py-8">
+                  No attractions yet.
+                </TableCell>
+              </TableRow>
+            )}
           </TableBody>
         </Table>
       </div>
 
-      <DeleteDialog
-        open={!!deleteTarget}
-        onOpenChange={(open) => { if (!open) setDeleteTarget(null); }}
-        title="Delete Attraction"
-        description={`Are you sure you want to delete "${deleteTarget?.name}"? This action cannot be undone.`}
-        onConfirm={handleDelete}
-      />
-
-      <AttractionFormDialog
-        open={!!editTarget}
-        onOpenChange={(open) => { if (!open) setEditTarget(null); }}
-        initialData={editTarget ? {
-          name: editTarget.name,
-          category: editTarget.category,
-        } : undefined}
-        title="Edit Attraction"
-        onSubmit={handleEdit}
-      />
-
-      <AttractionFormDialog
-        open={addOpen}
-        onOpenChange={setAddOpen}
-        title="Add Attraction"
-        onSubmit={handleAdd}
-      />
+      <DeleteDialog open={!!deleteTarget} onOpenChange={() => setDeleteTarget(null)} onConfirm={handleDelete} title="Delete Attraction" description={`Are you sure you want to delete "${deleteTarget?.name ?? ""}"?`} />
+      <AttractionFormDialog open={!!editTarget} onOpenChange={() => setEditTarget(null)} onSubmit={handleEdit} title="Edit Attraction" initialData={editTarget ? { name: editTarget.name, category: editTarget.category } : undefined} />
+      <AttractionFormDialog open={addOpen} onOpenChange={setAddOpen} onSubmit={handleAdd} title="Add Attraction" />
     </div>
   );
 }

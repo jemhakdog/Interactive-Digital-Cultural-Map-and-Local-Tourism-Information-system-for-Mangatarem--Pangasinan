@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Loader2 } from "lucide-react";
+import { Loader2, Users } from "lucide-react";
 
 interface UserRow {
   id: number;
@@ -27,8 +27,7 @@ export default function AdminUsersPage() {
 
   useEffect(() => {
     if (!user) return;
-    // No dedicated users list endpoint, so we use auth/me as a fallback
-    // In a real app you'd add GET /api/admin/users
+    // No dedicated users list endpoint yet
     setLoading(false);
   }, [user]);
 
@@ -37,16 +36,21 @@ export default function AdminUsersPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold">Manage Users</h1>
-        <p className="text-muted-foreground text-sm mt-1">User management (API endpoint pending)</p>
+    <div className="container mx-auto px-4 py-8 max-w-5xl">
+      <div className="flex items-center gap-3 mb-6">
+        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+          <Users className="h-5 w-5" />
+        </div>
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Manage Users</h1>
+          <p className="text-muted-foreground text-sm mt-0.5">User management (API endpoint pending)</p>
+        </div>
       </div>
 
-      <div className="border rounded-lg">
+      <div className="border rounded-xl border-border/50 overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className="bg-muted/50">
               <TableHead>Name</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Role</TableHead>
