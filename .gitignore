@@ -82,6 +82,8 @@ design-system/
 code_screenshots/
 
 # Generated / Non-essential
+backend/uploads/*
+!backend/uploads/.gitkeep
 db_schemas/
 archive/
 db_update_package/
@@ -92,3 +94,4 @@ nul
 Thumbs.db
 .DS_Store
 
+uvicorn.log
