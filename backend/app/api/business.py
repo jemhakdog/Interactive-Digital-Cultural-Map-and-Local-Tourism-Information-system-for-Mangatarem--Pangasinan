@@ -14,8 +14,13 @@ from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.core.database import get_db
-from backend.app.core.dependencies import get_current_active_user, get_current_user
+from backend.app.core.dependencies import (
+    get_current_active_user,
+    get_current_user,
+    require_business_owner,
+)
 from backend.app.models.business import (
+    BusinessVerification,
     Establishment,
     EstablishmentMenuItem,
     EstablishmentRoom,
@@ -24,6 +29,7 @@ from backend.app.models.attractions import Review
 from backend.app.models.barangay import BarangayInfo
 from backend.app.models.gamification import TouristCheckIn
 from backend.app.models.user import User
+from backend.app.schemas.verification import VerificationCreate
 from backend.app.schemas.business import (
     EstablishmentCreate,
     EstablishmentListResponse,
@@ -606,3 +612,124 @@ async def reply_to_review(
     )
     db.add(reply)
     return {"message": "Reply posted"}
+
+
+# ───────────────────────────────────────────────────────────────
+# OWNER — Business verification submission
+# ───────────────────────────────────────────────────────────────
+
+@router.post(
+    "/verification",
+    status_code=status.HTTP_201_CREATED,
+    summary="Submit or update business verification documents",
+)
+async def submit_verification(
+    body: VerificationCreate,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    user: Annotated[User, Depends(require_business_owner)],
+):
+    """Submit (or re-submit) verification documents for the owner's account.
+
+    One verification record per owner — re-submitting resets status to pending.
+    """
+    result = await db.execute(
+        select(BusinessVerification).where(BusinessVerification.user_id == user.id)
+    )
+    verification = result.scalar_one_or_none()
+    if verification:
+        verification.permit_document_url = body.permit_document_url
+        verification.other_document_url = body.other_document_url
+        verification.status = "pending"
+        verification.submitted_at = datetime.utcnow()
+    else:
+        verification = BusinessVerification(
+            user_id=user.id,
+            permit_document_url=body.permit_document_url,
+            other_document_url=body.other_document_url,
+            status="pending",
+        )
+        db.add(verification)
+    await db.flush()
+    await db.refresh(verification)
+    return {
+        "id": verification.id,
+        "user_id": verification.user_id,
+        "permit_document_url": verification.permit_document_url,
+        "other_document_url": verification.other_document_url,
+        "status": verification.status,
+        "submitted_at": (
+            verification.submitted_at.isoformat() if verification.submitted_at else None
+        ),
+    }
+
+
+# ───────────────────────────────────────────────────────────────
+# OWNER — Establishment reviews (all statuses)
+# ───────────────────────────────────────────────────────────────
+
+@router.get(
+    "/{establishment_id}/reviews",
+    summary="Owner's establishment reviews (all statuses)",
+)
+async def list_owner_reviews(
+    establishment_id: int,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    user: Annotated[User, Depends(require_business_owner)],
+):
+    """Return every review (pending/approved/rejected) for the owner's establishment."""
+    est = await db.get(Establishment, establishment_id)
+    if est is None:
+        raise HTTPException(status_code=404, detail="Establishment not found")
+    if est.owner_id != user.id and user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized")
+
+    result = await db.execute(
+        select(Review, User.username.label("username"))
+        .outerjoin(User, User.id == Review.user_id)
+        .where(
+            Review.establishment_id == establishment_id,
+            Review.parent_id.is_(None),
+        )
+        .order_by(Review.created_at.desc())
+    )
+    review_rows = result.all()
+
+    reviews = []
+    for r, uname in review_rows:
+        rep = await db.execute(
+            select(Review, User.username.label("username"))
+            .outerjoin(User, User.id == Review.user_id)
+            .where(Review.parent_id == r.id)
+            .order_by(Review.created_at.asc())
+        )
+        replies = [
+            {
+                "id": rp.id,
+                "user_id": rp.user_id,
+                "username": rp_uname or "Business Owner",
+                "comment": rp.comment,
+                "created_at": rp.created_at.isoformat() if rp.created_at else None,
+            }
+            for rp, rp_uname in rep.all()
+        ]
+        reviews.append(
+            {
+                "id": r.id,
+                "user_id": r.user_id,
+                "username": uname or "Visitor",
+                "rating": r.rating,
+                "comment": r.comment,
+                "status": r.status,
+                "created_at": r.created_at.isoformat() if r.created_at else None,
+                "replies": replies,
+            }
+        )
+
+    return {
+        "establishment": {
+            "id": est.id,
+            "name": est.name,
+            "owner_id": est.owner_id,
+        },
+        "reviews": reviews,
+    }

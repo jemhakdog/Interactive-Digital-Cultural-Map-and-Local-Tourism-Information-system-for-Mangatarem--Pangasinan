@@ -46,5 +46,8 @@ from backend.app.models.booking import BookableAsset, BookingSlot, Reservation  
 # Gamification
 from backend.app.models.gamification import AchievementBadge, UserPassport, TouristCheckIn  # noqa: F401
 
+# Documents
+from backend.app.models.document import Document  # noqa: F401
+
 # Announcements
 from backend.app.models.announcements import Announcement  # noqa: F401

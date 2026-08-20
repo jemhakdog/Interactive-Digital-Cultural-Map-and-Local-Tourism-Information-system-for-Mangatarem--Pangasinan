@@ -1,6 +1,7 @@
 """Shared FastAPI dependencies (auth, DB, etc.)."""
 from __future__ import annotations
 
+from collections.abc import Awaitable, Callable
 from typing import Annotated
 
 from fastapi import Depends, HTTPException, status
@@ -67,3 +68,26 @@ async def require_admin(
             detail="Admin access required",
         )
     return current_user
+
+
+def require_roles(*roles: str) -> Callable[..., Awaitable[User]]:
+    """Build a dependency that allows only the given roles (403 otherwise).
+
+    Usage: ``Depends(require_roles("contributor", "admin"))``.
+    """
+    async def _checker(
+        current_user: Annotated[User, Depends(get_current_user)],
+    ) -> User:
+        if current_user.role not in roles:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Insufficient permissions for this action",
+            )
+        return current_user
+
+    return _checker
+
+
+# Convenience pre-bound role dependencies.
+require_contributor = require_roles("contributor", "admin")
+require_business_owner = require_roles("business_owner", "admin")

@@ -14,12 +14,12 @@ from pathlib import Path
 # Add parent directory to path so we can import app modules
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from app.models.base import Base
-
-# Import ALL models so Alembic sees them
-from app.models import user, attractions, events, barangay, business
-from app.models import heritage, gallery, analytics, notifications
-from app.models import chat, booking, gamification, announcements
+# Import ALL models so Alembic sees them.
+# Use the backend.app.* path consistently with models/__init__.py and the
+# rest of the app (importing via both `app.models` and `backend.app.models`
+# creates duplicate Table objects on the same MetaData).
+from backend.app.models.base import Base
+import backend.app.models  # noqa: F401  (models/__init__.py imports every model)
 
 # this is the Alembic Config object
 config = context.config

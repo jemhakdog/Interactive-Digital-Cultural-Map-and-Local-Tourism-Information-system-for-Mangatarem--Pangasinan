@@ -77,6 +77,11 @@ from backend.app.api.notifications import router as notifications_router  # noqa
 from backend.app.api.analytics import router as analytics_router  # noqa: E402
 from backend.app.api.uploads import router as uploads_router  # noqa: E402
 from backend.app.api.admin import router as admin_router  # noqa: E402
+from backend.app.api.contributor import router as contributor_router  # noqa: E402
+from backend.app.api.user import router as user_router  # noqa: E402
+from backend.app.api.admin_documents import router as admin_documents_router  # noqa: E402
+from backend.app.api.admin_newsletter import router as admin_newsletter_router  # noqa: E402
+from backend.app.api.admin_visitors import router as admin_visitors_router  # noqa: E402
 
 app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
 app.include_router(public_router, prefix="/api", tags=["public"])
@@ -92,6 +97,11 @@ app.include_router(notifications_router, prefix="/api/notifications", tags=["not
 app.include_router(analytics_router, prefix="/api/analytics", tags=["analytics"])
 app.include_router(uploads_router, prefix="/api/uploads", tags=["uploads"])
 app.include_router(admin_router, prefix="/api/admin", tags=["admin"])
+app.include_router(contributor_router, prefix="/api/contributor", tags=["contributor"])
+app.include_router(user_router, prefix="/api/user", tags=["user"])
+app.include_router(admin_documents_router, prefix="/api/documents", tags=["documents"])
+app.include_router(admin_newsletter_router, prefix="/api/newsletter", tags=["newsletter"])
+app.include_router(admin_visitors_router, prefix="/api", tags=["visitors"])
 
 # Serve uploaded files and static assets in development
 from fastapi.staticfiles import StaticFiles

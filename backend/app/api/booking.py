@@ -9,12 +9,17 @@ from datetime import datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
+from pydantic import BaseModel
 from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from backend.app.core.database import get_db
-from backend.app.core.dependencies import get_current_active_user, get_current_user
+from backend.app.core.dependencies import (
+    get_current_active_user,
+    get_current_user,
+    require_roles,
+)
 from backend.app.models.booking import BookableAsset, BookingSlot, Reservation
 from backend.app.models.attractions import Attraction
 from backend.app.models.business import Establishment
@@ -285,3 +290,70 @@ async def verify_arrival(
         "target_id": arrived_target_id,
         "target_type": arrived_target_type,
     }
+
+
+# ───────────────────────────────────────────────────────────────
+# ADMIN — List reservations (admin / contributor / business_owner)
+# ───────────────────────────────────────────────────────────────
+
+class AdminBookingItem(BaseModel):
+    """Local response model — matches frontend admin/bookings page shape."""
+
+    id: int
+    date: str
+    asset: str
+    tourist: str
+    party_size: int
+    status: str
+
+
+def _asset_name(asset: BookableAsset) -> str:
+    if asset is None:
+        return "Unknown asset"
+    if asset.attraction is not None:
+        return asset.attraction.name
+    if asset.heritage_profile is not None:
+        return asset.heritage_profile.common_name or asset.heritage_profile.name_of_asset or f"Asset #{asset.id}"
+    return f"Asset #{asset.id}"
+
+
+@router.get(
+    "/admin/list",
+    response_model=list[AdminBookingItem],
+    summary="List all reservations for admin review",
+)
+async def list_reservations_admin(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    user: Annotated[User, Depends(require_roles("admin", "contributor", "business_owner"))],
+):
+    stmt = (
+        select(Reservation)
+        .options(
+            selectinload(Reservation.slot)
+            .selectinload(BookingSlot.bookable_asset)
+            .selectinload(BookableAsset.attraction),
+            selectinload(Reservation.slot)
+            .selectinload(BookingSlot.bookable_asset)
+            .selectinload(BookableAsset.heritage_profile),
+            selectinload(Reservation.user),
+        )
+        .join(Reservation.slot)
+        .order_by(BookingSlot.date.desc(), Reservation.id.desc())
+    )
+    reservations = (await db.execute(stmt)).scalars().all()
+
+    items: list[AdminBookingItem] = []
+    for r in reservations:
+        asset = r.slot.bookable_asset if r.slot else None
+        tourist = r.user
+        items.append(
+            AdminBookingItem(
+                id=r.id,
+                date=r.slot.date.isoformat() if r.slot and r.slot.date else "",
+                asset=_asset_name(asset),
+                tourist=f"{tourist.username} ({tourist.email})" if tourist else "Unknown",
+                party_size=r.party_size,
+                status=r.status,
+            )
+        )
+    return items

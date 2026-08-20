@@ -44,6 +44,8 @@ class Establishment(Base):
     )
     status: Mapped[str] = mapped_column(String(20), default="pending", index=True)
     is_featured: Mapped[bool] = mapped_column(Boolean, default=False)
+    verified: Mapped[bool] = mapped_column(Boolean, default=False)
+    # ponytail: new column — requires migration or DB recreate (init_db uses create_all, won't alter existing tables)
     rating_avg: Mapped[float] = mapped_column(Float, default=0)
     review_count: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime | None] = mapped_column(
