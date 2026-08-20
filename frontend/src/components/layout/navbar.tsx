@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Menu, X, MapPin, Search, User, LogOut, Compass } from "lucide-react";
+import { Menu, Search, User, LogOut, Compass, Shield, CalendarCheck, Star, Store, UserCog, BookOpen } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,9 +14,18 @@ const navLinks = [
   { href: "/events", label: "Events" },
   { href: "/business", label: "Business" },
   { href: "/map", label: "Map" },
+  { href: "/barangays", label: "Barangays" },
   { href: "/heritage", label: "Heritage" },
   { href: "/gallery", label: "Gallery" },
+  { href: "/announcements", label: "Announcements" },
 ];
+
+const roleLabels: Record<string, string> = {
+  admin: "Admin",
+  business_owner: "Owner",
+  contributor: "Contributor",
+  user: "Explorer",
+};
 
 export function Navbar() {
   const pathname = usePathname();
@@ -73,11 +82,51 @@ export function Navbar() {
                     <User className="h-3.5 w-3.5" />
                   </div>
                   <span className="max-w-[100px] truncate">{user.name}</span>
-                  {user.role === "admin" && (
-                    <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0">Admin</Badge>
-                  )}
+                  <Badge variant="secondary" className="ml-1 text-[10px] px-1.5 py-0">{roleLabels[user.role]}</Badge>
                 </Button>
               </Link>
+
+              {user.role === "admin" && (
+                <>
+                  <Link href="/admin">
+                    <Button variant="outline" size="sm" className="gap-1.5 rounded-lg">
+                      <Shield className="h-3.5 w-3.5" /> Admin
+                    </Button>
+                  </Link>
+                  <Link href="/admin/bookings">
+                    <Button variant="ghost" size="sm" className="gap-1.5 rounded-lg">
+                      <CalendarCheck className="h-3.5 w-3.5" /> Bookings
+                    </Button>
+                  </Link>
+                  <Link href="/admin/reviews">
+                    <Button variant="ghost" size="sm" className="gap-1.5 rounded-lg">
+                      <Star className="h-3.5 w-3.5" /> Reviews
+                    </Button>
+                  </Link>
+                </>
+              )}
+              {user.role === "business_owner" && (
+                <Link href="/business/dashboard">
+                  <Button variant="outline" size="sm" className="gap-1.5 rounded-lg">
+                    <Store className="h-3.5 w-3.5" /> My Business
+                  </Button>
+                </Link>
+              )}
+              {user.role === "contributor" && (
+                <Link href="/contributor/dashboard">
+                  <Button variant="outline" size="sm" className="gap-1.5 rounded-lg">
+                    <UserCog className="h-3.5 w-3.5" /> Contributor
+                  </Button>
+                </Link>
+              )}
+              {user.role === "user" && (
+                <Link href="/passport">
+                  <Button variant="ghost" size="sm" className="gap-1.5 rounded-lg">
+                    <BookOpen className="h-3.5 w-3.5" /> Passport
+                  </Button>
+                </Link>
+              )}
+
               <Button variant="ghost" size="icon" onClick={logout} className="text-muted-foreground hover:text-foreground">
                 <LogOut className="h-4 w-4" />
               </Button>
@@ -135,6 +184,48 @@ export function Navbar() {
                           <User className="h-4 w-4" /> Dashboard
                         </Button>
                       </Link>
+
+                      {user.role === "admin" && (
+                        <>
+                          <Link href="/admin" onClick={() => setOpen(false)}>
+                            <Button variant="outline" className="w-full justify-start gap-2 rounded-lg">
+                              <Shield className="h-4 w-4" /> Admin
+                            </Button>
+                          </Link>
+                          <Link href="/admin/bookings" onClick={() => setOpen(false)}>
+                            <Button variant="ghost" className="w-full justify-start gap-2 rounded-lg">
+                              <CalendarCheck className="h-4 w-4" /> Bookings
+                            </Button>
+                          </Link>
+                          <Link href="/admin/reviews" onClick={() => setOpen(false)}>
+                            <Button variant="ghost" className="w-full justify-start gap-2 rounded-lg">
+                              <Star className="h-4 w-4" /> Reviews
+                            </Button>
+                          </Link>
+                        </>
+                      )}
+                      {user.role === "business_owner" && (
+                        <Link href="/business/dashboard" onClick={() => setOpen(false)}>
+                          <Button variant="outline" className="w-full justify-start gap-2 rounded-lg">
+                            <Store className="h-4 w-4" /> My Business
+                          </Button>
+                        </Link>
+                      )}
+                      {user.role === "contributor" && (
+                        <Link href="/contributor/dashboard" onClick={() => setOpen(false)}>
+                          <Button variant="outline" className="w-full justify-start gap-2 rounded-lg">
+                            <UserCog className="h-4 w-4" /> Contributor
+                          </Button>
+                        </Link>
+                      )}
+                      {user.role === "user" && (
+                        <Link href="/passport" onClick={() => setOpen(false)}>
+                          <Button variant="ghost" className="w-full justify-start gap-2 rounded-lg">
+                            <BookOpen className="h-4 w-4" /> Passport
+                          </Button>
+                        </Link>
+                      )}
+
                       <Button
                         variant="ghost"
                         className="w-full justify-start gap-2 text-destructive rounded-lg"

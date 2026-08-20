@@ -120,7 +120,7 @@ export default async function HomePage() {
               </Button>
             </Link>
             <Link href="/map">
-              <Button size="lg" variant="outline" className="gap-2 border-white/30 text-white hover:bg-white/10 rounded-xl">
+              <Button size="lg" className="gap-2 bg-white/15 hover:bg-white/25 text-white border border-white/30 backdrop-blur-sm rounded-xl shadow-sm">
                 <Search className="h-5 w-5" /> Open Map
               </Button>
             </Link>
@@ -129,8 +129,8 @@ export default async function HomePage() {
       </section>
 
       {/* Quick links */}
-      <section className="container mx-auto px-4 -mt-6 relative z-10">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <section className="container mx-auto px-4 -mt-8 md:-mt-10 relative z-10">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
             { href: "/attractions", icon: MapPin, label: "Attractions", count: "Places to visit" },
             { href: "/events", icon: Calendar, label: "Events", count: "What's happening" },
@@ -138,7 +138,7 @@ export default async function HomePage() {
             { href: "/business", icon: Building2, label: "Business", count: "Local spots" },
           ].map(({ href, icon: Icon, label, count }) => (
             <Link key={href} href={href}>
-              <Card className="border-border/50 hover:shadow-md hover:border-primary/20 transition-all cursor-pointer">
+              <Card className="bg-card border border-border shadow-md shadow-black/5 hover:shadow-lg hover:border-primary/30 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer">
                 <CardContent className="p-4 flex items-center gap-3">
                   <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
                     <Icon className="h-5 w-5" />
