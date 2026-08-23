@@ -53,15 +53,15 @@
     </div>
 
     <!-- Right Side (Form) -->
-    <div class="w-full lg:w-1/2 flex items-center justify-center py-16 px-4 relative z-10 bg-transparent lg:bg-white">
+    <div class="w-full lg:w-1/2 flex items-center justify-center py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8 relative z-10 bg-transparent lg:bg-white">
         <div class="w-full max-w-2xl">
             <!-- Glassmorphism Container (overridden on desktop with !important modifiers) -->
-            <div class="glass-card lg:!bg-transparent lg:!border-none lg:!shadow-none lg:!backdrop-filter-none rounded-[2.5rem] p-8 md:p-12 lg:p-12">
+            <div class="glass-card lg:!bg-transparent lg:!border-none lg:!shadow-none lg:!backdrop-filter-none rounded-3xl sm:rounded-[2.5rem] p-6 sm:p-8 md:p-12 lg:p-12">
                 
                 <!-- Floating Heritage Icon (Mobile Only) -->
-                <div class="flex lg:hidden justify-center mb-10">
-                    <div class="w-20 h-20 rounded-3xl bg-sky-950/80 backdrop-blur-xl border border-accent/30 flex items-center justify-center shadow-2xl transform rotate-3 hover:rotate-0 hover:border-accent transition-all duration-500 group">
-                        <svg class="w-10 h-10 transform group-hover:scale-110 transition-transform duration-300" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <div class="flex lg:hidden justify-center mb-6 sm:mb-8">
+                    <div class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl sm:rounded-3xl bg-sky-950/80 backdrop-blur-xl border border-accent/30 flex items-center justify-center shadow-2xl transform rotate-3 hover:rotate-0 hover:border-accent transition-all duration-500 group">
+                        <svg class="w-7 h-7 sm:w-8 sm:h-8 transform group-hover:scale-110 transition-transform duration-300" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 3C12 3 7.5 7.5 7.5 12C7.5 16.5 12 21 12 21C12 21 16.5 16.5 16.5 12C16.5 7.5 12 3 12 3Z" stroke="#D4AF37" stroke-width="1.5" stroke-linejoin="round" />
                             <path d="M12 21V12" stroke="#38bdf8" stroke-width="1.5" stroke-linecap="round" />
                             <path d="M12 12C12 12 9.5 9.5 7.5 12" stroke="#38bdf8" stroke-width="1.2" stroke-linecap="round" />
@@ -70,34 +70,34 @@
                     </div>
                 </div>
 
-                <div class="text-center mb-10">
-                    <h1 class="font-display text-4xl md:text-5xl font-bold text-white lg:text-slate-900 mb-3 tracking-tight">
+                <div class="text-center mb-6 sm:mb-8">
+                    <h1 class="font-display text-2xl sm:text-3xl md:text-5xl font-bold text-white lg:text-slate-900 mb-2 sm:mb-3 tracking-tight">
                         Join the <span class="text-accent lg:text-sky-600">Legacy</span>
                     </h1>
-                    <p class="text-sky-100/90 lg:text-slate-600 font-body text-base italic">Create your sanctuary in our digital cultural map</p>
+                    <p class="text-sky-100/90 lg:text-slate-600 font-body text-sm sm:text-base italic">Create your sanctuary in our digital cultural map</p>
                 </div>
 
-                <form action="{{ url_for('auth.register') }}" method="POST" class="space-y-8">
+                <form action="{{ url_for('auth.register') }}" method="POST" class="space-y-5 sm:space-y-8">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
 
                     <!-- Role Selection -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-semibold text-sky-100/90 lg:text-slate-700 uppercase tracking-widest ml-1">Begin your journey as...</label>
+                    <div class="space-y-1.5 sm:space-y-2">
+                        <label class="block text-xs sm:text-sm font-semibold text-sky-100/90 lg:text-slate-700 uppercase tracking-widest ml-1">Begin your journey as...</label>
                         <select name="role" id="role-select" data-action="toggle-barangay" required
-                            class="input-glass lg:!bg-slate-50 lg:!border-slate-200 lg:!text-slate-900 lg:focus:!bg-white lg:focus:!border-sky-500 lg:focus:!ring-4 lg:focus:!ring-sky-500/20 block w-full px-5 py-4 rounded-2xl focus:outline-none cursor-pointer font-medium transition-all">
+                            class="input-glass lg:!bg-slate-50 lg:!border-slate-200 lg:!text-slate-900 lg:focus:!bg-white lg:focus:!border-sky-500 lg:focus:!ring-4 lg:focus:!ring-sky-500/20 block w-full px-4 sm:px-5 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl focus:outline-none cursor-pointer font-medium transition-all text-sm sm:text-base">
                             <option value="user" selected>Explorer (Tourist)</option>
                             <option value="contributor">Heritage Guardian (Barangay Representative/Steward)</option>
                             <option value="business_owner">Business Owner (Hospitality, Dining, Establishments)</option>
                         </select>
                     </div>
 
-                    <div id="barangay-section" class="space-y-2 hidden">
-                        <label class="block text-sm font-bold text-sky-200/80 lg:text-slate-700 uppercase tracking-widest ml-1">
+                    <div id="barangay-section" class="space-y-1.5 sm:space-y-2 hidden">
+                        <label class="block text-xs sm:text-sm font-bold text-sky-200/80 lg:text-slate-700 uppercase tracking-widest ml-1">
                             Designated Barangay
                             <span class="ml-2 text-[10px] bg-sky-500 lg:bg-sky-100 text-sky-950 lg:text-sky-700 px-2 py-0.5 rounded-full font-bold">Verification Required</span>
                         </label>
                         <select name="barangay" id="barangay-select"
-                            class="input-glass lg:!bg-slate-50 lg:!border-slate-200 lg:!text-slate-900 lg:focus:!bg-white lg:focus:!border-sky-500 lg:focus:!ring-4 lg:focus:!ring-sky-500/20 block w-full px-5 py-4 rounded-2xl focus:outline-none cursor-pointer font-medium transition-all">
+                            class="input-glass lg:!bg-slate-50 lg:!border-slate-200 lg:!text-slate-900 lg:focus:!bg-white lg:focus:!border-sky-500 lg:focus:!ring-4 lg:focus:!ring-sky-500/20 block w-full px-4 sm:px-5 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl focus:outline-none cursor-pointer font-medium transition-all text-sm sm:text-base">
                             <option value="" disabled selected>Select your territory...</option>
                             {% for b in ["Andangin", "Arellano Street (Poblacion)", "Bantay", "Bantocaling", "Baracbac",
                             "Peania Pedania (Bedania)", "Bogtong Bolo", "Bogtong Bunao", "Bogtong Centro", "Bogtong Niog",
@@ -120,39 +120,39 @@
                     </div>
 
                     <!-- Personal Info -->
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="space-y-2">
-                            <label class="block text-sm font-semibold text-sky-100/90 lg:text-slate-700 uppercase tracking-widest ml-1">Username</label>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
+                        <div class="space-y-1.5 sm:space-y-2">
+                            <label class="block text-xs sm:text-sm font-semibold text-sky-100/90 lg:text-slate-700 uppercase tracking-widest ml-1">Username</label>
                             <input type="text" name="username" required placeholder="NatureSpirit99"
-                                class="input-glass lg:!bg-slate-50 lg:!border-slate-200 lg:!text-slate-900 lg:focus:!bg-white lg:focus:!border-sky-500 lg:focus:!ring-4 lg:focus:!ring-sky-500/20 block w-full px-5 py-4 rounded-2xl focus:outline-none transition-all">
+                                class="input-glass lg:!bg-slate-50 lg:!border-slate-200 lg:!text-slate-900 lg:focus:!bg-white lg:focus:!border-sky-500 lg:focus:!ring-4 lg:focus:!ring-sky-500/20 block w-full px-4 sm:px-5 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl focus:outline-none transition-all text-sm sm:text-base">
                         </div>
 
-                        <div class="space-y-2">
-                            <label class="block text-sm font-semibold text-sky-100/90 lg:text-slate-700 uppercase tracking-widest ml-1">Email</label>
+                        <div class="space-y-1.5 sm:space-y-2">
+                            <label class="block text-xs sm:text-sm font-semibold text-sky-100/90 lg:text-slate-700 uppercase tracking-widest ml-1">Email</label>
                             <input type="email" name="email" required placeholder="heritage@example.com"
-                                class="input-glass lg:!bg-slate-50 lg:!border-slate-200 lg:!text-slate-900 lg:focus:!bg-white lg:focus:!border-sky-500 lg:focus:!ring-4 lg:focus:!ring-sky-500/20 block w-full px-5 py-4 rounded-2xl focus:outline-none transition-all">
+                                class="input-glass lg:!bg-slate-50 lg:!border-slate-200 lg:!text-slate-900 lg:focus:!bg-white lg:focus:!border-sky-500 lg:focus:!ring-4 lg:focus:!ring-sky-500/20 block w-full px-4 sm:px-5 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl focus:outline-none transition-all text-sm sm:text-base">
                         </div>
                     </div>
 
-                    <div class="space-y-2">
-                        <label class="block text-sm font-semibold text-sky-100/90 lg:text-slate-700 uppercase tracking-widest ml-1">Password</label>
+                    <div class="space-y-1.5 sm:space-y-2">
+                        <label class="block text-xs sm:text-sm font-semibold text-sky-100/90 lg:text-slate-700 uppercase tracking-widest ml-1">Password</label>
                         <div class="relative group">
                             <input type="password" name="password" required placeholder="••••••••••••"
-                                class="input-glass lg:!bg-slate-50 lg:!border-slate-200 lg:!text-slate-900 lg:focus:!bg-white lg:focus:!border-sky-500 lg:focus:!ring-4 lg:focus:!ring-sky-500/20 block w-full pl-5 pr-12 py-4 rounded-2xl focus:outline-none transition-all">
-                            <button type="button" class="absolute inset-y-0 right-0 pr-4 flex items-center text-accent lg:text-slate-400 hover:text-white lg:hover:text-slate-600 toggle-password" aria-label="Toggle password visibility">
+                                class="input-glass lg:!bg-slate-50 lg:!border-slate-200 lg:!text-slate-900 lg:focus:!bg-white lg:focus:!border-sky-500 lg:focus:!ring-4 lg:focus:!ring-sky-500/20 block w-full pl-4 sm:pl-5 pr-11 sm:pr-12 py-3.5 sm:py-4 rounded-xl sm:rounded-2xl focus:outline-none transition-all text-sm sm:text-base">
+                            <button type="button" class="absolute inset-y-0 right-0 pr-3.5 sm:pr-4 flex items-center text-accent lg:text-slate-400 hover:text-white lg:hover:text-slate-600 toggle-password" aria-label="Toggle password visibility">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                                 </svg>
                             </button>
                         </div>
-                        <p class="text-[10px] text-sky-200/70 lg:text-slate-500 font-bold uppercase tracking-wider mt-2 ml-1">8+ characters recommended for a secure sanctuary.</p>
+                        <p class="text-[10px] text-sky-200/70 lg:text-slate-500 font-bold uppercase tracking-wider mt-1.5 ml-1">8+ characters recommended for a secure sanctuary.</p>
                     </div>
 
                     <!-- Flask Flash Messages Fallback -->
                     {% with messages = get_flashed_messages() %}
                     {% if messages %}
-                    <div class="bg-red-500/10 border border-red-500/20 text-red-200 lg:text-red-600 lg:bg-red-50 px-4 py-3 rounded-2xl text-sm flex items-start gap-3 backdrop-blur-md lg:backdrop-blur-none">
+                    <div class="bg-red-500/10 border border-red-500/20 text-red-200 lg:text-red-600 lg:bg-red-50 px-4 py-3 rounded-xl sm:rounded-2xl text-sm flex items-start gap-3 backdrop-blur-md lg:backdrop-blur-none">
                         <svg class="w-5 h-5 flex-shrink-0 text-red-500 lg:text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
@@ -161,17 +161,17 @@
                     {% endif %}
                     {% endwith %}
 
-                    <div class="pt-6">
+                    <div class="pt-2 sm:pt-4">
                         <button type="submit"
-                            class="w-full gold-shimmer lg:!bg-none lg:!bg-sky-500 py-5 rounded-2xl text-white font-bold text-lg shadow-[0_10px_20px_-5px_rgba(14,165,233,0.3)] hover:shadow-[0_20px_40px_-10px_rgba(14,165,233,0.4)] lg:hover:!bg-sky-600 hover:-translate-y-1 transition-all duration-300 active:scale-95">
+                            class="w-full gold-shimmer lg:!bg-none lg:!bg-sky-500 py-4 sm:py-5 rounded-xl sm:rounded-2xl text-white font-bold text-base sm:text-lg shadow-[0_10px_20px_-5px_rgba(14,165,233,0.3)] hover:shadow-[0_20px_40px_-10px_rgba(14,165,233,0.4)] lg:hover:!bg-sky-600 hover:-translate-y-1 transition-all duration-300 active:scale-95">
                             Initialize Membership
                         </button>
                     </div>
 
                     <!-- Divider -->
-                    <div class="relative py-4 flex items-center">
+                    <div class="relative py-2 sm:py-4 flex items-center">
                         <div class="flex-grow border-t border-white/10 lg:border-slate-200"></div>
-                        <span class="flex-shrink mx-4 text-sky-500/50 lg:text-slate-400 text-xs font-bold uppercase tracking-[0.2em]">Heritage Identity</span>
+                        <span class="flex-shrink mx-4 text-sky-500/50 lg:text-slate-400 text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em]">Heritage Identity</span>
                         <div class="flex-grow border-t border-white/10 lg:border-slate-200"></div>
                     </div>
 
@@ -187,16 +187,16 @@
                     </div>
                     <script src="{{ url_for('static', filename='js/pages/auth.js') }}" defer></script>
 
-                    <p class="text-center text-sm font-medium text-sky-100/70 lg:text-slate-600 mt-8">
+                    <p class="text-center text-sm font-medium text-sky-100/70 lg:text-slate-600 mt-6 sm:mt-8">
                         Returning to your roots?
                         <a href="{{ url_for('auth.login') }}" class="font-bold text-accent lg:text-sky-600 hover:text-white lg:hover:text-sky-700 transition-colors">
                             Log in here
                         </a>
                     </p>
 
-                    <div class="text-center mt-6">
+                    <div class="text-center mt-4 sm:mt-6">
                         <a href="{{ url_for('public.index') }}"
-                            class="inline-flex items-center gap-2 text-xs font-bold text-sky-300/80 lg:text-slate-500 hover:text-accent lg:hover:text-sky-600 transition-all group">
+                            class="inline-flex items-center gap-2 text-xs font-bold text-sky-300/80 lg:text-slate-500 hover:text-accent lg:hover:text-sky-600 transition-all group py-1">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform group-hover:-translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>

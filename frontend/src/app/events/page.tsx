@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { EventsView, EventItem } from "./events-view";
+import { AdminManageBar } from "@/components/layout/admin-manage-bar";
 
 export const metadata: Metadata = {
   title: "Events",
@@ -24,6 +25,7 @@ export default async function EventsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <AdminManageBar label="Events" href="/admin/events" />
       {/* ── Page Header ── */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">Events</h1>

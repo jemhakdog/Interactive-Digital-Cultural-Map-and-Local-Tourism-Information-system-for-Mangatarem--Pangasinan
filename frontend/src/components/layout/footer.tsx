@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { Compass } from "lucide-react";
 
 const footerLinks = {
@@ -22,6 +25,12 @@ const footerLinks = {
 };
 
 export function Footer() {
+  const pathname = usePathname();
+
+  if (pathname.startsWith("/admin")) {
+    return null;
+  }
+
   return (
     <footer className="border-t border-border/50 bg-muted/30">
       <div className="container mx-auto px-4 py-12">

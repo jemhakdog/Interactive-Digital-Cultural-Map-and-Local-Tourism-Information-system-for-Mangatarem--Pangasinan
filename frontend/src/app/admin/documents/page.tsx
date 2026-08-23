@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
+import { fetchAPI } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { Loader2, FolderOpen, FileText, Upload, Download, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,24 +10,36 @@ import { Button } from "@/components/ui/button";
 interface Folder {
   name: string;
   count: number;
-  total_size: string;
 }
 
-interface RecordItem {
+interface DocumentRecord {
   id: number;
-  name_of_asset: string;
-  asset_type: string;
-  created_at: string;
-  size: string;
+  title: string;
+  category: string;
+  content: string | null;
+  file_url: string | null;
+  created_at: string | null;
+}
+
+async function listDocuments(): Promise<DocumentRecord[]> {
+  return fetchAPI<DocumentRecord[]>("/api/documents/");
+}
+
+function groupByCategory(records: DocumentRecord[]): Folder[] {
+  const counts = new Map<string, number>();
+  for (const r of records) {
+    counts.set(r.category, (counts.get(r.category) ?? 0) + 1);
+  }
+  return Array.from(counts.entries()).map(([name, count]) => ({ name, count }));
 }
 
 export default function AdminDocumentsPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  // TODO: FastAPI /api/documents router not implemented yet — using local placeholder state.
-  const [folders] = useState<Folder[]>([]);
-  const [records] = useState<RecordItem[]>([]);
+  const [folders, setFolders] = useState<Folder[]>([]);
+  const [records, setRecords] = useState<DocumentRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && (!user || user.role !== "admin")) router.push("/dashboard");
@@ -34,9 +47,71 @@ export default function AdminDocumentsPage() {
 
   useEffect(() => {
     if (!user) return;
-    // No documents backend yet; placeholder lists stay empty.
-    setLoading(false);
+    let cancelled = false;
+    listDocuments()
+      .then((docs) => {
+        if (cancelled) return;
+        setRecords(docs);
+        setFolders(groupByCategory(docs));
+        setError(null);
+      })
+      .catch((err: unknown) => {
+        if (!cancelled) setError(err instanceof Error ? err.message : "Failed to load documents.");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
+
+  async function handleCreateRecord() {
+    const title = window.prompt("New record title:");
+    if (!title) return;
+    try {
+      await fetchAPI<DocumentRecord>("/api/documents/", {
+        method: "POST",
+        body: JSON.stringify({ title }),
+      });
+      const docs = await listDocuments();
+      setRecords(docs);
+      setFolders(groupByCategory(docs));
+      setError(null);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to create record.");
+    }
+  }
+
+  async function handleEditRecord(record: DocumentRecord) {
+    const title = window.prompt("Edit record title:", record.title);
+    if (!title || title === record.title) return;
+    try {
+      await fetchAPI<DocumentRecord>(`/api/documents/${record.id}`, {
+        method: "PUT",
+        body: JSON.stringify({ title }),
+      });
+      const docs = await listDocuments();
+      setRecords(docs);
+      setFolders(groupByCategory(docs));
+      setError(null);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to update record.");
+    }
+  }
+
+  async function handleDeleteRecord(record: DocumentRecord) {
+    if (!window.confirm(`Delete "${record.title}"? This cannot be undone.`)) return;
+    try {
+      await fetchAPI(`/api/documents/${record.id}`, { method: "DELETE" });
+      const docs = await listDocuments();
+      setRecords(docs);
+      setFolders(groupByCategory(docs));
+      setError(null);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Failed to delete record.");
+    }
+  }
 
   if (authLoading || !user || loading) {
     return (
@@ -61,14 +136,22 @@ export default function AdminDocumentsPage() {
           </div>
         </div>
         <div className="flex gap-2">
+          {/* TODO: backend has no import endpoint — add POST /api/documents/import before enabling. */}
           <Button variant="outline" className="gap-2 rounded-xl" disabled title="Import not available yet">
             <Upload className="h-4 w-4" /> Import
           </Button>
+          {/* TODO: backend has no backup endpoint — add GET /api/documents/backup before enabling. */}
           <Button variant="outline" className="gap-2 rounded-xl" disabled title="Backup not available yet">
             <Download className="h-4 w-4" /> Backup
           </Button>
         </div>
       </div>
+
+      {error && (
+        <p className="text-sm text-destructive bg-destructive/10 border border-destructive/30 rounded-xl px-4 py-3">
+          {error}
+        </p>
+      )}
 
       <section>
         <h3 className="text-xl font-bold text-foreground flex items-center gap-2 mb-6">
@@ -79,7 +162,7 @@ export default function AdminDocumentsPage() {
             <FolderOpen className="h-10 w-10 mx-auto mb-3 text-muted-foreground/40" />
             <p className="font-bold text-foreground">No document folders yet</p>
             <p className="text-xs text-muted-foreground mt-1">
-              The document management backend is not implemented yet.
+              Create a record to start a category folder.
             </p>
           </div>
         ) : (
@@ -94,7 +177,7 @@ export default function AdminDocumentsPage() {
                 </div>
                 <h4 className="font-bold text-foreground">{f.name}</h4>
                 <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-1">
-                  {f.count} Structures • {f.total_size}
+                  {f.count} {f.count === 1 ? "Record" : "Records"}
                 </p>
               </div>
             ))}
@@ -107,7 +190,12 @@ export default function AdminDocumentsPage() {
           <h3 className="text-xl font-bold text-foreground flex items-center gap-2">
             <span className="w-2 h-8 bg-amber-500 rounded-full" /> Structured Records
           </h3>
-          <Button variant="outline" size="sm" className="gap-1 rounded-xl" disabled title="New record not available yet">
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1 rounded-xl"
+            onClick={handleCreateRecord}
+          >
             <Plus className="h-3.5 w-3.5" /> New Record
           </Button>
         </div>
@@ -115,7 +203,7 @@ export default function AdminDocumentsPage() {
           <div className="border border-dashed border-border rounded-2xl py-12 text-center">
             <p className="font-bold text-foreground">No structured records found yet.</p>
             <p className="text-xs text-muted-foreground mt-1">
-              Use the document backend once it is implemented to start. (Pending.)
+              Use “New Record” to add the first document.
             </p>
           </div>
         ) : (
@@ -127,16 +215,30 @@ export default function AdminDocumentsPage() {
                     <FileText className="h-6 w-6" />
                   </div>
                   <span className="text-[8px] font-black uppercase tracking-widest text-amber-400">
-                    {r.asset_type}
+                    {r.category}
                   </span>
                 </div>
-                <h4 className="font-bold text-foreground truncate">{r.name_of_asset}</h4>
+                <h4 className="font-bold text-foreground truncate">{r.title}</h4>
                 <div className="flex gap-2 mt-4">
-                  <Button variant="outline" size="sm" className="flex-1 rounded-xl" disabled>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 rounded-xl"
+                    onClick={() => handleEditRecord(r)}
+                  >
                     Edit Record
                   </Button>
                   <Button size="sm" className="flex-1 rounded-xl" disabled>
+                    {/* TODO: backend has no .docx export/backup/import endpoints yet — add /api/documents/export, /backup and an importer before enabling. */}
                     Export .docx
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-xl text-destructive"
+                    onClick={() => handleDeleteRecord(r)}
+                  >
+                    Delete
                   </Button>
                 </div>
               </div>

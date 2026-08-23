@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
+import { fetchAPI } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { Loader2, Users, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,9 +23,9 @@ interface VisitLog {
 export default function AdminVisitorRegistryPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  // TODO: FastAPI visitor-registry read endpoint not implemented yet — using local placeholder state.
-  const [logs] = useState<VisitLog[]>([]);
+  const [logs, setLogs] = useState<VisitLog[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     target_type: "",
     target_id: "",
@@ -38,10 +39,36 @@ export default function AdminVisitorRegistryPage() {
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    if (!user) return;
-    // No dedicated visitor-registry read endpoint exists yet; placeholder list stays empty.
-    setLoading(false);
-  }, [user]);
+    if (!user || user.role !== "admin") return;
+    let cancelled = false;
+    const load = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const params = new URLSearchParams();
+        if (filters.target_type) params.set("target_type", filters.target_type);
+        if (filters.target_id) params.set("target_id", filters.target_id);
+        if (filters.start_date) params.set("start_date", filters.start_date);
+        if (filters.end_date) params.set("end_date", filters.end_date);
+        if (filters.search) params.set("search", filters.search);
+        const data = await fetchAPI<{ visitors: VisitLog[]; total: number }>(
+          `/api/visitor-registry?${params.toString()}`
+        );
+        if (!cancelled) setLogs(data.visitors ?? []);
+      } catch (err) {
+        if (!cancelled) {
+          setLogs([]);
+          setError(err instanceof Error ? err.message : "Failed to load visitor registry.");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, filters]);
 
   if (authLoading || !user || loading) {
     return (
@@ -68,6 +95,7 @@ export default function AdminVisitorRegistryPage() {
             </p>
           </div>
         </div>
+        {/* TODO: backend has no export endpoint — add GET /api/visitor-registry/export (CSV) before enabling. */}
         <Button variant="outline" className="gap-2 rounded-xl" disabled title="Export not available yet">
           <Download className="h-4 w-4" /> Export Dataset
         </Button>
@@ -141,10 +169,19 @@ export default function AdminVisitorRegistryPage() {
               <tr>
                 <td colSpan={6} className="text-center text-muted-foreground py-16">
                   <Users className="h-10 w-10 mx-auto mb-3 text-muted-foreground/40" />
-                  <p className="font-bold text-foreground">No detailed records found</p>
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Detailed logs will appear here as check-ins are recorded. (Backend endpoint pending.)
-                  </p>
+                  {error ? (
+                    <>
+                      <p className="font-bold text-destructive">Failed to load visitor registry</p>
+                      <p className="text-xs text-muted-foreground mt-1">{error}</p>
+                    </>
+                  ) : (
+                    <>
+                      <p className="font-bold text-foreground">No detailed records found</p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Detailed logs will appear here as check-ins are recorded.
+                      </p>
+                    </>
+                  )}
                 </td>
               </tr>
             ) : (

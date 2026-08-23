@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { GalleryView, GalleryItem } from "./gallery-view";
+// TODO: no admin gallery-moderation section exists yet — the manage bar links to the admin dashboard as a placeholder.
+import { AdminManageBar } from "@/components/layout/admin-manage-bar";
 
 export const metadata: Metadata = {
   title: "Visions of Mangatarem — Multimedia Cultural Gallery",
@@ -30,6 +32,7 @@ export default async function GalleryPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 sm:py-10">
+      <AdminManageBar label="Gallery" href="/admin/gallery" note="(moderate submissions)" />
       {/* ── Standard Page Header for Consistency & Test Compatibility ── */}
       <div className="mb-8 space-y-1">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-2">

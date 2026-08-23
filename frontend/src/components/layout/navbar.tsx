@@ -20,6 +20,18 @@ const navLinks = [
   { href: "/announcements", label: "Announcements" },
 ];
 
+// Admins land on the full-control section instead of the public browse page.
+// Sections without an admin twin keep their public href.
+const adminTwins: Record<string, string> = {
+  "/attractions": "/admin/attractions",
+  "/events": "/admin/events",
+  "/business": "/admin/establishments",
+  "/heritage": "/admin/heritage",
+  "/gallery": "/admin/gallery",
+  "/announcements": "/admin/announcements",
+  "/barangays": "/admin/barangays",
+};
+
 const roleLabels: Record<string, string> = {
   admin: "Admin",
   business_owner: "Owner",
@@ -31,6 +43,15 @@ export function Navbar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
+
+  const isOwnerConsole =
+    pathname.startsWith("/business/dashboard") ||
+    pathname.startsWith("/business/peers") ||
+    /\/business\/[^/]+\/(edit|menu|rooms|reviews|verify)/.test(pathname);
+
+  if (pathname.startsWith("/admin") || isOwnerConsole) {
+    return null;
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl supports-[backdrop-filter]:bg-background/60">
@@ -46,11 +67,12 @@ export function Navbar() {
         {/* Desktop nav */}
         <nav className="hidden lg:flex items-center gap-0.5">
           {navLinks.map((link) => {
-            const active = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+            const href = user?.role === "admin" ? (adminTwins[link.href] ?? link.href) : link.href;
+            const active = pathname === href || pathname.startsWith(href);
             return (
               <Link
                 key={link.href}
-                href={link.href}
+                href={href}
                 className={`relative px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
                   active
                     ? "text-primary bg-primary/10"
@@ -76,7 +98,17 @@ export function Navbar() {
 
           {user ? (
             <div className="hidden md:flex items-center gap-2">
-              <Link href="/dashboard">
+              <Link
+                href={
+                  user.role === "admin"
+                    ? "/admin"
+                    : user.role === "business_owner"
+                    ? "/business/dashboard"
+                    : user.role === "contributor"
+                    ? "/contributor/dashboard"
+                    : "/dashboard"
+                }
+              >
                 <Button variant="ghost" size="sm" className="gap-2 rounded-lg">
                   <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/10 text-primary">
                     <User className="h-3.5 w-3.5" />
@@ -159,11 +191,12 @@ export function Navbar() {
                 </div>
                 <nav className="flex-1 p-4 space-y-1">
                   {navLinks.map((link) => {
-                    const active = pathname === link.href || (link.href !== "/" && pathname.startsWith(link.href));
+                    const href = user?.role === "admin" ? (adminTwins[link.href] ?? link.href) : link.href;
+                    const active = pathname === href || pathname.startsWith(href);
                     return (
                       <Link
                         key={link.href}
-                        href={link.href}
+                        href={href}
                         onClick={() => setOpen(false)}
                         className={`block px-3 py-2.5 text-sm font-medium rounded-lg transition-colors ${
                           active
@@ -179,7 +212,18 @@ export function Navbar() {
                 <div className="p-4 border-t space-y-2">
                   {user ? (
                     <>
-                      <Link href="/dashboard" onClick={() => setOpen(false)}>
+                      <Link
+                        href={
+                          user.role === "admin"
+                            ? "/admin"
+                            : user.role === "business_owner"
+                            ? "/business/dashboard"
+                            : user.role === "contributor"
+                            ? "/contributor/dashboard"
+                            : "/dashboard"
+                        }
+                        onClick={() => setOpen(false)}
+                      >
                         <Button variant="outline" className="w-full justify-start gap-2 rounded-lg">
                           <User className="h-4 w-4" /> Dashboard
                         </Button>

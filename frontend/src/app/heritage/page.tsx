@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { HeritageHubView } from "./heritage-hub-view";
 import { HeritageItem } from "./heritage-types";
+import { AdminManageBar } from "@/components/layout/admin-manage-bar";
 
 export const metadata: Metadata = {
   title: "Heritage Registry | Mangatarem Tourism",
@@ -56,6 +57,7 @@ export default async function HeritagePage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <AdminManageBar label="Heritage" href="/admin/heritage" />
       {/* ── Editorial Header ── */}
       <div className="mb-8 space-y-2">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
+import { fetchAPI } from "@/lib/api";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Users } from "lucide-react";
@@ -20,15 +21,31 @@ export default function AdminUsersPage() {
   const router = useRouter();
   const [users, setUsers] = useState<UserRow[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && (!user || user.role !== "admin")) router.push("/dashboard");
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    if (!user) return;
-    // No dedicated users list endpoint yet
-    setLoading(false);
+    if (!user || user.role !== "admin") return;
+    let cancelled = false;
+    const loadUsers = async () => {
+      try {
+        const data = await fetchAPI<{ users: UserRow[]; total: number }>(
+          "/api/admin/users?page=1&per_page=100"
+        );
+        if (!cancelled) setUsers(data.users);
+      } catch {
+        if (!cancelled) setError("Failed to load users.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    loadUsers();
+    return () => {
+      cancelled = true;
+    };
   }, [user]);
 
   if (authLoading || !user || loading) {
@@ -43,7 +60,7 @@ export default function AdminUsersPage() {
         </div>
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Manage Users</h1>
-          <p className="text-muted-foreground text-sm mt-0.5">User management (API endpoint pending)</p>
+          <p className="text-muted-foreground text-sm mt-0.5">User management</p>
         </div>
       </div>
 
@@ -58,11 +75,32 @@ export default function AdminUsersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow>
-              <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
-                User list endpoint (GET /api/admin/users) needs to be added to the backend.
-              </TableCell>
-            </TableRow>
+            {error ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center text-destructive py-8">
+                  {error}
+                </TableCell>
+              </TableRow>
+            ) : users.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center text-muted-foreground py-8">
+                  No users found.
+                </TableCell>
+              </TableRow>
+            ) : (
+              users.map((u) => (
+                <TableRow key={u.id}>
+                  <TableCell className="font-medium">{u.name}</TableCell>
+                  <TableCell>{u.email}</TableCell>
+                  <TableCell className="capitalize">{u.role}</TableCell>
+                  <TableCell>
+                    <Badge variant={u.is_approved ? "default" : "secondary"}>
+                      {u.is_approved ? "Approved" : "Pending"}
+                    </Badge>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

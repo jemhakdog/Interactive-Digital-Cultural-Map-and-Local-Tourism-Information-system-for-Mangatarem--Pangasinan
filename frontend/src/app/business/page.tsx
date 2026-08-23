@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { BusinessView, EstablishmentItem } from "./business-view";
+import { AdminManageBar } from "@/components/layout/admin-manage-bar";
 
 export const metadata: Metadata = {
   title: "Business Directory",
@@ -27,6 +28,7 @@ export default async function BusinessPage() {
 
   return (
     <div className="container mx-auto px-4 py-8">
+      <AdminManageBar label="Businesses & Establishments" href="/admin/establishments" />
       {/* ── Page Header ── */}
       <div className="mb-8 space-y-1">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-2">

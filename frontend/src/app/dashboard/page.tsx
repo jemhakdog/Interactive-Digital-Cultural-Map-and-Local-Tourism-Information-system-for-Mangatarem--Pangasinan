@@ -17,7 +17,17 @@ export default function DashboardPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!authLoading && !user) router.push("/auth/login");
+    if (!authLoading) {
+      if (!user) {
+        router.push("/auth/login");
+      } else if (user.role === "admin") {
+        router.push("/admin");
+      } else if (user.role === "business_owner") {
+        router.push("/business/dashboard");
+      } else if (user.role === "contributor") {
+        router.push("/contributor/dashboard");
+      }
+    }
   }, [user, authLoading, router]);
 
   useEffect(() => {

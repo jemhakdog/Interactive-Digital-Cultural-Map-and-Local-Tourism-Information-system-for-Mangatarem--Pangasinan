@@ -929,7 +929,7 @@ export function BusinessView({ establishments }: BusinessViewProps) {
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-          <Link href="/auth/register">
+          <Link href="/auth/register-business">
             <Button className="shadow-sm">
               Register as Business
               <ArrowRight className="h-4 w-4 ml-1.5" />

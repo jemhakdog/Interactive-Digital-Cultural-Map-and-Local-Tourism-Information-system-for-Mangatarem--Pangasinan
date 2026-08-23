@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { fetchAPI } from "@/lib/api";
+// TODO: map content (attraction/event locations) is managed via /admin/attractions and /admin/events — no dedicated map-admin section exists.
+import { AdminManageBar } from "@/components/layout/admin-manage-bar";
 import { MarkerPlace, CuratedTrail, UserLocation, SortOption, ViewMode } from "@/components/map/types";
 import { calculateDistance, CURATED_TRAILS } from "@/components/map/data";
 import { MapContainer } from "@/components/map/map-container";
@@ -226,6 +228,7 @@ export default function MapPage() {
 
   return (
     <div className="flex flex-col h-[calc(100vh-64px)] w-full overflow-hidden bg-background">
+      <AdminManageBar label="Map data" href="/admin/attractions" note="(locations are managed via Attractions & Events)" />
       {/* Top Action & Sub-Navigation Bar */}
       <header className="h-14 border-b border-border/80 px-4 flex items-center justify-between gap-3 bg-background/95 backdrop-blur-md z-30 shrink-0">
         {/* Title and stats */}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { TreePine } from "lucide-react";
 import { AttractionsView } from "./attractions-view";
+import { AdminManageBar } from "@/components/layout/admin-manage-bar";
 import { AttractionItem } from "./attraction-types";
 import { CURATED_ATTRACTION_METADATA } from "./attraction-data";
 
@@ -37,6 +38,7 @@ export default async function AttractionsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 sm:py-10 space-y-8">
+      <AdminManageBar label="Attractions" href="/admin/attractions" />
       {/* ── Page Header ── */}
       <div className="space-y-2 max-w-2xl">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">

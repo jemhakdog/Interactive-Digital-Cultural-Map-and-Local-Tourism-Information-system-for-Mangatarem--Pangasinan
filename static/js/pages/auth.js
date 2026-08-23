@@ -2,40 +2,46 @@
  * Authentication Pages specific JavaScript
  */
 (function() {
-    function setGoogleBtnWidth() {
+    function getResponsiveButtonWidth() {
         var container = document.getElementById('google-btn-container');
+        if (!container) return 300;
+        var isRegister = window.location.pathname.includes('register');
+        var maxWidth = isRegister ? 400 : 384;
+        var availableWidth = container.offsetWidth || (window.innerWidth - 64);
+        return Math.max(240, Math.min(maxWidth, availableWidth));
+    }
+
+    function setGoogleBtnWidth() {
         var btn = document.getElementById('g_id_signin_btn');
-        if (container && btn) {
-            // Check if we are on the login or register page to set max width appropriately
-            // Login typically uses max 384, register max 400
-            var isRegister = window.location.pathname.includes('register');
-            var maxWidth = isRegister ? 400 : 384;
-            var w = Math.min(maxWidth, container.offsetWidth);
-            btn.setAttribute('data-width', w);
+        if (btn) {
+            btn.setAttribute('data-width', getResponsiveButtonWidth());
         }
     }
     setGoogleBtnWidth();
     
+    var resizeTimer;
     window.addEventListener('resize', function() {
-        setGoogleBtnWidth();
-        // Re-render the button on resize
-        if (window.google && window.google.accounts) {
-            var btn = document.getElementById('g_id_signin_btn');
-            if (btn) {
-                var isRegister = window.location.pathname.includes('register');
-                var textType = isRegister ? 'signup_with' : 'signin_with';
-                var containerWidth = document.getElementById('google-btn-container').offsetWidth;
-                var width = Math.min(isRegister ? 400 : 384, containerWidth);
-                var theme = window.innerWidth >= 1024 ? 'outline' : 'filled_black';
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(function() {
+            setGoogleBtnWidth();
+            // Re-render the button on resize
+            if (window.google && window.google.accounts) {
+                var btn = document.getElementById('g_id_signin_btn');
+                if (btn) {
+                    var isRegister = window.location.pathname.includes('register');
+                    var textType = isRegister ? 'signup_with' : 'signin_with';
+                    var width = getResponsiveButtonWidth();
+                    var theme = window.innerWidth >= 1024 ? 'outline' : 'filled_black';
 
-                btn.innerHTML = '';
-                google.accounts.id.renderButton(btn, {
-                    type: 'standard', shape: 'pill', theme: theme,
-                    text: textType, size: 'large', logo_alignment: 'left',
-                    width: width
-                });
+                    btn.innerHTML = '';
+                    google.accounts.id.renderButton(btn, {
+                        type: 'standard', shape: 'pill', theme: theme,
+                        text: textType, size: 'large', logo_alignment: 'left',
+                        width: width
+                    });
+                }
             }
-        }
+        }, 150);
     });
 
     // Make toggleBarangay globally available for the register page

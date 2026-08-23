@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -100,3 +100,24 @@ async def list_history(
     result = await db.execute(stmt)
     history = result.scalars().all()
     return [NewsletterHistoryResponse.model_validate(h) for h in history]
+
+
+# ─────────────────────────────────────────────
+# DELETE /subscribers/{id} — unsubscribe (deactivate) a subscriber
+# ─────────────────────────────────────────────
+@router.delete(
+    "/subscribers/{subscriber_id}",
+    summary="Unsubscribe a newsletter subscriber",
+)
+async def unsubscribe_subscriber(
+    subscriber_id: int,
+    db: Annotated[AsyncSession, Depends(get_db)],
+    admin: Annotated[User, Depends(require_admin)],
+):
+    """Deactivate a subscriber so they no longer count as a dispatch recipient."""
+    subscriber = await db.get(NewsletterSubscriber, subscriber_id)
+    if subscriber is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscriber not found")
+    subscriber.is_active = False
+    await db.flush()
+    return {"success": True, "id": subscriber.id, "is_active": False}

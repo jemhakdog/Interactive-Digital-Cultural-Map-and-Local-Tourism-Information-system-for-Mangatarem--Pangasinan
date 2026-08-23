@@ -28,56 +28,91 @@
 
     /* Structural input fields rules - applied globally */
     input.input-glass, select.input-glass {
-        padding-left: 1.25rem !important;
-        padding-right: 1.25rem !important;
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
-        font-size: 1rem !important;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+        padding-top: 0.875rem !important;
+        padding-bottom: 0.875rem !important;
+        font-size: 1rem !important; /* Prevents auto-zoom on iOS */
         line-height: 1.5 !important;
-        border-radius: 1rem !important;
+        border-radius: 0.875rem !important;
+    }
+
+    @media (min-width: 640px) {
+        input.input-glass, select.input-glass {
+            padding-left: 1.25rem !important;
+            padding-right: 1.25rem !important;
+            padding-top: 1rem !important;
+            padding-bottom: 1rem !important;
+            border-radius: 1rem !important;
+        }
     }
 
     /* Highly specific rules for inputs inside relative wrappers that contain absolute icons */
     .relative.group input.input-glass,
     .relative input.input-glass {
-        padding-left: 3.25rem !important; /* Forces 52px left padding to keep text safe from the absolute icon */
-        padding-right: 1.25rem !important;
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
+        padding-left: 2.75rem !important; /* Safe clearance for absolute icon on mobile */
+        padding-right: 2.75rem !important; /* Room for toggle button */
+        padding-top: 0.875rem !important;
+        padding-bottom: 0.875rem !important;
+    }
+
+    @media (min-width: 640px) {
+        .relative.group input.input-glass,
+        .relative input.input-glass {
+            padding-left: 3.25rem !important;
+            padding-right: 3rem !important;
+            padding-top: 1rem !important;
+            padding-bottom: 1rem !important;
+        }
+    }
+
+    /* Prevent mobile double-tap zoom delay & improve button touches */
+    button, input, select, a {
+        touch-action: manipulation;
     }
 
     @media (max-width: 1023px) {
         .glass-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6);
         }
 
         .input-glass {
-            background: rgba(2, 6, 23, 0.8) !important;
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            background: rgba(2, 6, 23, 0.85) !important;
+            border: 1px solid rgba(255, 255, 255, 0.12) !important;
             color: white !important;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .input-glass:focus {
-            background: rgba(2, 6, 23, 0.6);
+            background: rgba(2, 6, 23, 0.7);
             border-color: #0ea5e9;
-            box-shadow: 0 0 0 4px rgba(14, 165, 233, 0.2);
+            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.25);
         }
     }
 
-    /* Fallback spacing to prevent visual crowding when Tailwind's spacing utilities are overridden */
+    /* Relaxed responsive spacing */
     .space-y-6 > :not([hidden]) ~ :not([hidden]) {
-        margin-top: 1.75rem !important; /* Slightly more relaxed vertical spacing for premium look */
+        margin-top: 1.25rem !important;
+    }
+    @media (min-width: 640px) {
+        .space-y-6 > :not([hidden]) ~ :not([hidden]) {
+            margin-top: 1.5rem !important;
+        }
     }
     .space-y-2 > :not([hidden]) ~ :not([hidden]) {
-        margin-top: 0.625rem !important; /* Airy gap between label and input */
+        margin-top: 0.5rem !important;
     }
     .space-y-8 > :not([hidden]) ~ :not([hidden]) {
-        margin-top: 2.25rem !important;
+        margin-top: 1.5rem !important;
+    }
+    @media (min-width: 640px) {
+        .space-y-8 > :not([hidden]) ~ :not([hidden]) {
+            margin-top: 2rem !important;
+        }
     }
 
     .gold-shimmer {
@@ -93,6 +128,9 @@
     }
 
     .google-btn-wrapper {
+        width: 100%;
         max-width: 100%;
+        display: flex;
+        justify-content: center;
         overflow: hidden;
     }

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Megaphone } from "lucide-react";
 import { NewsletterSubscribe } from "@/components/public/newsletter-subscribe";
+// TODO: no announcement CRUD endpoints exist yet (GET /api/announcements is a stub) — the manage bar links to the admin dashboard as a placeholder.
+import { AdminManageBar } from "@/components/layout/admin-manage-bar";
 
 export const metadata: Metadata = {
   title: "Bulletins & Announcements",
@@ -38,6 +40,7 @@ export default async function AnnouncementsPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 sm:py-10 max-w-4xl space-y-10">
+      <AdminManageBar label="Announcements" href="/admin/announcements" note="(post and manage bulletins)" />
       {/* ── Header ── */}
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">

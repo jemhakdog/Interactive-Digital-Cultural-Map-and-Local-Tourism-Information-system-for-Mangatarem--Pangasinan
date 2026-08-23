@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { BusinessLayout } from "@/components/business/business-layout";
 import {
   Dialog,
   DialogContent,
@@ -161,7 +162,8 @@ export default function ManageRoomsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-5xl space-y-8">
+    <BusinessLayout>
+      <div className="container mx-auto px-4 py-8 max-w-5xl space-y-8">
       <div className="flex items-center justify-between pb-4 border-b border-border/50">
         <div className="space-y-1">
           <Link
@@ -320,5 +322,6 @@ export default function ManageRoomsPage() {
         </div>
       </div>
     </div>
+    </BusinessLayout>
   );
 }

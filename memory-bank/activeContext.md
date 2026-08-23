@@ -2,7 +2,8 @@
 
 ## Current focus
 
-- All cleanup, bug fixes, and CRUD verification complete. Ready for commit.
+- Seeded business profile for test_owner; fixed dashboard 422 bug (per_page=200 → 100).
+- Previous: all cleanup, bug fixes, and CRUD verification complete. Ready for commit.
 
 ## Recent changes (2026-07-29)
 

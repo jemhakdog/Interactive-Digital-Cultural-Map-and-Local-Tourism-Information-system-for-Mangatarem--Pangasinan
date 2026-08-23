@@ -35,13 +35,12 @@ const STATUS_CLASS: Record<string, string> = {
 export default function AdminBookingsPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  // TODO: FastAPI admin reservation-read endpoint not implemented yet — using local placeholder state.
+  // GET /api/booking/admin/list returns all reservations (admin|contributor|business_owner).
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [info, setInfo] = useState<string | null>(null);
 
   const load = useCallback(() => {
-    // Best-effort: there is currently no admin list endpoint. This will fall back to an empty list.
     return fetchAPI<Booking[]>("/api/booking/admin/list")
       .then((data) => setBookings(data ?? []))
       .catch(() => setBookings([]));
@@ -66,7 +65,7 @@ export default function AdminBookingsPage() {
       setBookings((prev) => prev.map((b) => (b.id === id ? { ...b, status } : b)));
       setInfo("Reservation status updated.");
     } catch {
-      setInfo("Could not update status — reservation read endpoint is missing.");
+      setInfo("Could not update status — the reservation may already be in that state or the transition is not allowed.");
     }
   };
 
@@ -143,7 +142,7 @@ export default function AdminBookingsPage() {
             {bookings.length === 0 && (
               <TableRow>
                 <TableCell colSpan={6} className="text-center text-muted-foreground py-8">
-                  No reservations found. The admin reservation-read endpoint is not implemented yet.
+                  No reservations found.
                 </TableCell>
               </TableRow>
             )}

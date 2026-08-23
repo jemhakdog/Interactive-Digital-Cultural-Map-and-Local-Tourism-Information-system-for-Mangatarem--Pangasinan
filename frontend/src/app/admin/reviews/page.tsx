@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useAuth } from "@/lib/auth";
+import { fetchAPI } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { Loader2, MessageSquare, Star, Check, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
@@ -28,19 +29,47 @@ const STATUS_CLASS: Record<string, string> = {
 export default function AdminReviewsPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  // TODO: FastAPI admin review-moderation endpoint not implemented yet — using local placeholder state.
-  const [reviews] = useState<Review[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>("all");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [actingId, setActingId] = useState<number | null>(null);
+
+  const loadReviews = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await fetchAPI<{ reviews: Review[] }>("/api/admin/reviews");
+      setReviews(data.reviews);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load reviews.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const moderate = async (reviewId: number, action: "approve" | "reject") => {
+    setActingId(reviewId);
+    try {
+      await fetchAPI(`/api/admin/reviews/${reviewId}/moderate`, {
+        method: "POST",
+        body: JSON.stringify({ action }),
+      });
+      await loadReviews();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : `Failed to ${action} review.`);
+    } finally {
+      setActingId(null);
+    }
+  };
 
   useEffect(() => {
     if (!authLoading && (!user || user.role !== "admin")) router.push("/dashboard");
   }, [user, authLoading, router]);
 
   useEffect(() => {
-    if (!user) return;
-    // No moderation read endpoint exists yet; placeholder list stays empty.
-    setLoading(false);
+    if (!user || user.role !== "admin") return;
+    loadReviews();
   }, [user]);
 
   if (authLoading || !user || loading) {
@@ -88,12 +117,16 @@ export default function AdminReviewsPage() {
         ))}
       </div>
 
+      {error && (
+        <p className="text-sm text-destructive">{error}</p>
+      )}
+
       {reviews.length === 0 ? (
         <div className="border border-dashed border-border rounded-2xl py-20 text-center">
           <MessageSquare className="h-12 w-12 mx-auto mb-3 text-muted-foreground/40" />
           <p className="font-bold text-foreground">No reviews found</p>
           <p className="text-xs text-muted-foreground mt-1">
-            Review moderation requires a backend endpoint that is not implemented yet.
+            There are no visitor reviews to moderate yet.
           </p>
         </div>
       ) : (
@@ -126,13 +159,20 @@ export default function AdminReviewsPage() {
                     {r.comment && <p className="text-sm text-foreground mt-2">{r.comment}</p>}
                   </div>
                   <div className="flex gap-2 flex-shrink-0">
-                    <Button size="sm" className="gap-1 rounded-lg">
+                    <Button
+                      size="sm"
+                      className="gap-1 rounded-lg"
+                      disabled={actingId === r.id}
+                      onClick={() => moderate(r.id, "approve")}
+                    >
                       <Check className="h-3.5 w-3.5" /> Approve
                     </Button>
                     <Button
                       size="sm"
                       variant="outline"
                       className="gap-1 rounded-lg text-destructive"
+                      disabled={actingId === r.id}
+                      onClick={() => moderate(r.id, "reject")}
                     >
                       <X className="h-3.5 w-3.5" /> Reject
                     </Button>

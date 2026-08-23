@@ -3,15 +3,16 @@
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/lib/auth";
 import { useRouter } from "next/navigation";
-import { api } from "@/lib/api";
+import { fetchAPI } from "@/lib/api";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Loader2, BadgeCheck, X } from "lucide-react";
 
-interface Establishment {
-  id: number;
-  name: string;
-  type?: string;
+// Matches GET /api/admin/merchants/pending response items.
+interface PendingMerchant {
+  verification_id: number;
+  name?: string | null;
+  type?: string | null;
   barangay?: string | null;
   owner_name?: string | null;
   status?: string;
@@ -20,16 +21,19 @@ interface Establishment {
 export default function AdminVerifyMerchantsPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  const [items, setItems] = useState<Establishment[]>([]);
+  const [items, setItems] = useState<PendingMerchant[]>([]);
   const [loading, setLoading] = useState(true);
-  // TODO: FastAPI merchant-verification endpoint not implemented yet — using local placeholder handlers.
+  const [error, setError] = useState<string | null>(null);
   const [info, setInfo] = useState<string | null>(null);
+  const [busyId, setBusyId] = useState<number | null>(null);
 
   const load = useCallback(() => {
-    return api
-      .business("status=pending")
-      .then((data) => setItems((data.items as Establishment[]) ?? []))
-      .catch(() => {});
+    return fetchAPI<{ merchants: PendingMerchant[] }>("/api/admin/merchants/pending")
+      .then((data) => {
+        setItems(data.merchants ?? []);
+        setError(null);
+      })
+      .catch(() => setError("Failed to load pending merchants. Please try again."));
   }, []);
 
   useEffect(() => {
@@ -41,11 +45,38 @@ export default function AdminVerifyMerchantsPage() {
     load().finally(() => setLoading(false));
   }, [user, load]);
 
-  // Placeholder handler — backend verification endpoint is missing.
-  const handleVerify = (est: Establishment, action: "approve" | "reject") => {
-    setInfo(
-      `Verification for "${est.name}" (${action}) is not implemented on the backend yet.`
-    );
+  // POST /api/admin/merchants/{verification_id}/verify
+  const handleVerify = async (merchant: PendingMerchant) => {
+    setBusyId(merchant.verification_id);
+    setError(null);
+    try {
+      await fetchAPI(`/api/admin/merchants/${merchant.verification_id}/verify`, {
+        method: "POST",
+      });
+      setInfo(`"${merchant.name ?? "Merchant"}" has been verified.`);
+      await load();
+    } catch {
+      setError("Failed to verify merchant. Please try again.");
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  // POST /api/admin/merchants/{verification_id}/reject
+  const handleReject = async (merchant: PendingMerchant) => {
+    setBusyId(merchant.verification_id);
+    setError(null);
+    try {
+      await fetchAPI(`/api/admin/merchants/${merchant.verification_id}/reject`, {
+        method: "POST",
+      });
+      setInfo(`"${merchant.name ?? "Merchant"}" has been rejected.`);
+      await load();
+    } catch {
+      setError("Failed to reject merchant. Please try again.");
+    } finally {
+      setBusyId(null);
+    }
   };
 
   if (authLoading || !user || loading) {
@@ -72,9 +103,9 @@ export default function AdminVerifyMerchantsPage() {
         </div>
       </div>
 
-      {info && (
-        <div className="mb-4 rounded-lg border border-border bg-muted px-4 py-3 text-sm text-muted-foreground">
-          {info}
+      {(info || error) && (
+        <div className={`mb-4 rounded-lg border px-4 py-3 text-sm ${error ? "border-destructive/50 bg-destructive/10 text-destructive" : "border-border bg-muted text-muted-foreground"}`}>
+          {error ?? info}
         </div>
       )}
 
@@ -90,11 +121,11 @@ export default function AdminVerifyMerchantsPage() {
         <div className="flex flex-col gap-4">
           {items.map((est) => (
             <div
-              key={est.id}
+              key={est.verification_id}
               className="border border-border/50 rounded-2xl p-5 flex flex-col md:flex-row md:items-center justify-between gap-4"
             >
               <div>
-                <h3 className="font-bold text-foreground">{est.name}</h3>
+                <h3 className="font-bold text-foreground">{est.name ?? "Unnamed business"}</h3>
                 <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground mt-1">
                   <Badge variant="secondary" className="capitalize">{est.type ?? "Business"}</Badge>
                   {est.barangay && <span>Brgy. {est.barangay}</span>}
@@ -102,13 +133,23 @@ export default function AdminVerifyMerchantsPage() {
                 </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                <Button className="gap-1 rounded-lg" onClick={() => handleVerify(est, "approve")}>
-                  <BadgeCheck className="h-3.5 w-3.5" /> Approve
+                <Button
+                  className="gap-1 rounded-lg"
+                  disabled={busyId === est.verification_id}
+                  onClick={() => handleVerify(est)}
+                >
+                  {busyId === est.verification_id ? (
+                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                  ) : (
+                    <BadgeCheck className="h-3.5 w-3.5" />
+                  )}{" "}
+                  Approve
                 </Button>
                 <Button
                   variant="outline"
                   className="gap-1 rounded-lg text-destructive"
-                  onClick={() => handleVerify(est, "reject")}
+                  disabled={busyId === est.verification_id}
+                  onClick={() => handleReject(est)}
                 >
                   <X className="h-3.5 w-3.5" /> Reject
                 </Button>

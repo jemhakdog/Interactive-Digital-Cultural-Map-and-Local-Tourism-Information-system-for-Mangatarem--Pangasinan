@@ -36,6 +36,11 @@ Performed comprehensive ponytail audit, cleanup, bug fixes, and CRUD verificatio
 
 ## Last concrete action
 
+### Business dashboard profile seeded + 422 bug fixed (2026-08-23)
+- Added `Mangatarem Bangus Grill` (restaurant, `approved`, moderate) for `test_owner` (user id 2) directly in `instance/mangatarem.db` — establishment id 10. test_owner previously had no establishment, so the dashboard showed only the onboarding modal.
+- Fixed `?per_page=200` → 422 bug: FastAPI `GET /api/business` caps `per_page` at 100, so all 4 frontend call sites got a hard 422 and no owner's establishment ever appeared on the dashboard. Changed to `per_page=100` in `frontend/src/app/business/dashboard/page.tsx` (x2), `frontend/src/app/business/[id]/edit/page.tsx`, `frontend/src/components/business/business-sidebar.tsx`.
+- Verified end-to-end in browser: login test_owner@example.com / password123 → `/business/dashboard` renders the full profile. All three dashboard API calls (list, rooms/list, menu/list) return 200. Public `/api/business/10` returns 200.
+
 ### Ponytail Batch Cleanup (2026-07-31)
 - Deleted dead tracked artifacts: `archive/`, `code_screenshots/`, `.antigravitycli/`, `tmp/verify_newsletter.py`, `instance/heritage_page.html`, `data/scraped_attractions.json`, `data/scraped_heritage.json`, `build/desktop.py`.
 - Deleted duplicate shims: `core/db_manager.py`, `core/geo.py`, `core/logger.py`, `core/session.py`, `utils/session_helper.py`.

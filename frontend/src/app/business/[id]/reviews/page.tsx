@@ -8,6 +8,7 @@ import { fetchAPI } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
+import { BusinessLayout } from "@/components/business/business-layout";
 import { Loader2, ArrowLeft, MessageSquare, ShieldCheck, Star, Send } from "lucide-react";
 
 interface ReviewReplyItem {
@@ -89,7 +90,8 @@ export default function BusinessReviewsPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-4xl space-y-8">
+    <BusinessLayout>
+      <div className="container mx-auto px-4 py-8 max-w-4xl space-y-8">
       <div className="flex items-center justify-between pb-4 border-b border-border/50">
         <div className="space-y-1">
           <Link
@@ -227,5 +229,6 @@ export default function BusinessReviewsPage() {
         </div>
       )}
     </div>
+    </BusinessLayout>
   );
 }
