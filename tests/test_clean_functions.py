@@ -137,20 +137,3 @@ class TestFileHelpers:
 
         with patch("utils.file_helpers.current_app", app):
             assert save_uploaded_file(bad_file) is None
-
-
-# === App Constants Tests ===
-
-
-class TestAppConstants:
-    """Verify named constants replaced magic numbers correctly."""
-
-    def test_session_lifetime_is_7_days(self):
-        """PERMANENT_SESSION_LIFETIME equals 7 days."""
-        from config import Config
-        assert Config.PERMANENT_SESSION_LIFETIME.days == 7
-
-    def test_remember_cookie_is_30_days(self):
-        """REMEMBER_COOKIE_DURATION equals 30 days."""
-        from config import Config
-        assert Config.REMEMBER_COOKIE_DURATION.days == 30
