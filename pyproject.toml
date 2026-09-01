@@ -5,29 +5,16 @@ description = "Interactive Digital Cultural Map and Local Tourism Information Sy
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "flask",
-    "flask-sqlalchemy",
-    "flask-login",
-    "flask-limiter",
-    "flask-migrate",
-    "flask-wtf",
+    "flask",  # still used by utils/file_helpers.py (current_app/url_for)
     "python-dotenv",
-    "upstash-redis",
-    "supabase",
     "bleach",
     "psycopg2-binary",
     "google-auth",
     "email-validator",
     "werkzeug",
-    "pillow",
-    "python-docx",
-    "gunicorn",
     "requests",
     "httpx",
     "beautifulsoup4>=4.14.3",
-    "flask-socketio>=5.6.1",
-    "eventlet>=0.41.0",
-    "polyline>=2.0.4",
 ]
 
 [tool.uv]
