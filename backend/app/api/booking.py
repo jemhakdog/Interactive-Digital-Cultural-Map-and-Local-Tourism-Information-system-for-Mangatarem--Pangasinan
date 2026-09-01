@@ -24,6 +24,7 @@ from backend.app.models.booking import BookableAsset, BookingSlot, Reservation
 from backend.app.models.attractions import Attraction
 from backend.app.models.business import Establishment
 from backend.app.models.user import User
+from backend.app.models.analytics import VisitorLog
 from backend.app.schemas.booking import (
     AvailabilityResponse,
     ReserveRequest,
@@ -261,6 +262,30 @@ async def verify_arrival(
             res.status = "attended"
             booking_attended = True
             place_name = att.name
+            # Idempotent visit log: one row per (user, target, day)
+            existing_log = (
+                await db.execute(
+                    select(VisitorLog).where(
+                        VisitorLog.visitor_user_id == user.id,
+                        VisitorLog.target_type == "attraction",
+                        VisitorLog.target_id == att.id,
+                        VisitorLog.visit_date == today,
+                    )
+                )
+            ).scalar_one_or_none()
+            if existing_log is None:
+                db.add(
+                    VisitorLog(
+                        target_type="attraction",
+                        target_id=att.id,
+                        visitor_count=res.party_size,
+                        visitor_name=user.username,
+                        is_system_user=True,
+                        logged_by=user.id,
+                        visitor_user_id=user.id,
+                        notes="verified via GPS arrival",
+                    )
+                )
             break
 
     # Step 2: check navigation target
@@ -281,6 +306,30 @@ async def verify_arrival(
                 place_name = obj.name
                 arrived_target_id = body.navigated_target_id
                 arrived_target_type = body.navigated_target_type
+                # Idempotent visit log: one row per (user, target, day)
+                existing_log = (
+                    await db.execute(
+                        select(VisitorLog).where(
+                            VisitorLog.visitor_user_id == user.id,
+                            VisitorLog.target_type == body.navigated_target_type,
+                            VisitorLog.target_id == body.navigated_target_id,
+                            VisitorLog.visit_date == today,
+                        )
+                    )
+                ).scalar_one_or_none()
+                if existing_log is None:
+                    db.add(
+                        VisitorLog(
+                            target_type=body.navigated_target_type,
+                            target_id=body.navigated_target_id,
+                            visitor_count=1,
+                            visitor_name=user.username,
+                            is_system_user=True,
+                            logged_by=user.id,
+                            visitor_user_id=user.id,
+                            notes="verified via GPS arrival at navigated destination",
+                        )
+                    )
 
     return {
         "success": True,

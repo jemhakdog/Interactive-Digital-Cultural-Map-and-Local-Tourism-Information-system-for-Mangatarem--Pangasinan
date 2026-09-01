@@ -1,27 +1,45 @@
 """
-Unit and integration tests for physical arrival verification and check-in API.
+Integration tests for physical arrival verification and check-in API (FastAPI).
+
+Port of the Flask-era tests/test_booking_arrival.py to the FastAPI TestClient
+with JWT auth. Exercises POST /api/booking/verify-arrival.
+
+NOTE: the FastAPI route currently does NOT write VisitorLog rows (port gap).
+The assertions on VisitorLog below encode the intended behavior.
 """
+import asyncio
+from datetime import datetime
 
 import pytest
-from datetime import datetime
-from models import User, Attraction, Establishment, VisitorLog
-from modules.booking.models import BookableAsset, BookingSlot, Reservation
-from extensions import db
+from sqlalchemy import select
+
+from backend.app.models.user import User
+from backend.app.models.attractions import Attraction
+from backend.app.models.business import Establishment
+from backend.app.models.booking import BookableAsset, BookingSlot, Reservation
+from backend.app.models.analytics import VisitorLog
+from backend.app.core.database import async_session_factory
 
 
-class TestBookingArrivalVerification:
-    
-    @pytest.fixture
-    def setup_data(self, app):
-        """Set up test environment models in DB."""
-        with app.app_context():
-            # 1. Create a dummy user
-            user = User(username="test_traveler", email="traveler@mangatarem.com", role="user", is_approved=True)
+def _run(coro):
+    return asyncio.run(coro)
+
+
+@pytest.fixture
+def setup_data(client, auth_headers):
+    """Seed users/attractions/establishment/booking slot via direct DB session."""
+    async def _seed():
+        async with async_session_factory() as db:
+            user = User(
+                username="test_traveler",
+                email="traveler@mangatarem.com",
+                role="user",
+                is_approved=True,
+            )
             user.set_password("securepassword")
-            db.session.add(user)
-            
-            # 2. Create attractions (e.g. Mangatarem Church and a far away place)
-            # Mangatarem Church roughly: 15.7905, 120.2934
+            db.add(user)
+            await db.flush()
+
             church = Attraction(
                 name="Mangatarem Holy Family Parish",
                 description="Historic Roman Catholic parish church in Mangatarem.",
@@ -29,11 +47,9 @@ class TestBookingArrivalVerification:
                 latitude=15.7905,
                 longitude=120.2934,
                 status="approved",
-                is_verified=True
+                is_verified=True,
             )
-            db.session.add(church)
-            
-            # Far attraction (e.g. 5 kilometers away: 15.8350, 120.2934)
+            db.add(church)
             far_spot = Attraction(
                 name="Far Away Eco Park",
                 description="Eco park located far away.",
@@ -41,11 +57,9 @@ class TestBookingArrivalVerification:
                 latitude=15.8350,
                 longitude=120.2934,
                 status="approved",
-                is_verified=True
+                is_verified=True,
             )
-            db.session.add(far_spot)
-
-            # 3. Create an establishment (e.g. Local Cafe at 15.7906, 120.2935)
+            db.add(far_spot)
             cafe = Establishment(
                 name="Mangatarem Heritage Cafe",
                 description="Cozy heritage cafe.",
@@ -53,205 +67,212 @@ class TestBookingArrivalVerification:
                 latitude=15.7906,
                 longitude=120.2935,
                 status="approved",
-                owner=user
+                owner=user,
             )
-            db.session.add(cafe)
-            
-            db.session.commit()
-            
-            # Save IDs for thread-safe/session-safe lookup in tests
-            user_id = user.id
-            church_id = church.id
-            far_spot_id = far_spot.id
-            cafe_id = cafe.id
-            
-            # 4. Bind booking slot & reservation for today
+            db.add(cafe)
+            await db.flush()
+
+            asset = BookableAsset(attraction_id=church.id, daily_capacity=20, status="active")
+            db.add(asset)
+            await db.flush()
+
             today = datetime.utcnow().date()
-            
-            asset = BookableAsset(attraction_id=church_id, daily_capacity=20, status="active")
-            db.session.add(asset)
-            db.session.commit()
-            
             slot = BookingSlot(bookable_asset_id=asset.id, date=today, total_capacity=20)
-            db.session.add(slot)
-            db.session.commit()
-            
+            db.add(slot)
+            await db.flush()
+
             reservation = Reservation(
-                user_id=user_id,
+                user_id=user.id,
                 booking_slot_id=slot.id,
                 party_size=3,
                 primary_contact="09171234567",
-                status="confirmed"
+                status="confirmed",
             )
-            db.session.add(reservation)
-            db.session.commit()
-            
-            yield {
-                'user_id': user_id,
-                'church_id': church_id,
-                'far_spot_id': far_spot_id,
-                'cafe_id': cafe_id,
-                'reservation_id': reservation.id
+            db.add(reservation)
+            await db.commit()
+
+            return {
+                "user_id": user.id,
+                "church_id": church.id,
+                "far_spot_id": far_spot.id,
+                "cafe_id": cafe.id,
+                "reservation_id": reservation.id,
             }
 
-    def test_unauthenticated_request_fails(self, client):
-        """Verify unauthorized users cannot verify arrival."""
-        response = client.post('/booking/api/verify-arrival', json={
-            'latitude': 15.7905,
-            'longitude': 120.2934
-        })
-        assert response.status_code in (302, 401)  # Flask-Login redirects or returns 401 for unauthenticated users
+    return _run(_seed())
 
-    def test_invalid_payload_fails(self, client, setup_data):
-        """Verify endpoint handles malformed or missing coordinate payloads."""
-        # Authenticate traveler
-        with client.session_transaction() as sess:
-            sess['_user_id'] = str(setup_data['user_id'])
-            sess['_fresh'] = True
-            
-        # Empty body
-        response = client.post('/booking/api/verify-arrival', json=None)
-        assert response.status_code == 400
-        
-        # Missing coordinates
-        response = client.post('/booking/api/verify-arrival', json={'latitude': 15.7905})
-        assert response.status_code == 400
-        
-        # Invalid numeric coordinate formats
-        response = client.post('/booking/api/verify-arrival', json={
-            'latitude': "invalid_lat",
-            'longitude': 120.2934
-        })
-        assert response.status_code == 400
 
-    def test_arrival_check_in_within_proximity(self, app, client, setup_data):
-        """Verify reservation is checked in and VisitorLog written when user is within 100 meters."""
-        # Authenticate traveler
-        with client.session_transaction() as sess:
-            sess['_user_id'] = str(setup_data['user_id'])
-            sess['_fresh'] = True
-            
-        # Call API at coordinates extremely close to Mangatarem Church (church latitude=15.7905, longitude=120.2934)
-        response = client.post('/booking/api/verify-arrival', json={
-            'latitude': 15.79052,  # roughly 2 meters away
-            'longitude': 120.29342
-        })
-        
-        assert response.status_code == 200
-        json_data = response.get_json()
-        assert json_data['success'] is True
-        assert json_data['booking_attended'] is True
-        assert json_data['place_name'] == "Mangatarem Holy Family Parish"
-        
-        # Verify DB updates in app context
-        with app.app_context():
-            res = Reservation.query.get(setup_data['reservation_id'])
-            assert res.status == 'attended'
-            
-            # Visitor log must be logged automatically
-            log = VisitorLog.query.filter_by(
-                visitor_user_id=setup_data['user_id'],
-                target_type='attraction',
-                target_id=setup_data['church_id']
-            ).first()
+def _login_traveler(client):
+    resp = client.post(
+        "/api/auth/login",
+        json={"email": "traveler@mangatarem.com", "password": "securepassword"},
+    )
+    assert resp.status_code == 200, resp.text
+    return {"Authorization": f"Bearer {resp.json()['access_token']}"}
+
+
+def test_unauthenticated_request_fails(client):
+    """Verify unauthorized users cannot verify arrival."""
+    response = client.post("/api/booking/verify-arrival", json={"latitude": 15.7905, "longitude": 120.2934})
+    assert response.status_code == 401  # FastAPI OAuth2 requires a token
+
+
+def test_invalid_payload_fails(client, setup_data):
+    """Verify endpoint handles malformed or missing coordinate payloads."""
+    headers = _login_traveler(client)
+
+    # Empty body -> 422 (Pydantic)
+    response = client.post("/api/booking/verify-arrival", json=None, headers=headers)
+    assert response.status_code == 422
+
+    # Missing coordinates -> 422
+    response = client.post("/api/booking/verify-arrival", json={"latitude": 15.7905}, headers=headers)
+    assert response.status_code == 422
+
+    # Invalid numeric coordinate formats -> 422
+    response = client.post(
+        "/api/booking/verify-arrival",
+        json={"latitude": "invalid_lat", "longitude": 120.2934},
+        headers=headers,
+    )
+    assert response.status_code == 422
+
+
+def test_arrival_check_in_within_proximity(client, setup_data):
+    """Reservation checked in + VisitorLog written when within 100m."""
+    headers = _login_traveler(client)
+    response = client.post(
+        "/api/booking/verify-arrival",
+        json={"latitude": 15.79052, "longitude": 120.29342},
+        headers=headers,
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert data["booking_attended"] is True
+    assert data["place_name"] == "Mangatarem Holy Family Parish"
+
+    # Reservation flipped to attended
+    async def _check():
+        async with async_session_factory() as db:
+            res = await db.get(Reservation, setup_data["reservation_id"])
+            assert res.status == "attended"
+            log = (
+                await db.execute(
+                    select(VisitorLog).where(
+                        VisitorLog.visitor_user_id == setup_data["user_id"],
+                        VisitorLog.target_type == "attraction",
+                        VisitorLog.target_id == setup_data["church_id"],
+                    )
+                )
+            ).scalar_one_or_none()
             assert log is not None
             assert log.visitor_count == 3
             assert log.visitor_name == "test_traveler"
             assert "verified via GPS arrival" in log.notes
 
-    def test_arrival_check_in_outside_proximity(self, app, client, setup_data):
-        """Verify reservation check-in is skipped if user is outside the 100-meter proximity bounds."""
-        # Authenticate traveler
-        with client.session_transaction() as sess:
-            sess['_user_id'] = str(setup_data['user_id'])
-            sess['_fresh'] = True
-            
-        # Coordinates located far away (approx 500 meters from church)
-        response = client.post('/booking/api/verify-arrival', json={
-            'latitude': 15.7945,  
-            'longitude': 120.2934
-        })
-        
-        assert response.status_code == 200
-        json_data = response.get_json()
-        assert json_data['success'] is True
-        assert json_data['booking_attended'] is False
-        
-        # Verify DB is unchanged
-        with app.app_context():
-            res = Reservation.query.get(setup_data['reservation_id'])
-            assert res.status == 'confirmed'
-            
-            log = VisitorLog.query.filter_by(
-                visitor_user_id=setup_data['user_id'],
-                target_type='attraction',
-                target_id=setup_data['church_id']
-            ).first()
+    _run(_check())
+
+
+def test_arrival_check_in_outside_proximity(client, setup_data):
+    """Check-in skipped when outside 100m."""
+    headers = _login_traveler(client)
+    response = client.post(
+        "/api/booking/verify-arrival",
+        json={"latitude": 15.7945, "longitude": 120.2934},
+        headers=headers,
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert data["booking_attended"] is False
+
+    async def _check():
+        async with async_session_factory() as db:
+            res = await db.get(Reservation, setup_data["reservation_id"])
+            assert res.status == "confirmed"
+            log = (
+                await db.execute(
+                    select(VisitorLog).where(
+                        VisitorLog.visitor_user_id == setup_data["user_id"],
+                        VisitorLog.target_type == "attraction",
+                        VisitorLog.target_id == setup_data["church_id"],
+                    )
+                )
+            ).scalar_one_or_none()
             assert log is None
 
-    def test_navigated_landmark_arrival(self, app, client, setup_data):
-        """Verify navigated attraction arrival stops navigation, logs visit, and updates status correctly."""
-        # Authenticate traveler
-        with client.session_transaction() as sess:
-            sess['_user_id'] = str(setup_data['user_id'])
-            sess['_fresh'] = True
-            
-        # User is navigating to local Cafe (15.7906, 120.2935) and physically gets within 5 meters
-        response = client.post('/booking/api/verify-arrival', json={
-            'latitude': 15.79061,
-            'longitude': 120.29351,
-            'navigated_target_id': setup_data['cafe_id'],
-            'navigated_target_type': 'establishment'
-        })
-        
-        assert response.status_code == 200
-        json_data = response.get_json()
-        assert json_data['success'] is True
-        assert json_data['navigated_arrived'] is True
-        assert json_data['place_name'] == "Mangatarem Heritage Cafe"
-        assert json_data['target_id'] == setup_data['cafe_id']
-        assert json_data['target_type'] == 'establishment'
-        
-        # Verify visit was safely recorded in VisitorLog
-        with app.app_context():
-            log = VisitorLog.query.filter_by(
-                visitor_user_id=setup_data['user_id'],
-                target_type='establishment',
-                target_id=setup_data['cafe_id']
-            ).first()
+    _run(_check())
+
+
+def test_navigated_landmark_arrival(client, setup_data):
+    """Navigated attraction arrival stops navigation, logs visit."""
+    headers = _login_traveler(client)
+    response = client.post(
+        "/api/booking/verify-arrival",
+        json={
+            "latitude": 15.79061,
+            "longitude": 120.29351,
+            "navigated_target_id": setup_data["cafe_id"],
+            "navigated_target_type": "establishment",
+        },
+        headers=headers,
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["success"] is True
+    assert data["navigated_arrived"] is True
+    assert data["place_name"] == "Mangatarem Heritage Cafe"
+    assert data["target_id"] == setup_data["cafe_id"]
+    assert data["target_type"] == "establishment"
+
+    async def _check():
+        async with async_session_factory() as db:
+            log = (
+                await db.execute(
+                    select(VisitorLog).where(
+                        VisitorLog.visitor_user_id == setup_data["user_id"],
+                        VisitorLog.target_type == "establishment",
+                        VisitorLog.target_id == setup_data["cafe_id"],
+                    )
+                )
+            ).scalar_one_or_none()
             assert log is not None
             assert log.visitor_count == 1
             assert "via GPS arrival at navigated destination" in log.notes
 
-    def test_duplicate_arrival_prevention(self, app, client, setup_data):
-        """Verify system does not write multiple duplicate VisitorLog entries on repeated API hits."""
-        with client.session_transaction() as sess:
-            sess['_user_id'] = str(setup_data['user_id'])
-            sess['_fresh'] = True
-            
-        # Hit 1: Arrive at Cafe
-        res1 = client.post('/booking/api/verify-arrival', json={
-            'latitude': 15.79061,
-            'longitude': 120.29351,
-            'navigated_target_id': setup_data['cafe_id'],
-            'navigated_target_type': 'establishment'
-        })
-        assert res1.status_code == 200
-        
-        # Hit 2: Repeat checking location
-        res2 = client.post('/booking/api/verify-arrival', json={
-            'latitude': 15.79062,
-            'longitude': 120.29352,
-            'navigated_target_id': setup_data['cafe_id'],
-            'navigated_target_type': 'establishment'
-        })
-        assert res2.status_code == 200
-        
-        # Verify there is exactly one log entry for today
-        with app.app_context():
-            logs = VisitorLog.query.filter_by(
-                visitor_user_id=setup_data['user_id'],
-                target_type='establishment',
-                target_id=setup_data['cafe_id']
-            ).all()
-            assert len(logs) == 1
+    _run(_check())
+
+
+def test_duplicate_arrival_prevention(client, setup_data):
+    """No duplicate VisitorLog entries on repeated hits."""
+    headers = _login_traveler(client)
+    payload = {
+        "latitude": 15.79061,
+        "longitude": 120.29351,
+        "navigated_target_id": setup_data["cafe_id"],
+        "navigated_target_type": "establishment",
+    }
+    res1 = client.post("/api/booking/verify-arrival", json=payload, headers=headers)
+    assert res1.status_code == 200
+    res2 = client.post(
+        "/api/booking/verify-arrival",
+        json={"latitude": 15.79062, "longitude": 120.29352, **payload},
+        headers=headers,
+    )
+    assert res2.status_code == 200
+
+    async def _check():
+        async with async_session_factory() as db:
+            rows = (
+                await db.execute(
+                    select(VisitorLog).where(
+                        VisitorLog.visitor_user_id == setup_data["user_id"],
+                        VisitorLog.target_type == "establishment",
+                        VisitorLog.target_id == setup_data["cafe_id"],
+                    )
+                )
+            ).scalars().all()
+            assert len(rows) == 1
+
+    _run(_check())

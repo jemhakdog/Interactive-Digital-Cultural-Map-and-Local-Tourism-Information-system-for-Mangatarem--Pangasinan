@@ -1,7 +1,0 @@
-{% extends 'errors/base_error.html' %}
-
-{% block code %}403{% endblock %}
-{% block title %}Access Denied{% endblock %}
-{% block message %}You do not have permission to view this restricted resource. If you believe this is an error, please
-contact the administrator.{% endblock %}
-{% block error_bg %}{{ url_for('static', filename='img/error-403.png') }}{% endblock %}

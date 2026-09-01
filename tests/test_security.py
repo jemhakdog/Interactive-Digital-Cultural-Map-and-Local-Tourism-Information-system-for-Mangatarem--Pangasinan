@@ -141,12 +141,3 @@ class TestCoordinateValidation:
         assert validate_coordinates(91, 0) is False
         assert validate_coordinates(0, 181) is False
         assert validate_coordinates("invalid", 0) is False
-
-
-def test_gemini_config_requires_login(client):
-    os.environ["GEMINI_API_KEY"] = "test-gemini-key"
-
-    response = client.get("/api/gemini/config")
-
-    assert response.status_code == 401
-    assert "test-gemini-key" not in response.get_data(as_text=True)

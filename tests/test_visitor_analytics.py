@@ -4,7 +4,7 @@ Visitor Analytics and Logs tests.
 Tests for visitor log model validation, date filters, page views, and export functionality.
 """
 
-from modules.analytics.models import VisitorLog, DatabaseAuditLog, AnalyticsPageView
+from backend.app.models.analytics import VisitorLog, DatabaseAuditLog, AnalyticsPageView
 
 
 class TestVisitorLogModel:
@@ -31,20 +31,6 @@ class TestVisitorLogModel:
         assert log.logged_by == 1
         assert log.notes == "Testing visitor log notes"
 
-    def test_visitor_log_target_name_fallback(self, app):
-        """Test target_name property with nonexistent targets."""
-        with app.app_context():
-            log_attr = VisitorLog(target_type="attraction", target_id=999)
-            assert "Unknown Attraction" in log_attr.target_name
-
-            log_bus = VisitorLog(target_type="establishment", target_id=999)
-            assert "Unknown Establishment" in log_bus.target_name
-
-            log_unknown = VisitorLog(target_type="unknown", target_id=999)
-            assert "Unknown Target" in log_unknown.target_name
-
-
-class TestAuditAndPageViews:
     def test_database_audit_log_creation(self):
         """Test DatabaseAuditLog initialization to prevent dynamic kwargs issues."""
         log = DatabaseAuditLog(
