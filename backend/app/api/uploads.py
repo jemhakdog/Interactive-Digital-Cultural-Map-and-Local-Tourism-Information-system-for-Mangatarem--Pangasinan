@@ -17,9 +17,10 @@ router = APIRouter()
 UPLOAD_DIR = Path(__file__).resolve().parent.parent.parent / "uploads"
 UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
-ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif"}
-ALLOWED_MEDIA_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "mp4"}
-MAX_FILE_SIZE_MB = 10
+ALLOWED_IMAGE_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+ALLOWED_MEDIA_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp", "mp4"}
+ALLOWED_DOC_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp", "pdf", "doc", "docx"}
+MAX_FILE_SIZE_MB = 15
 MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024
 
 
@@ -61,8 +62,17 @@ async def upload_image(
     file: UploadFile,
     user: Annotated[User, Depends(get_current_user)],
 ):
-    """Upload a single image (jpg/png/gif). Returns URL + metadata."""
+    """Upload a single image (jpg/png/gif/webp). Returns URL + metadata."""
     return _validate_and_save(file, ALLOWED_IMAGE_EXTENSIONS)
+
+
+@router.post("/document", summary="Upload a verification document")
+async def upload_document(
+    file: UploadFile,
+    user: Annotated[User, Depends(get_current_user)],
+):
+    """Upload a document (pdf/png/jpg/webp/doc/docx). Returns URL + metadata."""
+    return _validate_and_save(file, ALLOWED_DOC_EXTENSIONS)
 
 
 @router.post("/multiple", summary="Upload multiple images")
@@ -70,7 +80,7 @@ async def upload_images(
     files: list[UploadFile],
     user: Annotated[User, Depends(get_current_user)],
 ):
-    """Upload multiple images (jpg/png/gif/mp4). Returns list of metadata."""
+    """Upload multiple images (jpg/png/gif/webp/mp4). Returns list of metadata."""
     if not files:
         raise HTTPException(status_code=400, detail="No files provided.")
     if len(files) > 10:

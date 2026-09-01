@@ -49,7 +49,9 @@ export default function ProfilePage() {
           <div className="flex justify-between items-center">
             <span className="text-sm text-muted-foreground">Member since</span>
             <span className="text-sm">
-              {new Date(user.created_at).toLocaleDateString("en-PH", { month: "long", year: "numeric" })}
+              {user.created_at
+                ? new Date(user.created_at).toLocaleDateString("en-PH", { month: "long", year: "numeric" })
+                : "—"}
             </span>
           </div>
         </CardContent>

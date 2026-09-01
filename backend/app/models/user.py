@@ -6,11 +6,13 @@ from datetime import datetime, timedelta, timezone
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
+from werkzeug.security import check_password_hash, generate_password_hash
 from passlib.context import CryptContext
 
 from backend.app.models.base import Base
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Legacy passlib bcrypt hashes (user created before the Werkzeug migration)
+_bcrypt = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
 class User(Base):
@@ -58,10 +60,14 @@ class User(Base):
     sent_messages = relationship("ChatMessage")
 
     def set_password(self, password: str) -> None:
-        self.password = pwd_context.hash(password)
+        self.password = generate_password_hash(password)
 
     def check_password(self, password: str) -> bool:
-        return pwd_context.verify(password, self.password)
+        try:
+            return check_password_hash(self.password, password)
+        except ValueError:
+            # Legacy bcrypt hashes use passlib format Werkzeug can't parse
+            return _bcrypt.verify(password, self.password)
 
     # --- Password-reset helpers (ported from Flask shim) ---
     def create_reset_token(self, expiry_minutes: int = 30) -> str:

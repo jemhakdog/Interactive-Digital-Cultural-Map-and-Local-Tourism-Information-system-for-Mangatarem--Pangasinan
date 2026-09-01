@@ -663,6 +663,33 @@ async def submit_verification(
     }
 
 
+@router.get(
+    "/verification",
+    summary="Get business verification status for current owner",
+)
+async def get_verification_status(
+    db: Annotated[AsyncSession, Depends(get_db)],
+    user: Annotated[User, Depends(require_business_owner)],
+):
+    """Fetch current verification record for the owner."""
+    result = await db.execute(
+        select(BusinessVerification).where(BusinessVerification.user_id == user.id)
+    )
+    verification = result.scalar_one_or_none()
+    if not verification:
+        return {"status": "none", "permit_document_url": None, "other_document_url": None}
+    return {
+        "id": verification.id,
+        "user_id": verification.user_id,
+        "permit_document_url": verification.permit_document_url,
+        "other_document_url": verification.other_document_url,
+        "status": verification.status,
+        "submitted_at": (
+            verification.submitted_at.isoformat() if verification.submitted_at else None
+        ),
+    }
+
+
 # ───────────────────────────────────────────────────────────────
 # OWNER — Establishment reviews (all statuses)
 # ───────────────────────────────────────────────────────────────
