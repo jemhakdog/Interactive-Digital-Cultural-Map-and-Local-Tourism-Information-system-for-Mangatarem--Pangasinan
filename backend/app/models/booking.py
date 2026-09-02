@@ -6,8 +6,8 @@ from datetime import date, datetime
 
 from sqlalchemy import (
     Boolean,
-    DateTime,
     Date,
+    DateTime,
     ForeignKey,
     Integer,
     String,

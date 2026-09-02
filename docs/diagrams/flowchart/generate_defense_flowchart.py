@@ -3,8 +3,8 @@ Generate a System Flowchart for the ERD Defense Script.
 Flow: Left to Right (Columns 1 -> 4)
 """
 
-import xml.etree.ElementTree as ET
 import os
+import xml.etree.ElementTree as ET
 
 # ─── Configuration ───
 PAGE_WIDTH = 2000

@@ -12,8 +12,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.core.database import get_db
 from backend.app.core.dependencies import get_current_active_user, require_admin
-from backend.app.models.events import Event
 from backend.app.models.barangay import BarangayInfo
+from backend.app.models.events import Event
 from backend.app.models.user import User
 from backend.app.schemas.event import (
     EventCreate,

@@ -6,7 +6,7 @@ Covers the JSON/API endpoints only; template-rendering routes stay in Flask.
 from __future__ import annotations
 
 import math
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -19,17 +19,16 @@ from backend.app.core.dependencies import (
     get_current_user,
     require_business_owner,
 )
+from backend.app.models.attractions import Review
+from backend.app.models.barangay import BarangayInfo
 from backend.app.models.business import (
     BusinessVerification,
     Establishment,
     EstablishmentMenuItem,
     EstablishmentRoom,
 )
-from backend.app.models.attractions import Review
-from backend.app.models.barangay import BarangayInfo
 from backend.app.models.gamification import TouristCheckIn
 from backend.app.models.user import User
-from backend.app.schemas.verification import VerificationCreate
 from backend.app.schemas.business import (
     EstablishmentCreate,
     EstablishmentListResponse,
@@ -45,6 +44,7 @@ from backend.app.schemas.business import (
     RoomResponse,
     RoomUpdate,
 )
+from backend.app.schemas.verification import VerificationCreate
 
 router = APIRouter()
 
@@ -191,7 +191,7 @@ async def get_establishment(
         r = await db.execute(
             select(EstablishmentRoom).where(
                 EstablishmentRoom.establishment_id == est.id,
-                EstablishmentRoom.is_available == True,  # noqa: E712
+                EstablishmentRoom.is_available == True,
             )
         )
         rooms = r.scalars().all()
@@ -199,7 +199,7 @@ async def get_establishment(
         m = await db.execute(
             select(EstablishmentMenuItem).where(
                 EstablishmentMenuItem.establishment_id == est.id,
-                EstablishmentMenuItem.is_available == True,  # noqa: E712
+                EstablishmentMenuItem.is_available == True,
             ).order_by(EstablishmentMenuItem.category, EstablishmentMenuItem.name)
         )
         menu_items = m.scalars().all()
@@ -640,7 +640,7 @@ async def submit_verification(
         verification.permit_document_url = body.permit_document_url
         verification.other_document_url = body.other_document_url
         verification.status = "pending"
-        verification.submitted_at = datetime.utcnow()
+        verification.submitted_at = datetime.now(UTC).replace(tzinfo=None)
     else:
         verification = BusinessVerification(
             user_id=user.id,

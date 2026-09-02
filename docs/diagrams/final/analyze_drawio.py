@@ -1,3 +1,4 @@
+import sys
 import xml.etree.ElementTree as ET
 
 file_path = 'docs/diagrams/final/dfd-level-1-clean_v1.drawio'
@@ -11,7 +12,7 @@ try:
     
     if root is None:
         print("Could not find <root> in XML.")
-        exit(1)
+        sys.exit(1)
         
     labels = ["Natural_Heritage", "Intangible_Heritage", "Cultural_Inst", "LGU_Program", "Personality", "Built_Heritage", "Movable_Heritage", "Heritage Profile", "Heritage Management"]
     
@@ -42,5 +43,5 @@ try:
         if s in node_mapping and t in node_mapping:
             print(f"Edge {edge.get('id')}: {node_mapping[s]} -> {node_mapping[t]} | value='{edge.get('value')}' | style='{edge.get('style')}'")
 
-except Exception as e:
+except ET.ParseError as e:
     print(f"Error parsing XML: {e}")

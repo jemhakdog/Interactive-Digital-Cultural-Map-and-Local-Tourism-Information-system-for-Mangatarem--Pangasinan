@@ -32,5 +32,5 @@ try:
                 # We will check manually based on the IDs
                 print(f"Edge {cell.get('id')}: {s} -> {t}")
 
-except Exception as e:
+except ET.ParseError as e:
     print(f"Error parsing XML: {e}")

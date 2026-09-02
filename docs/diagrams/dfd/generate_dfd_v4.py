@@ -1,5 +1,6 @@
-import xml.etree.ElementTree as ET
 import os
+import xml.etree.ElementTree as ET
+
 
 def create_dfd_v4_3():
     print("Initializing Draw.io Level-1 DFD V4.3 generator with localized Datastores Col 3 & Col 3.5...")
@@ -284,7 +285,7 @@ def create_dfd_v4_3():
 
     for i, (src, dest, lbl, *geom) in enumerate(flows):
         geom_style = geom[0] if geom else ""
-        edge_style = f"edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontSize=11;labelBackgroundColor=#F5F9F5;endArrow=classic;"
+        edge_style = "edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontSize=11;labelBackgroundColor=#F5F9F5;endArrow=classic;"
         
         flow_cell = ET.SubElement(root, 'mxCell', attrib={
             'id': f"flow_{1000 + i}",

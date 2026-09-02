@@ -4,7 +4,7 @@ from __future__ import annotations
 import base64
 import json
 import secrets
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -44,7 +44,7 @@ REFRESH_TOKEN_SUBJECT = "refresh"
 
 def _create_token(user_id: int, subject: str, expires_delta: timedelta) -> str:
     """Create a JWT with standard claims."""
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     payload = {
         "sub": str(user_id),
         "iat": now,
@@ -180,7 +180,7 @@ async def google_auth(body: GoogleAuthRequest, db: Annotated[AsyncSession, Depen
         )
         email = idinfo.get("email")
         name = idinfo.get("name") or idinfo.get("given_name")
-    except Exception:
+    except ValueError:
         # Fallback decode if token format is JWT
         try:
             parts = body.credential.split(".")
@@ -189,8 +189,8 @@ async def google_auth(body: GoogleAuthRequest, db: Annotated[AsyncSession, Depen
                 payload = json.loads(base64.urlsafe_b64decode(padded).decode("utf-8"))
                 email = payload.get("email")
                 name = payload.get("name") or payload.get("given_name")
-        except Exception:
-            pass
+        except (KeyError, ValueError):
+            pass  # Malformed/unreadable payload — treated as an invalid credential below.
 
     if not email:
         raise HTTPException(

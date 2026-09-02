@@ -79,7 +79,8 @@ async def analytics_summary(
         raise HTTPException(status_code=403, detail="Admin access required")
 
     from sqlalchemy import func
-    from backend.app.models.analytics import DatabaseAuditLog, AnalyticsPageView
+
+    from backend.app.models.analytics import AnalyticsPageView, DatabaseAuditLog
 
     # Total visitors
     visitor_count = await db.execute(select(func.count(VisitorLog.id)))
@@ -90,8 +91,8 @@ async def analytics_summary(
     total_page_views = page_view_count.scalar() or 0
 
     # Recent visitors (last 7 days)
-    from datetime import datetime, timedelta
-    week_ago = datetime.utcnow() - timedelta(days=7)
+    from datetime import UTC, datetime, timedelta
+    week_ago = datetime.now(UTC).replace(tzinfo=None) - timedelta(days=7)
     recent_count = await db.execute(
         select(func.count(VisitorLog.id)).where(VisitorLog.created_at >= week_ago)
     )
@@ -115,11 +116,13 @@ async def analytics_overview(
     if user.role != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
 
-    from datetime import date, datetime, timedelta
-    from sqlalchemy import func, desc, case
+    from datetime import UTC, date, datetime, timedelta
+
+    from sqlalchemy import case, desc, func
+
     from backend.app.models.analytics import AnalyticsPageView
 
-    today = date.today()
+    today = datetime.now(UTC).date()
     sd: date | None = None
     ed: date | None = None
 

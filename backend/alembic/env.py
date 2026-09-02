@@ -1,15 +1,14 @@
 """Alembic environment configuration for async SQLAlchemy."""
 import asyncio
-from logging.config import fileConfig
-
-from sqlalchemy import pool
-from sqlalchemy.ext.asyncio import async_engine_from_config
-
-from alembic import context
 
 # Import Base metadata from our models
 import sys
+from logging.config import fileConfig
 from pathlib import Path
+
+from alembic import context
+from sqlalchemy import pool
+from sqlalchemy.ext.asyncio import async_engine_from_config
 
 # Add parent directory to path so we can import app modules
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -18,8 +17,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 # Use the backend.app.* path consistently with models/__init__.py and the
 # rest of the app (importing via both `app.models` and `backend.app.models`
 # creates duplicate Table objects on the same MetaData).
+import backend.app.models
 from backend.app.models.base import Base
-import backend.app.models  # noqa: F401  (models/__init__.py imports every model)
 
 # this is the Alembic Config object
 config = context.config

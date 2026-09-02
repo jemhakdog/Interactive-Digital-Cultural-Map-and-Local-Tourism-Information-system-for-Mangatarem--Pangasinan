@@ -15,10 +15,12 @@ Architecture:
 """
 
 import logging
-from typing import Optional, Dict, Any
-from sqlalchemy import text
-from extensions import db
 import os
+from typing import Any
+
+from extensions import db
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
 
 logger = logging.getLogger(__name__)
 
@@ -126,8 +128,8 @@ def generate_mvt_tile(
     x: int,
     y: int,
     layer_name: str = "attractions",
-    filters: Optional[Dict[str, Any]] = None,
-) -> Optional[bytes]:
+    filters: dict[str, Any] | None = None,
+) -> bytes | None:
     """
     Generate a Mapbox Vector Tile for the specified tile coordinates.
 
@@ -174,7 +176,7 @@ def generate_mvt_tile(
         else:
             logger.debug(f"Empty tile for {layer_name} at z={z}, x={x}, y={y}")
             return b""
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error(f"Error generating MVT tile: {e}")
         db.session.rollback()
         return None
@@ -199,9 +201,9 @@ def generate_multi_layer_mvt(
     z: int,
     x: int,
     y: int,
-    layer_names: Optional[list] = None,
-    filters: Optional[Dict[str, Any]] = None,
-) -> Optional[bytes]:
+    layer_names: list | None = None,
+    filters: dict[str, Any] | None = None,
+) -> bytes | None:
     """
     Generate a multi-layer Mapbox Vector Tile.
 
@@ -261,13 +263,13 @@ def generate_multi_layer_mvt(
         if result:
             return bytes(result)
         return b""
-    except Exception as e:
+    except SQLAlchemyError as e:
         logger.error(f"Error generating multi-layer MVT tile: {e}")
         db.session.rollback()
         return None
 
 
-def _xyz_to_bounds(x: int, y: int, z: int) -> Dict[str, float]:
+def _xyz_to_bounds(x: int, y: int, z: int) -> dict[str, float]:
     """
     Convert XYZ tile coordinates to WGS84 bounding box.
 
@@ -300,10 +302,10 @@ def _xyz_to_bounds(x: int, y: int, z: int) -> Dict[str, float]:
 
 
 def _build_mvt_query(
-    config: Dict[str, Any],
-    tile_bounds: Dict[str, float],
+    config: dict[str, Any],
+    tile_bounds: dict[str, float],
     z: int,
-    filters: Optional[Dict[str, Any]] = None,
+    filters: dict[str, Any] | None = None,
 ) -> tuple[str, dict]:
     """
     Build a complete ST_AsMVT query for a single layer.
@@ -327,10 +329,10 @@ def _build_mvt_query(
 
 
 def _build_mvt_subquery(
-    config: Dict[str, Any],
-    tile_bounds: Dict[str, float],
+    config: dict[str, Any],
+    tile_bounds: dict[str, float],
     z: int,
-    filters: Optional[Dict[str, Any]] = None,
+    filters: dict[str, Any] | None = None,
     layer_name: str = "layer",
 ) -> tuple[str, dict]:
     """

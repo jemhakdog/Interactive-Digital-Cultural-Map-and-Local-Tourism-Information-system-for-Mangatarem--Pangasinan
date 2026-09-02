@@ -1,10 +1,12 @@
 import os
 import re
+
 from docx import Document
-from docx.shared import Pt, RGBColor, Inches
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
 from docx.oxml import OxmlElement, parse_xml
 from docx.oxml.ns import nsdecls, qn
+from docx.shared import Inches, Pt, RGBColor
+
 
 def create_element(name):
     return OxmlElement(name)
@@ -27,14 +29,14 @@ def set_cell_shading(cell, color_hex):
 def set_table_borders(table):
     tblPr = table._tbl.tblPr
     borders = parse_xml(
-        '<w:tblBorders %s>'
+        f'<w:tblBorders {nsdecls("w")}>'
         '<w:top w:val="single" w:sz="4" w:space="0" w:color="CCCCCC"/>'
         '<w:bottom w:val="single" w:sz="6" w:space="0" w:color="333333"/>'
         '<w:insideH w:val="single" w:sz="4" w:space="0" w:color="E0E0E0"/>'
         '<w:insideV w:val="none"/>'
         '<w:left w:val="none"/>'
         '<w:right w:val="none"/>'
-        '</w:tblBorders>' % nsdecls('w')
+        '</w:tblBorders>'
     )
     tblPr.append(borders)
 
@@ -184,7 +186,7 @@ def compile_manuscript():
                 heading_text = line[4:].strip()
                 doc.add_heading(heading_text, level=3)
             # Handle Bullet Lists
-            elif line.startswith('- ') or line.startswith('* '):
+            elif line.startswith(('- ', '* ')):
                 list_text = line[2:].strip()
                 p = doc.add_paragraph(style='List Bullet')
                 parse_runs(p, list_text)
@@ -201,7 +203,7 @@ def compile_manuscript():
                 while i < len(lines) and not lines[i].strip().startswith('```'):
                     i += 1
             # Skip image placeholders
-            elif line.startswith('<put the image') or line.startswith('[Insert') or line.startswith('*(Figure'):
+            elif line.startswith(('<put the image', '[Insert', '*(Figure')):
                 p = doc.add_paragraph(style='Normal')
                 p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
                 parse_runs(p, line)

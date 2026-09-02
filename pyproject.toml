@@ -5,21 +5,48 @@ description = "Interactive Digital Cultural Map and Local Tourism Information Sy
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "flask",  # still used by utils/file_helpers.py (current_app/url_for)
+    # --- HTTP / app framework (FastAPI; Flask migrated away) ---
+    "fastapi",
+    "uvicorn[standard]",
+    # --- Database / ORM / migrations ---
+    "sqlalchemy[asyncio]",
+    "aiosqlite",
+    "psycopg2-binary",
+    "alembic",
+    # --- Validation / settings ---
+    "pydantic",
+    "pydantic-settings",
+    "email-validator",
+    "python-multipart",
+    # --- Auth / security ---
+    "passlib[bcrypt]",
+    "python-jose[cryptography]",
+    "google-auth",
+    "werkzeug",
+    # --- Rate limiting / background / mail / templating ---
+    "slowapi",
+    "aiosmtplib",
+    "jinja2",
     "python-dotenv",
     "bleach",
-    "psycopg2-binary",
-    "google-auth",
-    "email-validator",
-    "werkzeug",
     "requests",
     "httpx",
     "beautifulsoup4>=4.14.3",
+    # --- Legacy: flask still imported by utils/file_helpers.py (current_app/url_for) ---
+    "flask",
 ]
 
 [tool.uv]
 managed = true
 package = false
+
+[dependency-groups]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "httpx",
+    "ruff",
+]
 
 [tool.ruff]
 # Exclude a variety of common directories
@@ -52,3 +79,6 @@ ignore = [
     "E712", # Allow == False equality checks (needed for SQLAlchmey filter_by)
     "E741", # Allow short/ambiguous variables like l
 ]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"

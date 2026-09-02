@@ -5,11 +5,13 @@ Centralizes allowed-extension checks and file-save logic that was
 previously duplicated across admin.py and barangay.py.
 """
 
-import os
 import logging
+import os
 from typing import Optional
+
 from flask import current_app, url_for
 from werkzeug.utils import secure_filename
+
 from utils.security import sanitize_filename
 
 logger = logging.getLogger(__name__)
@@ -18,7 +20,7 @@ ALLOWED_EXTENSIONS_DEFAULT = {"png", "jpg", "jpeg", "gif", "mp4"}
 VIDEO_EXTENSIONS = {"mp4", "avi", "mov", "wmv"}
 
 
-def allowed_file(filename: str, allowed_extensions: Optional[set] = None) -> bool:
+def allowed_file(filename: str, allowed_extensions: set | None = None) -> bool:
     """Check if a filename has an allowed extension.
 
     Args:
@@ -37,9 +39,9 @@ def allowed_file(filename: str, allowed_extensions: Optional[set] = None) -> boo
 
 def save_uploaded_file(
     file,
-    upload_folder: Optional[str] = None,
-    allowed_extensions: Optional[set] = None
-) -> Optional[str]:
+    upload_folder: str | None = None,
+    allowed_extensions: set | None = None
+) -> str | None:
     """Save an uploaded file and return its static URL.
 
     Performs double sanitization on filename for security:

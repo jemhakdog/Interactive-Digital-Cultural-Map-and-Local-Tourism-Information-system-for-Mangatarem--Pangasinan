@@ -5,12 +5,12 @@ Migrated from modules/booking/routes.py (Flask) to FastAPI.
 from __future__ import annotations
 
 import math
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -20,11 +20,11 @@ from backend.app.core.dependencies import (
     get_current_user,
     require_roles,
 )
-from backend.app.models.booking import BookableAsset, BookingSlot, Reservation
+from backend.app.models.analytics import VisitorLog
 from backend.app.models.attractions import Attraction
+from backend.app.models.booking import BookableAsset, BookingSlot, Reservation
 from backend.app.models.business import Establishment
 from backend.app.models.user import User
-from backend.app.models.analytics import VisitorLog
 from backend.app.schemas.booking import (
     AvailabilityResponse,
     ReserveRequest,
@@ -62,7 +62,7 @@ async def get_availability(
         raise HTTPException(status_code=400, detail="Asset is not available for booking")
 
     try:
-        query_date = datetime.strptime(date, "%Y-%m-%d").date()
+        query_date = datetime.strptime(f"{date}T00:00:00+00:00", "%Y-%m-%dT%H:%M:%S%z").date()
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid date format (YYYY-MM-DD)")
 
@@ -94,7 +94,7 @@ async def reserve_slot(
     user: Annotated[User, Depends(get_current_user)],
 ):
     try:
-        reserve_date = datetime.strptime(body.date, "%Y-%m-%d").date()
+        reserve_date = datetime.strptime(f"{body.date}T00:00:00+00:00", "%Y-%m-%dT%H:%M:%S%z").date()
     except ValueError:
         raise HTTPException(status_code=400, detail="Invalid date format")
 
@@ -220,7 +220,7 @@ async def verify_arrival(
     db: Annotated[AsyncSession, Depends(get_db)],
     user: Annotated[User, Depends(get_current_user)],
 ):
-    today = datetime.utcnow().date()
+    today = datetime.now(UTC).date()  # matches VisitorLog.visit_date default (date.today, local timezone)
     booking_attended = False
     navigated_arrived = False
     place_name = ""

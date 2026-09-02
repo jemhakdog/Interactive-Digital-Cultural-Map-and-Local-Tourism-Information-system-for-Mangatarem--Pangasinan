@@ -5,13 +5,13 @@ Uses EmailConfig dataclass to avoid excessive parameters.
 Separates message building from SMTP transmission.
 """
 
-import smtplib
 import logging
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
-from dataclasses import dataclass
-from typing import Optional
 import os
+import smtplib
+from dataclasses import dataclass
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +58,7 @@ def _build_email_message(
     subject: str,
     recipient: str,
     body: str,
-    html_body: Optional[str],
+    html_body: str | None,
     sender_email: str
 ) -> MIMEMultipart:
     """
@@ -115,7 +115,7 @@ def _send_via_smtp(msg: MIMEMultipart, config: EmailConfig) -> bool:
         logger.info(f"Email sent successfully to {msg['To']}")
         return True
     except Exception as e:
-        logger.error(f"Failed to send email to {msg['To']}. Error details: {e}", exc_info=True)
+        logger.exception(f"Failed to send email to {msg['To']}")
         return False
 
 
@@ -123,8 +123,8 @@ def send_email(
     subject: str,
     recipient: str, 
     body: str,
-    html_body: Optional[str] = None,
-    config: Optional[EmailConfig] = None
+    html_body: str | None = None,
+    config: EmailConfig | None = None
 ) -> bool:
     """
     Send email using SMTP (clean API with 5 parameters).

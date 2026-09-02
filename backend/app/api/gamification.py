@@ -16,7 +16,11 @@ from backend.app.core.database import get_db
 from backend.app.core.dependencies import get_current_user
 from backend.app.models.attractions import Attraction
 from backend.app.models.business import Establishment
-from backend.app.models.gamification import AchievementBadge, TouristCheckIn, UserPassport
+from backend.app.models.gamification import (
+    AchievementBadge,
+    TouristCheckIn,
+    UserPassport,
+)
 from backend.app.models.user import User
 from backend.app.schemas.gamification import (
     CheckinBadgeResponse,
@@ -40,7 +44,8 @@ def _haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 # ───────────────────────────────────────────────────────────────
 # Navigation lock (Redis-backed session store)
 # ───────────────────────────────────────────────────────────────
-from datetime import timezone
+from datetime import UTC, timezone
+
 from backend.app.core.redis import redis_client
 
 NAV_SESSION_TTL = 86400  # 24 hours
@@ -56,7 +61,7 @@ async def start_navigation(
     session_data = {
         "route_id": body.id,
         "route_type": body.type,
-        "started_at": datetime.now(timezone.utc).isoformat(),
+        "started_at": datetime.now(UTC).isoformat(),
     }
     await redis_client.set_json(f"nav:{user.id}", session_data, ttl=NAV_SESSION_TTL)
     return {"success": True, "message": "Active navigation route locked"}

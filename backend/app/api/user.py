@@ -10,6 +10,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from sqlalchemy import func, select
+from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.core.database import get_db
@@ -152,7 +153,7 @@ async def get_stats(
                 .where(UserPassport.user_id == current_user.id)
             )
         ).scalar() or 0
-    except Exception:
+    except (SQLAlchemyError, AttributeError):
         # Relations may be absent in some environments — degrade gracefully.
         pass
 
@@ -288,7 +289,7 @@ async def list_visits(
             .order_by(TouristCheckIn.verified_at.desc())
         )
         checkins = result.scalars().all()
-    except Exception:
+    except (SQLAlchemyError, AttributeError):
         return []
 
     out: list[VisitResponse] = []

@@ -1,5 +1,6 @@
-import xml.etree.ElementTree as ET
 import os
+import xml.etree.ElementTree as ET
+
 
 def create_dfd_v5():
     print("Initializing Draw.io Level-1 Hub-and-Spoke DFD V5 generator...")
@@ -300,7 +301,7 @@ def create_dfd_v5():
 
     for i, (src, dest, lbl, *geom) in enumerate(flows):
         geom_style = geom[0] if geom else ""
-        edge_style = f"edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontSize=11;labelBackgroundColor=#F5F9F5;endArrow=classic;"
+        edge_style = "edgeStyle=orthogonalEdgeStyle;rounded=1;strokeColor=#000000;strokeWidth=2;fontColor=#000000;fontSize=11;labelBackgroundColor=#F5F9F5;endArrow=classic;"
         
         flow_cell = ET.SubElement(root, 'mxCell', attrib={
             'id': f"flow_{3000 + i}",

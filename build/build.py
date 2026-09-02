@@ -1,9 +1,9 @@
 import os
-import sys
 import platform
 import stat
-import urllib.request
 import subprocess
+import sys
+import urllib.request
 
 # Add project root to path so paths resolve correctly from build/
 PROJECT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -76,7 +76,7 @@ def build_tailwind():
     try:
         if "--watch" in sys.argv:
              # Run asynchronously without capturing output allowing streaming
-             subprocess.run(cmd)
+             subprocess.run(cmd, check=True)
         else:
              subprocess.run(cmd, check=True)
         print("Tailwind build finished successfully.")

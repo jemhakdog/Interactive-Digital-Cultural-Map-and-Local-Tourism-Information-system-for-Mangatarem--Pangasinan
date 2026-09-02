@@ -40,7 +40,7 @@ class RedisClient:
             # Test connection
             await self._redis.ping()
             logger.info(f"Connected to Redis: {self.redis_url}")
-        except Exception as e:
+        except (aioredis.RedisError, OSError, ValueError) as e:
             logger.warning(f"Redis connection failed: {e}, using in-memory fallback")
             self._redis = None
     
@@ -53,7 +53,7 @@ class RedisClient:
         """Add prefix to key."""
         return f"{self.prefix}{key}"
     
-    async def get(self, key: str) -> Optional[str]:
+    async def get(self, key: str) -> str | None:
         """Get value by key."""
         if self._redis:
             return await self._redis.get(self._key(key))

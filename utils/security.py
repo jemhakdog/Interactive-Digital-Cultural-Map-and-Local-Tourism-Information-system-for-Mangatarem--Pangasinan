@@ -11,9 +11,9 @@ Provides functions for:
 """
 
 import re
-from typing import Optional, Any
-from markupsafe import escape
+from typing import Any, Optional
 
+from markupsafe import escape
 
 # Try to import bleach, fallback if not available
 try:
@@ -30,7 +30,7 @@ ALLOWED_ATTRIBUTES = {
 }
 
 
-def sanitize_html_input(raw_text: str, allowed_tags: Optional[list] = None) -> str:
+def sanitize_html_input(raw_text: str, allowed_tags: list | None = None) -> str:
     """
     Strip potentially malicious HTML from user input.
     
@@ -283,7 +283,7 @@ def detect_sql_injection_attempt(input_str: str) -> bool:
 
 
 def validate_string_input(value: str, min_length: int = 0, max_length: int = 500,
-                          allowed_pattern: Optional[str] = None,
+                          allowed_pattern: str | None = None,
                           block_sql_injection: bool = True) -> tuple[bool, str]:
     """
     Validate string input with comprehensive checks.
@@ -319,8 +319,8 @@ def validate_string_input(value: str, min_length: int = 0, max_length: int = 500
     return True, ""
 
 
-def validate_integer(value: Any, min_value: Optional[int] = None,
-                    max_value: Optional[int] = None) -> tuple[bool, int, str]:
+def validate_integer(value: Any, min_value: int | None = None,
+                    max_value: int | None = None) -> tuple[bool, int, str]:
     """
     Validate and safely convert integer input.
 
@@ -346,8 +346,8 @@ def validate_integer(value: Any, min_value: Optional[int] = None,
     return True, int_value, ""
 
 
-def validate_float(value: Any, min_value: Optional[float] = None,
-                  max_value: Optional[float] = None) -> tuple[bool, float, str]:
+def validate_float(value: Any, min_value: float | None = None,
+                  max_value: float | None = None) -> tuple[bool, float, str]:
     """
     Validate and safely convert float input.
 
@@ -392,14 +392,13 @@ def validate_boolean(value: Any) -> tuple[bool, bool]:
         elif value.lower() in ['false', '0', 'no', 'off']:
             return True, False
 
-    if isinstance(value, (int, float)):
-        if value in [0, 1]:
-            return True, bool(value)
+    if isinstance(value, (int, float)) and value in [0, 1]:
+        return True, bool(value)
 
     return False, False
 
 
-def sanitize_for_display(value: str, max_length: Optional[int] = None) -> str:
+def sanitize_for_display(value: str, max_length: int | None = None) -> str:
     """
     Sanitize string for safe display in UI (escape all HTML).
 

@@ -61,7 +61,7 @@ async def mark_all_read(
     result = await db.execute(
         select(UserNotification).where(
             UserNotification.user_id == user.id,
-            UserNotification.is_read == False,  # noqa: E712
+            UserNotification.is_read == False,
         )
     )
     notifications = result.scalars().all()
@@ -125,7 +125,7 @@ async def unread_count(
     result = await db.execute(
         select(func.count(UserNotification.id)).where(
             UserNotification.user_id == user.id,
-            UserNotification.is_read == False,  # noqa: E712
+            UserNotification.is_read == False,
         )
     )
     count = result.scalar() or 0

@@ -6,7 +6,6 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-
 # ---------- Request schemas ----------
 
 class AttractionCreate(BaseModel):
@@ -117,7 +116,7 @@ class ReviewResponse(BaseModel):
     parent_id: int | None = None
     created_at: datetime | None = None
     photos: list[dict] = []
-    replies: list[ReviewResponse] = []  # noqa: F821 — forward ref resolved below
+    replies: list[ReviewResponse] = []
 
     model_config = {"from_attributes": True}
 

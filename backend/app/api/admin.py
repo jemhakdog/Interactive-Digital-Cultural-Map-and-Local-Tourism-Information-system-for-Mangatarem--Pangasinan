@@ -315,7 +315,7 @@ async def list_pending_users(
     """Return users awaiting approval (is_approved=False)."""
     result = await db.execute(
         select(User)
-        .where(User.is_approved == False)  # noqa: E712
+        .where(User.is_approved == False)
         .order_by(User.created_at.desc())
     )
     users = result.scalars().all()
@@ -399,9 +399,8 @@ async def create_announcement(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> dict:
     """Create an announcement, published immediately (admin only)."""
-    if body.barangay_id is not None:
-        if await db.get(BarangayInfo, body.barangay_id) is None:
-            raise HTTPException(status_code=404, detail="Barangay not found")
+    if body.barangay_id is not None and await db.get(BarangayInfo, body.barangay_id) is None:
+        raise HTTPException(status_code=404, detail="Barangay not found")
     a = Announcement(
         title=body.title,
         content=body.content,

@@ -3,9 +3,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from collections.abc import Iterable
 from email.message import EmailMessage
 from pathlib import Path
-from typing import Iterable
 
 import aiosmtplib
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -61,14 +61,14 @@ async def _send_with_smtp(
             if not settings.smtp_use_tls or settings.smtp_port == 587:
                 try:
                     await smtp.starttls()
-                except Exception:
+                except aiosmtplib.SMTPException:
                     pass  # Some servers may not support STARTTLS
             if settings.smtp_user and settings.smtp_password:
                 await smtp.login(settings.smtp_user, settings.smtp_password)
             await smtp.send_message(message)
             await smtp.quit()
             return
-        except Exception as exc:
+        except aiosmtplib.SMTPException as exc:
             last_exception = exc
             logger.warning("SMTP attempt %s failed: %s", attempt, exc)
             if attempt < 3:
@@ -104,7 +104,7 @@ async def send_email(
     try:
         await _send_with_smtp(settings, message)
         logger.info("Email sent successfully to %s (subject: %s)", to, subject)
-    except Exception as exc:
+    except aiosmtplib.SMTPException as exc:
         logger.error("Failed to send email to %s: %s", to, exc)
         raise
 
@@ -138,7 +138,7 @@ async def send_bulk_email(
             await _send_with_smtp(settings, message)
             sent += 1
             logger.info("Bulk email sent to %s", recipient)
-        except Exception as exc:
+        except aiosmtplib.SMTPException as exc:
             logger.error("Bulk email failed for %s: %s", recipient, exc)
             failures.append(recipient)
 

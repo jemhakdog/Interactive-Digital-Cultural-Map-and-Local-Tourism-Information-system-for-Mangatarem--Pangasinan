@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 
+
 def create_cell(parent, id, value, x, y, width, height, style):
     cell = ET.SubElement(parent, 'mxCell', id=str(id), value=value, style=style, vertex="1", parent="1")
     geo = ET.SubElement(cell, 'mxGeometry', x=str(x), y=str(y), width=str(width), height=str(height))

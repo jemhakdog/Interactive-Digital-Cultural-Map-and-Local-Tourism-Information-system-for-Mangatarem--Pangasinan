@@ -2,12 +2,12 @@
 from __future__ import annotations
 
 import secrets
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta, timezone
 
+from passlib.context import CryptContext
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from werkzeug.security import check_password_hash, generate_password_hash
-from passlib.context import CryptContext
 
 from backend.app.models.base import Base
 
@@ -72,7 +72,7 @@ class User(Base):
     # --- Password-reset helpers (ported from Flask shim) ---
     def create_reset_token(self, expiry_minutes: int = 30) -> str:
         self.reset_token = secrets.token_hex(32)
-        self.reset_token_expires_at = datetime.utcnow() + timedelta(minutes=expiry_minutes)
+        self.reset_token_expires_at = datetime.now(UTC).replace(tzinfo=None) + timedelta(minutes=expiry_minutes)
         self.reset_token_used = False
         return self.reset_token
 
@@ -82,5 +82,5 @@ class User(Base):
             return False
         expires = self.reset_token_expires_at
         if expires.tzinfo is not None:
-            expires = expires.astimezone(timezone.utc).replace(tzinfo=None)
-        return not self.reset_token_used and datetime.utcnow() < expires
+            expires = expires.astimezone(UTC).replace(tzinfo=None)
+        return not self.reset_token_used and datetime.now(UTC).replace(tzinfo=None) < expires

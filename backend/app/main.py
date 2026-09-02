@@ -63,25 +63,29 @@ async def root():
 
 
 # --- Register routers ---
-from backend.app.api.auth import router as auth_router  # noqa: E402
-from backend.app.api.public import router as public_router  # noqa: E402
-from backend.app.api.attractions import router as attractions_router  # noqa: E402
-from backend.app.api.events import router as events_router  # noqa: E402
-from backend.app.api.business import router as business_router  # noqa: E402
-from backend.app.api.booking import router as booking_router  # noqa: E402
-from backend.app.api.chat import router as chat_router  # noqa: E402
-from backend.app.api.gallery import router as gallery_router  # noqa: E402
-from backend.app.api.heritage import router as heritage_router  # noqa: E402
-from backend.app.api.gamification import router as gamification_router  # noqa: E402
-from backend.app.api.notifications import router as notifications_router  # noqa: E402
-from backend.app.api.analytics import router as analytics_router  # noqa: E402
-from backend.app.api.uploads import router as uploads_router  # noqa: E402
-from backend.app.api.admin import router as admin_router  # noqa: E402
-from backend.app.api.contributor import router as contributor_router  # noqa: E402
-from backend.app.api.user import router as user_router  # noqa: E402
-from backend.app.api.admin_documents import router as admin_documents_router  # noqa: E402
-from backend.app.api.admin_newsletter import router as admin_newsletter_router  # noqa: E402
-from backend.app.api.admin_visitors import router as admin_visitors_router  # noqa: E402
+from backend.app.api.admin import router as admin_router
+from backend.app.api.admin_documents import (
+    router as admin_documents_router,
+)
+from backend.app.api.admin_newsletter import (
+    router as admin_newsletter_router,
+)
+from backend.app.api.admin_visitors import router as admin_visitors_router
+from backend.app.api.analytics import router as analytics_router
+from backend.app.api.attractions import router as attractions_router
+from backend.app.api.auth import router as auth_router
+from backend.app.api.booking import router as booking_router
+from backend.app.api.business import router as business_router
+from backend.app.api.chat import router as chat_router
+from backend.app.api.contributor import router as contributor_router
+from backend.app.api.events import router as events_router
+from backend.app.api.gallery import router as gallery_router
+from backend.app.api.gamification import router as gamification_router
+from backend.app.api.heritage import router as heritage_router
+from backend.app.api.notifications import router as notifications_router
+from backend.app.api.public import router as public_router
+from backend.app.api.uploads import router as uploads_router
+from backend.app.api.user import router as user_router
 
 app.include_router(auth_router, prefix="/api/auth", tags=["auth"])
 app.include_router(public_router, prefix="/api", tags=["public"])
@@ -104,8 +108,9 @@ app.include_router(admin_newsletter_router, prefix="/api/newsletter", tags=["new
 app.include_router(admin_visitors_router, prefix="/api", tags=["visitors"])
 
 # Serve uploaded files and static assets in development
-from fastapi.staticfiles import StaticFiles
 from pathlib import Path
+
+from fastapi.staticfiles import StaticFiles
 
 _uploads_dir = Path(__file__).resolve().parent.parent / "uploads"
 _uploads_dir.mkdir(parents=True, exist_ok=True)

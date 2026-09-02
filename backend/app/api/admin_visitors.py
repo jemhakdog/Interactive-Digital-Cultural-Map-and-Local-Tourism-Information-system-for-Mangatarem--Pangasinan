@@ -5,7 +5,7 @@ Data source: VisitorLog model (no dedicated Visit model needed).
 """
 from __future__ import annotations
 
-from datetime import date, datetime, timedelta
+from datetime import UTC, date, datetime, timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
@@ -20,8 +20,8 @@ from backend.app.models.attractions import Attraction
 from backend.app.models.business import Establishment
 from backend.app.models.user import User
 from backend.app.schemas.visitor import (
-    VisitResponse,
     VisitorRegistryResponse,
+    VisitResponse,
 )
 
 router = APIRouter()
@@ -161,7 +161,7 @@ async def visits_stats(
     total = int((await db.execute(total_stmt)).scalar() or 0)
 
     # Current-month total (independent of the requested period; DB-agnostic)
-    today = date.today()
+    today = datetime.now(UTC).date()
     if today.month == 12:
         month_end = date(today.year, 12, 31)
     else:

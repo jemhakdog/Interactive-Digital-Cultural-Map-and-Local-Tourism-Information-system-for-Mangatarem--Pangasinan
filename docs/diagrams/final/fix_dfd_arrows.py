@@ -52,5 +52,5 @@ try:
     else:
         print("No edges needed updating or already updated.")
 
-except Exception as e:
+except ET.ParseError as e:
     print(f"Error parsing XML: {e}")

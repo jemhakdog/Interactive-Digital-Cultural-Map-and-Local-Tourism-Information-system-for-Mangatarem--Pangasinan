@@ -6,7 +6,6 @@ from typing import Any
 
 from pydantic import BaseModel, Field
 
-
 # ---------- Request schemas ----------
 
 class EventCreate(BaseModel):
@@ -60,7 +59,7 @@ class EventResponse(BaseModel):
 class EventListResponse(BaseModel):
     """Paginated list of events."""
     events: list[EventResponse]
-    pagination: "PaginationMeta"
+    pagination: PaginationMeta
 
 
 class PaginationMeta(BaseModel):

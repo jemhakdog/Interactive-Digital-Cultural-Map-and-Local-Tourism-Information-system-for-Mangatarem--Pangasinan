@@ -8,9 +8,8 @@ Adds the `verified` boolean column to ESTABLISHMENT so the business
 verification flow (/api/business/verification, /api/admin/merchants/{id}/verify)
 can persist approval state. Idempotent: skips if the column already exists.
 """
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 revision = "f47ac10b9c3d"
 down_revision = None
