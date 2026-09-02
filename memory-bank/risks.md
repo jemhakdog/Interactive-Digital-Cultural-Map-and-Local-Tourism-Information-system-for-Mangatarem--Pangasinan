@@ -7,19 +7,21 @@
 
 ## Security-sensitive areas
 
-- `.env` and provider API keys.
-- MCP server configurations that may expose external systems.
-- OAuth credentials and local tokens.
-- Public repository copies should not include real secrets, local credential files, or unintended `.git/` history/remotes.
+- `.env` and provider API keys — **a real Supabase DB password was shared in chat this session; advise the user to rotate it** (Supabase → Settings → Database → Reset password). Vercel env vars are encrypted at rest, but the chat copy is public to the conversation.
+- Google OAuth client `794547070676-80dbt1j3a724hacci5684s7b7v93j1fh` — client ID is public by design; the allowlist currently has localhost + stale `gomangatarem.vercel.app` origins.
+- Vercel env `SECRET_KEY` (production) — set; do not commit to repo.
+- Public GitHub repo — `.env` must remain gitignored (it is); do not commit `.vercel/` (now gitignored). Anyway, secrets in chat should be rotated.
+- MCP server configs & provider tokens.
 
-## Performance-sensitive areas
+## Performance / reliability (deployment)
 
-TBD per copied project.
+- **Serverless cold starts + Postgres connections**: Supabase transaction pooler :6543 mitigates pool exhaustion; keep using 6543, not 5432.
+- **Ephemeral uploads** on Vercel: uploaded images disappear after instance recycle. Accepted for capstone demo; production needs object storage (Supabase Storage/Cloudflare R2/S3). See `docs/VERCEL_ARCH_DECISION.md`.
+- **`init_db()` runs only in development**: production tables are NOT auto-created; a one-time seed/migration is required before first real login. No Alembic yet.
+- **Google OAuth origin allowlist** is the active blocker (public short frontend URL missing from Google Console origins).
+- Frontend `NEXT_PUBLIC_API_URL` not persisted as project env (only `--build-env` at deploy); a future bare push deploy would bake `http://localhost:8000`. Add it as a project env var.
 
 ## Migration risks
 
-When copying into an existing project, avoid overwriting existing project-specific instructions without review.
-
-## External dependencies
-
-None required for the base template. MCP examples may require external packages or credentials only if enabled by the user.
+- The 2026-09-01 Flask→FastAPI migration: completed (86→13 tests ported). No known active migration risk for the deployed stack.
+- Any future schema change needs a real migration path (Alembic) rather than `create_all()`.

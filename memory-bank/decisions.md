@@ -2,6 +2,22 @@
 
 Record important project decisions here.
 
+### 2026-09-02 — Two Vercel projects (frontend + backend), Supabase Postgres, asyncpg
+
+Status: Accepted
+
+Context: Deploy to Vercel needed for the capstone. SQLite is impossible (serverless read-only ephemeral FS), one Vercel project serves one framework, and the frontend project's Google OAuth needs a public origin.
+
+Decision:
+1. **Two Vercel projects** from the same repo: frontend (root `frontend`, Next.js) + backend (root `/`, Python ASGI via `api/index.py`). Required by Vercel's one-framework-per-project model.
+2. **Supabase Postgres** in prod via `DATABASE_URL`; **asyncpg** driver; `postgresql://` → `postgresql+asyncpg://` rewrite in `config.async_database_url`.
+3. **Transaction pooler port 6543** (not 5432 session pooler) — 5432 caused `max clients reached (pool_size: 15)` on serverless cold starts.
+4. **CORS_ORIGINS as JSON array** env var (pydantic list field).
+5. Frontend URL canonicalized: `https://mangatarem-tourism-frontend.vercel.app` is the **public** alias; the `-jemhakdogs-projects` alias is SSO-protected. Use the short URL everywhere.
+6. `main` branch now tracks the FastAPI+Next stack (Vercel deploys from `main`).
+
+Consequences: Both apps live; Google OAuth origin allowlist is the remaining prod blocker. Uploads remain ephemeral (documented), tables not auto-created (need one-time seed).
+
 ### 2026-05-30 — Single Consolidated Hub-and-Spoke DFD Layout (V5)
 
 Status: Accepted
