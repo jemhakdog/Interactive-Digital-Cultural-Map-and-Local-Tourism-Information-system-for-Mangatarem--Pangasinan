@@ -13,6 +13,7 @@
     "test:ui": "cd frontend && npx playwright test --ui"
   },
   "devDependencies": {
-    "concurrently": "^9.0.0"
+    "concurrently": "^9.0.0",
+    "supabase": "^2.116.0"
   }
 }
