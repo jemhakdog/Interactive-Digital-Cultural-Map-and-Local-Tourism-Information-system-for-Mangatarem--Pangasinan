@@ -53,49 +53,45 @@ The application is built using a **Modular Monolith** structure, separating doma
 
 ## Technology Stack
 
-- **Backend**: Flask (Python 3.11+) with SQLAlchemy ORM.
-- **Real-Time**: Flask-SocketIO (WebSockets powered by Eventlet).
-- **Caching**: Redis support for session caching and rate-limiting.
-- **Storage/Auth Support**: Supabase integration for media assets and external authentication options.
-- **Frontend**: HTML5, Vanilla CSS, Tailwind CSS v4, JavaScript.
-- **Database**: SQLite (default for development/testing), PostgreSQL support for production deployments.
-- **Package Manager**: Astral `uv` for environment virtualenv management and rapid dependency installation.
+- **Backend**: FastAPI (Python 3.11+) with async SQLAlchemy ORM, served by uvicorn.
+- **API**: REST under `/api/*` (19 routers), auto docs at `/docs`.
+- **Frontend**: Next.js (React 19) + Tailwind CSS v4 + MapLibre GL for the interactive map.
+- **Database**: SQLite (default for development/testing, stored in `instance/mangatarem.db`).
+- **Package Manager**: Astral `uv` for environment management and dependency installation.
 
 ---
 
 ## How to Run the System
 
-Follow these steps to set up and run the system locally:
-
 1. **Install uv:**
-   Open PowerShell and run the following command to install the `uv` package manager:
    ```powershell
    powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
    ```
-   Once done, proceed to the next step.
 
 2. **Get the code (Clone or Download):**
-   - **Option A: Clone the repository (Recommended)**
-     ```bash
-     git clone https://github.com/jemhakdog/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan.git
-     cd Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan
-     ```
-   - **Option B: Download the ZIP**
-     Alternatively, you can download the source code as a ZIP archive:
-     [Download Source Code (ZIP)](https://github.com/jemhakdog/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan/archive/refs/tags/v0.5.0.zip) and extract it to your preferred directory.
+   ```bash
+   git clone https://github.com/jemhakdog/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan.git
+   cd Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan
+   ```
 
 3. **Install dependencies:**
-   Open a **new** command prompt (`cmd`), navigate to the project folder, and run:
-   ```cmd
+   ```bash
    uv sync
+   cd frontend && npm install && cd ..
    ```
 
-4. **Run the system:**
-   Start the application by running:
+4. **Run the system (backend + frontend):**
    ```bash
-   uv run app.py
+   npm run dev
    ```
-   The Flask application will start on `http://127.0.0.1:5002` (configurable via `app.py`).
+   - Backend (FastAPI): `http://127.0.0.1:8000` — API docs at `http://127.0.0.1:8000/docs`
+   - Frontend (Next.js): `http://127.0.0.1:3000`
+
+   Or run separately:
+   ```bash
+   npm run dev:backend   # uvicorn backend.app.main:app --port 8000
+   npm run dev:frontend  # Next.js dev server
+   ```
 
 ---
 
@@ -104,35 +100,24 @@ Follow these steps to set up and run the system locally:
 Create a `.env` file in the root directory and configure the environment variables as needed:
 
 ```ini
-FLASK_ENV=development
 SECRET_KEY=your-secure-secret-key
-DATABASE_URL=sqlite:///mangatarem_map.db
-# (Optional) REDIS_URL for Redis Caching
-# (Optional) SUPABASE_URL & SUPABASE_KEY for Media Storage/Auth
+# Optional overrides (defaults shown):
+# DATABASE_URL=sqlite:///instance/mangatarem.db
+# CORS_ORIGINS=["http://localhost:3000","http://127.0.0.1:3000"]
 ```
 
 ---
 
-## Database Seed Data
+## Database
 
-The system comes equipped with automatic database seeding. During local execution, the application initializes and seeds default information, which includes:
-- Municipal barangays of Mangatarem.
-- Pre-configured tourist attractions and heritage sites.
-- Sample local business listings.
-- Standard gamification badges.
-
-You can manually trigger database resets or seeding using utility scripts in the project:
-```bash
-uv run reset_db.py
-uv run seed_new_data.py
-```
+Tables are created automatically on startup (`create_all`) in development. The schema lives in `backend/app/models/`.
 
 ---
 
 ## Security Features
 
-- **XSS Protection**: Secure HTML output escaping using Bleach filters.
-- **CSRF Protection**: Flask-WTF CSRF protection enabled globally.
-- **SQL Injection Prevention**: Safe SQLAlchemy parameter bind syntax.
-- **Session Security**: HttpOnly and SameSite cookie policies enforced.
-- **Rate Limiting**: Flask-Limiter configured for auth routes to prevent brute-force attacks.
+- **Authentication**: JWT (python-jose) access tokens + Google OAuth sign-in.
+- **Password Storage**: Werkzeug password hashing (bcrypt via passlib for legacy hashes).
+- **Input Validation**: Pydantic schemas validate all request bodies at the API boundary.
+- **File Uploads**: Extension + size whitelist on upload endpoints (`/api/uploads`).
+- **SQL Injection Prevention**: SQLAlchemy ORM parameterized queries.
