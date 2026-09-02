@@ -2,6 +2,7 @@
 
 import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
+import { API_BASE } from "@/lib/api";
 import { Upload, X, ImageIcon } from "lucide-react";
 
 interface ImageUploadProps {
@@ -33,7 +34,7 @@ export function ImageUpload({ onUpload, multiple = false, accept = "image/*" }: 
         formData.append("file", file);
 
         try {
-          const res = await fetch("http://localhost:8000/api/uploads/single", {
+          const res = await fetch(`${API_BASE}/api/uploads/single`, {
             method: "POST",
             body: formData,
           });
