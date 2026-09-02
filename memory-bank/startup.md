@@ -4,13 +4,13 @@ Project: mangatarem-cultural-map (Mangatarem Interactive Digital Cultural Map & 
 
 Goal: Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan.
 
-Last updated: 2026-09-02
+Last updated: 2026-09-02 (pm)
 
-Current focus: **Deployment done** — FastAPI backend + Next.js frontend both live on Vercel with Supabase Postgres. Google OAuth origin fix is the only outstanding item (user adding short Vercel frontend domain to Google Cloud Console allowlist).
+Current focus: **Deployment done and verified** — FastAPI backend + Next.js frontend live on Vercel with Supabase Postgres. Google OAuth login confirmed working; backend `/health` stable (5/5) after asyncpg statement-cache fix.
 
 If resuming work or switching models, read `memory-bank/handoff.md` next.
 
 Next:
-- Confirm Google OAuth `origin_mismatch` clears after user registers `https://mangatarem-tourism-frontend.vercel.app` in Google Cloud Console.
-- If first login hits "relation does not exist", run one-time table seed against Supabase (`init_db()` only runs in development env).
-- Keep unknown project-specific requirements as `TBD` until user provides them.
+- Consider persisting `NEXT_PUBLIC_API_URL` as a Vercel project env (currently build-time only).
+- If first real DB write errors, seed tables against Supabase (init_db is dev-only).
+- Optionally clean up old broken `flask`-framed Vercel project / rotate Supabase password.

@@ -3,7 +3,7 @@
 - Last touched: 2026-09-02
 - Last model: Pi Coding Agent (Claude)
 - Branch: main
-- Status: **Vercel deployment complete** — backend + frontend live, Google OAuth allowlist outstanding.
+- Status: **Vercel deployment complete and verified** — backend + frontend live, Google OAuth login working.
 
 ## Current state
 
@@ -36,11 +36,10 @@ The repo is fully migrated from Flask to **FastAPI (backend/) + Next.js (fronten
 8. **Old broken frontend project** (`interactive-digital-cultural-map-and-local-tourism-information-system-for-mangatarem-pangasinan`) still exists, configured `framework: "flask"`, builds Error. It can be deleted or ignored.
 9. **Gitignore**: added `.vercel`; restored user's `supabase` npm devDependency (was stashed during branch switch).
 
-## Outstanding (blocking login)
+## Resolved after initial deploy
 
-**Google OAuth `origin_mismatch`.** The deployed frontend uses client ID `794547070676-80dbt1j3a724hacci5684s7b7v93j1fh.apps.googleusercontent.com` (hardcoded fallback in `frontend/src/components/auth/google-auth-button.tsx`; also default in `backend/app/core/config.py`). User's Google OAuth allowlist has the **long** protected URL + localhost, but NOT the **short public URL**. Fix (user doing it): add `https://mangatarem-tourism-frontend.vercel.app` to that client's **Authorized JavaScript origins** (+ optional redirect URI `/auth/google-login`). Propagation ~1–5 min.
-
-After OAuth: first login may hit missing tables — `init_db()` only runs when `ENVIRONMENT=development` (`backend/app/main.py` lifespan). No Alembic. Need one-time seed/migration against Supabase if so.
+- ✅ **Google OAuth `origin_mismatch`** — URL nuance: the deployed app popup uses the **short public URL** `https://mangatarem-tourism-frontend.vercel.app`. User added it to the Google OAuth client's Authorized JavaScript origins → **login works now** (user confirmed).
+- ✅ **Intermittent backend 500** — Supabase pooler (pgbouncer transaction mode) rejects asyncpg prepared statements: `DuplicatePreparedStatementError` on fresh connections (`select pg_catalog.version()`). Fixed by `connect_args={"statement_cache_size": 0}` for Postgres URLs in `backend/app/core/database.py` (commit `bf6374e`). Verified live: `/health` 5/5 → 200.
 
 ## Known limitations (documented in `docs/VERCEL_DEPLOYMENT.md` + `docs/VERCEL_ARCH_DECISION.md`)
 
@@ -56,8 +55,8 @@ After OAuth: first login may hit missing tables — `init_db()` only runs when `
 
 ## git state
 
-- Branch: `main`. Last commit: `8f56e99` ("chore: gitignore .vercel; add supabase CLI dev dep").
-- Commits today: `69c77c5` (deploy support), `3a6b097` (asyncpg), `8f56e99` (chore).
+- Branch: `main`. Last commit: `bf6374e` ("fix: disable asyncpg statement cache for Supabase pooler").
+- Commits today: `69c77c5` (deploy support), `3a6b097` (asyncpg + config rewrite), `8f56e99` (chore: .vercel gitignore + supabase CLI dev dep), `87e6051` (memory bank update), `bf6374e` (statement cache fix).
 - Note: local uncommitted change may exist — the `feat/react-migration` branch has prior work committed; main was fast-forwarded. Verify with `git status` before continuing.
 
 ## Previous session (2026-08-23, pre-migration era — historical only)

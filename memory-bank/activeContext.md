@@ -1,8 +1,13 @@
 # Active Context
 
-## Current focus (2026-09-02)
+## Current focus (2026-09-02, pm)
 
-**Vercel deployment — backend + frontend both live.** The only outstanding item is the user registering the short public frontend domain `https://mangatarem-tourism-frontend.vercel.app` in Google Cloud Console to fix Google OAuth `origin_mismatch`. After that, verify first login (may need one-time DB table seed against Supabase).
+**Deployment is fully live and working.** Google OAuth login confirmed working by user. Backend `/health` 5/5 stable after fixing asyncpg prepared-statement error.
+
+Resolved this session:
+- ✅ Google OAuth `origin_mismatch` — user added short public frontend URL to Google Console allowlist; login works.
+- ✅ Intermittent `DuplicatePreparedStatementError` on Supabase pooler — fixed with `connect_args={"statement_cache_size": 0}` in `backend/app/core/database.py` (commit `bf6374e`). Verified 5/5 `/health` 200.
+
 
 ## Live state
 
@@ -31,10 +36,10 @@
 
 ## Next steps
 
-1. User adds short frontend URL to Google OAuth origins → confirm login works.
-2. If tables missing: one-time seed script against Supabase.
-3. Consider adding `NEXT_PUBLIC_API_URL` as persistent project env (currently only passed via `--build-env` at deploy time).
-4. Optionally deprecate old broken `flask`-framed frontend project.
+1. If tables missing on first login: one-time seed script against Supabase (login already works, so tables look fine).
+2. Consider adding `NEXT_PUBLIC_API_URL` as persistent project env (currently only passed via `--build-env` at deploy time) so future bare pushes don't fall back to `http://localhost:8000`.
+3. Optionally deprecate/delete old broken `flask`-framed frontend project.
+4. Rotate the Supabase DB password shared in chat (optional hygiene).
 
 ## Historical (pre-migration, 2026-07/08)
 

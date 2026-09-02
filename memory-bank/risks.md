@@ -18,7 +18,8 @@
 - **Serverless cold starts + Postgres connections**: Supabase transaction pooler :6543 mitigates pool exhaustion; keep using 6543, not 5432.
 - **Ephemeral uploads** on Vercel: uploaded images disappear after instance recycle. Accepted for capstone demo; production needs object storage (Supabase Storage/Cloudflare R2/S3). See `docs/VERCEL_ARCH_DECISION.md`.
 - **`init_db()` runs only in development**: production tables are NOT auto-created; a one-time seed/migration is required before first real login. No Alembic yet.
-- **Google OAuth origin allowlist** is the active blocker (public short frontend URL missing from Google Console origins).
+- **Google OAuth allowlist** — resolved (short public frontend URL added; login confirmed working). Keep the allowlist in mind if the frontend domain ever changes.
+- **Supabase pooler + asyncpg prepared statements** — fixed via `statement_cache_size=0`; if deploying to a different Postgres host, revisit.
 - Frontend `NEXT_PUBLIC_API_URL` not persisted as project env (only `--build-env` at deploy); a future bare push deploy would bake `http://localhost:8000`. Add it as a project env var.
 
 ## Migration risks

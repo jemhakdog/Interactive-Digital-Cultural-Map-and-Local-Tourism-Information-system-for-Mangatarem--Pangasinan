@@ -18,10 +18,14 @@ Deploy docs added: `docs/VERCEL_DEPLOYMENT.md`, `docs/VERCEL_ARCH_DECISION.md`, 
 
 ## Outstanding / known
 
-- Google OAuth `origin_mismatch` — pending user's Google Console allowlist of `https://mangatarem-tourism-frontend.vercel.app`.
-- `init_db()` only runs in development — production tables need one-time seed (no Alembic yet).
-- Uploads ephemeral on Vercel — documented; acceptable for demo.
-- Frontend `NEXT_PUBLIC_API_URL` currently passed only at build time via CLI; consider persisting as project env.
+- `init_db()` only runs in development — production tables need one-time seed (no Alembic yet). Login worked, so tables were created somehow (likely via an earlier /health cold-start run or user seed) — verify on first real write.
+- Uploads ephemeral on Vercel — documented.
+- Frontend `NEXT_PUBLIC_API_URL` currently passed only at build time via CLI; consider persisting.
+
+## 2026-09-02 — Post-deploy fixes (DONE)
+
+- ✅ Google OAuth `origin_mismatch` resolved — user added `https://mangatarem-tourism-frontend.vercel.app` to Google Console origins; login confirmed working.
+- ✅ Intermittent `DuplicatePreparedStatementError` — asyncpg statement cache disabled for Postgres (`connect_args={"statement_cache_size": 0}`) in `backend/app/core/database.py`; `/health` 5/5 stable.
 
 ---
 
