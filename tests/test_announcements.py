@@ -9,10 +9,10 @@ import asyncio
 
 from sqlalchemy import select
 
-from backend.app.models.user import User
-from backend.app.models.barangay import BarangayInfo
-from backend.app.models.announcements import Announcement
 from backend.app.core.database import async_session_factory
+from backend.app.models.announcements import Announcement
+from backend.app.models.barangay import BarangayInfo
+from backend.app.models.user import User
 
 
 def _run(coro):

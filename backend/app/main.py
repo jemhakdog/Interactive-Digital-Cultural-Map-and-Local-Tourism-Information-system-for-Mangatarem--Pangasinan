@@ -3,15 +3,11 @@ from __future__ import annotations
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from slowapi import _rate_limit_exceeded_handler
-from slowapi.errors import RateLimitExceeded
 
 from backend.app.core.config import get_settings
 from backend.app.core.database import init_db
-from backend.app.core.rate_limiter import limiter
 
 settings = get_settings()
 
@@ -31,10 +27,6 @@ app = FastAPI(
     version="1.0.0",
     lifespan=lifespan,
 )
-
-# --- Rate Limiter ---
-app.state.limiter = limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # --- CORS ---
 app.add_middleware(
@@ -107,7 +99,7 @@ app.include_router(admin_documents_router, prefix="/api/documents", tags=["docum
 app.include_router(admin_newsletter_router, prefix="/api/newsletter", tags=["newsletter"])
 app.include_router(admin_visitors_router, prefix="/api", tags=["visitors"])
 
-# Serve uploaded files and static assets in development
+# Serve uploaded files in development
 from pathlib import Path
 
 from fastapi.staticfiles import StaticFiles
@@ -115,7 +107,3 @@ from fastapi.staticfiles import StaticFiles
 _uploads_dir = Path(__file__).resolve().parent.parent / "uploads"
 _uploads_dir.mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=str(_uploads_dir)), name="uploads")
-
-_static_dir = Path(__file__).resolve().parent.parent.parent / "static"
-if _static_dir.exists():
-    app.mount("/static", StaticFiles(directory=str(_static_dir)), name="static")

@@ -8,10 +8,9 @@ dependencies = [
     # --- HTTP / app framework (FastAPI; Flask migrated away) ---
     "fastapi",
     "uvicorn[standard]",
-    # --- Database / ORM / migrations ---
+    # --- Database / ORM ---
     "sqlalchemy[asyncio]",
     "aiosqlite",
-    "psycopg2-binary",
     "alembic",
     # --- Validation / settings ---
     "pydantic",
@@ -22,18 +21,8 @@ dependencies = [
     "passlib[bcrypt]",
     "python-jose[cryptography]",
     "google-auth",
+    "requests",  # google.auth.transport uses requests
     "werkzeug",
-    # --- Rate limiting / background / mail / templating ---
-    "slowapi",
-    "aiosmtplib",
-    "jinja2",
-    "python-dotenv",
-    "bleach",
-    "requests",
-    "httpx",
-    "beautifulsoup4>=4.14.3",
-    # --- Legacy: flask still imported by utils/file_helpers.py (current_app/url_for) ---
-    "flask",
 ]
 
 [tool.uv]
@@ -60,9 +49,6 @@ exclude = [
     "dist",
     "node_modules",
     "venv",
-    "migrations",
-    "tests",
-    "scripts",
     "scratch",
     ".agent",
 ]

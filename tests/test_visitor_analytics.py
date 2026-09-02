@@ -4,7 +4,7 @@ Visitor Analytics and Logs tests.
 Tests for visitor log model validation, date filters, page views, and export functionality.
 """
 
-from backend.app.models.analytics import VisitorLog, DatabaseAuditLog, AnalyticsPageView
+from backend.app.models.analytics import AnalyticsPageView, DatabaseAuditLog, VisitorLog
 
 
 class TestVisitorLogModel:

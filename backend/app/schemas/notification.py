@@ -15,11 +15,6 @@ class SubscribeResponse(BaseModel):
     message: str
 
 
-class MarkReadResponse(BaseModel):
-    status: str
-    message: str
-
-
 class NotificationItem(BaseModel):
     id: int
     title: str
@@ -28,8 +23,7 @@ class NotificationItem(BaseModel):
     is_read: bool
     created_at: datetime | None = None
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
 
 
 class NotificationListResponse(BaseModel):

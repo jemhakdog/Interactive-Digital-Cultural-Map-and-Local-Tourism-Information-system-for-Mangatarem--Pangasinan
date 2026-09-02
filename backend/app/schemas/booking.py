@@ -1,7 +1,7 @@
 """Pydantic schemas for the Booking module."""
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import date
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -27,19 +27,6 @@ class ReserveResponse(BaseModel):
     status: str
     qr_token: str | None = None
     idempotent: bool | None = None
-
-
-class ReservationResponse(BaseModel):
-    id: int
-    user_id: int
-    booking_slot_id: int
-    party_size: int
-    primary_contact: str | None = None
-    status: str
-    qr_code_token: str | None = None
-    created_at: datetime | None = None
-
-    model_config = {"from_attributes": True}
 
 
 class UpdateStatusRequest(BaseModel):

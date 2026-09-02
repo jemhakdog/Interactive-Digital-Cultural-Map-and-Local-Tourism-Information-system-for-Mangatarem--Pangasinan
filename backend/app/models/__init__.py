@@ -12,7 +12,6 @@ from backend.app.models.announcements import Announcement
 # Attractions
 from backend.app.models.attractions import (
     Attraction,
-    MapFeedback,
     Review,
     UserFavorite,
 )

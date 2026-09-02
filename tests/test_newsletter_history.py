@@ -8,9 +8,9 @@ import asyncio
 
 from sqlalchemy import select
 
-from backend.app.models.user import User
-from backend.app.models.notifications import NewsletterHistory
 from backend.app.core.database import async_session_factory
+from backend.app.models.notifications import NewsletterHistory
+from backend.app.models.user import User
 
 
 def _run(coro):

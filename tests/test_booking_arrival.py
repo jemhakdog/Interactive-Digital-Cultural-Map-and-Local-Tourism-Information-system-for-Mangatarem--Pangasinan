@@ -8,17 +8,17 @@ NOTE: the FastAPI route currently does NOT write VisitorLog rows (port gap).
 The assertions on VisitorLog below encode the intended behavior.
 """
 import asyncio
-from datetime import datetime
+from datetime import UTC, datetime
 
 import pytest
 from sqlalchemy import select
 
-from backend.app.models.user import User
-from backend.app.models.attractions import Attraction
-from backend.app.models.business import Establishment
-from backend.app.models.booking import BookableAsset, BookingSlot, Reservation
-from backend.app.models.analytics import VisitorLog
 from backend.app.core.database import async_session_factory
+from backend.app.models.analytics import VisitorLog
+from backend.app.models.attractions import Attraction
+from backend.app.models.booking import BookableAsset, BookingSlot, Reservation
+from backend.app.models.business import Establishment
+from backend.app.models.user import User
 
 
 def _run(coro):
@@ -76,7 +76,7 @@ def setup_data(client, auth_headers):
             db.add(asset)
             await db.flush()
 
-            today = datetime.utcnow().date()
+            today = datetime.now(UTC).date()
             slot = BookingSlot(bookable_asset_id=asset.id, date=today, total_capacity=20)
             db.add(slot)
             await db.flush()

@@ -17,13 +17,8 @@ export const LOCAL_PLACE_IMAGES: Record<string, string> = {
  * Resolves an image URL to a clean local or remote path with fallback
  */
 export function resolvePlaceImage(imageUrl: string | null | undefined, name: string): string {
-  if (imageUrl) {
-    if (imageUrl.startsWith("/static/img/")) {
-      return imageUrl.replace("/static/img/", "/img/");
-    }
-    if (!imageUrl.includes("placehold.co")) {
-      return imageUrl;
-    }
+  if (imageUrl && !imageUrl.includes("placehold.co")) {
+    return imageUrl;
   }
 
   for (const [key, path] of Object.entries(LOCAL_PLACE_IMAGES)) {

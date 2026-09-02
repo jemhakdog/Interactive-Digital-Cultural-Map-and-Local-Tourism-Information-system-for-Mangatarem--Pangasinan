@@ -78,38 +78,6 @@ export const authAPI = {
   forgotPassword: (email: string) =>
     fetchAPI<{ detail: string }>("/api/auth/forgot-password", body({ email })),
   me: () => fetchAPI<UserProfile>("/api/auth/me"),
-  refresh: (refresh_token: string) =>
-    fetchAPI<TokenResponse>("/api/auth/refresh", body({ refresh_token })),
 };
 
-/** Typed helper endpoints for public data. */
-export const api = {
-  home: () => fetchAPI<Record<string, unknown>>("/api/"),
-  attractions: (params?: Record<string, string>) => {
-    const qs = params ? `?${new URLSearchParams(params)}` : "";
-    return fetchAPI<{ attractions?: unknown[]; items?: unknown[] }>(`/api/attractions${qs}`);
-  },
-  events: (params?: Record<string, string>) => {
-    const qs = params ? `?${new URLSearchParams(params)}` : "";
-    return fetchAPI<{ items?: unknown[] }>(`/api/events${qs}`);
-  },
-  business: (params?: Record<string, string>) => {
-    const qs = params ? `?${new URLSearchParams(params)}` : "";
-    return fetchAPI<{ businesses?: unknown[]; establishments?: unknown[]; items?: unknown[] }>(
-      `/api/business${qs}`
-    );
-  },
-  search: (q: string, params?: Record<string, string>) => {
-    const qs = new URLSearchParams({ q, ...params });
-    return fetchAPI<Record<string, unknown>>(`/api/search?${qs}`);
-  },
-  map: (category?: string) => {
-    const qs = category ? `?category=${encodeURIComponent(category)}` : "";
-    return fetchAPI<{ markers?: unknown[] }>(`/api/map${qs}`);
-  },
-  heritageTypes: () => fetchAPI<{ types?: unknown[] }>("/api/heritage/types"),
-  gallery: (params?: Record<string, string>) => {
-    const qs = params ? `?${new URLSearchParams(params)}` : "";
-    return fetchAPI<{ items?: unknown[] }>(`/api/gallery${qs}`);
-  },
-};
+

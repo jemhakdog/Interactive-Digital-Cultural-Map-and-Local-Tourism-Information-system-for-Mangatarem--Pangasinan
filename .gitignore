@@ -75,6 +75,10 @@ tmp/
 .agent/
 .agents/
 .antigravitycli/
+.pi-subagents/
+.mcp/
+.planning/
+piolium/
 
 # Design & Mockups
 .mockups/

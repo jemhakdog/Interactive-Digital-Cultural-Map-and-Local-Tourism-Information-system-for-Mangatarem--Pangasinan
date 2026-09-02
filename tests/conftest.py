@@ -20,8 +20,8 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import text
 
-from backend.app.main import app
 from backend.app.core.database import engine
+from backend.app.main import app
 from backend.app.models.base import Base
 
 

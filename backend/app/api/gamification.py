@@ -5,7 +5,7 @@ Migrated from modules/gamification/routes.py (Flask) to FastAPI.
 from __future__ import annotations
 
 import math
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -31,6 +31,11 @@ from backend.app.schemas.gamification import (
 
 router = APIRouter()
 
+# ponytail: in-process nav-lock store; was Redis-backed via core/redis.py (redis
+# never installed/dep — the client silently fell back to a dict anyway).
+# Upgrade path: single-flight claims need real Redis, not this.
+_nav_sessions: dict[int, dict] = {}
+
 
 def _haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     R = 6371000.0
@@ -42,13 +47,21 @@ def _haversine_m(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
 
 
 # ───────────────────────────────────────────────────────────────
-# Navigation lock (Redis-backed session store)
+# Navigation lock (per-user active route)
 # ───────────────────────────────────────────────────────────────
-from datetime import UTC, timezone
-
-from backend.app.core.redis import redis_client
 
 NAV_SESSION_TTL = 86400  # 24 hours
+
+
+def _expired(ts: str | None) -> bool:
+    if not ts:
+        return True
+    try:
+        from datetime import timedelta
+
+        return datetime.now(UTC) - datetime.fromisoformat(ts) > timedelta(seconds=NAV_SESSION_TTL)
+    except ValueError:
+        return True
 
 
 @router.post("/start-navigation", summary="Lock active navigation route")
@@ -56,14 +69,12 @@ async def start_navigation(
     body: StartNavigationRequest,
     user: Annotated[User, Depends(get_current_user)],
 ):
-    """Store active navigation target in Redis with 24h TTL."""
-    import json
-    session_data = {
+    """Store active navigation target for the user (24h TTL, in-process)."""
+    _nav_sessions[user.id] = {
         "route_id": body.id,
         "route_type": body.type,
         "started_at": datetime.now(UTC).isoformat(),
     }
-    await redis_client.set_json(f"nav:{user.id}", session_data, ttl=NAV_SESSION_TTL)
     return {"success": True, "message": "Active navigation route locked"}
 
 
@@ -71,7 +82,7 @@ async def start_navigation(
 async def stop_navigation(
     user: Annotated[User, Depends(get_current_user)],
 ):
-    await redis_client.delete(f"nav:{user.id}")
+    _nav_sessions.pop(user.id, None)
     return {"success": True, "message": "Active navigation route cleared"}
 
 
@@ -80,8 +91,9 @@ async def get_active_navigation(
     user: Annotated[User, Depends(get_current_user)],
 ):
     """Return the user's current active navigation, or null if none."""
-    session = await redis_client.get_json(f"nav:{user.id}")
-    if session is None:
+    session = _nav_sessions.get(user.id)
+    if session is None or _expired(session.get("started_at")):
+        _nav_sessions.pop(user.id, None)
         return {"active": False, "session": None}
     return {"active": True, "session": session}
 

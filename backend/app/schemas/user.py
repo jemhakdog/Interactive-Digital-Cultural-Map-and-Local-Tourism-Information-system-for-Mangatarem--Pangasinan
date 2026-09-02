@@ -4,7 +4,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 
 
 class UserProfileResponse(BaseModel):
@@ -19,13 +19,6 @@ class UserProfileResponse(BaseModel):
     created_at: datetime | None = None
 
     model_config = {"from_attributes": True}
-
-
-class UserProfileUpdate(BaseModel):
-    """Editable profile fields for the current user."""
-    name: str | None = Field(None, min_length=2, max_length=80)
-    email: str | None = None
-    barangay_id: int | None = None
 
 
 class UserStatsResponse(BaseModel):

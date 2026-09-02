@@ -68,7 +68,6 @@ class Attraction(Base):
     heritage_profile = relationship("HeritageProfile", back_populates="attractions")
     user = relationship("User", foreign_keys=[user_id], back_populates="attractions")
     reviews = relationship("Review", back_populates="attraction", lazy="dynamic")
-    map_feedbacks = relationship("MapFeedback", back_populates="attraction")
     bookable_asset = relationship("BookableAsset", back_populates="attraction", uselist=False, cascade="all, delete-orphan")
 
     @property
@@ -145,18 +144,3 @@ class UserFavorite(Base):
             name="ck_favorite_target",
         ),
     )
-
-
-class MapFeedback(Base):
-    __tablename__ = "MAP_FEEDBACK"
-
-    id: Mapped[int] = mapped_column(Integer, primary_key=True)
-    attraction_id: Mapped[int | None] = mapped_column(
-        Integer, ForeignKey("ATTRACTION.id"), nullable=True
-    )
-    feedback_type: Mapped[str] = mapped_column(String(50), nullable=False)
-    message: Mapped[str] = mapped_column(Text, nullable=False)
-    status: Mapped[str] = mapped_column(String(20), default="pending")
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
-
-    attraction = relationship("Attraction", back_populates="map_feedbacks")
