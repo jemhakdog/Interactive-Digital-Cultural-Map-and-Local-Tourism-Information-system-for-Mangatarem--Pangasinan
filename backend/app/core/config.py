@@ -25,7 +25,6 @@ class Settings(BaseSettings):
     database_url: str | None = None  # Full URL override (default: sqlite in ./instance)
 
     # --- JWT ---
-    access_token_expire_minutes: int = 30 * 24  # 7 days
     algorithm: str = "HS256"
 
     # --- CORS ---
