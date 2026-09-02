@@ -22,6 +22,7 @@ dependencies = [
     "google-auth",
     "requests",  # google.auth.transport uses requests
     "werkzeug",
+    "asyncpg>=0.31.0",
 ]
 
 [tool.uv]
