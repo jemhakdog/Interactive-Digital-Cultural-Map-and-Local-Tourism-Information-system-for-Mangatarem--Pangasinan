@@ -1,88 +1,64 @@
 # Handoff
 
-- Last touched: 2026-07-31
+- Last touched: 2026-09-02
 - Last model: Pi Coding Agent (Claude)
 - Branch: main
-- Status: Ponytail batch cleanup and Map V2 mobile fixes completed
+- Status: **Vercel deployment complete and verified** — backend + frontend live, Google OAuth login working.
 
-## Current task
-Ready for commit. All cleanup, bug fixes, Map V2 mobile fixes, and ponytail batch cleanup complete.
+## Current state
 
-## Last concrete action
-Performed comprehensive ponytail audit, cleanup, bug fixes, and CRUD verification:
+The repo is fully migrated from Flask to **FastAPI (backend/) + Next.js (frontend/)**. That migration was completed 2026-09-01 (see MEMORY.md). Today (2026-09-02) we deployed both to Vercel.
 
-### Ponytail Audit & Cleanup (156 files changed, -12,540 lines)
-- Deleted `scratch/` (142 throwaway scripts, 6,829 lines)
-- Deleted `db_update_package/` (5 dead migration files)
-- Deleted unreferenced JS: `bundle.min.js`, `map.min.js`, `leaflet.js`, `animations*.js`
-- Deleted old vendor lib: `static/vendor/leaflet-1.7.1/`
-- Deleted 6 duplicate `core/` modules (security, email, validators, template_filters, file_helpers, tile_generator)
-- Consolidated imports: `modules/auth/register.py` and `modules/auth/password.py` now use `utils/` instead of `core/`
-- Updated `templates/pagez/map_v2.html` to use `vendor/leaflet/leaflet.js`
+## Live deployments
 
-### Bug Fixes (6 issues)
-1. **Admin attraction form action**: Fixed wrong action pointing to list page instead of add endpoint (`templates/admin/add_attraction.html`)
-2. **Missing `errors/500.html`**: Created error template based on existing pattern (`templates/errors/500.html`)
-3. **PWA z-index**: Lowered from 9999 to 100 to stop covering form submit buttons (`static/js/components/pwa-features.js`)
-4. **Business Owner menu edit**: Added edit modal with full form to each menu card (`templates/business/manage_menu.html`)
-5. Verified tourist pages work correctly (redirect issue was bad test user with empty role)
-6. Verified event form date field is correct HTML `<input type='date'>` (was browser automation filling wrong fields)
+| App | URL | Status |
+|---|---|---|
+| Backend (FastAPI) | https://mangatarem-tourism-api.vercel.app | ✅ live, `/health` → 200 `{"status":"ok"}`, CORS verified |
+| Frontend (Next.js) | https://mangatarem-tourism-frontend.vercel.app | ✅ live & public |
 
-### CRUD Verification Across All User Roles
-- **Admin** (9 nav items): Full CRUD on Landmarks and Events, read-only on Analytics, Reviews, Newsletters, Businesses, Verify Merchants, Reservations
-- **Business Owner** (6 nav items): Create/Update establishment, Create menu items, Read-only on Visitor Registry, Reviews, Reservations
-- **Barangay Rep** (7 nav items): Full CRUD on Landmarks and Events, Update Barangay Profile, Read-only on Gallery, Reviews, Reservations
-- **Tourist** (10 nav items): Read-only across Dashboard, Passport, Map, Barangays, Events, Gallery, Stay & Eat, Routes
+**Critical URL nuance:** the frontend has TWO aliases:
+- `https://mangatarem-tourism-frontend.vercel.app` → **public** (this is the one to use/test)
+- `https://mangatarem-tourism-frontend-jemhakdogs-projects.vercel.app` → **SSO-protected** (redirects to Vercel login) — because team SSO protection `all_except_custom_domains` applies to non-custom domains. Do NOT use this for testing.
 
-## Last concrete action
+## What was done today (deploy)
 
-### Business dashboard profile seeded + 422 bug fixed (2026-08-23)
-- Added `Mangatarem Bangus Grill` (restaurant, `approved`, moderate) for `test_owner` (user id 2) directly in `instance/mangatarem.db` — establishment id 10. test_owner previously had no establishment, so the dashboard showed only the onboarding modal.
-- Fixed `?per_page=200` → 422 bug: FastAPI `GET /api/business` caps `per_page` at 100, so all 4 frontend call sites got a hard 422 and no owner's establishment ever appeared on the dashboard. Changed to `per_page=100` in `frontend/src/app/business/dashboard/page.tsx` (x2), `frontend/src/app/business/[id]/edit/page.tsx`, `frontend/src/components/business/business-sidebar.tsx`.
-- Verified end-to-end in browser: login test_owner@example.com / password123 → `/business/dashboard` renders the full profile. All three dashboard API calls (list, rooms/list, menu/list) return 200. Public `/api/business/10` returns 200.
+1. **Branch fix:** Vercel was auto-deploying from `main` which still had old Flask code. Fast-forwarded `main` to `feat/react-migration` (FastAPI+Next). Both projects deploy `main`.
+2. **`api/index.py`** (new): Vercel Python-runtime ASGI entrypoint re-exporting `backend.app.main:app`.
+3. **`backend/app/core/config.py`**: `async_database_url` now rewrites `postgresql://` → `postgresql+asyncpg://` (was SQLite-only `aiosqlite`).
+4. **`pyproject.toml` + `uv.lock`**: added `asyncpg` dependency.
+5. **frontend/src/components/image-upload.tsx**: replaced hardcoded `http://localhost:8000` with `API_BASE` (`@/lib/api`).
+6. **Env vars set on Vercel backend project (`mangatarem-tourism-api`):**
+   - `DATABASE_URL=postgresql://postgres.yeptvckixavcltatwhnw:<pw>@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres` — **port 6543 (transaction pooler), NOT 5432** (5432 gave `EMAXCONNSESSION max clients reached`).
+   - `SECRET_KEY=<random hex>` (rotate later if needed)
+   - `CORS_ORIGINS=["https://mangatarem-tourism-frontend.vercel.app","http://localhost:3000"]` (JSON array format — pydantic list)
+   - Other legacy env already present (SMTP_*, SUPABASE_*, DB_PROVIDER=sqlite, mapbox, GEMINI — harmless, unused by FastAPI).
+7. **Frontend project:** user created `mangatarem-tourism-frontend` (Next.js preset, root `frontend`). Deployed with `NEXT_PUBLIC_API_URL=https://mangatarem-tourism-api.vercel.app` via CLI (`vercel deploy --prod --build-env NEXT_PUBLIC_API_URL=...`). Note: that env was passed at build time, not stored as a project env — a future redeploy without `--build-env` will fall back to `http://localhost:8000`. Consider adding `NEXT_PUBLIC_API_URL` as a persistent project env.
+8. **Old broken frontend project** (`interactive-digital-cultural-map-and-local-tourism-information-system-for-mangatarem-pangasinan`) still exists, configured `framework: "flask"`, builds Error. It can be deleted or ignored.
+9. **Gitignore**: added `.vercel`; restored user's `supabase` npm devDependency (was stashed during branch switch).
 
-### Ponytail Batch Cleanup (2026-07-31)
-- Deleted dead tracked artifacts: `archive/`, `code_screenshots/`, `.antigravitycli/`, `tmp/verify_newsletter.py`, `instance/heritage_page.html`, `data/scraped_attractions.json`, `data/scraped_heritage.json`, `build/desktop.py`.
-- Deleted duplicate shims: `core/db_manager.py`, `core/geo.py`, `core/logger.py`, `core/session.py`, `utils/session_helper.py`.
-- Updated active imports from `core.logger` → `utils.logger_helper` and `core.geo` → `utils.geo` across 8 modules.
-- Removed unused validators `validate_json_input()` and `validate_coordinates_fields()` (~110 lines) from `utils/validators.py`.
-- Removed unused `DatabaseAuditLog` model from `modules/analytics/models.py`.
-- Preserved live `data/scraped_events.json` and deferred higher-risk refactors.
+## Resolved after initial deploy
 
-### Map V2 Mobile Touch Fixes (2026-07-31)
-Fixed Map V2 mobile touch issues and updated service-worker caching for immediate delivery:
-- Removed `touch-action: none` from the bottom sheet so the results list scrolls on mobile.
-- Added `touch-action: pan-y` to `#results-section` and refined the gesture-routing logic so swipes scroll the list when the sheet is fully open.
-- Bumped SW cache to `gomangatarem-v10` and static version to `map_v2.js?v=1.1.9` so the fixed assets replace stale cached files immediately.
-- Confirmed temporary Cloudflare Tunnel is sufficient for mobile testing without a named domain.
+- ✅ **Google OAuth `origin_mismatch`** — URL nuance: the deployed app popup uses the **short public URL** `https://mangatarem-tourism-frontend.vercel.app`. User added it to the Google OAuth client's Authorized JavaScript origins → **login works now** (user confirmed).
+- ✅ **Intermittent backend 500** — Supabase pooler (pgbouncer transaction mode) rejects asyncpg prepared statements: `DuplicatePreparedStatementError` on fresh connections (`select pg_catalog.version()`). Fixed by `connect_args={"statement_cache_size": 0}` for Postgres URLs in `backend/app/core/database.py` (commit `bf6374e`). Verified live: `/health` 5/5 → 200.
 
-Prior session completed a comprehensive ponytail audit, cleanup, bug fixes, and CRUD verification:
+## Known limitations (documented in `docs/VERCEL_DEPLOYMENT.md` + `docs/VERCEL_ARCH_DECISION.md`)
 
-## Next concrete step
-Commit all changes to main branch.
+- **Uploads are ephemeral** on Vercel (server FS reset between invocations) — acceptable for capstone demo; future work = object storage.
+- **`init_db()` dev-only**; no Alembic migration infra yet.
+- Root `package.json` `npm run dev` runs both servers locally (unchanged).
 
-## Files touched this session
-- `templates/pagez/map_v2.html` (leaflet path fix, map_v2.js query version bump)
-- `static/js/pages/map_v2.js` (sheet-drag gesture refinement)
-- `static/sw.js` (service-worker cache bump to v10)
-- `templates/admin/add_attraction.html` (form action fix)
-- `templates/errors/500.html` (new file)
-- `static/js/components/pwa-features.js` (z-index fix)
-- `templates/business/manage_menu.html` (edit modal added)
-- `modules/auth/register.py` (import fix)
-- `modules/auth/password.py` (import fix)
-- `modules/api_v1/public.py` (geo import fix)
-- `modules/attractions/routes.py` (geo import fix)
-- `modules/auth/login.py` (logger import fix)
-- `modules/auth/oauth.py` (logger import fix)
-- `modules/business/routes.py` (logger import fix)
-- `modules/gallery/routes.py` (logger import fix)
-- `modules/heritage/routes.py` (logger import fix)
-- `utils/validators.py` (removed dead validators)
-- `modules/analytics/models.py` (removed dead model)
-- `memory-bank/handoff.md`
-- `memory-bank/activeContext.md`
-- `memory-bank/progress.md`
+## Deploy docs added this session
 
-## Open questions / blockers
-- None.
+- `docs/VERCEL_DEPLOYMENT.md` — click-by-click dashboard guide
+- `docs/VERCEL_ARCH_DECISION.md` — why two projects, choices, upload limitation
+- `docs/VERCEL_CLI.md` — CLI alternative
+
+## git state
+
+- Branch: `main`. Last commit: `bf6374e` ("fix: disable asyncpg statement cache for Supabase pooler").
+- Commits today: `69c77c5` (deploy support), `3a6b097` (asyncpg + config rewrite), `8f56e99` (chore: .vercel gitignore + supabase CLI dev dep), `87e6051` (memory bank update), `bf6374e` (statement cache fix).
+- Note: local uncommitted change may exist — the `feat/react-migration` branch has prior work committed; main was fast-forwarded. Verify with `git status` before continuing.
+
+## Previous session (2026-08-23, pre-migration era — historical only)
+
+Business dashboard profile seeded + 422 bug fixed (details in old handoff below; superseded by migration).

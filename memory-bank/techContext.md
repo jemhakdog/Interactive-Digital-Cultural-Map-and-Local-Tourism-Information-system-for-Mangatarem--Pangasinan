@@ -1,58 +1,57 @@
 # Tech Context
 
-## Stack
+## Stack (current, post-migration)
 
-- Language: Python (>=3.11)
-- Framework: Flask
-- Dependencies: Flask-SQLAlchemy, Flask-Login, Flask-Migrate, Flask-WTF, Supabase, Upstash Redis, TailwindCSS
-- Package manager: uv
+- **Backend**: Python 3.12, **FastAPI**, SQLAlchemy (async), uvicorn
+- **Frontend**: **Next.js 16** (App Router), React 19, Tailwind v4, maplibre-gl, SWR, shadcn/ui, zod
+- **Database**: SQLite (`aiosqlite`) locally; **Supabase Postgres** (`asyncpg`) in production via `DATABASE_URL`
+- **Auth**: JWT (`python-jose`), bcrypt via `passlib`, Google Sign-In (GSI, client-side `accounts.id`)
+- **Package manager**: uv (Python), npm (Node)
+- **Monorepo**: `backend/` (FastAPI), `frontend/` (Next.js), `tests/` (pytest, 13 tests), root `package.json` runs both via `concurrently`
 
 ## Commands
 
 ### Install
 ```bash
-uv sync # or standard pip install -r requirements.txt
+uv sync          # Python deps (backend + tests)
+cd frontend && npm install
 ```
 
-### Run
+### Run locally
 ```bash
-python app.py
+npm run dev      # runs backend (uvicorn :8000) + frontend (Next :3000) with concurrently
 ```
 
 ### Test
 ```bash
-pytest # or .venv\Scripts\pytest within virtual environment
+.venv/bin/python -m pytest -q   # 13 tests, tests/
+cd frontend && npx playwright test   # E2E (optional)
 ```
 
 ### Lint
 ```bash
-uv run ruff check .
+.venv/bin/uv run ruff check .   # or: ruff check backend tests
 ```
 
-### Build
-- CSS/Tailwind: `npm run build:css` or equivalent compiler setup.
+## Config (backend/app/core/config.py)
 
-## Environment variables
+- Reads env vars / `.env`. Required: `SECRET_KEY`. Optional: `DATABASE_URL`, `CORS_ORIGINS` (JSON array), `GOOGLE_CLIENT_ID`, `ENVIRONMENT`, `SMTP_*`.
+- `async_database_url`: `sqlite:///` → `sqlite+aiosqlite:///`, `postgresql://` → `postgresql+asyncpg://`.
+- `init_db()` (create_all) runs only when `environment == "development"`; production relies on external DB setup (no Alembic yet — flagged).
 
-See `.env.example`.
+## Vercel deployment specifics
+
+- Backend: root `/`, Python runtime, entry `api/index.py` re-exports `backend.app.main:app`.
+- Frontend: root `frontend/`, Next.js preset, `NEXT_PUBLIC_API_URL` build-time env.
+- Supabase pooler: use **port 6543** (transaction) not 5432 (session) to avoid connection-pool exhaustion on serverless.
+- Env vars on backend project: `DATABASE_URL`, `SECRET_KEY`, `CORS_ORIGINS` (JSON array).
+- Frontend project currently has **no persistent env vars** (API URL passed via `--build-env` at deploy) — pending addition.
 
 ## Tooling notes
 
-- FAST_INIT stack detection found `pyproject.toml` and `requirements.txt`.
-- Added Mapbox GL JS for frontend maps.
-- Redis caching requires `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`.
-- OSRM used for TSP (Traveling Salesman Problem) routing.
-- PostGIS extension required in Supabase database for MVT generation.
-- Security relies on `bleach` for HTML sanitization, and Flask-WTF for CSRF.
-- Admin attraction form action must use `url_for('admin.add_attraction')` not `url_for('admin.admin_attractions')`.
-- Canonical logging helpers live in `utils/logger_helper.py`; all active imports now use `utils.logger_helper` (no `core.logger`).
-- Canonical geo helpers live in `utils/geo.py`; all active imports now use `utils.geo` (no `core.geo`).
-- `validate_json_input()` and `validate_coordinates_fields()` were removed from `utils/validators.py` — use `validate_form_data()` and inline coordinate checks instead.
-- On mobile, Map V2 relies on `touch-action: pan-y` in `#results-section` and keeps `touch-action: none` only on drag-initiator elements so the landmark list can scroll.
-- Event form date field is `<input type='date'>` — fill with `YYYY-MM-DD` format.
-- PWA install prompt z-index set to 100 (was 9999) to avoid covering form buttons.
-- `errors/500.html` template required for Flask error handler to render properly.
-- Duplicate `core/` modules (security, email, validators, etc.) removed — use `utils/` as canonical source.
-- Map V2 bottom sheet must not set `touch-action: none` on the entire sheet or it blocks list scrolling on mobile; use `touch-action: pan-y` on `#results-section` and restrict no-touch to drag initiators.
-- Service-worker cache version and static script query strings must be bumped whenever HTML/JS behavior changes so stale cached assets are replaced immediately.
-- Temporary Cloudflare tunnels (`trycloudflare.com`) are the fastest zero-config way to test from a LAN mobile device; a permanent named tunnel still requires a domain and one-time `cloudflared tunnel login`.
+- Vercel CLI authenticated as `jemhakdog` (`~/.vercel`). Team: `jemhakdogs-projects`.
+- `vercel redeploy <url> --target production` rebuilds with new envs (add env → redeploy).
+
+## Historical (pre-migration)
+
+- Old stack: Flask, Flask-SQLAlchemy, Flask-Migrate, Flask-WTF, WTForms, Supabase, Upstash Redis, Tailwind. Superseded 2026-09-01.

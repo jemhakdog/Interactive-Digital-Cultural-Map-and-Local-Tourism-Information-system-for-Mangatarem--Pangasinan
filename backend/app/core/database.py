@@ -10,9 +10,17 @@ from backend.app.models.base import Base
 
 settings = get_settings()
 
+# Postgres-over-pgbouncer (Supabase pooler) does not support asyncpg prepared
+# statements (DuplicatePreparedStatementError), so disable the statement cache
+# for real databases; SQLite/aiosqlite ignores it.
+_connect_args = (
+    {"statement_cache_size": 0} if "sqlite" not in settings.async_database_url else {}
+)
+
 engine = create_async_engine(
     settings.async_database_url,
     echo=(settings.environment == "development"),
+    connect_args=_connect_args,
     pool_pre_ping=True,
     # aiosqlite doesn't support pool_size; only set for real databases
     **(

@@ -99,3 +99,4 @@ Thumbs.db
 .DS_Store
 
 uvicorn.log
+.vercel

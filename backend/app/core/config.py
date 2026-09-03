@@ -36,9 +36,12 @@ class Settings(BaseSettings):
     # --- Computed database URL ---
     @property
     def async_database_url(self) -> str:
-        """Async-compatible database URL (aiosqlite for sqlite)."""
+        """Async-compatible database URL (aiosqlite for sqlite, asyncpg for postgres)."""
         url = self.database_url or self._build_sqlite_url()
-        return url.replace("sqlite:///", "sqlite+aiosqlite:///")
+        if url.startswith("sqlite:///"):
+            return url.replace("sqlite:///", "sqlite+aiosqlite:///")
+        # postgresql:// → postgresql+asyncpg:// (async driver for SQLAlchemy)
+        return url.replace("postgresql://", "postgresql+asyncpg://", 1)
 
     @property
     def sync_database_url(self) -> str:
