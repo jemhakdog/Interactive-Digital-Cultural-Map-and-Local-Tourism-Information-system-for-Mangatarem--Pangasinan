@@ -1,8 +1,10 @@
+import { NewsletterSubscribe } from "@/components/public/newsletter-subscribe";
 import Link from "next/link";
 import { MapPin, Calendar, Search, ArrowRight, Compass, Star, Landmark, Building2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { resolvePlaceImage } from "@/components/map/data";
 
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
@@ -21,13 +23,7 @@ function AttractionCard({ item }: { item: { id: number; name: string; category?:
     <Link href={`/attractions/${item.id}`}>
       <Card className="group overflow-hidden border-border/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-0.5 h-full">
         <div className="aspect-[4/3] bg-muted relative overflow-hidden">
-          {item.image_url ? (
-            <img src={item.image_url} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <MapPin className="h-10 w-10 text-muted-foreground/20" />
-            </div>
-          )}
+          <img src={resolvePlaceImage(item.image_url, item.name)} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           {item.category && (
             <Badge variant="secondary" className="absolute top-3 left-3 text-xs bg-background/80 backdrop-blur-sm">
               {item.category}
@@ -56,13 +52,7 @@ function EventCard({ item }: { item: { id: number; name: string; category?: stri
     <Link href={`/events/${item.id}`}>
       <Card className="group overflow-hidden border-border/50 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 hover:-translate-y-0.5 h-full">
         <div className="aspect-[4/3] bg-muted relative overflow-hidden">
-          {item.image_url ? (
-            <img src={item.image_url} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Calendar className="h-10 w-10 text-muted-foreground/20" />
-            </div>
-          )}
+          <img src={resolvePlaceImage(item.image_url, item.name)} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
           {item.category && (
             <Badge variant="secondary" className="absolute top-3 left-3 text-xs bg-background/80 backdrop-blur-sm">
               {item.category}
@@ -196,7 +186,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* CTA */}
+      {/* CTA + Newsletter */}
       <section className="container mx-auto px-4 py-16 text-center">
         <div className="max-w-lg mx-auto">
           <h2 className="text-2xl font-bold mb-3 tracking-tight">Plan Your Visit</h2>
@@ -209,6 +199,13 @@ export default async function HomePage() {
               <MapPin className="h-5 w-5" /> Open Interactive Map
             </Button>
           </Link>
+        </div>
+        <div className="mt-10 pt-10 border-t border-border/50 max-w-2xl mx-auto">
+          <h2 className="text-xl font-bold mb-2 tracking-tight">Stay in the loop</h2>
+          <p className="text-sm text-muted-foreground mb-5">
+            Subscribe for tourism updates, events, and community bulletins from Mangatarem.
+          </p>
+          <NewsletterSubscribe />
         </div>
       </section>
     </div>

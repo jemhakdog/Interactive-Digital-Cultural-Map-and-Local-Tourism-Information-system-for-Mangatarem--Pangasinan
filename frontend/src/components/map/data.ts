@@ -1,34 +1,49 @@
 import { CuratedTrail } from "./types";
+import { PLACE_IMAGE_LOOKUP, LOCAL_ASSET_EXISTS } from "@/lib/place-images";
 
 /**
- * Local image fallbacks for Mangatarem landmarks
- */
-export const LOCAL_PLACE_IMAGES: Record<string, string> = {
-  "Manleluag Spring Protected Landscape": "/img/manleluag_spring.webp",
-  "Daang Kalikasan": "/img/daang_kalikasan.webp",
-  "St. Raymund de Penafort Church": "/img/st_raymund_church.webp",
-  "Timmanguyob Falls": "/img/attractions/timmanguyob_falls.png",
-  "Pacalat River": "/img/attractions/pacalat_river/image_1.jpg",
-  "Canding (Kanding) Falls": "/img/attractions/canding_falls/image_1.jpg",
-  "Municipal Town Plaza": "/img/attractions/municipal_hall/image_1.jpg",
-};
-
-/**
- * Resolves an image URL to a clean local or remote path with fallback
+ * Resolves an image URL to a clean local or remote path with fallback.
+ *
+ * - Externally hosted photos (uploads, etc.) are used as-is.
+ * - Local asset paths are checked against the ones that actually exist.
+ * - Otherwise falls back to a bundled local photo of the place, then a
+ *   generic teaser image.
  */
 export function resolvePlaceImage(imageUrl: string | null | undefined, name: string): string {
   if (imageUrl && !imageUrl.includes("placehold.co")) {
-    return imageUrl;
-  }
-
-  for (const [key, path] of Object.entries(LOCAL_PLACE_IMAGES)) {
-    if (name.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(name.toLowerCase())) {
-      return path;
+    // Placeholder services are treated as "no image".
+    if (imageUrl.startsWith("/") || imageUrl.startsWith("http") || imageUrl.startsWith("data:")) {
+      if (imageUrl.startsWith("/") && !imageUrl.includes("/uploads/")) {
+        const basename = imageUrl.split("/").pop() ?? "";
+        if (basename && !LOCAL_ASSET_EXISTS.has(basename)) {
+          // Local file that isn't in public/img — map by attraction name instead.
+          return matchLocalImage(name) ?? "/img/mangatarem_map_teaser.webp";
+        }
+        // Backend-served static (e.g. /static/img/foo.png) has no /static on the
+        // frontend origin — the same file is bundled here, so serve it locally.
+        if (imageUrl.startsWith("/static/")) {
+          return "/img/" + basename;
+        }
+      }
+      return imageUrl;
     }
   }
 
+  // Known place-by-name fallback (bundled photos)
+  const local = matchLocalImage(name);
+  if (local) return local;
+
   // Generic category fallbacks
   return "/img/mangatarem_map_teaser.webp";
+}
+
+/** Case-insensitive substring lookup against bundled place photos. */
+function matchLocalImage(name: string): string | undefined {
+  const n = name.toLowerCase();
+  for (const [key, path] of Object.entries(PLACE_IMAGE_LOOKUP)) {
+    if (key.includes(n) || n.includes(key)) return path;
+  }
+  return undefined;
 }
 
 /**
