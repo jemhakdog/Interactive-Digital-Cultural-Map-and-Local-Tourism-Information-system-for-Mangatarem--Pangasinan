@@ -19,6 +19,11 @@ export function resolvePlaceImage(imageUrl: string | null | undefined, name: str
           // Local file that isn't in public/img — map by attraction name instead.
           return matchLocalImage(name) ?? "/img/mangatarem_map_teaser.webp";
         }
+        // Backend-served static (e.g. /static/img/foo.png) has no /static on the
+        // frontend origin — the same file is bundled here, so serve it locally.
+        if (imageUrl.startsWith("/static/")) {
+          return "/img/" + basename;
+        }
       }
       return imageUrl;
     }
