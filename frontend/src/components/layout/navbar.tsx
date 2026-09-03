@@ -2,8 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
-import { Menu, Search, User, LogOut, Compass, Shield, CalendarCheck, Star, Store, UserCog, BookOpen } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Menu, Search, User, LogOut, Compass, Shield, CalendarCheck, Star, Store, UserCog, BookOpen, Sun, Moon } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -43,6 +43,18 @@ export function Navbar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const [open, setOpen] = useState(false);
+  const [isDark, setIsDark] = useState(false);
+
+  useEffect(() => {
+    setIsDark(document.documentElement.classList.contains("dark"));
+  }, []);
+
+  const toggleDarkMode = () => {
+    const nextDark = !isDark;
+    setIsDark(nextDark);
+    document.documentElement.classList.toggle("dark", nextDark);
+    localStorage.setItem("theme", nextDark ? "dark" : "light");
+  };
 
   const isOwnerConsole =
     pathname.startsWith("/business/dashboard") ||
@@ -95,6 +107,18 @@ export function Navbar() {
               <Search className="h-4.5 w-4.5" />
             </Button>
           </Link>
+
+          {/* Theme toggle — public & unauthenticated visitors */}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={toggleDarkMode}
+            aria-label={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+            className="text-muted-foreground hover:text-foreground"
+          >
+            {isDark ? <Sun className="h-4.5 w-4.5" /> : <Moon className="h-4.5 w-4.5" />}
+          </Button>
 
           {user ? (
             <div className="hidden md:flex items-center gap-2">
