@@ -61,7 +61,7 @@ export function Navbar() {
     pathname.startsWith("/business/peers") ||
     /\/business\/[^/]+\/(edit|menu|rooms|reviews|verify)/.test(pathname);
 
-  if (pathname.startsWith("/admin") || isOwnerConsole) {
+  if (pathname.startsWith("/admin") || isOwnerConsole || pathname === "/") {
     return null;
   }
 
