@@ -26,20 +26,20 @@ router = APIRouter()
 @router.get("/", summary="Homepage data")
 async def homepage(db: Annotated[AsyncSession, Depends(get_db)]):
     """Return featured attractions and events for the home page."""
-    # Featured attractions (up to 6, approved only)
+    # Featured attractions (up to 6, approved & with a photo only)
     att_stmt = (
         select(Attraction)
-        .where(Attraction.status == "approved")
+        .where(Attraction.status == "approved", Attraction.image_url.is_not(None))
         .order_by(Attraction.is_featured.desc(), func.random())
         .limit(6)
     )
     att_result = await db.execute(att_stmt)
     attractions = att_result.scalars().all()
 
-    # Featured events (up to 6, approved only)
+    # Featured events (up to 6, approved & with a photo only)
     evt_stmt = (
         select(Event)
-        .where(Event.status == "approved")
+        .where(Event.status == "approved", Event.image_url.is_not(None))
         .order_by(Event.date.desc())
         .limit(6)
     )
