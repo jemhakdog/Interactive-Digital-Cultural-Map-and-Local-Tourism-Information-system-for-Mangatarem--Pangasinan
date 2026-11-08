@@ -1,7 +1,7 @@
 """HeritageProfile model — ported from modules/heritage/models.py."""
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 
 from sqlalchemy import (
     Date,
@@ -51,10 +51,10 @@ class HeritageProfile(Base):
         Integer, ForeignKey("USER.id"), nullable=True, index=True
     )
     created_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, index=True
+        DateTime, default=lambda: datetime.now(UTC), index=True
     )
     updated_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
     )
 
     # Relationships

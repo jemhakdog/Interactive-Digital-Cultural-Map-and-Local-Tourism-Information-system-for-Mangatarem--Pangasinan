@@ -30,6 +30,11 @@ class Settings(BaseSettings):
     # --- CORS ---
     cors_origins: list[str] = ["http://localhost:5173", "http://localhost:3000", "http://127.0.0.1:3000"]
 
+    # --- Supabase Storage ---
+    supabase_url: str | None = None
+    supabase_key: str | None = None
+    supabase_storage_bucket: str = "tourism-uploads"
+
     # --- Misc ---
     environment: str = "development"
 

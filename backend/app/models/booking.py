@@ -2,10 +2,11 @@
 from __future__ import annotations
 
 import uuid
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 
 from sqlalchemy import (
     Boolean,
+    CheckConstraint,
     Date,
     DateTime,
     ForeignKey,
@@ -37,7 +38,9 @@ class BookableAsset(Base):
     requires_approval: Mapped[bool] = mapped_column(Boolean, default=True)
     booking_instructions: Mapped[str | None] = mapped_column(Text, nullable=True)
     status: Mapped[str] = mapped_column(String(20), default="active")
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime | None] = mapped_column(
+        DateTime, default=lambda: datetime.now(UTC)
+    )
 
     attraction = relationship("Attraction", back_populates="bookable_asset")
     heritage_profile = relationship("HeritageProfile", back_populates="bookable_asset")
@@ -60,6 +63,8 @@ class BookingSlot(Base):
 
     __table_args__ = (
         UniqueConstraint("bookable_asset_id", "date", name="uq_asset_date"),
+        CheckConstraint("booked_count <= total_capacity", name="ck_booking_slot_capacity"),
+        CheckConstraint("booked_count >= 0", name="ck_booking_slot_booked_count_nonnegative"),
     )
 
     @property
@@ -84,9 +89,11 @@ class Reservation(Base):
     qr_code_token: Mapped[str] = mapped_column(
         String(20), unique=True, default=_generate_qr_token, index=True
     )
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime | None] = mapped_column(
+        DateTime, default=lambda: datetime.now(UTC)
+    )
     updated_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
     )
 
     user = relationship("User", back_populates="reservations")

@@ -4,30 +4,78 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth";
 import { fetchAPI } from "@/lib/api";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Award, MapPin, Star } from "lucide-react";
+import { Loader2, Award, MapPin, Star, Sparkles, BookOpen } from "lucide-react";
 
 export default function PassportPage() {
   const { user, loading: authLoading } = useAuth();
-  const router = useRouter();
   const [passport, setPassport] = useState<Record<string, unknown> | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!authLoading && !user) router.push("/auth/login");
-  }, [user, authLoading, router]);
-
-  useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setLoading(false);
+      return;
+    }
     fetchAPI("/api/gamification/passport")
       .then((data) => setPassport(data as Record<string, unknown>))
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [user]);
 
-  if (authLoading || !user || loading) {
+  if (authLoading || (user && loading)) {
     return <div className="flex justify-center py-16"><Loader2 className="h-6 w-6 animate-spin text-muted-foreground" /></div>;
+  }
+
+  // Guest Passport preview if unauthenticated
+  if (!user) {
+    return (
+      <div className="container mx-auto px-4 py-10 max-w-4xl">
+        <div className="rounded-2xl border bg-card p-6 md:p-10 shadow-sm text-center mb-8">
+          <div className="h-20 w-20 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <BookOpen className="h-10 w-10 text-primary" />
+          </div>
+          <Badge variant="secondary" className="mb-3">Digital Heritage Passport</Badge>
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight mb-3">
+            Explore Mangatarem & Collect Stamps
+          </h1>
+          <p className="text-muted-foreground max-w-xl mx-auto mb-6">
+            Check in at historical landmarks, eco-tourism spots, and local events across Mangatarem to earn commemorative digital stamps and unlock explorer badges.
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3">
+            <Link href="/auth/register">
+              <Button size="lg" className="rounded-xl gap-2">
+                <Sparkles className="h-4 w-4" /> Start Your Passport
+              </Button>
+            </Link>
+            <Link href="/auth/login">
+              <Button variant="outline" size="lg" className="rounded-xl">
+                Log In to View Stamps
+              </Button>
+            </Link>
+          </div>
+        </div>
+
+        <h2 className="text-xl font-bold mb-4">Sample Collector Badges</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+          {[
+            { icon: "🏛️", title: "Heritage Sentinel", desc: "Visit San Raymundo Church" },
+            { icon: "🌿", title: "Canopy Pioneer", desc: "Check in at Manleluag Spring" },
+            { icon: "⛰️", title: "Ridge Cruiser", desc: "Traverse Daang Kalikasan" },
+            { icon: "🥭", title: "Fiesta Explorer", desc: "Attend local town celebrations" },
+          ].map((item, idx) => (
+            <Card key={idx} className="text-center p-4">
+              <div className="text-3xl mb-2">{item.icon}</div>
+              <p className="font-semibold text-sm">{item.title}</p>
+              <p className="text-xs text-muted-foreground mt-1">{item.desc}</p>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
   }
 
   const stamps = (passport?.stamps ?? []) as Record<string, unknown>[];

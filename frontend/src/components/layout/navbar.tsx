@@ -65,7 +65,7 @@ export function Navbar() {
         </Link>
 
         {/* Desktop nav */}
-        <nav className="hidden lg:flex items-center gap-0.5">
+        <nav aria-label="Primary" className="hidden lg:flex items-center gap-0.5">
           {navLinks.map((link) => {
             const href = user?.role === "admin" ? (adminTwins[link.href] ?? link.href) : link.href;
             const active = pathname === href || pathname.startsWith(href);
@@ -89,10 +89,16 @@ export function Navbar() {
         </nav>
 
         {/* Right side */}
-        <div className="flex items-center gap-2">
-          <Link href="/search">
-            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground">
+        <div className="flex items-center gap-1.5">
+          <Link href="/search" aria-label="Search attractions, events, and places">
+            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" aria-label="Search">
               <Search className="h-4.5 w-4.5" />
+            </Button>
+          </Link>
+
+          <Link href="/passport" aria-label="Digital Passport & Stamps">
+            <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" aria-label="Digital Passport">
+              <BookOpen className="h-4.5 w-4.5" />
             </Button>
           </Link>
 
@@ -176,7 +182,7 @@ export function Navbar() {
 
           {/* Mobile menu */}
           <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger render={<Button variant="ghost" size="icon" className="lg:hidden text-muted-foreground" />}>
+            <SheetTrigger render={<Button variant="ghost" size="icon" className="lg:hidden text-muted-foreground" aria-label="Open navigation menu" />}>
               <Menu className="h-5 w-5" />
             </SheetTrigger>
             <SheetContent side="right" className="w-72 p-0">
@@ -189,7 +195,7 @@ export function Navbar() {
                     Mangatarem
                   </Link>
                 </div>
-                <nav className="flex-1 p-4 space-y-1">
+                <nav aria-label="Mobile Navigation" className="flex-1 p-4 space-y-1">
                   {navLinks.map((link) => {
                     const href = user?.role === "admin" ? (adminTwins[link.href] ?? link.href) : link.href;
                     const active = pathname === href || pathname.startsWith(href);

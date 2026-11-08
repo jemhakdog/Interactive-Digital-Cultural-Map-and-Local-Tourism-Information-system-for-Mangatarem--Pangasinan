@@ -192,7 +192,7 @@ export default function LoginPage() {
               )}
 
               {/* Form Fields */}
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+              <form onSubmit={handleSubmit(onSubmit)} method="POST" className="space-y-4">
                 {/* Email */}
                 <div className="space-y-1.5">
                   <Label htmlFor="email" className="text-sm font-semibold">
@@ -206,7 +206,10 @@ export default function LoginPage() {
                       id="email"
                       type="email"
                       placeholder="you@example.com"
-                      autoComplete="email"
+                      autoComplete="username"
+                      autoCorrect="off"
+                      autoCapitalize="off"
+                      spellCheck={false}
                       className="pl-10 h-11 rounded-xl bg-background border-input text-sm"
                       {...register("email")}
                     />

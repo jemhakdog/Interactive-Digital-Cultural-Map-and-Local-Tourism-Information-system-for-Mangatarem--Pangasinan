@@ -82,6 +82,7 @@ async def get_room_messages(
     # Paginated messages
     msg_q = (
         select(ChatMessage)
+        .options(selectinload(ChatMessage.sender))
         .where(ChatMessage.chat_room_id == room_id)
         .order_by(ChatMessage.created_at.desc())
     )
@@ -94,10 +95,14 @@ async def get_room_messages(
 
     msg_data = []
     for msg in reversed(messages):
+        sender_name = "System"
+        if not msg.is_system_msg and msg.sender and msg.sender.username:
+            sender_name = msg.sender.username
+
         msg_data.append({
             "id": msg.id,
             "sender_id": msg.sender_id,
-            "sender_name": "System",
+            "sender_name": sender_name,
             "content": msg.content,
             "created_at": msg.created_at.isoformat() if msg.created_at else None,
             "is_system_msg": msg.is_system_msg,

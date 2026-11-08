@@ -122,6 +122,61 @@
   --sidebar-ring: oklch(0.65 0.18 148);
 }
 
+/* ── Scoped Public Theme (Earth & Canopy) ── */
+.public-theme {
+  --primary: oklch(0.38 0.12 150);
+  --primary-foreground: oklch(0.99 0.005 85);
+  --accent: oklch(0.62 0.16 48);
+  --accent-foreground: oklch(0.99 0.005 85);
+  --background: oklch(0.985 0.008 85);
+  --foreground: oklch(0.18 0.02 160);
+  --muted: oklch(0.94 0.012 85);
+  --muted-foreground: oklch(0.42 0.03 150);
+  --border: oklch(0.88 0.015 85);
+}
+
+.dark .public-theme {
+  --background: oklch(0.16 0.02 155);
+  --foreground: oklch(0.96 0.008 85);
+  --primary: oklch(0.55 0.14 150);
+  --accent: oklch(0.68 0.15 50);
+  --muted: oklch(0.22 0.02 155);
+  --border: oklch(0.28 0.02 155);
+}
+
+/* ── Accessibility & Utility Classes ── */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 100;
+  padding: 0.5rem 1rem;
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  font-weight: 500;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  transition: top 0.15s ease-in-out;
+}
+.skip-link:focus,
+.skip-link:focus-visible {
+  top: 1rem;
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.visually-hidden:where(:not(:focus-within, :active)) {
+  position: absolute !important;
+  clip-path: inset(50%) !important;
+  overflow: hidden !important;
+  width: 1px !important;
+  height: 1px !important;
+  margin: -1px !important;
+  padding: 0 !important;
+  border: 0 !important;
+  white-space: nowrap !important;
+}
+
 @layer base {
   * {
     @apply border-border;

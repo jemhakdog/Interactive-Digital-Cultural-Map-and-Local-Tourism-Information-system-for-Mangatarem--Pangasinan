@@ -1,7 +1,7 @@
 """Chat models — ported from modules/chat/models.py."""
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -20,7 +20,9 @@ class ChatRoom(Base):
     establishment_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("ESTABLISHMENT.id"), nullable=True, index=True
     )
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime | None] = mapped_column(
+        DateTime, default=lambda: datetime.now(UTC)
+    )
 
     barangay = relationship("BarangayInfo")
     establishment = relationship("Establishment")
@@ -38,10 +40,14 @@ class ChatParticipant(Base):
     user_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("USER.id"), nullable=False, index=True
     )
-    joined_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
-    last_read_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    joined_at: Mapped[datetime | None] = mapped_column(
+        DateTime, default=lambda: datetime.now(UTC)
+    )
+    last_read_at: Mapped[datetime | None] = mapped_column(
+        DateTime, default=lambda: datetime.now(UTC)
+    )
 
-    user = relationship("User")
+    user = relationship("User", back_populates="chat_memberships")
     room = relationship("ChatRoom", back_populates="participants")
 
 
@@ -57,9 +63,9 @@ class ChatMessage(Base):
     )
     content: Mapped[str] = mapped_column(Text, nullable=False)
     created_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, index=True
+        DateTime, default=lambda: datetime.now(UTC), index=True
     )
     is_system_msg: Mapped[bool] = mapped_column(Boolean, default=False)
 
-    sender = relationship("User")
+    sender = relationship("User", back_populates="sent_messages")
     room = relationship("ChatRoom", back_populates="messages")

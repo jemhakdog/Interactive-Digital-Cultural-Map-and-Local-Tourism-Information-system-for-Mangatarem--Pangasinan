@@ -1,7 +1,7 @@
 """Notifications models — ported from modules/notifications/models.py."""
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -18,7 +18,9 @@ class NewsletterSubscriber(Base):
     user_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("USER.id", ondelete="SET NULL"), nullable=True, index=True
     )
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime | None] = mapped_column(
+        DateTime, default=lambda: datetime.now(UTC)
+    )
 
     user = relationship("User", back_populates="newsletter_subscriptions")
 
@@ -33,7 +35,9 @@ class NewsletterHistory(Base):
     sender_id: Mapped[int | None] = mapped_column(
         Integer, ForeignKey("USER.id", ondelete="SET NULL"), nullable=True, index=True
     )
-    sent_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    sent_at: Mapped[datetime | None] = mapped_column(
+        DateTime, default=lambda: datetime.now(UTC)
+    )
 
     sender = relationship("User", back_populates="sent_newsletters")
 
@@ -50,7 +54,7 @@ class UserNotification(Base):
     link: Mapped[str | None] = mapped_column(String(200), nullable=True)
     is_read: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     created_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, index=True
+        DateTime, default=lambda: datetime.now(UTC), index=True
     )
 
     user = relationship("User", back_populates="notifications")

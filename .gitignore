@@ -100,3 +100,5 @@ Thumbs.db
 
 uvicorn.log
 .vercel
+.ag-kit-backups/
+*_report.md

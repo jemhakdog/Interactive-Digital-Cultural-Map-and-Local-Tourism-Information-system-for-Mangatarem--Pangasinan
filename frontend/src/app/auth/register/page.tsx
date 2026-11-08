@@ -229,7 +229,7 @@ export default function RegisterPage() {
                 </div>
               )}
 
-              <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+              <form onSubmit={handleSubmit(onSubmit)} method="POST" className="space-y-5">
                 {/* Role selection tab row */}
                 <div className="space-y-2">
                   <Label className="text-xs font-bold text-muted-foreground uppercase tracking-wider">
@@ -325,7 +325,10 @@ export default function RegisterPage() {
                         id="email"
                         type="email"
                         placeholder="you@example.com"
-                        autoComplete="email"
+                        autoComplete="username"
+                        autoCorrect="off"
+                        autoCapitalize="off"
+                        spellCheck={false}
                         className="pl-10 h-11 rounded-xl bg-background border-input text-sm"
                         {...register("email")}
                       />

@@ -1,7 +1,7 @@
 """Attractions models — ported from modules/attractions/models.py."""
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import (
@@ -60,7 +60,7 @@ class Attraction(Base):
         Integer, ForeignKey("USER.id"), nullable=True, index=True
     )
     created_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, index=True
+        DateTime, default=lambda: datetime.now(UTC), index=True
     )
 
     # Relationships
@@ -96,10 +96,10 @@ class Review(Base):
     )
     photo_urls: Mapped[list | None] = mapped_column(JSON, nullable=True, default=list)
     created_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, index=True
+        DateTime, default=lambda: datetime.now(UTC), index=True
     )
     updated_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
     )
 
     # Relationships
@@ -132,7 +132,9 @@ class UserFavorite(Base):
         Integer, ForeignKey("EVENT.id", ondelete="CASCADE"), nullable=True, index=True
     )
     status: Mapped[str] = mapped_column(String(20), default="favorite", index=True)
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime | None] = mapped_column(
+        DateTime, default=lambda: datetime.now(UTC)
+    )
 
     user = relationship("User", back_populates="favorites")
 

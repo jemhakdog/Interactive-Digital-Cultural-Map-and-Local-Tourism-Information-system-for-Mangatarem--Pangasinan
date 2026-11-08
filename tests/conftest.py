@@ -90,7 +90,7 @@ def auth_headers(client):
                 "role": role,
             },
         )
-        assert resp.status_code == 200, resp.text
+        assert resp.status_code == 201, resp.text
         tokens = resp.json()
         return {"Authorization": f"Bearer {tokens['access_token']}"}
 

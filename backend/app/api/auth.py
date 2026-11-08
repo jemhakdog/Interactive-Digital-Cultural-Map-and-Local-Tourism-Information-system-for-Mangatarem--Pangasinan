@@ -1,23 +1,25 @@
 """Auth API router — login, register, refresh, me, logout."""
 from __future__ import annotations
 
-import base64
-import json
+import logging
 import secrets
-from datetime import UTC, datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
+from google.auth.exceptions import GoogleAuthError
 from google.auth.transport import requests as google_requests
 from google.oauth2 import id_token
 from jose import JWTError, jwt
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
+from werkzeug.security import generate_password_hash
 
 from backend.app.core.config import get_settings
 from backend.app.core.database import get_db
 from backend.app.core.dependencies import get_current_user
 from backend.app.models.barangay import BarangayInfo
+from backend.app.models.notifications import UserNotification
 from backend.app.models.user import User
 from backend.app.schemas.auth import (
     ForgotPasswordRequest,
@@ -30,6 +32,8 @@ from backend.app.schemas.auth import (
     UserResponse,
     UserRole,
 )
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 settings = get_settings()
@@ -169,30 +173,22 @@ async def register(body: RegisterRequest, db: Annotated[AsyncSession, Depends(ge
 @router.post("/google", response_model=TokenResponse)
 async def google_auth(body: GoogleAuthRequest, db: Annotated[AsyncSession, Depends(get_db)]):
     """Authenticate or register a user via Google OAuth credential."""
-    email: str | None = None
-    name: str | None = None
-
     try:
         idinfo = id_token.verify_oauth2_token(
             body.credential,
             google_requests.Request(),
-            settings.google_client_id,
+            audience=settings.google_client_id,
         )
-        email = idinfo.get("email")
-        name = idinfo.get("name") or idinfo.get("given_name")
-    except ValueError:
-        # Fallback decode if token format is JWT
-        try:
-            parts = body.credential.split(".")
-            if len(parts) >= 2:
-                padded = parts[1] + "=" * ((4 - len(parts[1]) % 4) % 4)
-                payload = json.loads(base64.urlsafe_b64decode(padded).decode("utf-8"))
-                email = payload.get("email")
-                name = payload.get("name") or payload.get("given_name")
-        except (KeyError, ValueError):
-            pass  # Malformed/unreadable payload — treated as an invalid credential below.
+    except (ValueError, GoogleAuthError):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid Google OAuth credential",
+        )
 
-    if not email:
+    email = idinfo.get("email")
+    name = idinfo.get("name") or idinfo.get("given_name")
+
+    if not email or idinfo.get("email_verified") is not True:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid Google OAuth credential",
@@ -230,7 +226,21 @@ async def forgot_password(body: ForgotPasswordRequest, db: Annotated[AsyncSessio
     result = await db.execute(select(User).where(User.email == body.email))
     user = result.scalar_one_or_none()
     if user:
-        user.create_reset_token()
+        token = user.create_reset_token()
+        reset_link = f"/auth/reset-password?token={token}"
+        logger.info(
+            "Password reset link generated for user_id=%s (email=%s): %s",
+            user.id,
+            user.email,
+            reset_link,
+        )
+        notification = UserNotification(
+            user_id=user.id,
+            title="Password Reset Request",
+            message=f"A password reset was requested for your account. Reset link: {reset_link}",
+            link=reset_link,
+        )
+        db.add(notification)
         await db.flush()
     return {"detail": "If an account with that email exists, a password reset link has been generated."}
 
@@ -238,19 +248,29 @@ async def forgot_password(body: ForgotPasswordRequest, db: Annotated[AsyncSessio
 @router.post("/reset-password", status_code=status.HTTP_200_OK)
 async def reset_password(body: ResetPasswordRequest, db: Annotated[AsyncSession, Depends(get_db)]):
     """Reset password using a valid reset token."""
-    result = await db.execute(select(User).where(User.reset_token == body.token))
-    user = result.scalar_one_or_none()
-
-    if user is None or not user.is_reset_token_valid:
+    now = datetime.now(UTC).replace(tzinfo=None)
+    hashed_password = generate_password_hash(body.password)
+    stmt = (
+        update(User)
+        .where(
+            User.reset_token.is_not(None),
+            User.reset_token == body.token,
+            User.reset_token_used.is_(False),
+            User.reset_token_expires_at > now,
+        )
+        .values(
+            password=hashed_password,
+            reset_token_used=True,
+        )
+    )
+    res = await db.execute(stmt)
+    await db.flush()
+    if res.rowcount == 0:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid or expired reset token",
         )
-
-    user.set_password(body.password)
-    user.reset_token_used = True
-    await db.flush()
-    return {"detail": "Password has been successfully updated."}
+    return {"detail": "Password has been successfully reset. You may now log in."}
 
 
 @router.get("/me", response_model=UserResponse)

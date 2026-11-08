@@ -28,7 +28,7 @@ class User(Base):
     )
     is_approved: Mapped[bool] = mapped_column(Boolean, default=False, index=True)
     created_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, index=True
+        DateTime, default=lambda: datetime.now(UTC), index=True
     )
     reset_token: Mapped[str | None] = mapped_column(
         String(128), unique=True, nullable=True
@@ -40,7 +40,9 @@ class User(Base):
 
     # Relationships
     barangay = relationship("BarangayInfo", foreign_keys=[barangay_id], back_populates="residents")
-    managed_barangay_info = relationship("BarangayInfo", foreign_keys="[BarangayInfo.user_id]")
+    managed_barangay_info = relationship(
+        "BarangayInfo", foreign_keys="[BarangayInfo.user_id]", back_populates="manager"
+    )
     attractions = relationship("Attraction", foreign_keys="[Attraction.user_id]")
     events = relationship("Event", foreign_keys="[Event.user_id]")
     establishments = relationship("Establishment", foreign_keys="[Establishment.owner_id]")
@@ -56,8 +58,8 @@ class User(Base):
     check_ins = relationship("TouristCheckIn", back_populates="user", lazy=True, cascade="all, delete-orphan")
     reservations = relationship("Reservation", back_populates="user", lazy="dynamic")
     business_verification = relationship("BusinessVerification", back_populates="user", uselist=False)
-    chat_memberships = relationship("ChatParticipant")
-    sent_messages = relationship("ChatMessage")
+    chat_memberships = relationship("ChatParticipant", back_populates="user")
+    sent_messages = relationship("ChatMessage", back_populates="sender")
 
     def set_password(self, password: str) -> None:
         self.password = generate_password_hash(password)

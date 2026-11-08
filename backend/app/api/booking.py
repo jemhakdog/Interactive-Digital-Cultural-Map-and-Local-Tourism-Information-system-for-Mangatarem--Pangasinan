@@ -10,7 +10,8 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
-from sqlalchemy import func, select
+from sqlalchemy import case, func, select, update
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -103,7 +104,7 @@ async def reserve_slot(
     if not asset or asset.status != "active":
         raise HTTPException(status_code=400, detail="Asset not available")
 
-    # Get or create slot
+    # Get or create slot safely handling race conditions
     slot_result = await db.execute(
         select(BookingSlot).where(
             BookingSlot.bookable_asset_id == asset.id,
@@ -112,14 +113,25 @@ async def reserve_slot(
     )
     slot = slot_result.scalar_one_or_none()
     if not slot:
-        slot = BookingSlot(
-            bookable_asset_id=asset.id,
-            date=reserve_date,
-            total_capacity=asset.daily_capacity,
-            booked_count=0,
-        )
-        db.add(slot)
-        await db.flush()
+        try:
+            async with db.begin_nested():
+                slot = BookingSlot(
+                    bookable_asset_id=asset.id,
+                    date=reserve_date,
+                    total_capacity=asset.daily_capacity,
+                    booked_count=0,
+                )
+                db.add(slot)
+                await db.flush()
+        except IntegrityError:
+            # Another concurrent request already created the slot; retrieve it
+            slot_result = await db.execute(
+                select(BookingSlot).where(
+                    BookingSlot.bookable_asset_id == asset.id,
+                    BookingSlot.date == reserve_date,
+                )
+            )
+            slot = slot_result.scalar_one()
 
     # Idempotency check
     existing_result = await db.execute(
@@ -139,20 +151,57 @@ async def reserve_slot(
             "idempotent": True,
         }
 
-    # Check capacity
-    if (slot.total_capacity - slot.booked_count) < body.party_size:
+    # Atomic capacity check and allocation
+    stmt = (
+        update(BookingSlot)
+        .where(
+            BookingSlot.id == slot.id,
+            BookingSlot.booked_count + body.party_size <= BookingSlot.total_capacity,
+        )
+        .values(booked_count=BookingSlot.booked_count + body.party_size)
+        .returning(BookingSlot.id, BookingSlot.booked_count)
+    )
+    update_result = await db.execute(stmt)
+    updated_slot = update_result.fetchone()
+    if updated_slot is None:
         raise HTTPException(status_code=400, detail="Not enough capacity available")
 
-    slot.booked_count += body.party_size
-    reservation = Reservation(
-        user_id=user.id,
-        booking_slot_id=slot.id,
-        party_size=body.party_size,
-        primary_contact=body.contact,
-        status="pending" if asset.requires_approval else "confirmed",
-    )
-    db.add(reservation)
-    await db.flush()
+    # Create reservation
+    try:
+        async with db.begin_nested():
+            reservation = Reservation(
+                user_id=user.id,
+                booking_slot_id=slot.id,
+                party_size=body.party_size,
+                primary_contact=body.contact,
+                status="pending" if asset.requires_approval else "confirmed",
+            )
+            db.add(reservation)
+            await db.flush()
+    except IntegrityError:
+        # Revert atomic capacity increment if duplicate reservation raced
+        await db.execute(
+            update(BookingSlot)
+            .where(BookingSlot.id == slot.id)
+            .values(booked_count=BookingSlot.booked_count - body.party_size)
+        )
+        existing_result = await db.execute(
+            select(Reservation).where(
+                Reservation.user_id == user.id,
+                Reservation.booking_slot_id == slot.id,
+                Reservation.status != "cancelled",
+            )
+        )
+        existing = existing_result.scalar_one_or_none()
+        if existing:
+            return {
+                "success": True,
+                "reservation_id": existing.id,
+                "status": existing.status,
+                "qr_token": existing.qr_code_token,
+                "idempotent": True,
+            }
+        raise
 
     return {
         "success": True,
@@ -195,13 +244,21 @@ async def update_status(
             detail=f"Cannot transition from {reservation.status} to {body.status}",
         )
 
-    # Roll back capacity on cancel
+    # Roll back capacity atomically on cancel
     if body.status == "cancelled":
-        slot_result = await db.execute(
-            select(BookingSlot).where(BookingSlot.id == reservation.booking_slot_id)
+        await db.execute(
+            update(BookingSlot)
+            .where(BookingSlot.id == reservation.booking_slot_id)
+            .values(
+                booked_count=case(
+                    (
+                        BookingSlot.booked_count >= reservation.party_size,
+                        BookingSlot.booked_count - reservation.party_size,
+                    ),
+                    else_=0,
+                )
+            )
         )
-        slot = slot_result.scalar_one()
-        slot.booked_count = max(0, slot.booked_count - reservation.party_size)
 
     reservation.status = body.status
     return {"success": True, "new_status": reservation.status}

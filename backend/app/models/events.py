@@ -1,7 +1,7 @@
 """Event model — ported from modules/events/models.py."""
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import Boolean, DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import JSON
@@ -30,7 +30,7 @@ class Event(Base):
         Integer, ForeignKey("USER.id"), nullable=True, index=True
     )
     created_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, index=True
+        DateTime, default=lambda: datetime.now(UTC), index=True
     )
 
     # Relationships

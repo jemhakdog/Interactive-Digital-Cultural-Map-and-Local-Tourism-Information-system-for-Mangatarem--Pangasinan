@@ -1,7 +1,7 @@
 """Document model — admin document vault (new model for /api/documents)."""
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import DateTime, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -18,8 +18,8 @@ class Document(Base):
     content: Mapped[str | None] = mapped_column(Text, nullable=True)
     file_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     created_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, index=True
+        DateTime, default=lambda: datetime.now(UTC), index=True
     )
     updated_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow
+        DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
     )

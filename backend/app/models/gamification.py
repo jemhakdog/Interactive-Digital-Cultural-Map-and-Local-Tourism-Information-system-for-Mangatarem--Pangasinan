@@ -1,7 +1,7 @@
 """Gamification models — ported from modules/gamification/models.py."""
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import (
     DateTime,
@@ -28,7 +28,9 @@ class AchievementBadge(Base):
     required_visits: Mapped[int] = mapped_column(Integer, default=1)
     target_locations: Mapped[list] = mapped_column(JSON, nullable=False)
     reward_promo: Mapped[dict | None] = mapped_column(JSON, nullable=True)
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime | None] = mapped_column(
+        DateTime, default=lambda: datetime.now(UTC)
+    )
 
     unlocks = relationship("UserPassport", back_populates="badge")
 
@@ -44,7 +46,7 @@ class UserPassport(Base):
         Integer, ForeignKey("ACHIEVEMENT_BADGE.id", ondelete="CASCADE"), nullable=False, index=True
     )
     unlocked_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, index=True
+        DateTime, default=lambda: datetime.now(UTC), index=True
     )
 
     user = relationship("User", back_populates="passports")
@@ -72,7 +74,7 @@ class TouristCheckIn(Base):
     longitude: Mapped[float] = mapped_column(Float, nullable=False)
     distance_meters: Mapped[float | None] = mapped_column(Float, nullable=True)
     verified_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, index=True
+        DateTime, default=lambda: datetime.now(UTC), index=True
     )
 
     user = relationship("User", back_populates="check_ins")

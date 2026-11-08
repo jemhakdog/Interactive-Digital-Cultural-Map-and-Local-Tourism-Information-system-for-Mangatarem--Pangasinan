@@ -1,7 +1,7 @@
 """BarangayInfo model — ported from modules/barangay/models.py."""
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.dialects.postgresql import JSON
@@ -26,12 +26,18 @@ class BarangayInfo(Base):
     unique_features: Mapped[str | None] = mapped_column(Text, nullable=True)
 
     # Metadata
-    user_id: Mapped[int | None] = mapped_column(Integer, ForeignKey("USER.id"), nullable=True)
+    user_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey("USER.id", use_alter=True, name="fk_barangay_info_user_id"),
+        nullable=True,
+    )
 
     # JSON fields (use JSON type for SQLite compat; switch to postgresql.JSON in prod)
     map_geo_json: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     location_data: Mapped[dict | None] = mapped_column(JSON, nullable=True)
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime | None] = mapped_column(
+        DateTime, default=lambda: datetime.now(UTC)
+    )
 
     # Relationships
     manager = relationship("User", foreign_keys=[user_id], back_populates="managed_barangay_info")

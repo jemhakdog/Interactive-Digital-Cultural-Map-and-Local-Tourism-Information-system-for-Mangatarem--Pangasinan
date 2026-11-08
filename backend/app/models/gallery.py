@@ -1,7 +1,7 @@
 """GalleryItem model — ported from modules/gallery/models.py."""
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -21,5 +21,5 @@ class GalleryItem(Base):
     )
     status: Mapped[str] = mapped_column(String(20), default="pending", index=True)
     created_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, index=True
+        DateTime, default=lambda: datetime.now(UTC), index=True
     )

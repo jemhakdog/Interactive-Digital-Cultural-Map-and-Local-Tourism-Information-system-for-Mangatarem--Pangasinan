@@ -1,9 +1,17 @@
 import type { Metadata } from "next";
-import { Poppins, Geist_Mono } from "next/font/google";
+import { Cormorant_Garamond, Poppins, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
+import { ConciergeChatBubble } from "@/components/layout/concierge-chat-bubble";
+
+const cormorant = Cormorant_Garamond({
+  variable: "--font-heading",
+  subsets: ["latin"],
+  weight: ["500", "600", "700"],
+  display: "swap",
+});
 
 const poppins = Poppins({
   variable: "--font-geist-sans",
@@ -44,12 +52,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           }}
         />
       </head>
-      <body className={`${poppins.variable} ${geistMono.variable} font-sans antialiased`}>
+      <body className={`${poppins.variable} ${geistMono.variable} ${cormorant.variable} font-sans antialiased`}>
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <AuthProvider>
           <div className="flex min-h-screen flex-col">
             <Navbar />
-            <main className="flex-1">{children}</main>
+            <main id="main-content" tabIndex={-1} className="flex-1 outline-none">
+              {children}
+            </main>
             <Footer />
+            <ConciergeChatBubble />
           </div>
         </AuthProvider>
       </body>

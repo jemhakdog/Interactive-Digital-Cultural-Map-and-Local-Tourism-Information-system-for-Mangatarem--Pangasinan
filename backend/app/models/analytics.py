@@ -1,7 +1,7 @@
 """Analytics models — ported from modules/analytics/models.py."""
 from __future__ import annotations
 
-from datetime import date, datetime
+from datetime import UTC, date, datetime
 
 from sqlalchemy import (
     Boolean,
@@ -27,7 +27,7 @@ class AnalyticsPageView(Base):
     page_name: Mapped[str | None] = mapped_column(String(100), nullable=True, index=True)
     user_id: Mapped[int | None] = mapped_column(Integer, nullable=True, index=True)
     timestamp: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, index=True
+        DateTime, default=lambda: datetime.now(UTC), index=True
     )
     session_id: Mapped[str | None] = mapped_column(String(100), nullable=True)
     ip_address: Mapped[str | None] = mapped_column(String(45), nullable=True)
@@ -49,7 +49,7 @@ class DatabaseAuditLog(Base):
     query_summary: Mapped[str | None] = mapped_column(String(500), nullable=True)
     status: Mapped[str] = mapped_column(String(20), default="success", index=True)
     created_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, index=True
+        DateTime, default=lambda: datetime.now(UTC), index=True
     )
 
     user = relationship("User", back_populates="audit_logs")
@@ -101,7 +101,9 @@ class VisitorLog(Base):
         Integer, ForeignKey("USER.id"), nullable=True, index=True
     )
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime | None] = mapped_column(
+        DateTime, default=lambda: datetime.now(UTC)
+    )
 
     steward = relationship("User", foreign_keys=[logged_by])
     visitor_user = relationship("User", foreign_keys=[visitor_user_id])

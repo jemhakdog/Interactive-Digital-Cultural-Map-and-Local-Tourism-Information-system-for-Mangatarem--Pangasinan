@@ -1,7 +1,7 @@
 """Business models — ported from modules/business/models.py."""
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import (
     Boolean,
@@ -49,7 +49,7 @@ class Establishment(Base):
     rating_avg: Mapped[float] = mapped_column(Float, default=0)
     review_count: Mapped[int] = mapped_column(Integer, default=0)
     created_at: Mapped[datetime | None] = mapped_column(
-        DateTime, default=datetime.utcnow, index=True
+        DateTime, default=lambda: datetime.now(UTC), index=True
     )
 
     # Relationships
@@ -74,7 +74,9 @@ class EstablishmentRoom(Base):
     amenities: Mapped[dict | None] = mapped_column(JSON, nullable=True)
     image_urls: Mapped[list | None] = mapped_column(JSON, nullable=True)
     is_available: Mapped[bool] = mapped_column(Boolean, default=True)
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime | None] = mapped_column(
+        DateTime, default=lambda: datetime.now(UTC)
+    )
 
     establishment = relationship("Establishment", back_populates="rooms")
 
@@ -93,7 +95,9 @@ class EstablishmentMenuItem(Base):
     image_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     is_available: Mapped[bool] = mapped_column(Boolean, default=True)
     is_bestseller: Mapped[bool] = mapped_column(Boolean, default=False)
-    created_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    created_at: Mapped[datetime | None] = mapped_column(
+        DateTime, default=lambda: datetime.now(UTC)
+    )
 
     establishment = relationship("Establishment", back_populates="menu_items")
 
@@ -108,6 +112,8 @@ class BusinessVerification(Base):
     permit_document_url: Mapped[str] = mapped_column(String(500), nullable=False)
     other_document_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
     status: Mapped[str] = mapped_column(String(20), default="pending")
-    submitted_at: Mapped[datetime | None] = mapped_column(DateTime, default=datetime.utcnow)
+    submitted_at: Mapped[datetime | None] = mapped_column(
+        DateTime, default=lambda: datetime.now(UTC)
+    )
 
     user = relationship("User", back_populates="business_verification")
