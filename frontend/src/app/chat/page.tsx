@@ -20,7 +20,7 @@ export default function ChatPage() {
 
   useEffect(() => {
     if (!user) return;
-    fetchAPI("/api/chat")
+    fetchAPI("/api/chat/")
       .then((data) => {
         const d = data as Record<string, unknown>;
         setRooms(((d.rooms ?? d.items ?? d) as { id: string | number; name?: string; title?: string; description?: string; category?: string; participant_count?: number }[]) ?? []);
@@ -50,7 +50,11 @@ export default function ChatPage() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {rooms.map((room) => (
-            <Card key={String(room.id)} className="hover:shadow-md transition-shadow cursor-pointer">
+            <Card
+              key={String(room.id)}
+              className="hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => router.push(`/chat/${room.id}`)}
+            >
               <CardContent className="p-4">
                 <div className="flex items-start justify-between">
                   <div>

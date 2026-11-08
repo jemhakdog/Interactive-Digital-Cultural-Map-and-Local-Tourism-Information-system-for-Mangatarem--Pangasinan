@@ -39,8 +39,11 @@ export function NewsletterSubscribe() {
       <div className="relative flex-1">
         <Mail className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input
+          id="newsletter-email"
+          name="email"
           type="email"
           required
+          aria-label="Email address for newsletter"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           placeholder="you@example.com"

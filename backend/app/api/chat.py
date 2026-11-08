@@ -7,7 +7,7 @@ from __future__ import annotations
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -27,24 +27,35 @@ from backend.app.schemas.chat import (
 router = APIRouter()
 
 
-@router.get("/", summary="List chat rooms for current user")
+@router.get("", summary="List chat rooms for current user")
+@router.get("/", summary="List chat rooms for current user", include_in_schema=False)
 async def list_rooms(
     db: Annotated[AsyncSession, Depends(get_db)],
     user: Annotated[User, Depends(get_current_user)],
 ):
-    """Return rooms the current user is a participant of."""
+    """Return rooms the current user is a participant of plus public/general/barangay channels."""
     part_q = select(ChatParticipant.chat_room_id).where(ChatParticipant.user_id == user.id)
     room_ids = (await db.execute(part_q)).scalars().all()
 
-    if not room_ids:
-        return {"status": "success", "rooms": []}
+    conditions = [ChatRoom.type.in_(["public", "general", "barangay"])]
+    if room_ids:
+        conditions.append(ChatRoom.id.in_(room_ids))
 
-    rooms_q = select(ChatRoom).where(ChatRoom.id.in_(room_ids))
+    rooms_q = (
+        select(ChatRoom)
+        .options(selectinload(ChatRoom.barangay))
+        .where(or_(*conditions))
+    )
     rooms = (await db.execute(rooms_q)).scalars().all()
 
     room_data = []
     for r in rooms:
-        name = f"Room {r.id}"
+        if r.type in ("public", "general"):
+            name = "General Community & Visitor Desk"
+        elif r.barangay:
+            name = f"{r.barangay.name} Community"
+        else:
+            name = f"Room {r.id}"
         room_data.append({
             "id": r.id,
             "type": r.type,
@@ -76,7 +87,8 @@ async def get_room_messages(
         )
     )
     is_participant = part_result.scalar_one_or_none()
-    if not is_participant and room.type != "barangay":
+    is_public = room.type in ("public", "general", "barangay")
+    if not is_participant and not is_public:
         raise HTTPException(status_code=403, detail="Not authorized to view this room")
 
     # Paginated messages
@@ -138,7 +150,8 @@ async def send_message(
             ChatParticipant.user_id == user.id,
         )
     )
-    if not part_result.scalar_one_or_none() and room.type != "barangay":
+    is_public = room.type in ("public", "general", "barangay")
+    if not part_result.scalar_one_or_none() and not is_public:
         raise HTTPException(status_code=403, detail="Not a participant of this room")
 
     msg = ChatMessage(

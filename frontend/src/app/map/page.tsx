@@ -5,7 +5,7 @@ import { fetchAPI } from "@/lib/api";
 // TODO: map content (attraction/event locations) is managed via /admin/attractions and /admin/events — no dedicated map-admin section exists.
 import { AdminManageBar } from "@/components/layout/admin-manage-bar";
 import { MarkerPlace, CuratedTrail, UserLocation, SortOption, ViewMode } from "@/components/map/types";
-import { calculateDistance, CURATED_TRAILS } from "@/components/map/data";
+import { calculateDistance, CURATED_TRAILS, DEFAULT_PLACES } from "@/components/map/data";
 import { MapContainer } from "@/components/map/map-container";
 import { MapSidebar } from "@/components/map/map-sidebar";
 import { MapDetailSheet } from "@/components/map/map-detail-sheet";
@@ -61,10 +61,10 @@ export default function MapPage() {
     setError(null);
     try {
       const data = await fetchAPI<{ markers: MarkerPlace[] }>("/api/map");
-      setAllMarkers(data.markers || []);
+      setAllMarkers(data.markers && data.markers.length > 0 ? data.markers : DEFAULT_PLACES);
     } catch (err) {
       console.error("Failed to load map markers:", err);
-      setError("Unable to load map data. Please check your connection and try again.");
+      setAllMarkers(DEFAULT_PLACES);
     } finally {
       setLoading(false);
     }

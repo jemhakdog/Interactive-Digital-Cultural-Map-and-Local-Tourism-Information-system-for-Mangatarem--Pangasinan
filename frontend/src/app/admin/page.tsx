@@ -60,9 +60,9 @@ export default function AdminPage() {
     if (!user || user.role !== "admin") return;
 
     Promise.allSettled([
-      fetchAPI("/api/attractions").then((d) => (d as { items?: unknown[] }).items?.length ?? 0),
-      fetchAPI("/api/events").then((d) => (d as { items?: unknown[] }).items?.length ?? 0),
-      fetchAPI("/api/business").then((d) => (d as { items?: unknown[] }).items?.length ?? 0),
+      fetchAPI<Record<string, unknown>>("/api/attractions/").then((d) => (d.attractions as unknown[] | undefined)?.length ?? (d.items as unknown[] | undefined)?.length ?? 0),
+      fetchAPI<Record<string, unknown>>("/api/events/").then((d) => (d.events as unknown[] | undefined)?.length ?? (d.items as unknown[] | undefined)?.length ?? 0),
+      fetchAPI<Record<string, unknown>>("/api/business/").then((d) => (d.establishments as unknown[] | undefined)?.length ?? (d.items as unknown[] | undefined)?.length ?? 0),
       fetchAPI<{ total: number }>("/api/admin/users?per_page=1").then((d) => d.total).catch(() => 0),
       fetchAPI<{ merchants?: unknown[] }>("/api/admin/merchants/pending").then((d) => d.merchants?.length ?? 0).catch(() => 0),
       fetchAPI<{ reviews?: Array<{ status?: string }> }>("/api/admin/reviews")

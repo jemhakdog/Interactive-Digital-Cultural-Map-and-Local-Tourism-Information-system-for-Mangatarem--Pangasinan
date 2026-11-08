@@ -51,7 +51,7 @@ export default function ChatRoomPage() {
     setLoading(true);
     Promise.all([
       fetchAPI(`/api/chat/${id}`).catch(() => null),
-      fetchAPI(`/api/chat`).catch(() => null),
+      fetchAPI(`/api/chat/`).catch(() => null),
     ])
       .then(([roomData, roomsData]) => {
         const rd = roomData as Record<string, unknown> | null;
