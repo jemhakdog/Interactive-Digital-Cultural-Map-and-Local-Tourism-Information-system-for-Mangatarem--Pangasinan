@@ -319,9 +319,9 @@ async def analytics_overview(
 
     stewards_map = {}
     if steward_ids:
-        res = await db.execute(select(User.id, User.name, User.username).where(User.id.in_(steward_ids)))
+        res = await db.execute(select(User.id, User.username).where(User.id.in_(steward_ids)))
         for row in res.all():
-            stewards_map[row.id] = row.name or row.username
+            stewards_map[row.id] = row.username
 
     recent_logs_data = []
     for l in recent_logs_res:

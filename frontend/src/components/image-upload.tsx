@@ -27,6 +27,7 @@ export function ImageUpload({ onUpload, multiple = false, accept = "image/*" }: 
     // Upload to server
     setUploading(true);
     const uploadedUrls: string[] = [];
+    const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
     Promise.all(
       files.map(async (file) => {
@@ -34,14 +35,17 @@ export function ImageUpload({ onUpload, multiple = false, accept = "image/*" }: 
         formData.append("file", file);
 
         try {
-          const res = await fetch(`${API_BASE}/api/uploads/single`, {
+          const res = await fetch(`${API_BASE}/api/uploads/image`, {
             method: "POST",
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
             body: formData,
           });
 
           if (res.ok) {
             const data = await res.json();
             uploadedUrls.push(data.url || data.path);
+          } else {
+            console.error(`Upload failed with status ${res.status}`);
           }
         } catch (err) {
           console.error("Upload failed:", err);

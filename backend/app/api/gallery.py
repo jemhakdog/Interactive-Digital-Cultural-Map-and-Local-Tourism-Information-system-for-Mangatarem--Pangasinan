@@ -13,6 +13,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.core.database import get_db
+from backend.app.core.dependencies import get_current_user
 from backend.app.models.gallery import GalleryItem
 from backend.app.models.user import User
 
@@ -23,7 +24,6 @@ class GalleryItemCreate(BaseModel):
     type: str = Field(default="photo", description="photo or video")
     url: str = Field(..., description="Direct media URL")
     caption: str | None = Field(default=None, description="Media caption or title")
-    user_id: int | None = None
 
 
 @router.get("/", summary="List approved gallery items")
@@ -97,13 +97,14 @@ async def list_gallery(
 async def create_gallery_item(
     payload: GalleryItemCreate,
     db: Annotated[AsyncSession, Depends(get_db)],
+    current_user: Annotated[User, Depends(get_current_user)],
 ):
     """Submit a new media item for moderation."""
     new_item = GalleryItem(
         type=payload.type,
         url=payload.url,
         caption=payload.caption,
-        user_id=payload.user_id,
+        user_id=current_user.id,
         status="pending",
     )
     db.add(new_item)

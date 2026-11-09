@@ -8,6 +8,7 @@ dependencies = [
     # --- HTTP / app framework (FastAPI; Flask migrated away) ---
     "fastapi",
     "uvicorn[standard]",
+    "httpx",
     # --- Database / ORM ---
     "sqlalchemy[asyncio]",
     "aiosqlite",

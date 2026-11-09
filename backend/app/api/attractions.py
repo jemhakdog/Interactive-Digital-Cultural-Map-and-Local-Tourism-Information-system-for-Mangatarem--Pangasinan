@@ -4,12 +4,14 @@ Migrated from modules/attractions/routes.py (Flask) to FastAPI.
 """
 from __future__ import annotations
 
+import math
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
 from sqlalchemy import func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from backend.app.core.database import get_db
 from backend.app.core.dependencies import get_current_active_user, require_admin
@@ -58,11 +60,21 @@ async def _get_rating(attraction_id: int, db: AsyncSession) -> float | None:
     return round(avg_rating, 1) if avg_rating else None
 
 
-async def _attraction_to_dict(a: Attraction, db: AsyncSession) -> dict:
-    barangay_name = None
-    if a.barangay_id:
-        b = await db.get(BarangayInfo, a.barangay_id)
-        barangay_name = b.name if b else None
+async def _attraction_to_dict(
+    a: Attraction,
+    db: AsyncSession,
+    rating: float | None = None,
+    barangay_name: str | None = None,
+) -> dict:
+    if barangay_name is None:
+        if hasattr(a, "barangay") and a.barangay:
+            barangay_name = a.barangay.name
+        elif a.barangay_id:
+            b = await db.get(BarangayInfo, a.barangay_id)
+            barangay_name = b.name if b else None
+
+    if rating is None:
+        rating = await _get_rating(a.id, db)
 
     return {
         "id": a.id,
@@ -87,7 +99,7 @@ async def _attraction_to_dict(a: Attraction, db: AsyncSession) -> dict:
         "directions": a.directions,
         "osm_alternatives": a.osm_alternatives,
         "heritage_profile_id": a.heritage_profile_id,
-        "rating": await _get_rating(a.id, db),
+        "rating": rating,
         "created_at": a.created_at.isoformat() if a.created_at else None,
     }
 
@@ -156,8 +168,8 @@ async def list_attractions(
 ):
     stmt = (
         select(Attraction)
+        .options(selectinload(Attraction.barangay))
         .where(Attraction.status == "approved")
-        .order_by(Attraction.is_featured.desc(), Attraction.name)
     )
 
     if category and category != "all":
@@ -169,6 +181,18 @@ async def list_attractions(
     if is_featured is not None:
         stmt = stmt.where(Attraction.is_featured == is_featured)
 
+    # Spatial bounding box pre-filter when lat/lng is provided
+    if lat is not None and lng is not None:
+        lat_delta = radius / 111.0
+        cos_lat = max(math.cos(math.radians(lat)), 0.01)
+        lng_delta = radius / (111.0 * cos_lat)
+        stmt = stmt.where(
+            Attraction.latitude.between(lat - lat_delta, lat + lat_delta),
+            Attraction.longitude.between(lng - lng_delta, lng + lng_delta),
+        )
+
+    stmt = stmt.order_by(Attraction.is_featured.desc(), Attraction.name)
+
     # Count total for pagination
     count_stmt = select(func.count()).select_from(stmt.subquery())
     total = (await db.execute(count_stmt)).scalar() or 0
@@ -178,9 +202,28 @@ async def list_attractions(
     result = await db.execute(stmt)
     attractions = result.scalars().all()
 
+    # Batch query ratings
+    att_ids = [a.id for a in attractions]
+    ratings_map: dict[int, float] = {}
+    if att_ids:
+        r_stmt = (
+            select(Review.attraction_id, func.avg(Review.rating))
+            .where(
+                Review.attraction_id.in_(att_ids),
+                Review.status == "approved",
+                Review.parent_id.is_(None),
+                Review.rating.isnot(None),
+            )
+            .group_by(Review.attraction_id)
+        )
+        for att_id, avg_r in (await db.execute(r_stmt)).all():
+            if avg_r:
+                ratings_map[att_id] = round(float(avg_r), 1)
+
     items = []
     for a in attractions:
-        d = await _attraction_to_dict(a, db)
+        b_name = a.barangay.name if getattr(a, "barangay", None) else None
+        d = await _attraction_to_dict(a, db, rating=ratings_map.get(a.id), barangay_name=b_name)
         if lat is not None and lng is not None and a.latitude and a.longitude:
             dist = _haversine(lat, lng, a.latitude, a.longitude)
             d["distance"] = round(dist, 2)

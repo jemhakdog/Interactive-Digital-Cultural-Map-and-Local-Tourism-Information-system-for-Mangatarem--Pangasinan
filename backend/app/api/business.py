@@ -106,6 +106,16 @@ async def list_establishments(
             )
         )
 
+    # Spatial bounding box pre-filter when lat/lng is provided
+    if lat is not None and lng is not None:
+        lat_delta = radius / 111.0
+        cos_lat = max(math.cos(math.radians(lat)), 0.01)
+        lng_delta = radius / (111.0 * cos_lat)
+        stmt = stmt.where(
+            Establishment.latitude.between(lat - lat_delta, lat + lat_delta),
+            Establishment.longitude.between(lng - lng_delta, lng + lng_delta),
+        )
+
     # Count
     count_stmt = select(func.count()).select_from(stmt.subquery())
     total = (await db.execute(count_stmt)).scalar() or 0

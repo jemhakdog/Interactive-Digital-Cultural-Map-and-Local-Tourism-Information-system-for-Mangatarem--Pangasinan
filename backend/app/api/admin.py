@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from backend.app.core.database import get_db
 from backend.app.core.dependencies import require_admin
@@ -72,9 +73,13 @@ async def list_users(
 # ─────────────────────────────────────────────
 async def _review_to_dict(r: Review, db: AsyncSession) -> dict:
     """Map a Review row to the fields the admin reviews UI reads."""
-    user = await db.get(User, r.user_id)
+    user = getattr(r, "user", None) or (await db.get(User, r.user_id) if r.user_id else None)
     location = None
-    if r.attraction_id:
+    if getattr(r, "attraction", None):
+        location = r.attraction.name
+    elif getattr(r, "establishment", None):
+        location = r.establishment.name
+    elif r.attraction_id:
         att = await db.get(Attraction, r.attraction_id)
         location = att.name if att else None
     elif r.establishment_id:
@@ -103,7 +108,16 @@ async def list_reviews(
     db: Annotated[AsyncSession, Depends(get_db)],
 ) -> dict:
     """Return all reviews with their moderation status (admin only)."""
-    result = await db.execute(select(Review).order_by(Review.created_at.desc()))
+    stmt = (
+        select(Review)
+        .options(
+            selectinload(Review.user),
+            selectinload(Review.attraction),
+            selectinload(Review.establishment),
+        )
+        .order_by(Review.created_at.desc())
+    )
+    result = await db.execute(stmt)
     reviews = result.scalars().all()
     return {"reviews": [await _review_to_dict(r, db) for r in reviews]}
 

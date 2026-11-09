@@ -77,7 +77,14 @@ async def update_profile(
             )
         current_user.email = body.email
 
-    if body.name is not None:
+    # Guard against username collisions (excluding self).
+    if body.name is not None and body.name != current_user.username:
+        existing_name = await db.execute(select(User).where(User.username == body.name))
+        if existing_name.scalar_one_or_none() is not None:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail="Username already taken",
+            )
         current_user.username = body.name
 
     if body.password is not None:

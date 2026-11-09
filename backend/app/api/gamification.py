@@ -9,7 +9,7 @@ from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import insert, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.app.core.database import get_db
@@ -154,20 +154,16 @@ async def verify_checkin(
             already_checked_in=True,
         )
 
-    # Insert check-in (ON CONFLICT DO NOTHING)
-    conflict_cols = ["user_id", "attraction_id"] if body.type == "attraction" else ["user_id", "establishment_id"]
-    await db.execute(
-        insert(TouristCheckIn)
-        .values(
-            user_id=user.id,
-            attraction_id=body.id if body.type == "attraction" else None,
-            establishment_id=body.id if body.type == "establishment" else None,
-            latitude=body.latitude,
-            longitude=body.longitude,
-            distance_meters=distance,
-        )
-        .on_conflict_do_nothing(index_elements=conflict_cols)
+    # Insert check-in
+    checkin = TouristCheckIn(
+        user_id=user.id,
+        attraction_id=body.id if body.type == "attraction" else None,
+        establishment_id=body.id if body.type == "establishment" else None,
+        latitude=body.latitude,
+        longitude=body.longitude,
+        distance_meters=distance,
     )
+    db.add(checkin)
     await db.flush()
 
     # Badge unlock logic
@@ -189,11 +185,9 @@ async def verify_checkin(
     for badge in badges:
         req_ids = badge.target_locations or []
         if req_ids and all(rid in visited_ids for rid in req_ids):
-            await db.execute(
-                insert(UserPassport)
-                .values(user_id=user.id, badge_id=badge.id)
-                .on_conflict_do_nothing(index_elements=["user_id", "badge_id"])
-            )
+            passport_entry = UserPassport(user_id=user.id, badge_id=badge.id)
+            db.add(passport_entry)
+            await db.flush()
             unlocked_badges.append({
                 "title": badge.title,
                 "description": badge.description,

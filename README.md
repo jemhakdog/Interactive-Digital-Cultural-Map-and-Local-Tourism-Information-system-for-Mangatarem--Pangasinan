@@ -1,123 +1,56 @@
-# Interactive Digital Cultural Map and Local Tourism Information System for Mangatarem, Pangasinan
+# Mangatarem Cultural Map & Tourism Information System Blueprint
 
-A comprehensive, interactive web platform dedicated to cultural mapping, heritage preservation, and local tourism promotion for the municipality of **Mangatarem, Pangasinan, Philippines**.
+## System Overview
+A full-stack municipal digital cultural mapping, heritage preservation, and tourism information platform for Mangatarem, Pangasinan, Philippines. It integrates an asynchronous Python/FastAPI backend, Supabase/PostgreSQL and local SQLite data layers, and a Next.js (React 19) App Router frontend with MapLibre GL geospatial rendering.
 
-This system helps tourists, researchers, and locals explore Mangatarem's rich history, discover local attractions and businesses, plan travel routes, book guides or accommodations, interact in real-time forums, and participate in gamified cultural exploration.
+## Local Interface & Invariants
+- Dev orchestration scripts:
+  - `dev.sh` / `dev.bat` / `dev.ps1`: Concurrently launches FastAPI backend (`uvicorn backend.app.main:app`) on port 8000 and Next.js frontend on port 3000.
+  - Root `package.json`: NPM runner scripts (`dev`, `dev:backend`, `dev:frontend`, `build`).
+- Root Invariants:
+  - Python virtual environment runs on Python >=3.11 with dependencies managed in `pyproject.toml`.
+  - Next.js web application is located in `frontend/` and communicates with the backend via `NEXT_PUBLIC_API_URL` (default `http://localhost:8000`).
+
+## Subdirectories & System Boundaries
+- [`backend`](./backend/README.md): FastAPI service application blueprint (routers, core settings, database pooling, declarative models, and Pydantic schemas).
+- [`frontend`](./frontend/README.md): Next.js 16+ App Router web portal, MapLibre GL mapping components, and authentication context.
+- [`api`](./api/README.md): Vercel serverless ASGI entrypoint bridging Vercel Python runtime to `backend.app.main:app`.
+- [`db_schemas`](./db_schemas/README.md): Relational PostgreSQL/Supabase DDL schema specifications, constraints, and indexes.
+
+## Global Invariants
+- **Database Connection Strategy**: Asynchronous dialect (`sqlite+aiosqlite:///` locally or `postgresql+asyncpg:///` in production via Supabase transaction pooler port 6543 with `statement_cache_size=0`).
+- **Security & Authorization**: Bearer JWT tokens with HMAC SHA-256 signing via `SECRET_KEY`, Google OAuth token verification, and role-based access control (`admin`, `contributor`, `business_owner`, `user`).
+- **Geospatial & Fallback Resilience**: Map visualization utilizes MapLibre GL with Carto basemaps; falls back gracefully to curated local static points if backend is cold.
+
+## Global Side Effects
+- Mutates relational tables (PostgreSQL/SQLite) across 19 domain subsystems.
+- Stores uploaded media files locally in `backend/uploads/` (or cloud storage bucket).
+- Communicates with Google OAuth verification services.
+
+## System Verification
+- Backend tests: `.venv/bin/pytest tests/`
+- Frontend build & validation: `cd frontend && npm run build && npm run lint`
+- End-to-end dev runner: `npm run dev`
 
 ---
 
-## Table of Contents
+## Architectural Notes (Preserved)
 
-- [Key Features](#key-features)
-- [System Architecture](#system-architecture)
-- [Technology Stack](#technology-stack)
-- [How to Run the System](#how-to-run-the-system)
-- [Environment Configuration](#environment-configuration)
-- [Database Seed Data](#database-seed-data)
-- [Security Features](#security-features)
-
----
-
-## Key Features
-
+### Key Features
 - 🗺️ **Interactive Digital Cultural Map**: Dynamic visualization of barangays, heritage sites, local attractions, and businesses.
 - 🏛️ **Heritage & Cultural Profile**: Comprehensive records of local history, cultural properties, historical facts, and barangay information.
 - 🌴 **Tourism & Attractions Directory**: Complete directory of tourist spots, natural landscapes, and historical locations with reviews, photos, and ratings.
 - 💼 **Local Establishments & Businesses**: Verified directories for accommodations, restaurants, stores, and local tour guides, including menu/room booking details.
 - 📅 **Events & Festivals**: Local festival calendars, barangay events, and community activities.
 - 🗺️ **Smart Routing & Navigation**: Interactive route optimization tool helping visitors discover the most efficient paths between local spots.
-- 💬 **Real-Time Community Chat**: Built-in chat module using WebSockets (Socket.io) for discussion channels and tourist inquiries.
+- 💬 **Real-Time Community Chat**: Chat module for discussion channels and tourist inquiries.
 - 🎟️ **Booking & Reservations**: Built-in asset booking slots for scheduling guides, room reservations, and activity bookings.
 - 🏅 **Gamification Engine**: Explore Mangatarem to earn achievement badges, check-in to locations, and unlock achievements.
 - 📊 **Administration & Analytics**: Administrative dashboards for local government and tourism offices with user audit logs, page views, and visitor metrics.
 
----
-
-## System Architecture
-
-The application is built using a **Modular Monolith** structure, separating domain models, business logic, routes, and views into self-contained modules located in the `modules/` directory:
-
-- **auth**: User registration, role-based login (Tourists, Business Owners, Tour Guides, Admin), password resets.
-- **barangay**: Cultural profiles, festival schedules, and local history for Mangatarem's barangays.
-- **attractions**: Management of tourist spots, reviews, rating aggregates, and favorites.
-- **business**: Directory for accommodations, dining, retail, and local tour guides, including rooms and menu listings.
-- **heritage**: Cultural heritage documentation, profile questionnaires, and history logs.
-- **booking**: Resource scheduling for rooms, tour guides, and activities.
-- **chat**: WebSocket-based chatrooms for real-time discussion and inquiries.
-- **gamification**: Badge creation, user check-ins, leaderboards, and tourist passports.
-- **analytics**: Traffic monitoring, visitor counts, page views, and administrative audit logs.
-- **routing**: Tour itinerary planning and route optimization.
-- **notifications**: Event updates and newsletter distribution.
-
----
-
-## Technology Stack
-
+### Technology Stack
 - **Backend**: FastAPI (Python 3.11+) with async SQLAlchemy ORM, served by uvicorn.
 - **API**: REST under `/api/*` (19 routers), auto docs at `/docs`.
 - **Frontend**: Next.js (React 19) + Tailwind CSS v4 + MapLibre GL for the interactive map.
-- **Database**: SQLite (default for development/testing, stored in `instance/mangatarem.db`).
-- **Package Manager**: Astral `uv` for environment management and dependency installation.
-
----
-
-## How to Run the System
-
-1. **Install uv:**
-   ```powershell
-   powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
-   ```
-
-2. **Get the code (Clone or Download):**
-   ```bash
-   git clone https://github.com/jemhakdog/Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan.git
-   cd Interactive-Digital-Cultural-Map-and-Local-Tourism-Information-system-for-Mangatarem--Pangasinan
-   ```
-
-3. **Install dependencies:**
-   ```bash
-   uv sync
-   cd frontend && npm install && cd ..
-   ```
-
-4. **Run the system (backend + frontend):**
-   ```bash
-   npm run dev
-   ```
-   - Backend (FastAPI): `http://127.0.0.1:8000` — API docs at `http://127.0.0.1:8000/docs`
-   - Frontend (Next.js): `http://127.0.0.1:3000`
-
-   Or run separately:
-   ```bash
-   npm run dev:backend   # uvicorn backend.app.main:app --port 8000
-   npm run dev:frontend  # Next.js dev server
-   ```
-
----
-
-## Environment Configuration
-
-Create a `.env` file in the root directory and configure the environment variables as needed:
-
-```ini
-SECRET_KEY=your-secure-secret-key
-# Optional overrides (defaults shown):
-# DATABASE_URL=sqlite:///instance/mangatarem.db
-# CORS_ORIGINS=["http://localhost:3000","http://127.0.0.1:3000"]
-```
-
----
-
-## Database
-
-Tables are created automatically on startup (`create_all`) in development. The schema lives in `backend/app/models/`.
-
----
-
-## Security Features
-
-- **Authentication**: JWT (python-jose) access tokens + Google OAuth sign-in.
-- **Password Storage**: Werkzeug password hashing (bcrypt via passlib for legacy hashes).
-- **Input Validation**: Pydantic schemas validate all request bodies at the API boundary.
-- **File Uploads**: Extension + size whitelist on upload endpoints (`/api/uploads`).
-- **SQL Injection Prevention**: SQLAlchemy ORM parameterized queries.
+- **Database**: SQLite (default for development/testing, stored in `instance/mangatarem.db`) and PostgreSQL (Supabase) in production.
+- **Package Manager**: Astral `uv` and `npm`.

@@ -113,6 +113,7 @@ def _validate_and_save(file: UploadFile, allowed: set[str]) -> dict:
 
 
 @router.post("/image", summary="Upload a single image")
+@router.post("/single", summary="Upload a single image (alias)", include_in_schema=False)
 async def upload_image(
     file: UploadFile,
     user: Annotated[User, Depends(get_current_user)],

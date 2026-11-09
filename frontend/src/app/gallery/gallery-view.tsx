@@ -48,6 +48,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { API_BASE } from "@/lib/api";
 
 export interface GalleryItem {
   id: string | number;
@@ -678,11 +679,19 @@ export function GalleryView({ initialItems, availableBarangays = [] }: GalleryVi
         caption: formTitle,
       };
 
-      await fetch("/api/gallery", {
+      const token = typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+      const res = await fetch(`${API_BASE}/api/gallery/`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
         body: JSON.stringify(payload),
-      }).catch(() => {});
+      });
+
+      if (!res.ok) {
+        throw new Error(`Submission failed (${res.status})`);
+      }
 
       setSubmissionSuccess(true);
       setTimeout(() => {
@@ -693,8 +702,8 @@ export function GalleryView({ initialItems, availableBarangays = [] }: GalleryVi
         setFormContributor("");
         setFormStory("");
       }, 2000);
-    } catch {
-      // Fallback
+    } catch (err) {
+      console.error("Submission failed:", err);
     } finally {
       setIsSubmitting(false);
     }
